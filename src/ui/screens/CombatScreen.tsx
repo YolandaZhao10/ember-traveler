@@ -3,7 +3,7 @@ import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { ENEMIES } from '../../data/enemies';
 import { viewCard, type DescribeContext } from '../../engine/cards';
-import { EMBER_MAX, aliveEnemies, canPlayCard, enemyIntent, needsTarget } from '../../engine/combat';
+import { aliveEnemies, canPlayCard, enemyIntent, needsTarget } from '../../engine/combat';
 import type { CardInstance, CombatState, EnemyState } from '../../engine/types';
 import { Card } from '../components/Card';
 import { HpBar, StatusChips, intentText } from '../components/Common';
@@ -248,14 +248,10 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
 
 function EmberMeter({ value }: { value: number }) {
   return (
-    <div className="embermeter" onClick={() => openOverlay({ kind: 'status', status: 'emberHeart', amount: value, ownerName: '余烬资源' })} title="余烬：0–10，战斗内跨回合保留，战斗结束清空">
-      <div className="cells">
-        {Array.from({ length: EMBER_MAX }).map((_, i) => (
-          <div key={i} className={`cell ${i < value ? 'on' : ''}`} />
-        ))}
-      </div>
-      <div className="lbl">余烬 {value}/{EMBER_MAX}</div>
-    </div>
+    <button type="button" className="embermeter" onClick={() => openOverlay({ kind: 'ember' })} aria-label={`余烬 ${value}，查看资源说明`} title="余烬：战斗内跨回合保留，战斗结束清空">
+      <span className="ember-current"><span className="ember-icon" aria-hidden="true">🔥</span><strong>{value}</strong></span>
+      <span className="lbl">余烬</span>
+    </button>
   );
 }
 

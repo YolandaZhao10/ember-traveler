@@ -871,26 +871,23 @@ h3 {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  min-width: 82px;
+  padding: 5px 8px;
+  border: 1px solid #95652f;
+  border-radius: 12px;
+  background: #25190ee6;
+  color: var(--ember-2);
   cursor: pointer;
 }
-.embermeter .cells {
-  display: grid;
-  grid-template-columns: repeat(5, 14px);
-  gap: 3px;
+.embermeter .ember-current {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 24px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
-.embermeter .cell {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  background: #2b241e;
-  border: 1px solid #5a4a36;
-  transition: background 0.3s, box-shadow 0.3s;
-}
-.embermeter .cell.on {
-  background: radial-gradient(circle at 40% 30%, #ffd27a, var(--ember) 60%, var(--ember-dark));
-  border-color: var(--ember-2);
-  box-shadow: 0 0 8px rgba(255, 122, 42, 0.8);
-}
+.embermeter .ember-icon { font-size: 20px; }
 .embermeter .lbl {
   font-size: 12px;
   color: var(--ember-2);
@@ -1868,6 +1865,10 @@ h3 {
     width: 50px;
     height: 50px;
     font-size: 18px;
+  }
+  .side > .player-hud {
+    left: 0;
+    gap: 6px;
   }
   .btn {
     padding: 8px 14px;

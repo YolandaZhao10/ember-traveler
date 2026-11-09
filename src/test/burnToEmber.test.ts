@@ -3,6 +3,7 @@ import { CARDS } from '../data/cards';
 import { describeCard } from '../engine/cards';
 import { createCombat, playCard } from '../engine/combat';
 import { makeRng } from '../engine/rng';
+import { EMBER_MAX } from '../engine/constants';
 import type { CardDef, CombatState, Effect } from '../engine/types';
 
 const SOURCE = '__burn_to_ember_probe';
@@ -37,8 +38,9 @@ describe('燃烧兑换余烬', () => {
   it.each([
     { layers: 2, initial: 0, up: false, gained: 4 },
     { layers: 12, initial: 0, up: false, gained: 5 },
-    { layers: 12, initial: 9, up: false, gained: 1 },
-    { layers: 12, initial: 10, up: false, gained: 0 },
+    { layers: 12, initial: 9, up: false, gained: 5 },
+    { layers: 12, initial: EMBER_MAX - 1, up: false, gained: 1 },
+    { layers: 12, initial: EMBER_MAX, up: false, gained: 0 },
     { layers: 3, initial: 0, up: true, gained: 8 },
   ])('$layers 层燃烧 / $initial 余烬 / 升级 $up：清空目标燃烧，实际获得 $gained 余烬', ({ layers, initial, up, gained }) => {
     withCard(cs => {
@@ -89,11 +91,11 @@ describe('燃烧兑换余烬', () => {
 
   it('余烬接近上限时熔炉只按实际获得数触发', () => {
     withCard(cs => {
-      cs.player.ember = 9; cs.player.statuses.forge = 3;
+      cs.player.ember = EMBER_MAX - 1; cs.player.statuses.forge = 3;
       cs.relics.push('ash_hourglass'); cs.enemies[0].statuses.burn = 7;
       expect(preview(cs)).toContain('当前获得 1 点余烬');
       const result = playCard(cs, SOURCE, 'e0').state;
-      expect(result.player.ember).toBe(10);
+      expect(result.player.ember).toBe(EMBER_MAX);
       expect(result.player.block).toBe(3);
     });
   });
@@ -126,10 +128,10 @@ describe('燃烧兑换余烬', () => {
       const before = structuredClone(cs), description = preview(cs);
       expect(description).toContain('当前获得 5 点余烬');
       expect(description).toContain('基础上限 20）（当前 0 点格挡）');
-      expect(description).toContain('余烬翻倍（6 → 10）');
+      expect(description).toContain('余烬翻倍（6 → 12）');
       expect(cs).toEqual(before);
       const result = playCard(cs, SOURCE, 'e0').state;
-      expect(result.player.ember).toBe(10);
+      expect(result.player.ember).toBe(12);
       expect(result.player.block).toBe(0);
       expect(result.enemies[0].statuses.burn).toBeUndefined();
     }, [{ kind: 'burnToEmber', amount: 2, max: 5 }, { kind: 'blockPerBurn', amount: 3, max: 20 }, { kind: 'doubleEmber' }]);

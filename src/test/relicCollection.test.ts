@@ -220,12 +220,12 @@ describe('遗物组合、死亡与存档边界', () => {
     cs.player.hand.push(card('strike', 'again')); cs = playCard(cs, 'again', 'e0').state;
     expect(cs.player.ember).toBe(2); expect(cs.player.block).toBe(0);
   });
-  it('开场抽牌和遗物余烬尊重上限，遗物余烬不再触发卡牌沙漏加成', () => {
+  it('开场手牌仍限十张而余烬可超过十，遗物余烬不触发卡牌沙漏加成', () => {
     const deck = Array.from({ length: 30 }, (_, i) => card('strike', `c${i}`));
     const cs = createCombat('open', ['furnace_drone'], 'normal', deck, 35, 100, ['ash_compass', 'copper_feather', 'scribe_scroll', 'lantern_archive', 'ember_seed', 'ash_hourglass'], makeRng('OPEN', 'c'), 100).state;
     expect(cs.player.hand).toHaveLength(9); expect(cs.player.ember).toBe(4); expect(cs.player.block).toBe(4);
-    const capped = createCombat('cap', ['furnace_drone'], 'normal', deck, 35, 100, [...cs.relics, 'crowned_lantern', 'dawn_crystal', 'ember_lantern'], makeRng('OPEN', 'c'), 100).state;
-    expect(capped.player.hand).toHaveLength(10); expect(capped.player.ember).toBe(10);
+    const capped = createCombat('cap', ['furnace_drone'], 'normal', deck, 35, 100, [...cs.relics, 'crowned_lantern', 'dawn_crystal', 'ember_lantern', 'wishing_cinder'], makeRng('OPEN', 'c'), 100).state;
+    expect(capped.player.hand).toHaveLength(10); expect(capped.player.ember).toBe(13);
     const next = startPlayerTurn(endPlayerTurn(cs).state).state;
     expect(next.player.hand).toHaveLength(6); expect(next.player.ember).toBe(4);
   });

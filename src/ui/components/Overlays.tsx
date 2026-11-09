@@ -84,6 +84,11 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
           </div>
         </Modal>
       );
+    case 'ember':
+      return <Modal title="余烬" onClose={closeOverlay}>
+        <p>当前余烬：<b>{run.combat?.player.ember ?? 0}</b></p>
+        <p>战斗内跨回合保留，战斗结束清空。通过卡牌、能力和遗物积累，部分卡牌会消耗余烬换取伤害、格挡或其他收益。</p>
+      </Modal>;
     case 'status': {
       const def = STATUSES[overlay.status];
       return (

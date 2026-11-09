@@ -26,6 +26,7 @@ export type Overlay =
   | { kind: 'pile'; pile: 'deck' | 'draw' | 'discard' | 'exhaust' }
   | { kind: 'card'; card: CardInstance; inCombat: boolean }
   | { kind: 'status'; status: StatusId; amount: number; ownerName: string; detail?: string }
+  | { kind: 'ember' }
   | { kind: 'relic'; relicId: string }
   | { kind: 'log' }
   | { kind: 'map' }

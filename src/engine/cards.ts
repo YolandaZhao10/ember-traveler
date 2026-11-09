@@ -1,4 +1,5 @@
 import { RELIC_TUNING as T } from '../data/relicBalance';
+import { EMBER_MAX } from './constants';
 import { CARDS } from '../data/cards';
 import { STATUSES } from '../data/statuses';
 import type { CardDef, CardInstance, Condition, Effect, Entity, PlayerCombat, Statuses } from './types';
@@ -186,7 +187,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         previewStrength(e.amount);
         break;
       case 'doubleEmber':
-        parts.push(`余烬翻倍${ctx ? `（${ctx.player.ember} → ${Math.min(10, ctx.player.ember * 2)}）` : ''}`);
+        parts.push(`余烬翻倍${ctx ? `（${ctx.player.ember} → ${Math.min(EMBER_MAX, ctx.player.ember * 2)}）` : ''}`);
         break;
       case 'discardRandom':
         parts.push(e.count === 'all' ? '弃置所有手牌' : `随机弃置 ${e.count} 张手牌`);
@@ -311,7 +312,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
           const layers = ctx.target.hp > 0 ? (ctx.target.statuses.burn ?? 0) : 0;
           const base = Math.min(layers * e.amount, e.max);
           current = layers > 0 && base > 0
-            ? Math.max(0, Math.min(10 - ctx.player.ember, base + (ctx.relics.includes('ash_hourglass') ? 1 : 0)))
+            ? Math.max(0, Math.min(EMBER_MAX - ctx.player.ember, base + (ctx.relics.includes('ash_hourglass') ? 1 : 0)))
             : 0;
           if (layers > 0) delete ctx.target.statuses.burn;
           ctx.player.ember += current;

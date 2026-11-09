@@ -142,7 +142,7 @@ describe('战斗基础', () => {
     expect(taken).toBeLessThanOrEqual(6);
   });
 
-  it('余烬：上限 10，爆发消耗全部并按点数结算', () => {
+  it('余烬可以超过10，爆发消耗全部并按点数结算', () => {
     const cs = combatWith([card('stoke'), card('stoke'), card('stoke'), card('ember_burst'), card('strike')], ['rubble_golem']);
     let s = cs;
     s = playCard(s, handCard(s, 'stoke').uid, null).state;
@@ -151,14 +151,14 @@ describe('战斗基础', () => {
     expect(s.player.ember).toBe(9);
     expect(s.player.energy).toBe(0);
     s.player.energy = 3;
-    // 补一张 stoke 测试上限
+    // 第四次添薪仍能继续积累。
     s.player.hand.push(card('stoke'));
     s = playCard(s, handCard(s, 'stoke').uid, null).state;
-    expect(s.player.ember).toBe(10);
+    expect(s.player.ember).toBe(12);
     s.enemies[0].hp = s.enemies[0].maxHp = 100;
     const hp = s.enemies[0].hp;
     s = playCard(s, handCard(s, 'ember_burst').uid, 'e0').state;
-    expect(hp - s.enemies[0].hp).toBe(60);
+    expect(hp - s.enemies[0].hp).toBe(72);
     expect(s.player.ember).toBe(0);
   });
 

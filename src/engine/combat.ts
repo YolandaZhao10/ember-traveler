@@ -6,6 +6,7 @@ import { RELIC_TUNING as T } from '../data/relicBalance';
 import { calcBlock, calcDamage, checkCondition, viewCard, type CardView } from './cards';
 import { scaleEnemyValue } from './difficulty';
 import { ensurePowerInstances } from './powers';
+import { EMBER_MAX } from './constants';
 import { nextInt, pick, shuffle, type RngState } from './rng';
 import type {
   CardInstance,
@@ -25,7 +26,7 @@ import type {
   Statuses,
 } from './types';
 
-export const EMBER_MAX = 10;
+export { EMBER_MAX } from './constants';
 export const HAND_MAX = 10;
 
 function relicProc(cs: CombatState, relicId: string, ev: CombatEvent[]) {

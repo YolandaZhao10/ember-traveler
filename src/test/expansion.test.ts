@@ -6,6 +6,7 @@ import { SHOP_RELICS } from '../data/specialRelics';
 import { RELICS, RELIC_LIST, relicPool } from '../data/relics';
 import { describeCard, viewCard } from '../engine/cards';
 import { createCombat, playCard } from '../engine/combat';
+import { EMBER_MAX } from '../engine/constants';
 import { makeRng } from '../engine/rng';
 import * as R from '../engine/run';
 import type { CardInstance, CharacterId } from '../engine/types';
@@ -113,7 +114,7 @@ describe('扩展卡池与遗物配额', () => {
       expect(result.events.some(e => e.type === 'cardPlayed'), def.id).toBe(true);
       expect(describeCard(c, null)).not.toMatch(/undefined|NaN/);
       expect(result.state.player.hp, def.id).toBeGreaterThan(0);
-      expect(result.state.player.ember).toBeGreaterThanOrEqual(0); expect(result.state.player.ember).toBeLessThanOrEqual(10);
+      expect(result.state.player.ember).toBeGreaterThanOrEqual(0); expect(result.state.player.ember).toBeLessThanOrEqual(EMBER_MAX);
       const zones = [...result.state.player.hand, ...result.state.player.draw, ...result.state.player.discard, ...result.state.player.exhaust];
       expect(new Set(zones.map(c => c.uid)).size, def.id).toBe(zones.length);
       for (const e of result.events) if (e.type === 'damage' || e.type === 'block' || e.type === 'heal') expect(Number.isFinite(e.amount), def.id).toBe(true);
