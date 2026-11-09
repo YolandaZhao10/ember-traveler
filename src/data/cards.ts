@@ -68,6 +68,7 @@ def({
   owner: 'traveler',
   cost: 0,
   target: 'self',
+  exhaust: true,
   effects: [
     { kind: 'draw', amount: 1 },
     { kind: 'gainEmber', amount: 1 },
@@ -172,7 +173,7 @@ def({
     { kind: 'energy', amount: 1 },
     { kind: 'draw', amount: 1 },
   ],
-  upgrade: { exhaust: false },
+  upgrade: { effects: [{ kind: 'energy', amount: 1 }, { kind: 'draw', amount: 2 }] },
 });
 def({
   id: 'thousand_cuts',
@@ -183,8 +184,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damagePerAttack', amount: 4 }],
-  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 5 }] },
+  effects: [{ kind: 'damagePerAttack', amount: 5 }],
+  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 7 }] },
   flavor: '每一刀都为下一刀铺路。',
 });
 def({
@@ -422,8 +423,8 @@ def({
   archetype: 'ember',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'emberBurst', damagePer: 4 }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 5 }] },
+  effects: [{ kind: 'emberBurst', damagePer: 6 }],
+  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 8 }] },
   flavor: '所有积蓄，一息之间。',
 });
 def({
@@ -571,12 +572,12 @@ def({
   requireEmber: 2,
   effects: [
     { kind: 'gainEmber', amount: -2 },
-    { kind: 'damage', amount: 11 },
+    { kind: 'damage', amount: 15 },
   ],
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -2 },
-      { kind: 'damage', amount: 14 },
+      { kind: 'damage', amount: 20 },
     ],
   },
 });
@@ -774,15 +775,16 @@ def({
   owner: 'picker',
   cost: 0,
   target: 'enemy',
+  exhaust: true,
   effects: [
-    { kind: 'status', status: 'burn', amount: 1, target: 'target' },
     { kind: 'conditional', cond: { kind: 'targetBurning' }, then: [{ kind: 'gainEmber', amount: 1 }] },
+    { kind: 'status', status: 'burn', amount: 1, target: 'target' },
     { kind: 'draw', amount: 1 },
   ],
   upgrade: {
     effects: [
-      { kind: 'status', status: 'burn', amount: 2, target: 'target' },
       { kind: 'conditional', cond: { kind: 'targetBurning' }, then: [{ kind: 'gainEmber', amount: 1 }] },
+      { kind: 'status', status: 'burn', amount: 2, target: 'target' },
       { kind: 'draw', amount: 1 },
     ],
   },
@@ -830,8 +832,8 @@ def({
   cost: 1,
   target: 'enemy',
   exhaust: true,
-  effects: [{ kind: 'damage', amount: 8 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 12 }] },
+  effects: [{ kind: 'damage', amount: 12 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 17 }] },
 });
 def({
   id: 'ash_feast',
@@ -880,7 +882,7 @@ def({
   cost: 1,
   target: 'self',
   effects: [{ kind: 'returnExhausted', count: 1 }],
-  upgrade: { cost: 0 },
+  upgrade: { effects: [{ kind: 'returnExhausted', count: 2 }] },
 });
 def({
   id: 'dust_to_dust',
@@ -979,8 +981,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 7, lifesteal: true }],
-  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true }] },
+  effects: [{ kind: 'damage', amount: 7, lifesteal: true, lifestealCap: 6 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true, lifestealCap: 8 }] },
 });
 def({
   id: 'blood_pact',
@@ -1113,8 +1115,8 @@ def({
   owner: 'oathbound',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 13 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 17 }] },
+  effects: [{ kind: 'damage', amount: 18 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 24 }] },
 });
 def({
   id: 'overpower',

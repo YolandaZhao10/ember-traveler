@@ -155,9 +155,10 @@ describe('战斗基础', () => {
     s.player.hand.push(card('stoke'));
     s = playCard(s, handCard(s, 'stoke').uid, null).state;
     expect(s.player.ember).toBe(10);
+    s.enemies[0].hp = s.enemies[0].maxHp = 100;
     const hp = s.enemies[0].hp;
     s = playCard(s, handCard(s, 'ember_burst').uid, 'e0').state;
-    expect(hp - s.enemies[0].hp).toBe(40);
+    expect(hp - s.enemies[0].hp).toBe(60);
     expect(s.player.ember).toBe(0);
   });
 
@@ -345,7 +346,7 @@ describe('战斗基础', () => {
       const e2 = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'leech_bite').uid, 'e0').state; // 7+4 = 11 吸血
       expect(e2 - s.enemies[0].hp).toBe(11);
-      expect(s.player.hp).toBe(41);
+      expect(s.player.hp).toBe(36); // 吸血按实际伤害，普通版最多回复 6
       s = endPlayerTurn(s).state;
       expect(s.player.statuses.strength).toBe(2); // 力竭 -2
       expect(s.player.statuses.strengthDown).toBeUndefined();
@@ -390,9 +391,9 @@ describe('战斗基础', () => {
 
     it('攻击带荆棘的敌人会反伤；余烬虫死亡点燃玩家；钟楼之心二阶段', () => {
       let s = mk([card('strike'), card('strike'), card('strike'), card('strike'), card('strike')], ['hollow_guard'], []);
-      expect(s.enemies[0].statuses.thorns).toBe(2);
+      expect(s.enemies[0].statuses.thorns).toBe(1);
       s = playCard(s, s.player.hand[0].uid, 'e0').state;
-      expect(s.player.hp).toBe(58);
+      expect(s.player.hp).toBe(59);
       let g = mk([card('strike'), card('strike'), card('strike'), card('strike'), card('strike')], ['ember_grub'], []);
       g.enemies[0].hp = 1;
       g = playCard(g, g.player.hand[0].uid, 'e0').state;

@@ -1,7 +1,7 @@
 {
   "name": "ember-traveler",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,8 @@
     "package:play": "npm run build && node scripts/package-game.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "sim": "vitest run src/test/simulation.test.ts"
+    "sim": "vitest run src/test/simulation.test.ts",
+    "audit:balance": "vite-node scripts/audit-balance.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -64,7 +64,7 @@ export type Condition =
   | { kind: 'hasEcho' };
 
 export type Effect =
-  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; perHandCard?: number }
+  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number }
   | { kind: 'damagePerHpLost'; mult: number }
   | { kind: 'loseHp'; amount: number }
   | { kind: 'tempStrength'; amount: number }

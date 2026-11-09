@@ -104,7 +104,7 @@ def({
   sprite: 'cultist',
   description: '向灰烬祈祷的狂信者。越拖越危险，速战速决。',
   moves: [
-    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 2, target: 'self' }] },
+    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 1, target: 'self' }] },
     { id: 'strike', name: '仪式刀', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }] },
   ],
   chooseMove: (ctx) => (ctx.enemy.turn === 0 ? 'chant' : 'strike'),
@@ -321,15 +321,15 @@ def({
   tier: 'normal',
   hp: [44, 50],
   sprite: 'deacon',
-  description: '信徒的头目，会为自己祈福并治疗。',
+  description: '信徒的头目，会为同伴祈福。半血以下治疗 6 点并获得 4 格挡，两次治疗之间至少行动两次。',
   moves: [
     { id: 'bless', name: '祈福', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
-    { id: 'firerain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
-    { id: 'mend', name: '治疗', intent: 'buff', actions: [{ kind: 'heal', amount: 8 }, { kind: 'block', amount: 5 }] },
+    { id: 'firerain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
+    { id: 'mend', name: '治疗', intent: 'buff', actions: [{ kind: 'heal', amount: 6 }, { kind: 'block', amount: 4 }] },
   ],
   chooseMove: (ctx) => {
     if (ctx.enemy.turn === 0) return 'bless';
-    if (ctx.enemy.hp < ctx.enemy.maxHp * 0.5 && last(ctx) !== 'mend') return 'mend';
+    if (ctx.enemy.hp < ctx.enemy.maxHp * 0.5 && !ctx.enemy.moveHistory.slice(-2).includes('mend')) return 'mend';
     return last(ctx) === 'firerain' ? (chance(ctx.rng, 0.5) ? 'bless' : 'firerain') : 'firerain';
   },
 });
@@ -340,12 +340,12 @@ def({
   tier: 'normal',
   hp: [36, 40],
   sprite: 'hollow',
-  description: '盔甲里早已没有人。它浑身是刺，攻击它会被反伤。',
+  description: '盔甲里早已没有人。开场有 1 层荆棘，攻击它会被反伤。',
   moves: [
     { id: 'stance', name: '守势', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
     { id: 'cleave', name: '重劈', intent: 'attack', actions: [{ kind: 'attack', amount: 10 }] },
   ],
-  onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
+  onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 1, target: 'self' }],
   chooseMove: (ctx) => cycle(ctx, ['stance', 'cleave']),
 });
 

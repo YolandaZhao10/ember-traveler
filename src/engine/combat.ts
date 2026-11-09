@@ -575,6 +575,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   p.hand.splice(idx, 1);
   // 只计入打出本牌之前已生效的余音，新打出的能力不会计入自己。
   const activeTempos = ensurePowerInstances(p).filter(power => power.status === 'tempo');
+  // “下一张”只消费打牌之前已有的回响，不能被本牌刚获得的回响重复自己。
+  const hadEcho = (p.statuses.echo ?? 0) > 0;
   ev.push({ type: 'cardPlayed', uid, name: v.name });
   log(cs, ev, `打出「${v.name}」${target ? ` → ${target.name}` : ''}`);
 
@@ -593,7 +595,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   // 回响和每张镜像分别贡献一次重放；重放不算再次打牌。
   if (v.type !== 'power' && cs.outcome === 'ongoing') {
     const repeats: string[] = [];
-    if (p.statuses.echo) {
+    if (hadEcho) {
       addStatus(p, 'echo', -1, ev);
       repeats.push('回响');
     }
@@ -716,9 +718,9 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           for (const t of ts) {
             const r = hit(e.amount, t, extra);
             log(cs, ev, `对 ${t.name} 造成 ${r.dmg} 点伤害`);
-            if (e.lifesteal && r.lost > 0) {
+            if (e.lifesteal && r.lost > 0 && p.hp > 0) {
               const before = p.hp;
-              p.hp = Math.min(p.maxHp, p.hp + r.lost);
+              p.hp = Math.min(p.maxHp, p.hp + Math.min(r.lost, e.lifestealCap ?? Infinity));
               if (p.hp > before) {
                 ev.push({ type: 'heal', targetId: 'player', amount: p.hp - before });
                 log(cs, ev, `吸血：回复 ${p.hp - before} 点生命`);

@@ -87,11 +87,11 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [108, 116], sprite: 'slag_colossus',
-    description: '熔渣凝结成的重型躯壳。积蓄力量后重击；修补时回复 6 点生命。',
+    description: '熔渣凝结成的重型躯壳。积蓄力量后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
     moves: [
       { id: 'gather', name: '聚渣', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
       { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 20 }] },
-      { id: 'mend', name: '熔接', intent: 'special', actions: [{ kind: 'heal', amount: 6 }] },
+      { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['gather', 'crush', 'mend']),
   },

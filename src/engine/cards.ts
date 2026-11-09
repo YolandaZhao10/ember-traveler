@@ -164,7 +164,8 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
           notes.push(`，手牌中每有一张牌 +${e.perHandCard}`);
           if (ctx) extra += Math.max(0, ctx.player.hand.length - 1) * e.perHandCard;
         }
-        parts.push(`${t}造成 ${dmgText(e.amount, ctx, extra)} 点伤害${times}${notes.join('')}${e.lifesteal ? '，并回复等量生命' : ''}`);
+        const healing = e.lifesteal ? `，按实际扣除的敌人生命回复生命${e.lifestealCap === undefined ? '' : `（每次命中最多 ${e.lifestealCap} 点）`}` : '';
+        parts.push(`${t}造成 ${dmgText(e.amount, ctx, extra)} 点伤害${times}${notes.join('')}${healing}`);
         break;
       }
       case 'damagePerHpLost': {
@@ -287,11 +288,12 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`从消耗区随机取回 ${e.count} 张牌到手牌`);
         break;
       case 'conditional':
-        parts.push(`${condText(e.cond)}：${describeEffects(e.then, ctx).replace(/。$/, '')}`);
+        // 分号明确结束条件范围，后面的无条件效果不能被误读为也需要条件。
+        parts.push(`${condText(e.cond)}：${describeEffects(e.then, ctx).replace(/。$/, '')}；`);
         break;
     }
   }
-  let text = parts.join('，');
+  let text = parts.join('，').replace(/；，/g, '；').replace(/；$/, '');
   if (view) {
     const tail: string[] = [];
     if (view.requireEmber) tail.unshift(`需要 ${view.requireEmber} 点余烬`);
