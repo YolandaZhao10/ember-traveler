@@ -349,6 +349,9 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (e.target === 'self' && e.status === 'strength') previewStrength(ctx?.player.statuses.strength ?? 0);
         if (ctx?.target && e.target !== 'self' && e.status === 'burn') ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
         break;
+      case 'replayDiscard':
+        parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放牌；其他代价照常支付，原牌不移动）');
+        break;
       case 'returnExhausted':
         parts.push(e.selection === 'highestCost'
           ? `从消耗区按费用从高到低取回 ${e.count} 张牌到手牌（同费按消耗顺序）`

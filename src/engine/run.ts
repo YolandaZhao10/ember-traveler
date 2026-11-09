@@ -199,9 +199,9 @@ function applyCombatStep(input: RunState, step: StepResult): { run: RunState; ev
   return { run, events: step.events };
 }
 
-export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null) {
+export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null, replayUid?: string) {
   if (!run.combat) return { run, events: [] as CombatEvent[] };
-  const step = playCard(run.combat, cardUid, targetId);
+  const step = playCard(run.combat, cardUid, targetId, replayUid);
   const out = applyCombatStep(run, step);
   if (out.events.length) {
     out.run.stats.cardsPlayed += step.events.filter(e => e.type === 'cardPlayed').length;

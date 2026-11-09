@@ -40,6 +40,7 @@ function effectRole(effect: Effect): CardRole | null {
     case 'draw':
     case 'doubleEmber':
     case 'chargeHand':
+    case 'replayDiscard':
     case 'returnExhausted':
     case 'doubleStatus':
     case 'tempStrength':

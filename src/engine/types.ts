@@ -101,6 +101,7 @@ export type Effect =
   | { kind: 'burnToEmber'; amount: number; max: number }
   | { kind: 'consumeBurn'; damagePer: number }
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
+  | { kind: 'replayDiscard' }
   | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
   | { kind: 'conditional'; cond: Condition; then: Effect[] };
 

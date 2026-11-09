@@ -134,9 +134,10 @@ add('oathbound', 'common', [
   S('gather_fury', '聚怒', 'might', 0, [strength(2), when(wounded, draw(1))], [strength(3), when(wounded, draw(1))], { exhaust: true }),
 ]);
 add('oathbound', 'uncommon', [
+  S('oath_reenactment', '血誓重演', 'blood', 2, [{ kind: 'replayDiscard' }], [{ kind: 'replayDiscard' }], { exhaust: true, upgradeCost: 1 }),
   A('blood_reckoning', '血债追偿', 'blood', 1, [hit(8), when(wounded, draw(2))], [hit(12), when(wounded, draw(2))]),
   S('scar_shield', '伤痕盾', 'blood', 1, [lose(3), block(14), status('thorns', 1)], [lose(3), block(19), status('thorns', 2)]),
-  A('vein_cutter', '割脉刃', 'blood', 2, [hit(11, { lifesteal: true }), status('weak', 1, 'target')], [hit(15, { lifesteal: true }), status('weak', 2, 'target')]),
+  A('vein_cutter', '割脉刃', 'blood', 2, [hit(11, { lifesteal: true }), status('weak', 1, 'target')], [hit(15, { lifesteal: true }), status('weak', 2, 'target')], { exhaust: true }),
   S('pain_trade', '以痛换势', 'blood', 0, [lose(4), energy(2)], [lose(3), energy(2)], { exhaust: true }),
   A('scar_echo', '旧伤回响', 'blood', 1, [{ kind: 'damagePerHpLost', mult: 2 }, draw(1)], [{ kind: 'damagePerHpLost', mult: 3 }, draw(2)], { retain: true }),
   P('blood_watch', '血色守望', 'blood', 1, [status('bloodArmor', 3)], [status('bloodArmor', 4)]),

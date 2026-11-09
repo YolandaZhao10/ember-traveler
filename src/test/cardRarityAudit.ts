@@ -15,6 +15,7 @@ export function rarityFixture(id: string, upgraded = false, context: RarityConte
   const candidate = { ...card(id, upgraded), bonus: context === 'bare' ? 0 : 2 };
   state.player.hand = [candidate, card('strike', false, 'fuel-1'), card('defend', false, 'fuel-2'), card('ashes', false, 'fuel-3')];
   state.player.draw = Array.from({ length: 20 }, (_, i) => card('strike', false, `draw-${i}`));
+  if (id === 'oath_reenactment') state.player.discard = [card('strike', false, 'discard-target')];
   state.player.energy = 3;
   state.player.ember = context === 'bare' ? viewCard(candidate).requireEmber : 8;
   if (context !== 'bare') {
@@ -34,7 +35,7 @@ export function rarityFixture(id: string, upgraded = false, context: RarityConte
 export function rarityProbe(id: string, upgraded: boolean, context: RarityContext) {
   const before = rarityFixture(id, upgraded, context), candidate = before.player.hand[0];
   const view = viewCard(candidate), allowed = canPlayCard(before, candidate).ok;
-  const result = playCard(before, candidate.uid, view.target === 'enemy' ? 'e0' : null);
+  const result = playCard(before, candidate.uid, view.target === 'enemy' || id === 'oath_reenactment' ? 'e0' : null, 'discard-target');
   const after = result.state;
   return {
     id, upgraded, context, allowed, played: after !== before,

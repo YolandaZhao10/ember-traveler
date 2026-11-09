@@ -48,7 +48,7 @@ function fight(cs: CombatState) {
   while (cs.outcome === 'ongoing' && cs.turn <= 40 && actions++ < 400) {
     const move = planMove(cs, { depth: 3, width: 3, engines: true });
     if (args.includes('--trace')) trace.push({ turn: cs.turn, hp: cs.player.hp, block: cs.player.block, energy: cs.player.energy, move: move ? cs.player.hand.find(c=>c.uid===move.uid)?.defId : 'end', enemies: cs.enemies.map(e=>({hp:e.hp,block:e.block,intent:e.moveId,phase:e.phase})) });
-    if (move) { const next = playCard(cs, move.uid, move.target).state; if (next === cs) { invalid = true; break; } cs = next; }
+    if (move) { const next = playCard(cs, move.uid, move.target, move.replayUid).state; if (next === cs) { invalid = true; break; } cs = next; }
     else { cs = endPlayerTurn(cs).state; for (const e of cs.enemies) cs = enemyAct(cs, e.id).state; if (cs.outcome === 'ongoing') cs = startPlayerTurn(cs).state; }
     if (!Number.isFinite(cs.player.hp) || cs.player.energy < 0 || cs.enemies.some(e => e.hp < 0)) { invalid = true; break; }
   }

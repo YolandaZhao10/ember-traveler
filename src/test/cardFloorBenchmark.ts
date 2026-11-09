@@ -1,3 +1,4 @@
+import { playOptions } from './playOptions';
 import { CARDS } from '../data/cards';
 import { CHARACTERS } from '../data/characters';
 import { viewCard } from '../engine/cards';
@@ -60,7 +61,7 @@ export interface CardFloorRow {
   control: FightSummary;
 }
 
-interface PlannedMove { uid: string; target: string | null }
+interface PlannedMove { uid: string; target: string | null; replayUid?: string }
 // 玩家生命跨战斗保留；优先保存生命，而不是为少打一回合接受大量额外损血。
 const HP_WEIGHT = 3;
 
@@ -121,16 +122,15 @@ export function planMove(cs: CombatState, options = { depth: 5, width: 6, engine
         const key = `${card.defId}:${card.upgraded}:${card.bonus ?? 0}`;
         if (seen.has(key) || !canPlayCard(plan.state, card).ok) continue;
         seen.add(key);
-        const targets = viewCard(card).target === 'enemy' ? aliveEnemies(plan.state).map(e => e.id) : [null];
-        for (const target of targets) {
-          const result = playCard(plan.state, card.uid, target).state;
+        for (const { target, replayUid } of playOptions(plan.state, card)) {
+          const result = playCard(plan.state, card.uid, target, replayUid).state;
           if (result === plan.state) continue;
           // 已打出或离手的牌不再已知；即使搜索内洗回原 UID，也只能在真实抽到后重新规划。
           const handUids = new Set(result.player.hand.map(c => c.uid));
           const known = new Set([...plan.known].filter(uid => uid !== card.uid && handUids.has(uid)));
           const state = hideUnknown(result, known);
           const score = turnValue(state, known, options.engines);
-          const first = plan.first ?? { uid: card.uid, target };
+          const first = plan.first ?? { uid: card.uid, target, replayUid };
           if (score > best.score + 0.0001) best = { score, first };
           next.push({ state, first, score, known });
         }
@@ -147,7 +147,7 @@ function playFight(cs: CombatState, replacementCount: number): FightResult {
   while (cs.outcome === 'ongoing' && cs.turn <= 30 && actions++ < 240) {
     const move = planMove(cs);
     if (move) {
-      const next = playCard(cs, move.uid, move.target).state;
+      const next = playCard(cs, move.uid, move.target, move.replayUid).state;
       if (next === cs) { invalid = true; break; }
       cs = next;
       cardsPlayed++;

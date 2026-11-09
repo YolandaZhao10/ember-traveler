@@ -33,7 +33,7 @@ function fight(cs: CombatState) {
   const move = planMove(cs, { depth: 3, width: 3, engines: true });
   if (move) {
    if (move.uid.startsWith('candidate')) plays++;
-   const next = playCard(cs, move.uid, move.target).state;
+   const next = playCard(cs, move.uid, move.target, move.replayUid).state;
    if (next === cs) { invalid = true; break; } cs = next;
   } else {
    cs = endPlayerTurn(cs).state;

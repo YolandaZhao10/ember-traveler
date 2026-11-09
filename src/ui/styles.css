@@ -2321,3 +2321,10 @@ h3 {
 .event-curse-preview { border-left-color: #8b4555; background: #8b455510; }
 .choice .event-curse-preview strong { color: #7b3346; }
 .intent.escape { color: #ffe59b; border-color: #d1a84b; background: #51401d; font-weight: 800; }
+
+/* 弃牌选择区域独立滚动，目标和确认操作始终留在弹窗内。 */
+.replay-choices.cardgrid { max-height: min(48vh, 440px); overflow-y: auto; padding: 10px; }
+.replay-targets { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; }
+
+.replay-choice { background: transparent; padding: 4px; border: 2px solid transparent; border-radius: 12px; cursor: pointer; color: inherit; }
+.replay-choice.selected, .replay-choice:focus-visible { border-color: var(--gold); outline: none; }

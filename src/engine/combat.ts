@@ -574,6 +574,21 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
 }
 
 // ---------- 出牌 ----------
+export function needsDiscardReplay(card: CardInstance): boolean {
+  const containsReplay = (effects: Effect[]): boolean => effects.some(effect =>
+    effect.kind === 'replayDiscard' || (effect.kind === 'conditional' && containsReplay(effect.then)));
+  return containsReplay(viewCard(card).effects);
+}
+
+/** 选择只读取公开弃牌堆；费用豁免仅限能量，禁止重放选择器互相递归。 */
+export function discardReplayChoices(cs: CombatState): CardInstance[] {
+  return cs.player.discard.filter(card => {
+    const v = viewCard(card);
+    return (v.type === 'attack' || v.type === 'skill') && !needsDiscardReplay(card)
+      && v.requireEmber <= cs.player.ember && (v.target !== 'enemy' || aliveEnemies(cs).length > 0);
+  });
+}
+
 export function canPlayCard(cs: CombatState, card: CardInstance): { ok: boolean; reason?: string } {
   const v = viewCard(card);
   if (cs.phase !== 'player' || cs.outcome !== 'ongoing') return { ok: false, reason: '现在不能出牌' };
@@ -581,6 +596,7 @@ export function canPlayCard(cs: CombatState, card: CardInstance): { ok: boolean;
   if (v.cost > cs.player.energy) return { ok: false, reason: '能量不足' };
   if (v.requireEmber > cs.player.ember) return { ok: false, reason: `需要 ${v.requireEmber} 点余烬` };
   if (v.target === 'enemy' && aliveEnemies(cs).length === 0) return { ok: false, reason: '没有目标' };
+  if (needsDiscardReplay(card) && !discardReplayChoices(cs).length) return { ok: false, reason: '弃牌堆没有可重放的攻击或技能' };
   return { ok: true };
 }
 
@@ -588,7 +604,7 @@ export function needsTarget(card: CardInstance): boolean {
   return viewCard(card).target === 'enemy';
 }
 
-export function playCard(input: CombatState, uid: string, targetId: string | null): StepResult {
+export function playCard(input: CombatState, uid: string, targetId: string | null, replayUid?: string): StepResult {
   const cs = clone(input);
   const ev: CombatEvent[] = [];
   const p = cs.player;
@@ -598,8 +614,12 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   const v = viewCard(card);
   const check = canPlayCard(cs, card);
   if (!check.ok) return { state: input, events: [] };
+  const replayChoice = needsDiscardReplay(card) ? discardReplayChoices(cs).find(c => c.uid === replayUid) : undefined;
+  if (needsDiscardReplay(card) && !replayChoice) return { state: input, events: [] };
+  // 固定确认时的卡牌版本；本次重放的抽牌、洗牌不会复制实体或改变选择。
+  const replay = replayChoice ? { ...replayChoice } : undefined;
   let target: EnemyState | null = null;
-  if (v.target === 'enemy') {
+  if (v.target === 'enemy' || (replay && viewCard(replay).target === 'enemy')) {
     target = cs.enemies.find((e) => e.id === targetId && alive(e)) ?? null;
     if (!target) return { state: input, events: [] };
   }
@@ -614,7 +634,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   log(cs, ev, `打出「${v.name}」${target ? ` → ${target.name}` : ''}`);
 
   // 每次实际重放都独立结算一次出牌计数与触发；费用和实体卡去向仍只处理一次。
-  const finishPlay = () => {
+  const finishPlay = (v: CardView, releaseCharge: boolean) => {
     // 计数
     p.cardsPlayedThisTurn += 1;
     if (v.type === 'attack') p.attacksPlayedThisTurn += 1;
@@ -674,7 +694,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       log(cs, ev, '鼓手之心：获得 1 点能量');
     }
   };
-  const resolvePlay = () => {
+  const resolvePlay = (v: CardView, target: EnemyState | null, releaseCharge: boolean) => {
     let extraDamage = 0;
     if (v.type === 'attack') {
       if (p.attacksPlayedThisTurn === 0 && cs.relics.includes('flint')) {
@@ -684,10 +704,24 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
     }
     resolveEffects(cs, v.effects, target, ev, extraDamage, v);
-    finishPlay();
+    finishPlay(v, releaseCharge);
     handleEnemyDeaths(cs, ev);
   };
-  resolvePlay();
+  const resolveSource = () => {
+    resolvePlay(v, target, releaseCharge);
+    if (!replay || cs.outcome !== 'ongoing' || p.hp <= 0) return;
+    const selected = viewCard(replay);
+    if (selected.requireEmber > p.ember || (selected.target === 'enemy' && (!target || !alive(target)))) {
+      log(cs, ev, '重放停止：所选目标已倒下或余烬不足');
+      return;
+    }
+    ev.push({ type: 'cardPlayed', uid: replay.uid, name: selected.name });
+    log(cs, ev, `血誓重演：免费重放「${selected.name}」${selected.target === 'enemy' ? ` → ${target!.name}` : ''}`);
+    // 这是已被触发的重放，不再次消耗回响或递归触发镜像；新获得的回响留给下一张手动出牌。
+    resolvePlay(selected, selected.target === 'enemy' ? target : null,
+      !!p.statuses.chargeMaster && !!selected.charge && selected.bonus >= 2 && !p.turnFlags.chargeMaster);
+  };
+  resolveSource();
 
   // 只读取本次手动出牌之前的回响。重放获得的新回响留给下一张牌，不能递归复制。
   if (v.type !== 'power' && cs.outcome === 'ongoing') {
@@ -712,7 +746,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
         ev.push({ type: 'relic', relicId: 'tuning_fork' });
       }
       triggerRelics(cs, 'echo', ev);
-      resolvePlay();
+      resolveSource();
     }
   }
 
@@ -1038,6 +1072,9 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         }
         break;
       }
+      case 'replayDiscard':
+        // 在完整出牌流程中结算：先记录来源技能，再重放确认时选定的牌。
+        break;
       case 'returnExhausted': {
         for (let i = 0; i < e.count; i++) {
           if (!p.exhaust.length || p.hand.length >= HAND_MAX) break;

@@ -1,3 +1,4 @@
+import { playOptions } from './playOptions';
 import { describe, expect, it } from 'vitest';
 import { EVENTS } from '../data/events';
 import { viewCard } from '../engine/cards';
@@ -23,9 +24,10 @@ function botCombat(run: RunState, rng: { s: number }): RunState {
       const c = playable[0];
       const v = viewCard(c);
       const enemies = aliveEnemies(cs).slice().sort((a, b) => a.hp - b.hp);
-      const target = v.target === 'enemy' ? enemies[0].id : null;
+      const option = playOptions(cs, c)[0];
+      const target = option.replayUid ? option.target : v.target === 'enemy' ? enemies[0].id : null;
       const before = run;
-      run = R.combatPlayCard(run, c.uid, target).run;
+      run = R.combatPlayCard(run, c.uid, target, option.replayUid).run;
       if (run === before) throw new Error(`出牌失败 ${v.name}`);
       continue;
     }

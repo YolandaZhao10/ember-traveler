@@ -65,9 +65,9 @@ describe('扩展卡池与遗物配额', () => {
       expect(run.shop!.cards).toHaveLength(10);
     }
   });
-  it.each(characters)('%s 专属牌恰好普通20、罕见18、稀有15，初始牌另计', owner => {
+  it.each(characters)('%s 专属牌配额含血誓重演新增的罕见牌，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(cards.filter(c => c.rarity === rarity)).toHaveLength(count);
+    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(cards.filter(c => c.rarity === rarity)).toHaveLength(count + (owner === 'oathbound' && rarity === 'uncommon' ? 1 : 0));
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
@@ -78,10 +78,10 @@ describe('扩展卡池与遗物配额', () => {
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
   });
-  it('卡牌282张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(282); expect(EXTRA_CHARACTER_CARDS).toHaveLength(143); expect(EXTRA_SHARED_CARDS).toHaveLength(39);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(282);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(282);
+  it('卡牌283张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(283); expect(EXTRA_CHARACTER_CARDS).toHaveLength(144); expect(EXTRA_SHARED_CARDS).toHaveLength(39);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(283);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(283);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);
@@ -110,7 +110,8 @@ describe('扩展卡池与遗物配额', () => {
   it('全部新增牌的基础版与升级版可实际出牌，描述完整，结算数值有效', () => {
     for (const def of [...EXTRA_CHARACTER_CARDS, ...EXTRA_SHARED_CARDS]) for (const up of [false, true]) {
       const cs = battle(def.id, up); const c = cs.player.hand[0]; const v = viewCard(c);
-      const result = playCard(cs, c.uid, v.target === 'enemy' ? 'e0' : null);
+      if (def.id === 'oath_reenactment') cs.player.discard = [{ uid: 'replay-target', defId: 'strike', upgraded: false }];
+      const result = playCard(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
       expect(result.events.some(e => e.type === 'cardPlayed'), def.id).toBe(true);
       expect(describeCard(c, null)).not.toMatch(/undefined|NaN/);
       expect(result.state.player.hp, def.id).toBeGreaterThan(0);

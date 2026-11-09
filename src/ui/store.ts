@@ -6,6 +6,7 @@ import { clearSave, loadRun, loadSettings, saveRun, saveSettings, type Settings 
 import type { CardInstance, CharacterId, CombatEvent, RunDifficulty, RunState, StatusId } from '../engine/types';
 import { setSoundEnabled, sfx } from './sound';
 import { STATUSES } from '../data/statuses';
+import { canPlayCard, needsDiscardReplay } from '../engine/combat';
 import { viewCard } from '../engine/cards';
 import { impactCues, type ImpactItem } from './combatFx';
 import { ensureRecordId, recordJourney } from '../engine/history';
@@ -19,6 +20,7 @@ export interface FxItem {
 }
 
 export type Overlay =
+  | { kind: 'replay'; cardUid: string }
   | { kind: 'history' }
   | { kind: 'help' }
   | { kind: 'relicCatalog' }
@@ -324,19 +326,26 @@ export function selectCard(uid: string | null) {
   if (uid) sfx('click');
 }
 
-export async function playSelected(targetId: string | null) {
+export async function playSelected(targetId: string | null, replayUid?: string) {
   const uid = state.selectedCard;
   const run = state.run;
   if (!uid || !run || !run.combat || state.busy) return;
   const card = run.combat.player.hand.find((c) => c.uid === uid);
   if (!card) return;
-  const res = R.combatPlayCard(run, uid, targetId);
+  if (needsDiscardReplay(card) && !replayUid) {
+    const check = canPlayCard(run.combat, card);
+    if (!check.ok) { toast(check.reason ?? '无法打出'); return; }
+    openOverlay({ kind: 'replay', cardUid: uid });
+    return;
+  }
+  const res = R.combatPlayCard(run, uid, targetId, replayUid);
   if (res.run === run) {
     toast('无法打出');
     return;
   }
-  const attacks = viewCard(card).type === 'attack';
-  set({ busy: true, selectedCard: null, playing: uid, attacking: attacks ? 'player' : null, impacts: [] });
+  const replay = run.combat.player.discard.find(c => c.uid === replayUid);
+  const attacks = viewCard(card).type === 'attack' || (replay && viewCard(replay).type === 'attack');
+  set({ busy: true, overlay: null, selectedCard: null, playing: uid, attacking: attacks ? 'player' : null, impacts: [] });
   // 先保存结算结果，前摇期间刷新也不会回滚出牌或重复结算。
   pendingRun = res.run;
   persist(res.run);
@@ -349,9 +358,9 @@ export async function playSelected(targetId: string | null) {
   await afterStep();
 }
 
-export async function playCardDirect(uid: string, targetId: string | null) {
+export async function playCardDirect(uid: string, targetId: string | null, replayUid?: string) {
   set({ selectedCard: uid });
-  await playSelected(targetId);
+  await playSelected(targetId, replayUid);
 }
 
 async function afterStep() {

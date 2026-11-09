@@ -22,10 +22,10 @@ describe('全卡表基础/升级效果审查', () => {
    if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}
   }
  });
- it('五个可获得牌池仍各为20普通/18罕见/15稀有，没有用重标稀有度掩盖问题',()=>{
+ it('五个可获得牌池保持原稀有度配额，血誓者另增一张罕见重放牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([20,18,15]);
+   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([20,owner === 'oathbound' ? 19 : 18,15]);
   }
  });
 });

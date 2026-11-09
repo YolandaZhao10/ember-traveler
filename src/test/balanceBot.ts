@@ -1,7 +1,7 @@
 import { RELIC_TUNING as T } from '../data/relicBalance';
 import { CARDS } from '../data/cards';
 import { calcBlock, calcDamage, viewCard } from '../engine/cards';
-import { aliveEnemies, enemyIntent } from '../engine/combat';
+import { aliveEnemies, enemyIntent, discardReplayChoices } from '../engine/combat';
 import type { CardInstance, CombatState } from '../engine/types';
 
 export function incomingDamage(cs: CombatState): number {
@@ -89,6 +89,9 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         util += b >= 3 ? b * 1.5 : -4;
         break;
       }
+      case 'replayDiscard':
+        util += Math.max(0, ...discardReplayChoices(cs).map(choice => cardValue(cs, choice, needBlock) * Math.max(0.5, viewCard(choice).cost)));
+        break;
       case 'returnExhausted':
         util += p.exhaust.length ? 4 : -5;
         break;

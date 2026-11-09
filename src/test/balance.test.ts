@@ -1,3 +1,4 @@
+import { playOptions } from './playOptions';
 import { incomingDamage, cardValue } from './balanceBot';
 import { describe, expect, it } from 'vitest';
 import { CARDS } from '../data/cards';
@@ -25,8 +26,11 @@ function botCombat(run: RunState): RunState {
       const best = scored[0];
       if (best.s > 0.5) {
         const v = viewCard(best.c);
-        const target = v.target === 'enemy' ? aliveEnemies(cs).sort((a, b) => a.hp - b.hp)[0].id : null;
-        const next = R.combatPlayCard(run, best.c.uid, target).run;
+        const options = playOptions(cs, best.c);
+        options.sort((a, b) => cardValue(cs, cs.player.discard.find(c => c.uid === b.replayUid) ?? best.c, need) - cardValue(cs, cs.player.discard.find(c => c.uid === a.replayUid) ?? best.c, need));
+        const option = options[0];
+        const target = option.replayUid ? option.target : v.target === 'enemy' ? aliveEnemies(cs).sort((a, b) => a.hp - b.hp)[0].id : null;
+        const next = R.combatPlayCard(run, best.c.uid, target, option.replayUid).run;
         if (next !== run) {
           run = next;
           continue;
