@@ -28,7 +28,7 @@ describe('基础与通用卡牌的不同用途', () => {
     for (const prior of [0, 1]) {
       const cs = battle('chain_slash', up); cs.player.attacksPlayedThisTurn = prior;
       const result = playCard(cs, 'chain_slash', 'e0').state;
-      expect(result.enemies[0].hp).toBe(1000 - (up ? 8 : 6));
+      expect(result.enemies[0].hp).toBe(1000 - (up ? 9 : 6));
       expect(result.player.statuses.strength ?? 0).toBe(prior ? (up ? 3 : 2) : 0);
       expect(result.player.hand).toHaveLength(0);
       expect(endPlayerTurn(result).state.player.statuses.strength ?? 0).toBe(0);

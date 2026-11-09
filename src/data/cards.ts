@@ -122,7 +122,7 @@ def({
   ],
   upgrade: {
     effects: [
-      { kind: 'damage', amount: 8 },
+      { kind: 'damage', amount: 9 },
       { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'tempStrength', amount: 3 }] },
     ],
   },
@@ -184,8 +184,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damagePerAttack', amount: 5 }],
-  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 7 }] },
+  effects: [{ kind: 'damagePerAttack', amount: 6 }],
+  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }] },
   flavor: '每一刀都为下一刀铺路。',
 });
 def({
@@ -306,12 +306,12 @@ def({
   cost: 1,
   target: 'enemy',
   effects: [
-    { kind: 'damage', amount: 5 },
+    { kind: 'damage', amount: 6 },
     { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 4 }] },
   ],
   upgrade: {
     effects: [
-      { kind: 'damage', amount: 7 },
+      { kind: 'damage', amount: 9 },
       { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 5 }] },
     ],
   },
@@ -656,8 +656,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'all_enemies',
-  effects: [{ kind: 'status', status: 'burn', amount: 2, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 3, target: 'all' }] },
+  effects: [{ kind: 'status', status: 'burn', amount: 3, target: 'all' }],
+  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'all' }] },
 });
 def({
   id: 'scorch_mark',
@@ -674,7 +674,7 @@ def({
   ],
   upgrade: {
     effects: [
-      { kind: 'damage', amount: 8 },
+      { kind: 'damage', amount: 9 },
       { kind: 'conditional', cond: { kind: 'targetBurning' }, then: [{ kind: 'damage', amount: 5 }] },
     ],
   },
@@ -1070,12 +1070,12 @@ def({
   cost: 1,
   target: 'enemy',
   effects: [
-    { kind: 'damage', amount: 3 },
+    { kind: 'damage', amount: 6 },
     { kind: 'damagePerHpLost', mult: 2 },
   ],
   upgrade: {
     effects: [
-      { kind: 'damage', amount: 4 },
+      { kind: 'damage', amount: 9 },
       { kind: 'damagePerHpLost', mult: 3 },
     ],
   },
@@ -1127,8 +1127,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 4, strengthMult: 2 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 6, strengthMult: 2 }] },
+  effects: [{ kind: 'damage', amount: 6, strengthMult: 2 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 9, strengthMult: 2 }] },
   flavor: '力量越大，责任越小。',
 });
 def({
@@ -1371,8 +1371,8 @@ def({
   target: 'self',
   retain: true,
   charge: { block: 3 },
-  effects: [{ kind: 'block', amount: 4 }],
-  upgrade: { effects: [{ kind: 'block', amount: 6 }] },
+  effects: [{ kind: 'block', amount: 5 }],
+  upgrade: { effects: [{ kind: 'block', amount: 8 }] },
 });
 def({
   id: 'focus',
@@ -1420,8 +1420,8 @@ def({
   target: 'enemy',
   retain: true,
   charge: { damage: 4 },
-  effects: [{ kind: 'damage', amount: 6 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 8 }] },
+  effects: [{ kind: 'damage', amount: 8 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 11 }] },
 });
 def({
   id: 'meditate',

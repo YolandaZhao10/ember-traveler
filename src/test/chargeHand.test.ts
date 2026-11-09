@@ -66,7 +66,7 @@ describe('手牌立即蓄力', () => {
     cs.player.hand.push(card('charged_blade', 'attack', up, 1), card('rune_shield', 'shield', up), card('surge_glyph', 'both', up, 1));
     cs.player.statuses.strength = 2; cs.player.statuses.dexterity = 1;
     cs = playCard(cs, SOURCE, null).state;
-    for (const [uid, damage, block] of [['attack', up ? 22 : 20, 0], ['shield', 0, up ? 13 : 11], ['both', up ? 15 : 13, up ? 14 : 12]] as const) {
+    for (const [uid, damage, block] of [['attack', up ? 25 : 22, 0], ['shield', 0, up ? 15 : 12], ['both', up ? 15 : 13, up ? 14 : 12]] as const) {
       const instance = cs.player.hand.find(c => c.uid === uid)!;
       const snapshot = structuredClone(cs);
       const text = describeCard(instance, { player: cs.player, target: cs.enemies[0], relics: cs.relics, isFirstAttack: cs.player.attacksPlayedThisTurn === 0, crescendoBonus: 0 });

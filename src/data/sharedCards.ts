@@ -33,7 +33,7 @@ add('common', [
   S('shutter_lamp', '掩灯', 0, [block(3), when(coals(3), status('weak', 1, 'all'))], [block(5), when(coals(3), status('weak', 1, 'all'))]),
   S('tinder_bundle', '干薪束', 0, [ember(3)], [ember(5)], { exhaust: true }),
   S('field_notes', '行旅札记', 1, [draw(2), discard(1), ember(1)], [draw(3), discard(1), ember(2)]),
-  S('spark_lure', '诱火', 1, [status('burn', 2, 'target'), status('weak', 1, 'target')], [status('burn', 4, 'target'), status('weak', 1, 'target')], { target: 'enemy' }),
+  S('spark_lure', '诱火', 1, [status('burn', 3, 'target'), status('weak', 1, 'target')], [status('burn', 4, 'target'), status('weak', 1, 'target')], { target: 'enemy' }),
   A('lantern_flash', '灯闪', 1, [hit(6), status('vulnerable', 1, 'target'), when(coals(3), block(4))], [hit(9), status('vulnerable', 1, 'target'), when(coals(3), block(6))]),
   S('warm_cloak', '炽边斗篷', 1, [block(6), when(coals(3), status('burn', 2, 'all'))], [block(9), when(coals(3), status('burn', 3, 'all'))]),
   A('fanning_strike', '扇火斩', 1, [hit(8), when(coals(5), draw(1))], [hit(11), when(coals(5), draw(1))]),

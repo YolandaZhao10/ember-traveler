@@ -386,7 +386,7 @@ describe('战斗基础', () => {
       s.player.statuses.frail = 0;
       delete s.player.statuses.frail;
       s = playCard(s, shield.uid, null).state;
-      expect(s.player.block).toBe(4 + 3);
+      expect(s.player.block).toBe(5 + 3);
     });
 
     it('攻击带荆棘的敌人会反伤；余烬虫死亡点燃玩家；钟楼之心二阶段', () => {

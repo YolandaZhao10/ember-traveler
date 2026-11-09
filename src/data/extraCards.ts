@@ -66,7 +66,7 @@ add('traveler', 'rare', [
   A('encircling_blades', '环刃', 'combo', 1, [hit(2, { times: 4 }), when(attacks(2), status('energyNext', 1))], [hit(3, { times: 4 }), when(attacks(2), status('energyNext', 2))]),
   P('steadfast_guard', '不动阵地', 'bulwark', 2, [status('metallicize', 4), status('thorns', 2)], [status('metallicize', 6), status('thorns', 3)]),
   S('bastion_oath', '壁垒誓约', 'bulwark', 2, [block(18), status('barricade', 1)], [block(24), status('barricade', 1)], { exhaust: true }),
-  A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock' }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 5 }, status('weak', 3, 'target')]),
+  A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock', bonus: 6 }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 10 }, status('weak', 3, 'target')]),
   S('lantern_shelter', '灯下庇护', 'bulwark', 1, [{ kind: 'emberBurst', blockPer: 3 }, draw(2)], [{ kind: 'emberBurst', blockPer: 4 }, draw(2)]),
   P('long_road', '漫长守望', 'bulwark', 2, [status('study', 1), status('metallicize', 2)], [status('study', 1), status('metallicize', 3)]),
   A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(2), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(2), status('energyNext', 2))], { target: 'all_enemies' }),
@@ -91,7 +91,7 @@ add('picker', 'common', [
 add('picker', 'uncommon', [
   S('smoke_cover', '烟幕护身', 'cinder', 1, [exhaust(1), block(7), status('weak', 1, 'all')], [exhaust(1), block(10), status('weak', 2, 'all')]),
   A('flashpoint', '燃点', 'cinder', 1, [hit(8), when(burning, status('vulnerable', 2, 'target'))], [hit(12), when(burning, status('vulnerable', 2, 'target'))]),
-  A('coal_lance', '炭火长枪', 'cinder', 2, [{ kind: 'damagePerBurn', amount: 2 }, hit(8)], [{ kind: 'damagePerBurn', amount: 3 }, hit(8)]),
+  A('coal_lance', '炭火长枪', 'cinder', 2, [{ kind: 'damagePerBurn', amount: 2 }, hit(10)], [{ kind: 'damagePerBurn', amount: 3 }, hit(12)]),
   S('black_smoke', '浓烟', 'cinder', 1, [exhaust(1), status('burn', 2, 'all'), status('weak', 1, 'all')], [exhaust(1), status('burn', 3, 'all'), status('weak', 2, 'all')]),
   S('firebreak', '隔火带', 'cinder', 1, [status('burn', 2, 'target'), { kind: 'blockPerBurn', amount: 2, max: 18 }], [status('burn', 3, 'target'), { kind: 'blockPerBurn', amount: 2, max: 24 }], { target: 'enemy' }),
   P('coal_heart', '炉灰余温', 'cinder', 1, [status('pyre', 1)], [status('pyre', 2)]),

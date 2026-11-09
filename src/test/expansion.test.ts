@@ -124,7 +124,7 @@ describe('扩展卡池与遗物配额', () => {
     let after = playCard(cs, 'shield_rush', 'e0').state;
     expect(after.player.block).toBe(11); expect(cs.enemies[0].hp - after.enemies[0].hp).toBe(14);
     cs = battle('coal_lance', true); after = playCard(cs, 'coal_lance', 'e0').state;
-    expect(cs.enemies[0].hp - after.enemies[0].hp).toBe(20); expect(after.enemies[0].statuses.burn).toBe(4);
+    expect(cs.enemies[0].hp - after.enemies[0].hp).toBe(24); expect(after.enemies[0].statuses.burn).toBe(4);
     cs = battle('mountain_splitter'); cs.player.statuses.strength = 3; after = playCard(cs, 'mountain_splitter', 'e0').state;
     expect(cs.enemies[0].hp - after.enemies[0].hp).toBe(24);
     cs = battle('surge_glyph'); cs.player.hand[0].bonus = 2; cs.player.statuses.echo = 1; after = playCard(cs, 'surge_glyph', 'e0').state;
