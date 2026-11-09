@@ -398,10 +398,10 @@ h3 {
 
 /* ---------- 地图 ---------- */
 .map-screen {
-  padding: 12px;
-  gap: 10px;
+  padding: 8px;
+  gap: 6px;
 }
-.map-preview { height: min(70vh, 720px); min-height: 0; flex: none; }
+.map-preview { height: min(78dvh, 800px, calc(92dvh - 80px)); min-height: 0; flex: none; }
 .map-preview .map-node.available { cursor: default; }
 .map-stage {
   position: relative;
@@ -425,7 +425,9 @@ h3 {
 .map-svg {
   display: block;
   width: 100%;
+  max-width: 720px;
   min-width: 520px;
+  margin-inline: auto;
   height: auto;
 }
 .compact-map .map-svg {
@@ -474,7 +476,7 @@ h3 {
   }
 }
 .map-edge {
-  stroke: #5a4a36;
+  stroke: #8a7757;
   stroke-width: 2.5;
   stroke-dasharray: 5 6;
   fill: none;

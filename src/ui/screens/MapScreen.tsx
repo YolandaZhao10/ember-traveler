@@ -13,31 +13,40 @@ const ICONS: Record<MapNode['type'], string> = {
   rest: '♨',
   boss: '👑',
 };
+const ROW_HEIGHT = 60;
+const TOP_SPACE = 72;
+const BOTTOM_SPACE = 48;
 
 export function MapScreen({ preview = false }: { preview?: boolean }) {
   const { run } = useGame();
   const wrap = useRef<HTMLDivElement>(null);
   const curRow = run?.currentNodeId ? run.map.nodes[run.currentNodeId].row : -1;
+  const rows = run?.map.rows ?? MAP_ROWS;
+  const H = TOP_SPACE + (rows - 1) * ROW_HEIGHT + BOTTOM_SPACE;
+  const rowY = (row: number) => TOP_SPACE + (rows - 1 - row) * ROW_HEIGHT;
+  const focusY = rowY(Math.max(0, curRow));
   useEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    // 将当前层滚到视野中下部（SVG 按宽度缩放，用比例换算）
-    const rows = run?.map.rows ?? MAP_ROWS;
-    const H = rows * 78 + 40;
-    const total = el.scrollHeight;
-    const target = total * (1 - ((curRow + 1) * 78 + 40) / H) - el.clientHeight * 0.6;
-    el.scrollTop = Math.max(0, target);
-  }, [curRow, run?.map.rows]);
+    const locate = () => {
+      const svg = el.querySelector('svg');
+      if (!svg) return;
+      // 使用实际 SVG 高度换算，当前位置靠近下方，为前面的路线留出视野。
+      el.scrollTop = Math.max(0, focusY * svg.getBoundingClientRect().height / H - el.clientHeight * 0.8);
+    };
+    locate();
+    const observer = new ResizeObserver(locate);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [focusY, H]);
   if (!run) return null;
   const map = run.map;
   const chapter = CHAPTERS[run.chapter];
   const avail = availableNodes(map, run.currentNodeId);
   const compact = map.rows <= 5;
   const W = compact ? 320 : 720;
-  const rowH = 78;
-  const H = map.rows * rowH + 40;
   const colW = W / (map.cols + 1);
-  const pos = (n: MapNode) => ({ x: colW * (n.col + 1), y: H - 40 - n.row * rowH - 10 });
+  const pos = (n: MapNode) => ({ x: colW * (n.col + 1), y: rowY(n.row) });
   const nodes = Object.values(map.nodes);
   const visited = new Set(run.visited);
   // 已经无法到达的节点（在当前层以下或不在可达分支）
@@ -57,7 +66,7 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
           <b>{ICONS.combat}</b>战斗
         </span>
         <span>
-          <b>{ICONS.elite}</b>精英（同层额外强化，掉落遗物）
+          <b>{ICONS.elite}</b><span title="比普通战斗更强，胜利后额外掉落遗物">精英</span>
         </span>
         <span>
           <b>{ICONS.event}</b>事件
@@ -125,7 +134,7 @@ function MapSvg(props: {
         const isCur = n.id === currentId;
         const isVisited = visited.has(n.id);
         const dead = !isAvail && !isCur && !isVisited && !reachable.has(n.id);
-        const r = n.type === 'boss' ? 30 : 20;
+        const r = n.type === 'boss' ? 30 : 18;
         return (
           <g
             key={n.id}
@@ -141,7 +150,7 @@ function MapSvg(props: {
               {ICONS[n.type]}
             </text>
             {(isAvail || isCur) && (
-              <text y={-r - 8} textAnchor="middle" fontSize="11" fill="#ffb347">
+              <text y={-r - 6} textAnchor="middle" fontSize="10" fill="#ffb347">
                 {isCur ? '当前位置' : nodeTypeName(n.type)}
               </text>
             )}
@@ -149,7 +158,7 @@ function MapSvg(props: {
         );
       })}
       {Array.from({ length: map.rows }).map((_, r) => (
-        <text key={r} x={14} y={H - 40 - r * 78 - 6} fontSize="11" fill="#7a6a55">
+        <text key={r} x={14} y={TOP_SPACE + (map.rows - 1 - r) * ROW_HEIGHT + 4} fontSize="12" fill="#b7a98a">
           {floorOffset + r + 1}
         </text>
       ))}
