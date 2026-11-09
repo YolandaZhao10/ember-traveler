@@ -1,6 +1,6 @@
 import { createCombat, canPlayCard, playCard } from '../engine/combat';
 import { makeRng } from '../engine/rng';
-import type { CardInstance } from '../engine/types';
+import type { CardInstance, Statuses } from '../engine/types';
 import { CARD_LIST, CARDS } from '../data/cards';
 import { viewCard } from '../engine/cards';
 
@@ -12,12 +12,15 @@ export function resourcePairs(): [CardInstance, CardInstance][] {
 }
 
 /** 极薄牌组，无遗物/能力；满足连击、格挡、燃烧与本回合失血门槛，检查双牌资源循环。 */
-export function probePair(a: CardInstance, b: CardInstance, limit = 80) {
+export function probePair(a: CardInstance, b: CardInstance, limit = 80, statuses: Statuses = {}) {
   let cs = createCombat('audit', ['tomb_puppet'], 'normal', [], 100, 100, [], makeRng('LOOP', 'c'), 100).state;
   cs.enemies[0].hp = cs.enemies[0].maxHp = 1000000;
   cs.player.hand = [{ ...a, uid: 'probe-0' }, { ...b, uid: 'probe-1' }];
   cs.player.ember = 10; cs.player.cardsPlayedThisTurn = 10; cs.player.attacksPlayedThisTurn = 10;
   cs.player.block = 10; cs.player.hpLostThisTurn = 10; cs.enemies[0].statuses.burn = 10;
+  cs.player.statuses = { ...statuses };
+  if (statuses.comboFlow) cs.player.attacksPlayedThisTurn = 0;
+  if (statuses.chargeMaster) cs.player.hand.forEach(c => { c.bonus = 2; });
   let actions = 0;
   while (actions < limit) {
     const card = cs.player.hand.find(c => canPlayCard(cs, c).ok);

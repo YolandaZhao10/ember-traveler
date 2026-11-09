@@ -67,8 +67,10 @@ export function calcBlock(base: number, owner: Statuses): number {
   return Math.max(0, b);
 }
 
-export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity | null = null): boolean {
+export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity | null = null, charge = 0): boolean {
   switch (cond.kind) {
+    case 'exhaustedThisTurn': return (p.turnFlags.exhausted ?? 0) > 0;
+    case 'charged': return charge >= cond.value;
     case 'targetBurning':
       return !!target && (target.statuses.burn ?? 0) > 0;
     case 'lostHpThisTurn':
@@ -88,6 +90,8 @@ export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity 
 
 function condText(cond: Condition): string {
   switch (cond.kind) {
+    case 'exhaustedThisTurn': return '若本回合消耗过牌';
+    case 'charged': return `若本牌已蓄力至少 ${cond.value} 层`;
     case 'emberAtLeast':
       return `若余烬 ≥ ${cond.value}`;
     case 'attacksThisTurnAtLeast':

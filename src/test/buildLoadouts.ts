@@ -1,0 +1,14 @@
+import type { CharacterId } from '../engine/types';
+export const BUILD_LOADOUTS: { route: string; character: CharacterId; cards: string[]; relics: string[] }[] = [
+ { route:'combo', character:'traveler', cards:['quick_stab','twin_blades','chain_slash','spin_kick','rhythm','haste','thousand_cuts','tempo','war_drum','trip','quick_stab','iron_will'], relics:['clocktower_gear','furnace_crown','flint','metronome','trail_boots','drummer_heart'] },
+ { route:'bulwark', character:'traveler', cards:['raise_shield','shield_bash','thorn_mail','iron_wall','riposte','hold_fast','iron_will','shield_shatter','vigil','bulwark_counter','raise_shield','shield_bash'], relics:['gatekeeper_aegis','molten_sigil','rusted_plate','thorn_crown','shield_rivet','anvil_shard'] },
+ { route:'cinder', character:'picker', cards:['light_up','wildfire','scorch_mark','detonate','add_fuel','lingering_fire','heat_wave','cremation','everburning','ember_tongue','lingering_fire','ash_shield'], relics:['royal_ash_crown','deep_archive','tinderbox','soot_mask','ash_compass','rune_stone'] },
+ { route:'ash', character:'picker', cards:['burn_pages','bone_ash','ash_feast','pass_the_flame','burn_it_all','ash_return','dust_to_dust','ash_offering','bone_ash','ash_return','stoke','ember_burst'], relics:['crowned_lantern','foundry_core','bone_urn','coal_pouch','kiln_spark','phoenix_ash'] },
+ { route:'blood', character:'oathbound', cards:['blood_edge','blood_rite','leech_bite','blood_pact','martyr','numb','crimson_mail','sanguine','eye_for_eye','leech_bite','blood_rite','inflame'], relics:['belltower_pendulum','furnace_crown','iron_skull','blood_pendant','scar_band','war_horn'] },
+ { route:'might', character:'oathbound', cards:['flex','inflame','bone_crusher','overpower','frenzy','demon_heart','heavy_blow','intimidate','blood_fury','overpower','leech_bite','numb'], relics:['sovereign_sigil','furnace_crown','war_horn','whetstone','war_standard','rune_stone'] },
+ { route:'echo', character:'scholar', cards:['double_chant','echo_blade','resonance','mirror','ash_word','aria','rune_burst','finale','rune_shield','rune_wall','erudition','echo_blade'], relics:['crowned_lantern','deep_archive','old_tome','tuning_fork','ink_well','crystal_chime'] },
+ { route:'focus', character:'scholar', cards:['rune_shield','focus','rune_wall','charged_blade','meditate','erudition','ward_rune','ash_equation','charged_blade','rune_shield','stoke','ember_burst'], relics:['gatekeeper_aegis','deep_archive','lens','bookmark','star_chart','ink_well'] },
+];
+// 每条路线各带一件第三章奖励；其余均为已取得的前章与常规来源遗物。
+const chapterThreeRelics = ['astral_crown','moonward_aegis','starfire_seal','constellation_engine','sky_reliquary','astral_crown','eclipse_lens','constellation_engine'];
+BUILD_LOADOUTS.forEach((loadout, i) => loadout.relics.push(chapterThreeRelics[i]));

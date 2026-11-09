@@ -1,6 +1,11 @@
 import type { StatusDef, StatusId } from '../engine/types';
 
 export const STATUSES: Record<StatusId, StatusDef> = {
+  comboFlow: { id: 'comboFlow', name: '续势', kind: 'power', description: n => `每回合打出第 3 张攻击牌后，获得 ${n} 点能量。重放不计数。` },
+  guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
+  ashInsight: { id: 'ashInsight', name: '灰中启示', kind: 'power', description: n => `每回合生效后的前 2 次消耗，每次抽 ${n} 张牌。` },
+  bloodDraw: { id: 'bloodDraw', name: '血之筹码', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，抽 ${n} 张牌。` },
+  chargeMaster: { id: 'chargeMaster', name: '凝神', kind: 'power', description: n => `保留的蓄力牌额外蓄力 ${n} 层；每回合首张蓄力 ≥2 的牌返还固定 1 能量。` },
   strength: {
     id: 'strength',
     name: '力量',

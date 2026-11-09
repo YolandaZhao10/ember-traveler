@@ -35,6 +35,15 @@ describe('平衡边界回归', () => {
     const existing = battle('double_chant'); existing.player.statuses.echo = 1;
     expect(playCard(existing, 'double_chant', null).state.player.statuses.echo).toBe(4);
   });
+  it('新增续航能力在叠加压力下也不能让低费双牌形成无限循环', () => {
+    const loops: string[] = [];
+    for (const [a, b] of resourcePairs()) {
+      // 跨流派能力一并开启，作为强于实际可获得组合的上界压力。
+      if (probePair(a, b, 80, { comboFlow: 2, ashInsight: 2, bloodDraw: 3, chargeMaster: 2 }).actions === 80)
+        loops.push(`${a.defId}${a.upgraded}+${b.defId}${b.upgraded}`);
+    }
+    expect(loops).toEqual([]);
+  });
   it.each([false, true])('烬舌仅在目标事先燃烧时获得余烬，打完消耗（升级=%s）', up => {
     const plain = playCard(battle('ember_tongue', up), 'ember_tongue', 'e0').state;
     expect(plain.player.ember).toBe(0); expect(plain.enemies[0].statuses.burn).toBe(up ? 2 : 1);

@@ -31,7 +31,7 @@ describe('专属卡牌的不同用途', () => {
     expect(cs.player.statuses.study).toBe(1);
     expect(cs.player.statuses.barricade ?? 0).toBe(0);
     cs = endPlayerTurn(cs).state;
-    expect(cs.player.block).toBe(up ? 13 : 12);
+    expect(cs.player.block).toBe(up ? 16 : 14);
     cs = startPlayerTurn(cs).state;
     expect(cs.player.block).toBe(0);
     expect(cs.player.hand).toHaveLength(6);

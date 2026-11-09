@@ -145,6 +145,11 @@ function playerLoseHp(cs: CombatState, amount: number, ev: CombatEvent[], fromCa
     p.selfHpLost += lost;
     p.turnFlags.cardHpLost = (p.turnFlags.cardHpLost ?? 0) + lost;
     log(cs, ev, `失去 ${lost} 点生命`);
+    if (lost > 0 && p.hp > 0 && p.statuses.bloodDraw && !p.turnFlags.bloodDraw) {
+      p.turnFlags.bloodDraw = 1;
+      drawCards(cs, p.statuses.bloodDraw, ev);
+      log(cs, ev, `血之筹码：抽 ${p.statuses.bloodDraw} 张牌`);
+    }
     if (p.statuses.bloodRage) {
       gainStrength(cs, p.statuses.bloodRage, ev);
       log(cs, ev, `血契：获得 ${p.statuses.bloodRage} 点力量`);
@@ -263,6 +268,11 @@ function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[]) {
   p.exhaust.push(card);
   p.turnFlags.exhausted = (p.turnFlags.exhausted ?? 0) + 1;
   log(cs, ev, `「${viewCard(card).name}」被消耗`);
+  if (p.hp > 0 && cs.outcome === 'ongoing' && p.statuses.ashInsight && (p.turnFlags.ashInsight ?? 0) < 2) {
+    p.turnFlags.ashInsight = (p.turnFlags.ashInsight ?? 0) + 1;
+    drawCards(cs, p.statuses.ashInsight, ev);
+    log(cs, ev, `灰中启示：抽 ${p.statuses.ashInsight} 张牌`);
+  }
   if (p.statuses.ashFeast) {
     gainBlock(p, p.statuses.ashFeast, ev, cs);
     log(cs, ev, `灰烬盛宴：获得 ${p.statuses.ashFeast} 点格挡`);
@@ -487,7 +497,7 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
   log(cs, ev, `—— 第 ${cs.turn} 回合 ——`);
   p.turnFlags = {};
   for (const power of ensurePowerInstances(p)) if (power.status === 'mirror') power.progress = 0;
-  if (!p.statuses.barricade) p.block = 0;
+  if (!p.statuses.barricade) p.block = Math.min(p.block, p.statuses.guardReserve ?? 0);
   // 燃烧
   if (p.statuses.burn) {
     const b = p.statuses.burn;
@@ -594,6 +604,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   const activeTempos = ensurePowerInstances(p).filter(power => power.status === 'tempo');
   // “下一张”只消费打牌之前已有的回响，不能被本牌刚获得的回响重复自己。
   const hadEcho = (p.statuses.echo ?? 0) > 0;
+  const releaseCharge = !!p.statuses.chargeMaster && !!v.charge && v.bonus >= 2 && !p.turnFlags.chargeMaster;
   ev.push({ type: 'cardPlayed', uid, name: v.name });
   log(cs, ev, `打出「${v.name}」${target ? ` → ${target.name}` : ''}`);
 
@@ -638,6 +649,17 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   // 计数
   p.cardsPlayedThisTurn += 1;
   if (v.type === 'attack') p.attacksPlayedThisTurn += 1;
+  if (cs.outcome === 'ongoing' && p.hp > 0) {
+    if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && p.statuses.comboFlow) {
+      p.energy += p.statuses.comboFlow;
+      log(cs, ev, `续势：获得 ${p.statuses.comboFlow} 点能量`);
+    }
+    if (releaseCharge) {
+      p.turnFlags.chargeMaster = 1;
+      p.energy += 1;
+      log(cs, ev, '凝神：返还 1 点能量');
+    }
+  }
   if (v.type === 'skill') p.skillsPlayedThisTurn += 1;
   triggerRelics(cs, 'cardPlayed', ev);
   if (v.type === 'attack') triggerRelics(cs, 'attackPlayed', ev);
@@ -991,7 +1013,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       }
       case 'conditional':
-        if (checkCondition(e.cond, p, target)) resolveEffects(cs, e.then, target, ev, extraDamage);
+        if (checkCondition(e.cond, p, target, view?.bonus ?? 0)) resolveEffects(cs, e.then, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined);
         break;
     }
   }
@@ -1137,7 +1159,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
   for (const c of p.hand) {
     const cv = viewCard(c);
     if (cv.retain) {
-      if (cv.charge) c.bonus = (c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1);
+      if (cv.charge) c.bonus = (c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0);
       kept.push(c);
     } else p.discard.push(c);
   }

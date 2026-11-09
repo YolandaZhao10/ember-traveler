@@ -26,8 +26,8 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     starterRelic: 'ember_lantern',
     archetypes: ['basic', 'combo', 'bulwark', 'ember'],
     routes: [
-      { name: '连击', text: '低费牌、抽牌与多段攻击形成节奏。' },
-      { name: '壁垒', text: '格挡、荆棘与格挡转伤害。' },
+      { name: '连击', text: '先用低费攻击续势返能，再用多段终结技兑现连击。' },
+      { name: '壁垒', text: '保留剩余格挡，再决定用盾反击还是碎盾爆发。' },
       { name: '余烬', text: '先积累余烬，再一次性爆发。' },
     ],
     sprite: 'traveler',
@@ -44,7 +44,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     archetypes: ['basic', 'cinder', 'ash', 'ember'],
     routes: [
       { name: '焚烧', text: '给敌人叠加燃烧，用引爆、热浪借火放大伤害。' },
-      { name: '灰烬', text: '消耗手牌换能量、格挡与伤害，再从消耗区取回。' },
+      { name: '灰烬', text: '消耗补牌、护体与伤害，付费回收时也获得防护。' },
       { name: '余烬', text: '与旅人共享的余烬卡池。' },
     ],
     sprite: 'picker',
@@ -60,8 +60,8 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     starterRelic: 'blood_seal',
     archetypes: ['basic', 'blood', 'might', 'ember'],
     routes: [
-      { name: '血誓', text: '失去生命换取资源与伤害，吸血回补，失血触发力量或格挡。' },
-      { name: '狂力', text: '堆叠力量，用按力量倍增的攻击收割。' },
+      { name: '血誓', text: '主动失血补牌、换力量与格挡，再用吸血回补风险。' },
+      { name: '狂力', text: '安排临时力量的爆发回合，用多段与力量倍率收割。' },
       { name: '余烬', text: '与其他角色共享的余烬卡池。' },
     ],
     sprite: 'oathbound',
@@ -78,7 +78,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     archetypes: ['basic', 'echo', 'focus', 'ember'],
     routes: [
       { name: '回响', text: '让下一张牌触发两次，放大关键牌。' },
-      { name: '专注', text: '保留蓄力牌、储存能量、多抽牌。' },
+      { name: '专注', text: '保留牌蓄力，提前存能；达到蓄力门槛后释放返能。' },
       { name: '余烬', text: '与其他角色共享的余烬卡池。' },
     ],
     sprite: 'scholar',

@@ -50,11 +50,11 @@ describe('余烬使用9999内部边界', () => {
     const result = play(cs, 'stoke'); cs = result.state;
     expect(cs.player.ember).toBe(9999);
     expect(result.events.filter(e => e.type === 'ember')).toEqual([{ type: 'ember', amount: 1, total: 9999 }]);
-    expect(cs.player.block).toBe(5); // 添薪3 + 实际获得1余烬带来2格挡
+    expect(cs.player.block).toBe(8); // 添薪6 + 实际获得1余烬带来2格挡
     cs.player.hand.push(card('stoke', 'again'));
     const full = play(cs, 'stoke');
     expect(full.state.player.ember).toBe(9999);
-    expect(full.state.player.block - cs.player.block).toBe(3);
+    expect(full.state.player.block - cs.player.block).toBe(6);
     expect(full.events.some(e => e.type === 'ember')).toBe(false);
   });
 

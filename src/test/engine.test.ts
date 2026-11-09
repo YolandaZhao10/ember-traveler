@@ -97,7 +97,7 @@ describe('战斗基础', () => {
     expect(canPlayCard(cs, handCard(cs, 'ashes')).ok).toBe(false);
     let s = playCard(cs, handCard(cs, 'iron_wall').uid, null).state;
     expect(s.player.energy).toBe(1);
-    expect(s.player.block).toBe(12);
+    expect(s.player.block).toBe(16);
     expect(canPlayCard(s, handCard(s, 'iron_wall')).ok).toBe(false); // 能量不足
     // 无效目标不会结算
     const before = s;
@@ -165,7 +165,7 @@ describe('战斗基础', () => {
   it('能力牌打出后不进入弃牌堆，消耗牌进入消耗区，升级改变数值', () => {
     const cs = combatWith([card('iron_will'), card('haste'), card('strike', true), card('defend'), card('defend')], ['tomb_puppet']);
     let s = playCard(cs, handCard(cs, 'iron_will').uid, null).state;
-    expect(s.player.statuses.metallicize).toBe(3);
+    expect(s.player.statuses.metallicize).toBe(4);
     expect(s.player.discard.length).toBe(0);
     s = playCard(s, handCard(s, 'haste').uid, null).state;
     expect(s.player.exhaust.length).toBe(1);
@@ -174,7 +174,7 @@ describe('战斗基础', () => {
     s = playCard(s, handCard(s, 'strike').uid, 'e0').state;
     expect(hp - s.enemies[0].hp).toBe(9);
     s = endPlayerTurn(s).state;
-    expect(s.player.block).toBe(3); // 钢铁意志
+    expect(s.player.block).toBe(4); // 钢铁意志
   });
 
   it('Boss 阶段切换与清除减益', () => {
@@ -287,8 +287,8 @@ describe('战斗基础', () => {
       const energy = s.player.energy;
       s = playCard(s, handCard(s, 'burn_pages').uid, null).state;
       expect(s.player.exhaust.length).toBe(2); // 目标手牌与焚书自身各消耗一次
-      expect(s.player.block).toBe(6); // 两次灰烬盛宴
-      expect(enemyHp - s.enemies[0].hp).toBe(8); // 两次火种传递
+      expect(s.player.block).toBe(8); // 两次灰烬盛宴
+      expect(enemyHp - s.enemies[0].hp).toBe(16); // 两次火种传递
       expect(s.player.energy).toBe(energy + 1);
       // 焚书本身消耗、另消耗一张、骨灰坛只抽一张 → 手牌 -1 -1 +1
       expect(s.player.hand.length).toBe(handBefore - 1);
@@ -306,7 +306,7 @@ describe('战斗基础', () => {
       s = playCard(s, handCard(s, 'burn_it_all').uid, 'e0').state;
       expect(s.player.hand.length).toBe(0);
       expect(s.player.exhaust.length).toBe(4);
-      expect(hp - s.enemies[0].hp).toBe(24);
+      expect(hp - s.enemies[0].hp).toBe(36);
     });
 
     it('卡池与遗物池按角色过滤', () => {
@@ -336,11 +336,11 @@ describe('战斗基础', () => {
       expect(s.player.statuses.strength).toBe(2);
       const hpBefore = s.player.hp;
       const ehp = s.enemies[0].hp;
-      s = playCard(s, handCard(s, 'blood_edge').uid, 'e0').state; // 失去 2 → 血契 +1 力量（先于伤害）→ 9+3=12
+      s = playCard(s, handCard(s, 'blood_edge').uid, 'e0').state; // 失去 2 → 血契 +1 力量（先于伤害）→ 14+3=17
       expect(s.player.hp).toBe(hpBefore - 2);
       expect(s.player.statuses.strength).toBe(3);
       expect(s.player.block).toBe(2); // 铁颅
-      expect(ehp - s.enemies[0].hp).toBe(12);
+      expect(ehp - s.enemies[0].hp).toBe(17);
       s.player.hp = 30;
       s.player.energy = 1;
       const e2 = s.enemies[0].hp;
@@ -378,15 +378,15 @@ describe('战斗基础', () => {
       const shield = handCard(s, 'rune_shield');
       s = endPlayerTurn(s).state;
       expect(s.player.hand.map((c) => c.uid)).toEqual([shield.uid]);
-      expect(s.player.hand[0].bonus).toBe(1);
+      expect(s.player.hand[0].bonus).toBe(2);
       s = enemyAct(s, 'e0').state;
       s = startPlayerTurn(s).state;
-      expect(s.player.energy).toBe(4); // 蓄能 +1
+      expect(s.player.energy).toBe(5); // 蓄能 +2
       expect(s.player.hand.length).toBe(1 + 6); // 保留 1 + 抽 5 + 博学 1
       s.player.statuses.frail = 0;
       delete s.player.statuses.frail;
       s = playCard(s, shield.uid, null).state;
-      expect(s.player.block).toBe(5 + 3);
+      expect(s.player.block).toBe(5 + 6);
     });
 
     it('攻击带荆棘的敌人会反伤；余烬虫死亡点燃玩家；钟楼之心二阶段', () => {

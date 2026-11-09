@@ -52,6 +52,11 @@ export type StatusId =
   | 'mirror'
   | 'energyNext'
   | 'study'
+  | 'comboFlow'
+  | 'guardReserve'
+  | 'ashInsight'
+  | 'bloodDraw'
+  | 'chargeMaster'
   | 'arcaneWard';
 
 export type Condition =
@@ -61,6 +66,8 @@ export type Condition =
   | { kind: 'hasBlock' }
   | { kind: 'targetBurning' }
   | { kind: 'lostHpThisTurn' }
+  | { kind: 'charged'; value: number }
+  | { kind: 'exhaustedThisTurn' }
   | { kind: 'hasEcho' };
 
 export type Effect =

@@ -99,7 +99,7 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
         <RoutePanel run={run} selected={selected} preview={preview} canEnter={!!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
       </div>
       <p className="subtitle" style={{ textAlign: 'center', margin: 0 }}>
-        {preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较敌人与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
+        {preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
       </p>
     </div>
   );
@@ -122,7 +122,7 @@ function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
   reachable: boolean;
   onSelect: (id: string) => void;
 }) {
-  const encounter = selected ? plannedEncounter(run, selected) : undefined;
+  const encounter = selected && selected.type !== 'combat' ? plannedEncounter(run, selected) : undefined;
   const route = selected ? previewRoute(run.map, selected.id) : null;
   const enemies = encounter ? [...new Set(encounter.enemies)].map((id) => ({ enemy: ENEMIES[id], count: encounter.enemies.filter((enemyId) => enemyId === id).length })) : [];
   const distance = (value: number | null) => value === null ? '后路没有' : value === 0 ? '本站' : `最快 ${value} 层后`;
@@ -141,7 +141,7 @@ function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
           <div><dt>精英</dt><dd>{route.elites.min === route.elites.max ? route.elites.min : `${route.elites.min}–${route.elites.max}`} 场</dd></div>
         </dl><p className="route-note">包含所选节点；亮线为可达后路。“最快”取最近支路，精英数量随分叉选择变化。</p></section>}
         {!reachable && selected.id !== run.currentNodeId && <p className="route-note">这条路线已无法前往，可查看节点资料。</p>}
-      </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看敌人、收获和沿途补给，再决定下一步。</p><p>已有群攻、擅长持久战，或急需精简牌组，都可以成为选择路线的理由。</p></div>}
+      </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看收获、沿途补给与精英、首领资料，再决定下一步。</p><p>衡量精英的风险与收益，为休息、锻造或精简牌组留出路线。</p></div>}
     </div>
     <div className="route-panel-actions">
       {selected && canEnter && !preview && <button className="btn primary" onClick={() => travel(selected.id)}>确认前往 · {nodeTypeName(selected.type)}</button>}
@@ -202,7 +202,7 @@ function MapSvg(props: {
         const isCur = n.id === currentId;
         const isVisited = visited.has(n.id);
         const dead = !isAvail && !isCur && !isVisited && !reachable.has(n.id);
-        const encounter = plannedEncounter(run, n);
+        const encounter = n.type !== 'combat' ? plannedEncounter(run, n) : undefined;
         const r = n.type === 'boss' ? 30 : 18;
         return (
           <g

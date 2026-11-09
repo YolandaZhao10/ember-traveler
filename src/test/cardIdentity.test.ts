@@ -37,9 +37,9 @@ describe('卡牌效果身份与升级边界', () => {
   });
   it.each([false, true])('量步立即过牌，提灯巡守在本回合已出两张牌时为下一回合蓄能（升级=%s）', up => {
     const step = play('measured_step', up); const patrol = play('ember_patrol', up);
-    expect(step.player.block).toBe(up ? 9 : 6); expect(step.player.hand).toHaveLength(1);
+    expect(step.player.block).toBe(up ? 11 : 8); expect(step.player.hand).toHaveLength(1);
     expect(step.player.statuses.thorns ?? 0).toBe(0);
-    expect(patrol.player.block).toBe(up ? 9 : 6); expect(patrol.player.hand).toHaveLength(0);
+    expect(patrol.player.block).toBe(up ? 12 : 9); expect(patrol.player.hand).toHaveLength(0);
     expect(patrol.player.statuses.thorns ?? 0).toBe(0);
     expect(patrol.player.statuses.energyNext ?? 0).toBe(0);
     const ready = battle('ember_patrol', up); ready.player.cardsPlayedThisTurn = 2;
@@ -49,7 +49,7 @@ describe('卡牌效果身份与升级边界', () => {
     const fire = play('cremation', up); const armor = play('crimson_mail', up);
     expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 5 : 3, up ? 5 : 3]);
     expect(fire.player.statuses.pyre).toBe(up ? 3 : 2);
-    expect(armor.player.block).toBe(up ? 12 : 8); expect(armor.player.statuses.bloodArmor).toBe(up ? 4 : 3);
+    expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.bloodArmor).toBe(up ? 6 : 4);
     expect(play('coal_heart', true).enemies[0].statuses.burn ?? 0).toBe(0);
     expect(play('blood_watch', true).player.block).toBe(0);
   });
@@ -61,10 +61,10 @@ describe('卡牌效果身份与升级边界', () => {
     expect(endPlayerTurn(cs).state.player.statuses.strength ?? 0).toBe(0);
   });
   it('符文爆发的回响条件与群体伤害真实执行，未触发时不附加', () => {
-    expect(play('rune_burst').enemies.map(e => e.hp)).toEqual([992, 992]);
+    expect(play('rune_burst').enemies.map(e => e.hp)).toEqual([989, 989]);
     const echoed = play('rune_burst', false, 1);
-    // 首次有回响时8+4，重放前消耗回响，第二次只造成8。
-    expect(echoed.enemies.map(e => e.hp)).toEqual([980, 980]);
+    // 首次有回响时11+4，重放前消耗回响，第二次只造成11。
+    expect(echoed.enemies.map(e => e.hp)).toEqual([974, 974]);
   });
   it.each([false, true])('封存烈火兼有下回合能量，区别于干薪束（升级=%s）', up => {
     const result = play('sealed_flame', up);
@@ -96,7 +96,7 @@ describe('荆棘与盾牌的新取舍', () => {
     expect(after.player.statuses.thorns).toBe((3+(up?2:1))*2); expect(after.player.block).toBe(0);
     expect(after.player.hand).toHaveLength(1); expect(after.player.exhaust.map(c=>c.defId)).toContain('thorn_stance');
     expect(describeCard(card('thorn_stance',up),null)).toContain('自身的荆棘层数翻倍');
-    expect(play('thorn_mail',up).player.block).toBe(up?6:4);
+    expect(play('thorn_mail',up).player.block).toBe(up?10:7);
     expect(play('thorn_mail',up).player.statuses.thorns).toBe(up?3:2);
   });
   it.each([false,true])('碎盾先消耗格挡再按倍数群攻；盾击保留格挡且只击中所选敌人（升级=%s）',up=>{

@@ -47,7 +47,7 @@ describe('基础打击、防御的实际收益下限', () => {
     expect(candidate.cost).toBe(1);
     expect(candidate.damage).toBeGreaterThanOrEqual(base.damage);
     // 这些均可重复使用，不应靠本轮补强变成无条件的高倍爆发牌。
-    expect(candidate.damage).toBeLessThanOrEqual(12);
+    expect(candidate.damage).toBeLessThanOrEqual(14);
     expect(candidate.after.player.hp).toBe(candidate.before.player.hp);
     expect(candidate.after.player.energy).toBe(2);
   });
@@ -85,7 +85,7 @@ describe('基础打击、防御的实际收益下限', () => {
       expect(candidate.cost).toBe(2 * base.cost);
       // 长枪的额外费用主要换燃烧收益；回敬另有持续虚弱和格挡转伤。
       expect(candidate.damage).toBeGreaterThanOrEqual(base.damage + (id === 'coal_lance' ? 3 : 0));
-      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2);
+      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 2);
       expect(candidate.after.player.energy).toBe(1);
     }
   });
@@ -111,7 +111,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       expect(candidate.damage).toBeGreaterThan(base.damage);
       expect(candidate.damage - naked.damage).toBeGreaterThanOrEqual(4);
       expect(candidate.damage - naked.damage).toBeLessThanOrEqual(6);
-      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2);
+      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 2);
       expect(candidate.after.player.hp).toBe(198);
       expect(candidate.cost).toBe(1);
     }
@@ -124,7 +124,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       const candidate = measure('riposte', up, cs => { cs.player.block = 5; });
       expect(candidate.damage).toBeGreaterThan(naked.damage);
       expect(candidate.damage).toBeGreaterThan(base.damage);
-      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2);
+      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 2);
       expect(candidate.after.player.block).toBe(5);
       expect(candidate.cost).toBe(1);
     }
@@ -137,7 +137,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       const candidate = measure('scorch_mark', up, cs => { cs.enemies[0].statuses.burn = 2; });
       expect(candidate.damage).toBeGreaterThan(naked.damage);
       expect(candidate.damage).toBeGreaterThan(base.damage);
-      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2);
+      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 2);
       expect(candidate.after.enemies[0].statuses.burn).toBe(2);
       expect(candidate.cost).toBe(1);
     }
@@ -165,7 +165,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       const base = measure('strike', up);
       const candidate = measure('coal_lance', up, cs => { cs.enemies[0].statuses.burn = 2; });
       expect(candidate.damage).toBeGreaterThanOrEqual(base.damage * 2);
-      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 4);
+      expect(candidate.damage).toBeLessThanOrEqual(base.damage * 2 + 6);
       expect(candidate.cost).toBe(base.cost * 2);
       expect(candidate.after.enemies[0].statuses.burn).toBe(2);
     }
@@ -247,7 +247,7 @@ describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
     }
   });
 
-  it('荆棘甲虽然即时格挡较低，敌人攻击后防护与反伤之和仍超过基础防御', () => {
+  it('荆棘甲提高即时防护，反伤仍需要敌人实际攻击', () => {
     for (const up of upgrades) {
       const armor = measure('thorn_mail', up);
       const defense = measure('defend', up);
@@ -256,7 +256,7 @@ describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
       const undefended = round(bare);
       const prevented = armored.player.hp - undefended.player.hp;
       const reflected = armor.before.enemies[0].hp - armored.enemies[0].hp;
-      expect(armor.block).toBeLessThan(defense.block);
+      expect(armor.block).toBe(defense.block + 2);
       expect(prevented + reflected).toBeGreaterThan(defense.block);
       expect(armor.cost).toBe(defense.cost);
     }
@@ -266,7 +266,7 @@ describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
     for (const up of upgrades) {
       const base = measure('strike', up);
       const echoed = measure('echo_blade', up);
-      expect(echoed.damage).toBeLessThan(base.damage);
+      expect(echoed.damage).toBe(base.damage + 2);
       expect(echoed.after.player.hand).toHaveLength(echoed.before.player.hand.length);
       expect(echoed.cost).toBe(base.cost);
       const twin = measure('twin_blades', up, cs => { cs.player.statuses.strength = 1; });

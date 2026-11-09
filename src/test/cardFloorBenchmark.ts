@@ -68,7 +68,7 @@ const HP_WEIGHT = 3;
  * 用真实敌方回合评估当前回合的短计划，避免把条件效果统一当成“+1分”。
  * 未来收益只用于比较仍在进行的战斗；门槛始终按最终胜负、损血和回合统计。
  */
-function turnValue(input: CombatState, knownUids: Set<string>): number {
+function turnValue(input: CombatState, knownUids: Set<string>, engines = false): number {
   let cs = input.outcome === 'ongoing' ? endPlayerTurn(input).state : input;
   for (const enemy of cs.enemies) {
     if (cs.outcome !== 'ongoing') break;
@@ -79,6 +79,14 @@ function turnValue(input: CombatState, knownUids: Set<string>): number {
   const p = cs.player;
   let future = (p.statuses.strength ?? 0) * 2 + (p.statuses.metallicize ?? 0) * 2 + (p.statuses.energyNext ?? 0) * 2;
   future += (p.statuses.regen ?? 0) * 2 + p.ember * 0.3;
+  if (engines) {
+    // 同一估值器用于旧牌与新牌，只按机制估值，不按牌名或版本加分。
+    const weights = { comboFlow: 5, guardReserve: 0.7, ashInsight: 6, bloodDraw: 4, chargeMaster: 6,
+      ashFeast: 2, kindling: 2, echo: 4, resonance: 9, mirror: 6, tempo: 6, crescendo: 3,
+      study: 6, dexterity: 3, thorns: 2, pyre: 4, everburn: 5, arcaneWard: 3,
+      bloodArmor: 2, bloodRage: 4, demonHeart: 5, forge: 3, emberHeart: 2 };
+    for (const [status, weight] of Object.entries(weights)) future += (p.statuses[status as keyof typeof weights] ?? 0) * weight;
+  }
   // endPlayerTurn 已实际保留并蓄力；仅计一部分下回合潜力，不能用纸面蓄力掩盖当前失血。
   for (const card of p.hand.filter(card => knownUids.has(card.uid))) {
     const v = viewCard(card);
@@ -95,15 +103,15 @@ function turnValue(input: CombatState, knownUids: Set<string>): number {
 }
 
 /** 两方同一策略、无牌名分支。至多五次出牌，束宽六，保留立即结束回合的选项。 */
-function planMove(cs: CombatState): PlannedMove | null {
+export function planMove(cs: CombatState, options = { depth: 5, width: 6, engines: false }): PlannedMove | null {
   const knownUids = new Set(cs.player.hand.map(card => card.uid));
   // 搜索过程中抽到的未知牌用普通占位牌表示，避免回合末诅咒/保留也泄露牌序。
   const hideUnknown = (state: CombatState, known: Set<string>): CombatState => ({ ...state, player: { ...state.player,
     hand: state.player.hand.map(card => known.has(card.uid) ? card : { uid: card.uid, defId: 'strike', upgraded: false }),
   } });
-  let best = { score: turnValue(cs, knownUids), first: null as PlannedMove | null };
+  let best = { score: turnValue(cs, knownUids, options.engines), first: null as PlannedMove | null };
   let beam = [{ state: cs, first: null as PlannedMove | null, score: best.score, known: knownUids }];
-  for (let depth = 0; depth < 5 && beam.length; depth++) {
+  for (let depth = 0; depth < options.depth && beam.length; depth++) {
     const next: typeof beam = [];
     for (const plan of beam) {
       if (plan.state.outcome !== 'ongoing') continue;
@@ -121,14 +129,14 @@ function planMove(cs: CombatState): PlannedMove | null {
           const handUids = new Set(result.player.hand.map(c => c.uid));
           const known = new Set([...plan.known].filter(uid => uid !== card.uid && handUids.has(uid)));
           const state = hideUnknown(result, known);
-          const score = turnValue(state, known);
+          const score = turnValue(state, known, options.engines);
           const first = plan.first ?? { uid: card.uid, target };
           if (score > best.score + 0.0001) best = { score, first };
           next.push({ state, first, score, known });
         }
       }
     }
-    beam = next.sort((a, b) => b.score - a.score).slice(0, 6);
+    beam = next.sort((a, b) => b.score - a.score).slice(0, options.width);
   }
   return best.first;
 }
