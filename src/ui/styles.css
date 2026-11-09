@@ -408,6 +408,15 @@ h3 {
   gap: 6px;
 }
 .map-preview { height: min(78dvh, 800px, calc(92dvh - 80px)); min-height: 0; flex: none; }
+.map-heading-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+.map-heading-row .chapter-map-heading { flex: 1; min-width: 220px; }
+.map-note-tools { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.map-note-tools .btn { padding: 4px 9px; font-size: 12px; }
+.map-note-tools .map-pen { color: #8ce6b0; border-color: #549d70; }
+.map-note-tools .map-pen.active { background: #254b35; box-shadow: inset 0 0 0 1px #8ce6b0; }
+.map-ink polyline { fill: none; stroke: #6fe59b; stroke-width: 5; stroke-opacity: .75; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.map-svg.drawing, .map-svg.drawing .map-node { cursor: crosshair; }
+.map-svg.drawing { touch-action: none; user-select: none; }
 .map-route-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(270px, 26vw, 330px); gap: 10px; }
 .map-stage {
   position: relative;
@@ -443,6 +452,7 @@ h3 {
 .map-node {
   cursor: pointer;
   transition: transform 0.15s;
+  outline: none;
 }
 .map-node.available {
   cursor: pointer;
@@ -506,7 +516,6 @@ h3 {
   color: var(--parch);
   margin-right: 4px;
 }
-.map-node:focus-visible { outline: none; }
 .map-node:focus-visible .node-ring, .map-node.selected .node-ring { stroke: #ffe7a6; stroke-width: 4; filter: drop-shadow(0 0 5px #ecb85480); animation: none; }
 .map-node.branch:not(.selected):not(.current):not(.available) .node-ring { stroke: #d9b276; }
 .map-node.selected.dead { opacity: .8; }

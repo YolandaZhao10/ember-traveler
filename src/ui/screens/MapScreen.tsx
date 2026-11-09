@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { availableNodes, MAP_ROWS, nodeTypeName } from '../../engine/map';
 import { plannedEncounter } from '../../engine/encounters';
 import { previewRoute } from '../../engine/routePreview';
@@ -6,6 +6,8 @@ import { CHAPTERS } from '../../data/chapters';
 import { ENEMIES } from '../../data/enemies';
 import type { GameMap, MapNode, RunState } from '../../engine/types';
 import { Backdrop } from '../components/Art';
+import { MapInk, useMapInk } from '../components/MapInk';
+import { mapNoteScope, MAX_MAP_STROKES, useMapNotes, writeMapNotes, type MapNotes } from '../mapNotes';
 import { travel, useGame } from '../store';
 
 const ICONS: Record<MapNode['type'], string> = {
@@ -28,6 +30,11 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
   const curRow = run?.currentNodeId ? run.map.nodes[run.currentNodeId].row : -1;
   const rows = run?.map.rows ?? MAP_ROWS;
   const H = TOP_SPACE + (rows - 1) * ROW_HEIGHT + BOTTOM_SPACE;
+  const compact = rows <= 5;
+  const W = compact ? 320 : 720;
+  const noteScope = useMemo(() => run ? mapNoteScope(run) : null, [run?.recordId, run?.character, run?.seed, run?.chapter, run?.map]);
+  const notes = useMapNotes(noteScope);
+  const ink = useMapInk(noteScope, W, H);
   const rowY = (row: number) => TOP_SPACE + (rows - 1 - row) * ROW_HEIGHT;
   const focusY = rowY(Math.max(0, curRow));
   useEffect(() => {
@@ -48,8 +55,6 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
   const map = run.map;
   const chapter = CHAPTERS[run.chapter];
   const avail = availableNodes(map, run.currentNodeId);
-  const compact = map.rows <= 5;
-  const W = compact ? 320 : 720;
   const colW = W / (map.cols + 1);
   const pos = (n: MapNode) => ({ x: colW * (n.col + 1), y: rowY(n.row) });
   const nodes = Object.values(map.nodes);
@@ -66,8 +71,18 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
     stack.push(...(map.nodes[id]?.next ?? []));
   }
   return (
-    <div className={`screen map-screen ${preview ? 'map-preview' : ''} ${compact ? 'compact-map' : ''}`}>
-      <div className="chapter-map-heading"><b>{chapter.label} · {chapter.name}</b><span>第 {chapter.startFloor + 1}–{chapter.startFloor + map.rows} 层</span></div>
+    <div className={`screen map-screen ${preview ? 'map-preview' : ''} ${compact ? 'compact-map' : ''}`}
+      onKeyDownCapture={event => {
+        if (ink.drawing && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); ink.stop(); }
+      }}>
+      <div className="map-heading-row">
+        <div className="chapter-map-heading"><b>{chapter.label} · {chapter.name}</b><span>第 {chapter.startFloor + 1}–{chapter.startFloor + map.rows} 层</span></div>
+        <div className="map-note-tools" role="group" aria-label="个人路线标注">
+          <button className={`btn small map-pen ${ink.drawing ? 'active' : ''}`} aria-pressed={ink.drawing} onClick={ink.toggle} title="自由绘制绿色计划路线，仅作个人参考，不改变实际路线">{ink.drawing ? '完成标注' : '绿色标注'}</button>
+          <button className="btn small ghost" disabled={!notes.length || !!ink.draft.length} onClick={() => noteScope && writeMapNotes(noteScope, notes.slice(0, -1))}>撤销一笔</button>
+          <button className="btn small ghost" disabled={!notes.length || !!ink.draft.length} onClick={() => noteScope && writeMapNotes(noteScope, [])}>清空标注</button>
+        </div>
+      </div>
       <div className="map-legend">
         <span>
           <b>{ICONS.combat}</b>战斗
@@ -93,13 +108,13 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
         <div className="map-stage">
           <Backdrop id={chapter.mapArt} dim={0.68} />
           <div className="map-wrap grain" ref={wrap}>
-            <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} floorOffset={chapter.startFloor} selectedId={selectedId} branch={branch?.reachable} onSelect={selectNode} run={run} />
+            <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} floorOffset={chapter.startFloor} selectedId={selectedId} branch={branch?.reachable} onSelect={selectNode} run={run} notes={notes} ink={ink} />
           </div>
         </div>
         <RoutePanel run={run} selected={selected} preview={preview} canEnter={!!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
       </div>
       <p className="subtitle" style={{ textAlign: 'center', margin: 0 }}>
-        {preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
+        {ink.drawing ? notes.length >= MAX_MAP_STROKES ? '标注已满，请撤销或清空后继续。右键或 Esc 结束标注。' : '拖动绘制绿色计划路线 · 滚轮查看地图 · 右键或 Esc 结束标注。绿线仅作参考。' : preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
       </p>
     </div>
   );
@@ -166,8 +181,10 @@ function MapSvg(props: {
   branch: Set<string> | undefined;
   onSelect: (id: string) => void;
   run: RunState;
+  notes: MapNotes;
+  ink: ReturnType<typeof useMapInk>;
 }) {
-  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, floorOffset, selectedId, branch, onSelect, run } = props;
+  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, floorOffset, selectedId, branch, onSelect, run, notes, ink } = props;
   const glow = useId().replace(/:/g, '');
   const nodeRefs = useRef(new Map<string, SVGGElement>());
   const focusId = selectedId ?? avail[0] ?? currentId ?? nodes[0]?.id;
@@ -178,13 +195,16 @@ function MapSvg(props: {
     if (target) { onSelect(target.id); nodeRefs.current.get(target.id)?.focus(); }
   };
   return (
-    <svg className="map-svg" viewBox={`0 0 ${W} ${H}`}>
+    <svg className={`map-svg ${ink.drawing ? 'drawing' : ''}`} viewBox={`0 0 ${W} ${H}`} {...ink.handlers}
+      onClickCapture={event => { if (ink.drawing) { event.preventDefault(); event.stopPropagation(); } }}
+      onContextMenu={event => { if (ink.drawing) { event.preventDefault(); event.stopPropagation(); ink.stop(); } }}>
       <defs>
         <radialGradient id={glow}>
           <stop offset="0%" stopColor="#ff7a2a" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#ff7a2a" stopOpacity="0" />
         </radialGradient>
       </defs>
+      <MapInk strokes={notes} draft={ink.draft} W={W} H={H} />
       {nodes.map((n) =>
         n.next.map((nx) => {
           const a = pos(n);
