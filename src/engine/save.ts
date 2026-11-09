@@ -1,4 +1,4 @@
-import { ensureRewardCheckpoint, resumeLegacyVictory, SAVE_VERSION } from './run';
+import { ensureRewardCheckpoint, resumeFinalVictory, resumeLegacyVictory, SAVE_VERSION } from './run';
 import type { RunState } from './types';
 import { CHAPTERS, FLOORS_PER_CHAPTER } from '../data/chapters';
 import { normalizeDifficulty } from '../data/difficulty';
@@ -12,7 +12,7 @@ type Snapshot = NonNullable<RunState['checkpoint']>;
 function migrateLayout(input: Snapshot): Snapshot {
   const run: Snapshot = JSON.parse(JSON.stringify(input));
   const map = run.map;
-  const oldStart = (run.chapter - 1) * map.rows;
+  const oldStart = run.chapter === 4 ? CHAPTERS[4].startFloor : (run.chapter - 1) * map.rows;
   if (run.chapter !== 4 && map.rows < FLOORS_PER_CHAPTER) {
     const boss = map.nodes[map.bossId];
     const firstRow = boss.row;
@@ -31,9 +31,10 @@ function migrateLayout(input: Snapshot): Snapshot {
   }
   run.floor = CHAPTERS[run.chapter].startFloor + (run.currentNodeId ? map.nodes[run.currentNodeId].row : Math.max(0, run.floor - oldStart));
   run.version = SAVE_VERSION;
+  run.elapsedMs = Number.isFinite(run.elapsedMs) ? Math.max(0, run.elapsedMs) : 0;
   run.difficulty = normalizeDifficulty(run.difficulty);
   if (run.combat) ensurePowerInstances(run.combat.player);
-  if (run.chapter !== 4) expandLegacyRoutes(map, run.visited);
+  if (input.version < 12 && run.chapter !== 4) expandLegacyRoutes(map, run.visited);
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';
@@ -86,7 +87,7 @@ export function loadRun(): RunState | null {
         ...migrateLayout({ ...snapshot, chapter: singleChapter ? 1 : run.chapter }),
         checkpoint: run.version === 4 || !checkpoint ? null : migrateLayout({ ...checkpoint, chapter: singleChapter ? 1 : checkpoint.chapter }),
       };
-      return ensureRewardCheckpoint(singleChapter ? resumeLegacyVictory(migrated) : migrated);
+      return ensureRewardCheckpoint(resumeFinalVictory(singleChapter ? resumeLegacyVictory(migrated) : migrated));
     }
     if (run.version !== SAVE_VERSION) {
       s.removeItem(KEY);

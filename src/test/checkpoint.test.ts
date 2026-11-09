@@ -119,7 +119,7 @@ describe('当前节点快速 SL', () => {
     expect(R.eventChoose(restored, 'absorb')).toEqual(choice);
   });
 
-  it('死亡后刷新恢复战斗，最终胜利后刷新恢复章节领奖', () => {
+  it('死亡后刷新恢复战斗，最终胜利后刷新保持通关', () => {
     memoryStorage();
     for (const outcome of ['lost', 'won'] as const) {
       const original = enter('boss', 'FINAL-SL', 4);
@@ -127,7 +127,7 @@ describe('当前节点快速 SL', () => {
       terminal.combat!.outcome = outcome;
       if (outcome === 'lost') terminal.combat!.player.hp = 0;
       const reward = R.finishCombat(terminal);
-      const ended = outcome === 'won' ? R.rewardLeave(R.rewardTakeRelic(reward, reward.reward!.relicChoices![0])) : reward;
+      const ended = reward;
       saveRun(ended);
       const loaded = loadRun()!;
       expect(loaded.screen).toBe(outcome === 'lost' ? 'gameover' : 'victory');

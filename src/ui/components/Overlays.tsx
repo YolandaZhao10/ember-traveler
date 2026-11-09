@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
+import { CARDS } from '../../data/cards';
 import { ENEMIES } from '../../data/enemies';
 import { RELICS } from '../../data/relics';
 import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
 import { enemyIntent, enemyMoveName } from '../../engine/combat';
-import { calcBlock, calcDamage } from '../../engine/cards';
+import { calcBlock, calcDamage, describeCard } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { sortedDeck } from '../../engine/run';
 import type { CardInstance, CombatDifficulty } from '../../engine/types';
@@ -221,7 +222,7 @@ function describeAction(a: import('../../engine/types').EnemyAction, self: impor
     case 'stealGold':
       return `偷走 ${a.amount} 金币（战后结算）`;
     case 'addCardToDiscard':
-      return `向你的弃牌堆塞入 ${a.count} 张「灰烬」`;
+      return `向弃牌堆塞入 ${a.count} 张「${CARDS[a.cardId].name}」（仅本场战斗）：${describeCard({ uid: 'intent', defId: a.cardId, upgraded: false }, null)}`;
     case 'clearDebuffs':
       return '清除自身所有负面状态';
   }

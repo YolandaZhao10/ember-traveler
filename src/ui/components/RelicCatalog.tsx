@@ -39,7 +39,7 @@ export function RelicCatalog() {
           <h3 className="relic-catalog-heading">{c.label}<small>{entries.length} 件</small></h3>
           <div className="relic-catalog-grid">{entries.map(r => <article className="panel relic-catalog-entry" key={r.id}>
             <span className={`relic ${r.rarity}`}>{r.icon}</span>
-            <div><h4>{r.name}</h4>{r.owner && <span className="relic-owner">{CHARACTERS[r.owner].name}专属</span>}{r.chapter && <span className="relic-owner">{CHAPTERS[r.chapter].label}首领奖励</span>}<p>{r.description}</p></div>
+            <div><h4>{r.name}</h4>{r.owner && <span className="relic-owner">{CHARACTERS[r.owner].name}专属</span>}{r.chapter && <span className="relic-owner">{r.chapter === 4 ? '终章纪念 · 已停止掉落' : `${CHAPTERS[r.chapter].label}首领奖励`}</span>}<p>{r.description}</p></div>
           </article>)}</div>
         </section>;
       })}

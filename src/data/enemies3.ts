@@ -6,9 +6,9 @@ const cycle = (ctx: EnemyAiContext, order: string[]) => order[ctx.enemy.turn % o
 export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   {
     id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [28, 32], sprite: 'star_moth',
-    description: '星砂会削弱格挡。先施加脆弱，再连续扑击；展翅时只有格挡。',
+    description: '星砂施加 1 层脆弱并塞入 1 张朽败，持续干扰防御；扑击与合翼之间仍有反攻窗口。',
     moves: [
-      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
+      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'frailty', count: 1 }] },
       { id: 'flutter', name: '碎翼扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
       { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 7 }] },
     ], chooseMove: c => cycle(c, ['dust', 'flutter', 'wings', 'flutter']),
@@ -51,11 +51,11 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [50, 56], sprite: 'star_pilgrim',
-    description: '沉重的星仪兼具武器与护甲。重击后会停下修补，回复 5 点生命。',
+    description: '沉重的星仪兼具武器与护甲。重击后回复 4 生命，并把 1 张破绽塞入弃牌堆，放大后续攻击的威胁。',
     moves: [
       { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
       { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }] },
-      { id: 'repair', name: '拾回星屑', intent: 'special', actions: [{ kind: 'heal', amount: 5 }] },
+      { id: 'repair', name: '拾回星屑', intent: 'special', actions: [{ kind: 'heal', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'exposure', count: 1 }] },
     ], chooseMove: c => cycle(c, ['burden', 'fall', 'repair']),
   },
   {
@@ -90,7 +90,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'eclipse_archon', name: '坠星司辰', tier: 'boss', hp: [260, 260], sprite: 'eclipse_archon',
-    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 24 格挡与 2 力量。之后重斩、星尘帷幕与三连击循环。',
+    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 24 格挡与 2 力量。之后重斩、星尘帷幕、三连击与屏障循环；屏障回合可以整备。',
     moves: [
       { id: 'scythe', name: '弦月镰', intent: 'attack', actions: [{ kind: 'attack', amount: 18 }] },
       { id: 'veil', name: '星尘帷幕', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
@@ -100,7 +100,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
       { id: 'eclipse', name: '坠星裁决', intent: 'attack', actions: [{ kind: 'attack', amount: 23 }] },
       { id: 'rain', name: '群星陨落', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
     ], checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,
-    chooseMove: c => c.enemy.phase === 1 ? cycle(c, ['scythe', 'veil', 'orbits', 'shell']) : !c.enemy.flags.awakened ? 'awaken' : ['eclipse', 'veil', 'rain'][(c.enemy.flags.p2turn ?? 0) % 3],
+    chooseMove: c => c.enemy.phase === 1 ? cycle(c, ['scythe', 'veil', 'orbits', 'shell']) : !c.enemy.flags.awakened ? 'awaken' : ['eclipse', 'veil', 'rain', 'shell'][(c.enemy.flags.p2turn ?? 0) % 4],
   },
 ];
 

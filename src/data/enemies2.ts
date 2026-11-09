@@ -16,9 +16,9 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'furnace_drone', name: '铸铁傀儡', tier: 'normal', hp: [40, 46], sprite: 'furnace_drone',
-    description: '工坊留下的铸造工具。撑起铁壳后连续挥锤，招式按固定顺序循环。',
+    description: '撑起铁壳时排出冷灰，向弃牌堆塞入 1 张冷灰，干扰余烬积累；随后连续挥锤。',
     moves: [
-      { id: 'shell', name: '铁壳', intent: 'defend', actions: [{ kind: 'block', amount: 12 }] },
+      { id: 'shell', name: '排灰铁壳', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'hammer', name: '铸锤', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
       { id: 'pound', name: '连锤', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 2 }] },
     ],
@@ -36,12 +36,13 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'cinder_stoker', name: '添火侍从', tier: 'normal', hp: [32, 36], sprite: 'cinder_stoker',
-    description: '不断给同伴添火的炉工。每三次行动为所有存活同伴增加 1 点力量。',
+    description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张冷灰塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     ],
-    chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'rake']),
+    chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),
   },
   {
     id: 'soot_seer', name: '烟尘先知', tier: 'normal', hp: [36, 40], sprite: 'soot_seer',
@@ -96,7 +97,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'everburning_core', name: '永燃炉心', tier: 'boss', hp: [220, 220], sprite: 'everburning_core',
-    description: '深城的动力核心。泄压时混入灰烬并点燃你；半血后进入过载，清除负面状态、获得 20 格挡与 1 力量，随后连续进攻。',
+    description: '深城的动力核心。泄压时混入冷灰并点燃你；半血后进入过载，清除负面状态、获得 20 格挡与 1 力量，随后在爆燃后重铸外壳，留出进攻窗口。',
     moves: [
       { id: 'pressure', name: '高压冲击', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }] },
       { id: 'vent', name: '炉心泄压', intent: 'debuff', actions: [{ kind: 'status', status: 'burn', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
@@ -108,7 +109,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     ],
     checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,
     chooseMove: ctx => ctx.enemy.phase === 1 ? cycle(ctx, ['pressure', 'vent', 'pistons', 'shell'])
-      : !ctx.enemy.flags.awakened ? 'overdrive' : ['eruption', 'vent', 'cascade'][(ctx.enemy.flags.p2turn ?? 0) % 3],
+      : !ctx.enemy.flags.awakened ? 'overdrive' : ['eruption', 'vent', 'cascade', 'shell'][(ctx.enemy.flags.p2turn ?? 0) % 4],
   },
 ];
 

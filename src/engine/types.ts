@@ -441,6 +441,8 @@ export interface RunState {
   version: number;
   /** 与随机种子无关的本局记录标识，刷新、跨章与 SL 均保留。 */
   recordId?: string;
+  /** 前台游玩累计毫秒；SL 不回退，首页、后台与结算暂停。 */
+  elapsedMs: number;
   difficulty: RunDifficulty;
   /** 当前节点或战后奖励阶段开始时的完整状态，不递归保存历史回退点。 */
   checkpoint: Omit<RunState, 'checkpoint'> | null;

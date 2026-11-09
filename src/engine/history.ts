@@ -12,6 +12,7 @@ export interface JourneyRecord {
   floor: number;
   hp: number;
   maxHp: number;
+  elapsedMs?: number;
   deck: { defId: string; upgraded: boolean; count: number }[];
   relics: string[];
 }
@@ -67,7 +68,7 @@ export function recordJourney(run: RunState | null, abandoned = false) {
   const record: JourneyRecord = {
     id: run.recordId!, endedAt: previous?.endedAt ?? new Date().toISOString(), character: run.character,
     seed: run.seed, difficulty: normalizeDifficulty(run.difficulty), outcome, floor: run.floor + 1,
-    hp: run.hp, maxHp: run.maxHp, deck: deckSummary(run.deck), relics: [...run.relics],
+    hp: run.hp, maxHp: run.maxHp, elapsedMs: run.elapsedMs, deck: deckSummary(run.deck), relics: [...run.relics],
   };
   try { s.setItem(KEY, JSON.stringify({ version: 1, records: [record, ...records.filter(r => r.id !== record.id)] })); } catch { /* 存储不可用时仍允许游玩。 */ }
 }

@@ -37,12 +37,13 @@ def({
   tier: 'normal',
   hp: [28, 32],
   sprite: 'puppet',
-  description: '用骨头和绳索扎成的守卫，动作迟缓但有力。',
+  description: '重击后抖落墓灰，将 1 张灰烬塞入弃牌堆；随后支撑躯壳，留下两个不攻击的回合。',
   moves: [
     { id: 'smash', name: '重击', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
+    { id: 'dust', name: '抖落墓灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
     { id: 'brace', name: '支撑', intent: 'defend', actions: [{ kind: 'block', amount: 6 }] },
   ],
-  chooseMove: (ctx) => cycle(ctx, ['smash', 'brace']),
+  chooseMove: (ctx) => cycle(ctx, ['smash', 'dust', 'brace']),
 });
 
 def({
@@ -200,8 +201,8 @@ def({
         { kind: 'status', status: 'burn', amount: 4, target: 'player' },
       ],
     },
-    { id: 'rain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 8, times: 2 }] },
-    { id: 'offering', name: '献祭', intent: 'buff', actions: [{ kind: 'loseHp', amount: 5 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
+    { id: 'rain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
+    { id: 'offering', name: '献祭', intent: 'buff', actions: [{ kind: 'loseHp', amount: 5 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
   ],
   onCombatStart: () => [{ kind: 'status', status: 'enrage', amount: 1, target: 'self' }],
   chooseMove: (ctx) => {
@@ -273,8 +274,8 @@ def({
     const e = ctx.enemy;
     if (e.phase === 2) {
       if (!e.flags.awakened) return 'awaken';
-      const order = ['sear_sky', 'ignite', 'cinder_storm'];
-      return order[(e.flags.p2turn ?? 0) % 3];
+      const order = ['sear_sky', 'ignite', 'cinder_storm', 'ash_wall'];
+      return order[(e.flags.p2turn ?? 0) % order.length];
     }
     const prev = last(ctx);
     if (e.turn === 0) return 'ash_storm';
@@ -305,10 +306,10 @@ def({
   tier: 'normal',
   hp: [30, 34],
   sprite: 'snail',
-  description: '壳很硬，酸液会让你的格挡变脆。',
+  description: '缩壳后喷出锈灰，造成轻伤并将 1 张灰烬塞入弃牌堆，随后碾压。',
   moves: [
     { id: 'shell', name: '缩壳', intent: 'defend', actions: [{ kind: 'block', amount: 12 }] },
-    { id: 'acid', name: '酸液', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
+    { id: 'acid', name: '锈灰喷吐', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
     { id: 'roll', name: '碾压', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['shell', 'acid', 'roll']),
@@ -322,7 +323,7 @@ def({
   sprite: 'deacon',
   description: '信徒的头目，会为自己祈福并治疗。',
   moves: [
-    { id: 'bless', name: '祈福', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 2, target: 'allies' }] },
+    { id: 'bless', name: '祈福', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
     { id: 'firerain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
     { id: 'mend', name: '治疗', intent: 'buff', actions: [{ kind: 'heal', amount: 8 }, { kind: 'block', amount: 5 }] },
   ],
@@ -400,13 +401,12 @@ def({
   tier: 'elite',
   hp: [84, 84],
   sprite: 'beast',
-  description: '胸腔里烧着一团火。每回合都在变强，拖得越久越危险。',
+  description: '胸腔里烧着一团火。咆哮时增长力量并削弱你，随后撕裂、吞噬；每轮咆哮都是反攻窗口。',
   moves: [
     { id: 'roar', name: '咆哮', intent: 'debuff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     { id: 'rend', name: '撕裂', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
-    { id: 'devour', name: '吞噬', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }, { kind: 'heal', amount: 6 }] },
+    { id: 'devour', name: '吞噬', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }, { kind: 'heal', amount: 4 }] },
   ],
-  onCombatStart: () => [{ kind: 'status', status: 'ritual', amount: 1, target: 'self' }],
   chooseMove: (ctx) => cycle(ctx, ['roar', 'rend', 'devour']),
 });
 
@@ -417,7 +417,7 @@ def({
   tier: 'boss',
   hp: [130, 130],
   sprite: 'bellheart',
-  description: '古城钟楼的机械核心。钟声削弱你，齿轮保护它；生命减半后失控，钟锤连击不断。',
+  description: '古城钟楼的机械核心。钟声削弱你，齿轮保护它；生命减半后失控，连击、钟鸣、碎钟后会重整齿轮，留出反攻回合。',
   moves: [
     { id: 'toll', name: '钟鸣', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
     { id: 'pendulum', name: '摆锤', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
@@ -441,8 +441,8 @@ def({
     const e = ctx.enemy;
     if (e.phase === 2) {
       if (!e.flags.awakened) return 'overdrive';
-      const order = ['flurry', 'toll', 'shatter'];
-      return order[(e.flags.p2turn ?? 0) % 3];
+      const order = ['flurry', 'toll', 'shatter', 'gears'];
+      return order[(e.flags.p2turn ?? 0) % order.length];
     }
     if (e.turn === 0) return 'toll';
     const prev = last(ctx);

@@ -3,12 +3,12 @@ import type { EnemyDef, EncounterDef } from '../engine/types';
 export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
   {
     id: 'last_warden', name: '终庭执卫', tier: 'elite', hp: [150, 150], sprite: 'last_warden',
-    description: '最后一道守卫。先举盾施加易伤，随后重斩与双击；每轮收剑时获得 1 力量。',
+    description: '最后一道守卫。先举盾施加易伤，随后重斩与双击；收剑时获得 1 力量并塞入 1 张疑惧，考验输出与解牌节奏。',
     moves: [
       { id: 'seal', name: '封庭敕令', intent: 'special', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'verdict', name: '断路重斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
       { id: 'twins', name: '守门双击', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }] },
-      { id: 'sheathe', name: '收剑立誓', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'sheathe', name: '收剑封志', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
     ], chooseMove: c => ['seal', 'verdict', 'twins', 'sheathe'][c.enemy.turn % 4],
   },
   {

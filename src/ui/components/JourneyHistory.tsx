@@ -1,3 +1,4 @@
+import { formatJourneyTime } from '../journeyClock';
 import { useState } from 'react';
 import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { CARDS } from '../../data/cards';
@@ -22,7 +23,7 @@ export function JourneyHistory() {
   const total = journeyStats(filtered);
   return <Modal title={selected ? `${CHARACTERS[selected.character].name} · ${outcomes[selected.outcome]}牌组` : '旅程记录'} onClose={closeOverlay} wide>
     {selected ? <>
-      <div className="history-detail-meta"><span>{new Date(selected.endedAt).toLocaleString('zh-CN')}</span><span>第 {selected.floor} 层 · 生命 {selected.hp}/{selected.maxHp}</span><span>种子 {selected.seed}</span></div>
+      <div className="history-detail-meta"><span>{new Date(selected.endedAt).toLocaleString('zh-CN')}</span><span>第 {selected.floor} 层 · 生命 {selected.hp}/{selected.maxHp}</span><span>种子 {selected.seed}</span><span>用时 {selected.elapsedMs == null ? '未记录' : formatJourneyTime(selected.elapsedMs)}</span></div>
       <div className="history-scroll">
         <DifficultySummary value={selected.difficulty} />
         <h4>结束时的牌组 · {selected.deck.reduce((n,c) => n + c.count, 0)} 张</h4>

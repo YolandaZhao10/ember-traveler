@@ -1,3 +1,4 @@
+import { formatJourneyTime } from './journeyClock';
 import { nodeTypeName } from '../engine/map';
 import { CHAPTERS } from '../data/chapters';
 import { ChapterScreen } from './screens/ChapterScreen';
@@ -28,6 +29,7 @@ export function App() {
           <span className="stat floor">
             <span className="chapter-badge" title={CHAPTERS[run.chapter].name}>{CHAPTERS[run.chapter].label}</span> 第 {run.floor + 1} 层{run.currentNodeId ? ` · ${nodeTypeName(run.map.nodes[run.currentNodeId].type)}` : ''}
           </span>
+          <span className="stat journey-time" title="本局前台游玩用时；首页、后台与结算暂停，快速 SL 不回退">用时 {formatJourneyTime(run.elapsedMs)}</span>
           <RelicBar relics={run.relics} />
           <span className="spacer" />
           <button className="iconbtn" onClick={() => openOverlay({ kind: 'map' })} title="查看当前位置和路线">地图</button>

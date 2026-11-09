@@ -57,7 +57,7 @@ describe('第三章与五站终章', () => {
     expect(R.enterNextChapter(next)).toBe(next); expect(R.resetCurrentNode(next)).toEqual(next);
     saveRun(next); expect(loadRun()).toEqual(next); expect(next.map.rows).toBe(CHAPTERS[next.chapter].floors);
   });
-  it('第四章从61层逐站走完：两次营火、精英奖、10牌6遗物商店、65层首领奖励及唯一通关记录', () => {
+  it('第四章从61层逐站走完：两次营火、精英奖、10牌6遗物商店、65层首领直接结算及唯一通关记录', () => {
     storage(); let run = R.enterNextChapter(claim(win(boss(3)))); ensureRecordId(run); run.gold = 1000; run.hp = 10;
     const floors: number[] = []; const screens: string[] = [];
     for (let step = 0; step < 5; step++) {
@@ -73,17 +73,18 @@ describe('第三章与五站终章', () => {
     }
     expect(floors).toEqual([61,62,63,64,65]); expect(screens).toEqual(['rest','combat','shop','rest','combat']);
     expect(run.combat!.enemies[0].defId).toBe('nightless_lord');
-    const reward = win(run); expect(reward.reward!.chapterComplete).toBe(4); expect(reward.reward!.gold).toBe(75);
-    expect(reward.reward!.relicChoices!.every(id => RELICS[id].chapter === 4)).toBe(true);
-    expect(R.rewardLeave(reward)).toBe(reward); run = claim(reward); expect(run.screen).toBe('victory');
+    const before = run; run = win(run); expect(run.screen).toBe('victory');
+    expect(run.reward).toBeNull(); expect(run.gold).toBe(before.gold + 75);
+    expect(run.deck).toEqual(before.deck); expect(run.relics).toEqual(before.relics);
+    expect(R.finishCombat(run)).toBe(run); expect(R.rewardLeave(run)).toBe(run);
     expect(run.endMessage).toContain('65'); expect(R.enterNextChapter(run)).toBe(run);
     saveRun(run); saveRun(loadRun()); expect(loadHistory()).toHaveLength(1); expect(loadHistory()[0].floor).toBe(65);
-    expect(R.resetCurrentNode(loadRun()!)).toEqual(reward);
+    expect(R.resetCurrentNode(loadRun()!)).toEqual(run);
   });
   it('v11第二章已通关存档接入第三章，保留战利品和随机流，不重复发奖', () => {
     const values = storage(); const old = claim(win(boss(2))); old.version = 11; old.screen = 'victory'; old.endMessage = '永燃炉心已熄灭'; old.checkpoint!.version = 11;
     values.set('ember-traveler:save', JSON.stringify(old)); const loaded = loadRun()!;
-    expect(loaded.screen).toBe('chapter'); expect(loaded.endMessage).toBeNull(); expect(loaded.version).toBe(12);
+    expect(loaded.screen).toBe('chapter'); expect(loaded.endMessage).toBeNull(); expect(loaded.version).toBe(13);
     for (const key of ['deck','relics','gold','hp','maxHp','stats','rng'] as const) expect(loaded[key]).toEqual(old[key]);
     expect(R.enterNextChapter(loaded).chapter).toBe(3); saveRun(loaded); expect(loadRun()).toEqual(loaded);
     expect(R.resetCurrentNode(loaded).reward!.chapterComplete).toBe(2);

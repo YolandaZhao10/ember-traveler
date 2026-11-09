@@ -63,7 +63,7 @@ describe('逐层难度与20层迁移', () => {
     const base = createCombat('scale', ['furnace_drone'], 'elite', [], 1000, 1000, [], makeRng('SCALE', 'c'), 0).state;
     expect(cs.enemies[0].maxHp).toBe(Math.round(base.enemies[0].maxHp * d.healthMultiplier));
     cs = enemyAct(endPlayerTurn(cs).state, 'e0').state;
-    expect(cs.enemies[0].block).toBe(23);
+    expect(cs.enemies[0].block).toBe(19);
     cs.phase = 'player'; cs.enemies[0].moveId = 'pound'; cs.enemies[0].statuses.weak = 1; delete cs.enemies[0].flags.acted;
     cs.player.statuses.vulnerable = 2;
     const intent = enemyIntent(cs, cs.enemies[0])!;
@@ -88,7 +88,7 @@ describe('逐层难度与20层迁移', () => {
   it.each<ChapterId>([1, 2])('第%s章旧战斗与SL完整保留，旧路线增加8层且始终连接首领', chapter => {
     const old = legacy(chapter); storage(old);
     const loaded = loadRun()!;
-    expect(loaded.version).toBe(12); expect(loaded.map.rows).toBe(20); expect(validateMap(loaded.map)).toBe(true);
+    expect(loaded.version).toBe(13); expect(loaded.map.rows).toBe(20); expect(validateMap(loaded.map)).toBe(true);
     expect(loaded.combat).toEqual(old.combat); expect(loaded.rng).toEqual(old.rng); expect(loaded.deck).toEqual(old.deck);
     expect(loaded.floor).toBe(chapter === 1 ? 0 : 20);
     expect(R.resetCurrentNode(loaded).combat).toEqual(old.combat);

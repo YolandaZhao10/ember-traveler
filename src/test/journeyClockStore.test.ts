@@ -1,0 +1,32 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { viewCard } from '../engine/cards';
+
+afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.resetModules(); });
+it('UI计时不覆盖动画前已保存的出牌结果，暂停、继续、SL及新局均正确', async () => {
+  vi.useFakeTimers(); vi.resetModules();
+  let now = 0; vi.spyOn(performance,'now').mockImplementation(()=>now);
+  const values = new Map<string,string>([['ember-traveler:settings',JSON.stringify({sound:false,fastAnim:false})]]);
+  const events = new Map<string,()=>void>();
+  const doc = {hidden:false,addEventListener:(k:string,fn:()=>void)=>events.set(k,fn),removeEventListener:()=>{}};
+  vi.stubGlobal('document',doc);
+  vi.stubGlobal('window',{setInterval,addEventListener:(k:string,fn:()=>void)=>events.set(k,fn),removeEventListener:()=>{}});
+  vi.stubGlobal('localStorage',{getItem:(k:string)=>values.get(k)??null,setItem:(k:string,v:string)=>values.set(k,v),removeItem:(k:string)=>values.delete(k)});
+  const store=await import('../ui/store'); store.newGame('CLOCK-ANIMATION'); store.travel(store.getState().run!.map.startIds[0]);
+  now=1000; await vi.advanceTimersByTimeAsync(1000);
+  const cs=store.getState().run!.combat!; const card=cs.player.hand.find(c=>viewCard(c).type==='attack')!;
+  const action=store.playCardDirect(card.uid,cs.enemies[0].id);
+  now=1050; doc.hidden=true; events.get('visibilitychange')!(); events.get('pagehide')!();
+  const saved=JSON.parse(values.get('ember-traveler:save')!);
+  expect(saved.combat.player.hand.some((c:{uid:string})=>c.uid===card.uid)).toBe(false);
+  expect(saved.elapsedMs).toBe(1050);
+  now=12000; await vi.advanceTimersByTimeAsync(3000); await action;
+  expect(store.getState().run!.elapsedMs).toBe(1050);
+  doc.hidden=false;events.get('visibilitychange')!(); now=14000;store.quickReset();
+  expect(store.getState().run!.elapsedMs).toBe(3050);
+  expect(store.getState().run!.combat!.player.hand.some(c=>c.uid===card.uid)).toBe(true);
+  now=15000;store.toTitle();const paused=store.getState().run!.elapsedMs;
+  now=30000; await vi.advanceTimersByTimeAsync(1000);store.continueGame();
+  expect(store.getState().run!.elapsedMs).toBe(paused);
+  now=31000;store.openOverlay({kind:'menu'});expect(store.getState().run!.elapsedMs).toBe(paused+1000);
+  store.newGame('NEW-CLOCK');expect(store.getState().run!.elapsedMs).toBe(0);
+});

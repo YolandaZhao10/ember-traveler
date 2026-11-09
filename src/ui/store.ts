@@ -1,3 +1,4 @@
+import { JourneyClock, journeyClockRunning } from './journeyClock';
 import { useSyncExternalStore } from 'react';
 import { randomSeedString } from '../engine/rng';
 import * as R from '../engine/run';
@@ -74,9 +75,37 @@ const listeners = new Set<() => void>();
 function emit() {
   for (const l of listeners) l();
 }
+let pendingRun: RunState | null = null;
+const clock = new JourneyClock(performance.now());
+const clockRunning = () => journeyClockRunning(state.run, state.showTitle, typeof document !== 'undefined' && document.hidden);
 function set(patch: Partial<UIState>) {
+  const now = performance.now();
+  const delta = clock.sample(now, clockRunning());
+  if (state.run && delta) state = { ...state, run: { ...state.run, elapsedMs: state.run.elapsedMs + delta } };
+  // 动画前计算的结果或 SL 快照不能覆盖动画期间已经累计的时间。
+  if (patch.run && state.run && patch.run.recordId && patch.run.recordId === state.run.recordId) {
+    patch = { ...patch, run: { ...patch.run, elapsedMs: Math.max(patch.run.elapsedMs, state.run.elapsedMs) } };
+  }
   state = { ...state, ...patch };
+  clock.sample(now, clockRunning());
   emit();
+}
+if (typeof window !== 'undefined') {
+  let ticks = 0;
+  const timer = window.setInterval(() => {
+    if (!clockRunning()) return;
+    set({});
+    if (++ticks % 10 === 0 && !state.busy) persist(state.run);
+  }, 1000);
+  const flush = () => { set({}); if (state.run) persist(pendingRun ?? state.run); };
+  document.addEventListener('visibilitychange', flush);
+  window.addEventListener('pagehide', flush);
+  if (import.meta.hot) import.meta.hot.dispose(() => {
+    flush();
+    clearInterval(timer);
+    document.removeEventListener('visibilitychange', flush);
+    window.removeEventListener('pagehide', flush);
+  });
 }
 export function useGame(): UIState {
   return useSyncExternalStore(
@@ -98,12 +127,15 @@ function delay(ms: number) {
 }
 
 function persist(run: RunState | null) {
+  set({});
+  if (run && state.run && run.recordId === state.run.recordId) run = { ...run, elapsedMs: Math.max(run.elapsedMs, state.run.elapsedMs) };
   saveRun(run);
 }
 
 function setRun(run: RunState, save = true) {
+  pendingRun = null;
   set({ run });
-  if (save) persist(run);
+  if (save) persist(state.run);
 }
 
 // ---------- 标题 ----------
@@ -135,9 +167,11 @@ export function continueGame() {
 
 export function toTitle() {
   set({ showTitle: true, hasSave: loadRun() !== null, overlay: null, selectedCard: null });
+  persist(state.run);
 }
 
 export function abandonRun() {
+  set({});
   recordJourney(state.run, true);
   clearSave();
   set({ run: null, showTitle: true, hasSave: false, overlay: null });
@@ -302,6 +336,7 @@ export async function playSelected(targetId: string | null) {
   const attacks = viewCard(card).type === 'attack';
   set({ busy: true, selectedCard: null, playing: uid, attacking: attacks ? 'player' : null, impacts: [] });
   // 先保存结算结果，前摇期间刷新也不会回滚出牌或重复结算。
+  pendingRun = res.run;
   persist(res.run);
   sfx(attacks ? 'swing' : 'play');
   if (attacks) await delay(150);
@@ -359,6 +394,7 @@ async function runEnemyPhase() {
       const res = R.combatEnemyAct(run, e.id);
       // 若敌人先被燃烧击败，就不会制造一次不存在的挥击。
       const attacks = res.events.some((event) => event.type === 'damage' && event.source === 'enemy');
+      pendingRun = res.run;
       persist(res.run);
       set({ playing: e.id, attacking: attacks ? e.id : null, impacts: [] });
       if (attacks) sfx('swing');

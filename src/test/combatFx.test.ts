@@ -63,7 +63,7 @@ it('攻击前摇开始前已保存结算结果，动画结束后恢复操作', a
   expect(store.getState().busy).toBe(true);
   expect(store.getState().attacking).toBe('player');
   store.quickReset(); // 前摇中不能被 SL 打断，再由旧动画覆盖新进度。
-  expect(store.getState().run).toBe(initialRun);
+  expect(store.getState().run?.combat).toBe(initialRun?.combat);
   const saved = JSON.parse(values.get('ember-traveler:save')!);
   expect(saved.combat.player.hand.some((c: { uid: string }) => c.uid === card.uid)).toBe(false);
   expect(saved.combat.enemies[0].hp).toBeLessThan(cs.enemies[0].hp);
@@ -74,8 +74,10 @@ it('攻击前摇开始前已保存结算结果，动画结束后恢复操作', a
   expect(store.getState().busy).toBe(false);
   expect(store.getState().attacking).toBeNull();
   store.quickReset();
-  expect(store.getState().run).toEqual(initialRun);
+  expect(store.getState().run).toEqual({ ...initialRun, elapsedMs: store.getState().run!.elapsedMs });
+  expect(store.getState().run!.elapsedMs).toBeGreaterThanOrEqual(initialRun!.elapsedMs);
   expect(store.getState().impacts).toEqual([]);
-  expect(JSON.parse(values.get('ember-traveler:save')!)).toEqual(initialRun);
+  const restoredSave = JSON.parse(values.get('ember-traveler:save')!);
+  expect(restoredSave).toEqual({ ...initialRun, elapsedMs: restoredSave.elapsedMs });
   await vi.runAllTimersAsync();
 });

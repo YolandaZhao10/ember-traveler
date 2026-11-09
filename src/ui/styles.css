@@ -115,6 +115,7 @@ button:disabled {
 .stat.gold {
   color: var(--ember-2);
 }
+.journey-time { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .stat.floor {
   color: var(--text-dim);
 }

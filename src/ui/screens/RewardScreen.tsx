@@ -15,7 +15,7 @@ export function RewardScreen() {
     <div className="screen center-screen grain scroll">
       <Backdrop id={CHAPTERS[run.chapter].battleArt} dim={0.62} />
       <h2>{chapterEnd ? `${CHAPTERS[chapterEnd].label}通关` : '战斗胜利'}</h2>
-      <p className="subtitle">{chapterEnd === FINAL_CHAPTER ? '无昼之主已经倒下。领取本角色稀有卡牌与终章纪念遗物，为旅程留下最后的战利品。' : chapterEnd ? `${CHAPTERS[chapterEnd].name}的首领已倒下。领取本角色稀有卡牌与章节遗物，准备前往${CHAPTERS[nextChapter(chapterEnd)!].name}。` : '灰烬散去，火种仍在。领取战利品后继续前进。'}</p>
+      <p className="subtitle">{chapterEnd === FINAL_CHAPTER ? '无昼之主已经倒下，旅程完成。' : chapterEnd ? `${CHAPTERS[chapterEnd].name}的首领已倒下。领取本角色稀有卡牌与章节遗物，准备前往${CHAPTERS[nextChapter(chapterEnd)!].name}。` : '灰烬散去，火种仍在。领取战利品后继续前进。'}</p>
       <div className="rewardlist">
         <div className={`rewardrow panel ${r.goldTaken ? 'taken' : ''}`}>
           <div className="lbl">

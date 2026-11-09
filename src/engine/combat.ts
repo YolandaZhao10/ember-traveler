@@ -1,3 +1,4 @@
+import { CARDS } from '../data/cards';
 import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
 import { RELICS } from '../data/relics';
@@ -1149,7 +1150,7 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       break;
     case 'addCardToDiscard':
       for (let i = 0; i < a.count; i++) p.discard.push({ uid: newUid(cs), defId: a.cardId, upgraded: false });
-      log(cs, ev, `${a.count} 张「灰烬」被塞进你的弃牌堆`);
+      log(cs, ev, `${a.count} 张「${CARDS[a.cardId].name}」被塞进你的弃牌堆（仅本场战斗）`);
       break;
     case 'clearDebuffs':
       for (const k of Object.keys(e.statuses) as StatusId[]) {

@@ -117,9 +117,9 @@ function assignTypes(grid: (MapNode | null)[][], rng: RngState, camps: Set<strin
       else if (camps.has(n.id)) type = 'rest';
       else {
         const weights: { item: NodeType; weight: number }[] = [
-          { item: 'combat', weight: 46 },
+          { item: 'combat', weight: 42 },
           { item: 'event', weight: 22 },
-          { item: 'elite', weight: r >= 4 ? 14 : 0 },
+          { item: 'elite', weight: r >= 4 ? 18 : 0 },
           { item: 'rest', weight: r >= 3 && r <= lastRow - 2 && !n.next.some(id => camps.has(id)) ? 10 : 0 },
           { item: 'shop', weight: r >= 2 ? 8 : 0 },
         ];

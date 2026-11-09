@@ -1,3 +1,4 @@
+import { formatJourneyTime } from '../journeyClock';
 import { RELICS } from '../../data/relics';
 import { CHAPTERS } from '../../data/chapters';
 import { sortedDeck } from '../../engine/run';
@@ -16,6 +17,7 @@ export function EndScreen({ victory }: { victory: boolean }) {
       <p className="subtitle" style={{ maxWidth: 520, textAlign: 'center' }}>
         {CHAPTERS[run.chapter].label} · {CHAPTERS[run.chapter].name} — {run.endMessage}
       </p>
+      <p className="subtitle">本局用时 {formatJourneyTime(run.elapsedMs)}</p>
       <div className="endstats">
         <div className="panel">
           <b>{run.floor + 1}</b>

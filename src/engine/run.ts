@@ -13,7 +13,7 @@ import { encounterDifficulty, rarityBias } from './difficulty';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -54,6 +54,7 @@ export function newRun(seed: string, character: CharacterId = 'traveler', diffic
   const ch = CHARACTERS[character];
   const run: RunState = {
     version: SAVE_VERSION,
+    elapsedMs: 0,
     difficulty: normalizeDifficulty(difficulty),
     checkpoint: null,
     seed,
@@ -136,7 +137,7 @@ export function travelTo(input: RunState, nodeId: string): RunState {
 export function resetCurrentNode(run: RunState): RunState {
   const snapshot = ensureRewardCheckpoint(run).checkpoint;
   if (!snapshot || snapshot.chapter !== run.chapter || snapshot.currentNodeId !== run.currentNodeId) return run;
-  return { ...clone(snapshot), checkpoint: clone(snapshot) };
+  return { ...clone(snapshot), elapsedMs: run.elapsedMs, checkpoint: clone(snapshot) };
 }
 
 /** 兼容更新前停留在领奖页的存档；保留现有进度，只补齐领奖前的回退点。 */
@@ -259,17 +260,36 @@ export function finishCombat(input: RunState): RunState {
 
 /** 已完成第一章的胜利结算使用同一奖励流程，不重复计算战斗收益。 */
 function chapterBossReward(run: RunState): RunState {
+  const gold = nextInt(run.rng.reward, ...combatGoldRange(run.floor, 'boss', run.difficulty.gold)) + relicJourneyBonus(run, 'victory', 'gold', 'boss');
+  if (run.chapter === FINAL_CHAPTER) return finalVictory(run, gold);
   run.combat = null;
   run.screen = 'reward';
   run.endMessage = null;
   run.reward = {
-    gold: nextInt(run.rng.reward, ...combatGoldRange(run.floor, 'boss', run.difficulty.gold)) + relicJourneyBonus(run, 'victory', 'gold', 'boss'), goldTaken: false,
+    gold, goldTaken: false,
     cards: generateCardChoices(run, 'boss', 3), cardTaken: false,
     relic: null, relicTaken: false,
     relicChoices: shuffle(run.rng.reward, CHAPTER_RELICS.filter(r => r.chapter === run.chapter && !run.relics.includes(r.id))).slice(0, 3).map(r => r.id),
     chapterComplete: run.chapter,
   };
   return recordCheckpoint(run);
+}
+
+function finalVictory(run: RunState, gold: number): RunState {
+  run.gold += gold;
+  run.combat = null;
+  run.reward = null;
+  run.screen = 'victory';
+  run.endMessage = `无昼之主终于倒下。你走过灰烬古城、熔炉深城与星骸天穹，在余火终庭点亮了黎明。${TOTAL_FLOORS} 层旅程完成。首领金币已自动领取。`;
+  return recordCheckpoint(run);
+}
+
+/** 旧版终章领奖直接收束；只补未领金币，保留已经领取的卡牌和遗物。 */
+export function resumeFinalVictory(input: RunState): RunState {
+  if (input.chapter !== FINAL_CHAPTER) return input;
+  if (input.screen === 'victory') return finalVictory(clone(input), 0);
+  if (input.screen !== 'reward' || input.reward?.chapterComplete !== FINAL_CHAPTER) return input;
+  return finalVictory(clone(input), input.reward.goldTaken ? 0 : input.reward.gold);
 }
 
 /** v4/v5 的结局现在是第一章通关；保留现有牌组与统计，补上过章奖励。 */
