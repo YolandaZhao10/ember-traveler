@@ -286,17 +286,17 @@ describe('战斗基础', () => {
       const enemyHp = s.enemies[0].hp;
       const energy = s.player.energy;
       s = playCard(s, handCard(s, 'burn_pages').uid, null).state;
-      expect(s.player.exhaust.length).toBe(1);
-      expect(s.player.block).toBe(3); // 灰烬盛宴
-      expect(enemyHp - s.enemies[0].hp).toBe(4); // 火种传递
+      expect(s.player.exhaust.length).toBe(2); // 目标手牌与焚书自身各消耗一次
+      expect(s.player.block).toBe(6); // 两次灰烬盛宴
+      expect(enemyHp - s.enemies[0].hp).toBe(8); // 两次火种传递
       expect(s.player.energy).toBe(energy + 1);
-      // 焚书本身进弃牌堆、消耗一张、骨灰坛抽一张 → 手牌 -1 -1 +1
+      // 焚书本身消耗、另消耗一张、骨灰坛只抽一张 → 手牌 -1 -1 +1
       expect(s.player.hand.length).toBe(handBefore - 1);
       s.player.hand.push(card('ash_return'));
       s.player.energy = 3;
       const exhaustedId = s.player.exhaust[0].uid;
       s = playCard(s, handCard(s, 'ash_return').uid, null).state;
-      expect(s.player.exhaust.length).toBe(0);
+      expect(s.player.exhaust.length).toBe(1); // 优先回收 1 费打击，0 费焚书仍在消耗区
       expect(s.player.hand.some((c) => c.uid === exhaustedId)).toBe(true);
     });
 
@@ -332,23 +332,23 @@ describe('战斗基础', () => {
       expect(s.player.hp).toBe(58);
       expect(s.player.statuses.strength).toBe(1);
       s = playCard(s, handCard(s, 'blood_pact').uid, null).state;
-      s = playCard(s, handCard(s, 'flex').uid, null).state; // +2 临时
-      expect(s.player.statuses.strength).toBe(3);
+      s = playCard(s, handCard(s, 'flex').uid, null).state; // +1 临时
+      expect(s.player.statuses.strength).toBe(2);
       const hpBefore = s.player.hp;
       const ehp = s.enemies[0].hp;
-      s = playCard(s, handCard(s, 'blood_edge').uid, 'e0').state; // 失去 2 → 血契 +1 力量（先于伤害）→ 9+4=13
+      s = playCard(s, handCard(s, 'blood_edge').uid, 'e0').state; // 失去 2 → 血契 +1 力量（先于伤害）→ 9+3=12
       expect(s.player.hp).toBe(hpBefore - 2);
-      expect(s.player.statuses.strength).toBe(4);
+      expect(s.player.statuses.strength).toBe(3);
       expect(s.player.block).toBe(2); // 铁颅
-      expect(ehp - s.enemies[0].hp).toBe(13);
+      expect(ehp - s.enemies[0].hp).toBe(12);
       s.player.hp = 30;
       s.player.energy = 1;
       const e2 = s.enemies[0].hp;
-      s = playCard(s, handCard(s, 'leech_bite').uid, 'e0').state; // 7+4 = 11 吸血
-      expect(e2 - s.enemies[0].hp).toBe(11);
+      s = playCard(s, handCard(s, 'leech_bite').uid, 'e0').state; // 7+3 = 10 吸血
+      expect(e2 - s.enemies[0].hp).toBe(10);
       expect(s.player.hp).toBe(36); // 吸血按实际伤害，普通版最多回复 6
       s = endPlayerTurn(s).state;
-      expect(s.player.statuses.strength).toBe(2); // 力竭 -2
+      expect(s.player.statuses.strength).toBe(2); // 力竭 -1
       expect(s.player.statuses.strengthDown).toBeUndefined();
     });
 

@@ -92,8 +92,8 @@ def({
   owner: 'traveler',
   cost: 0,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 4 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
+  effects: [{ kind: 'damage', amount: 3 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
+  upgrade: { effects: [{ kind: 'damage', amount: 5 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
 });
 def({
   id: 'twin_blades',
@@ -814,6 +814,7 @@ def({
   owner: 'picker',
   cost: 0,
   target: 'self',
+  exhaust: true,
   effects: [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }],
   upgrade: {
     effects: [
@@ -959,6 +960,7 @@ def({
   owner: 'oathbound',
   cost: 0,
   target: 'self',
+  exhaust: true,
   effects: [
     { kind: 'loseHp', amount: 3 },
     { kind: 'draw', amount: 2 },
@@ -1091,8 +1093,8 @@ def({
   owner: 'oathbound',
   cost: 0,
   target: 'self',
-  effects: [{ kind: 'tempStrength', amount: 2 }],
-  upgrade: { effects: [{ kind: 'tempStrength', amount: 3 }] },
+  effects: [{ kind: 'tempStrength', amount: 1 }],
+  upgrade: { effects: [{ kind: 'tempStrength', amount: 2 }] },
 });
 def({
   id: 'inflame',
@@ -1194,7 +1196,7 @@ def({
   target: 'all_enemies',
   exhaust: true,
   effects: [{ kind: 'status', status: 'weak', amount: 1, target: 'all' }],
-  upgrade: { exhaust: false },
+  upgrade: { effects: [{ kind: 'status', status: 'weak', amount: 2, target: 'all' }] },
 });
 def({
   id: 'blood_fury',

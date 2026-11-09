@@ -30,7 +30,7 @@ add('common', [
   S('camp_guard', '守夜', 1, [block(7), when(coals(3), block(2))], [block(9), when(coals(3), block(3))]),
   A('sweeping_embers', '扫火', 1, [hit(4, { aoe: true }), ember(1)], [hit(6, { aoe: true }), ember(1)], { target: 'all_enemies' }),
   A('coal_tip', '炭尖', 1, [hit(7), when({ kind: 'targetBurning' }, ember(2))], [hit(10), when({ kind: 'targetBurning' }, ember(3))]),
-  S('shutter_lamp', '掩灯', 0, [block(3), when(coals(3), status('weak', 1, 'all'))], [block(5), when(coals(3), status('weak', 1, 'all'))]),
+  S('shutter_lamp', '掩灯', 0, [block(3), when(coals(3), status('weak', 1, 'all'))], [block(5), when(coals(3), status('weak', 1, 'all'))], { exhaust: true }),
   S('tinder_bundle', '干薪束', 0, [ember(3)], [ember(5)], { exhaust: true }),
   S('field_notes', '行旅札记', 1, [draw(2), discard(1), ember(1)], [draw(3), discard(1), ember(2)]),
   S('spark_lure', '诱火', 1, [status('burn', 3, 'target'), status('weak', 1, 'target')], [status('burn', 4, 'target'), status('weak', 1, 'target')], { target: 'enemy' }),
@@ -39,7 +39,7 @@ add('common', [
   A('fanning_strike', '扇火斩', 1, [hit(8), when(coals(5), draw(1))], [hit(11), when(coals(5), draw(1))]),
   S('ration_bite', '一口干粮', 0, [heal(3)], [heal(5)], { exhaust: true }),
   S('banked_spark', '守住火种', 1, [block(7), when(coals(4), status('energyNext', 1))], [block(10), when(coals(4), status('energyNext', 1))], { retain: true }),
-  S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(2))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(2))]),
+  S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))]),
   A('sling_volley', '连掷火石', 2, [hit(3, { times: 4 }), when(coals(5), status('energyNext', 1))], [hit(4, { times: 4 }), when(coals(5), status('energyNext', 2))]),
 ]);
 add('uncommon', [

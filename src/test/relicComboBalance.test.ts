@@ -86,7 +86,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     const first: CombatEvent[] = [];
     cs = emptyHand(cs, first);
     expect(cs.player.skillsPlayedThisTurn).toBe(12);
-    expect(cs.player.exhaust).toHaveLength(3);
+    expect(cs.player.exhaust).toHaveLength(12); // 干薪束与掩灯都消耗，返能仍只触发一次
     expect(cs.player.energy).toBe(4);
     expect(cs.player.statuses.energyNext).toBe(1);
     expect(draws(first)).toBe(2);
@@ -98,7 +98,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     const second: CombatEvent[] = [];
     cs = emptyHand(cs, second);
     expect(cs.player.skillsPlayedThisTurn).toBe(7);
-    expect(cs.player.exhaust).toHaveLength(5);
+    expect(cs.player.exhaust).toHaveLength(19);
     expect(cs.player.energy).toBe(5);
     expect(cs.player.statuses.energyNext).toBe(1);
     expect(draws(second)).toBe(2);
@@ -123,7 +123,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     expect(procs(first, 'echo_key')).toBe(0);
 
     cs = use(cs, first, 'whisper_needle');
-    expect(cs.enemies[0].hp).toBe(985); // 本体 + 回响 + 三张独立镜像，每次 3 点伤害。
+    expect(cs.enemies[0].hp).toBe(990); // 本体 + 回响 + 三张独立镜像，每次 2 点伤害。
     expect(cs.player.cardsPlayedThisTurn).toBe(4);
     expect(cs.player.attacksPlayedThisTurn).toBe(1);
     expect(cs.player.energy).toBe(5);
@@ -143,7 +143,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     expect(cs.player.energy).toBe(3);
     const enemyHp = cs.enemies[0].hp;
     cs = use(cs, second, 'whisper_needle');
-    expect(enemyHp - cs.enemies[0].hp).toBe(18);
+    expect(enemyHp - cs.enemies[0].hp).toBe(12);
     expect(cs.player.cardsPlayedThisTurn).toBe(2);
     expect(cs.player.attacksPlayedThisTurn).toBe(1);
     expect(cs.player.energy).toBe(4);
@@ -175,7 +175,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     expect(cs.player.hp).toBe(62);
     expect(cs.player.cardsPlayedThisTurn).toBe(10);
     expect(cs.player.skillsPlayedThisTurn).toBe(9);
-    expect(cs.player.exhaust).toHaveLength(2);
+    expect(cs.player.exhaust).toHaveLength(9); // 两张药包和七张掩灯，各只消耗一次
     expect(cs.player.energy).toBe(5);
     expect(cs.player.statuses.energyNext).toBe(1);
     expect(cs.player.powerInstances).toHaveLength(1);
