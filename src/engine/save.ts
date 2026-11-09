@@ -72,6 +72,8 @@ function migrateLayout(input: Snapshot): Snapshot {
       if (node?.type === 'event') node.mysteryType = 'event';
     }
   }
+  // 旧档没有可靠的历次付费删牌记录，从更新后开始计数，已生成货架保留原价。
+  if (input.version < 18) run.shopRemovals = 0;
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';

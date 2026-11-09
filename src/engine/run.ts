@@ -19,7 +19,7 @@ import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 17;
+export const SAVE_VERSION = 18;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -89,6 +89,7 @@ export function newRun(seed: string, character: CharacterId = 'traveler', diffic
     event: null,
     rest: null,
     campRefined: false,
+    shopRemovals: 0,
     usedEvents: [],
     seenEncounters: [],
     stats: { floorsCleared: 0, enemiesKilled: 0, cardsPlayed: 0, damageDealt: 0, elitesKilled: 0 },
@@ -491,7 +492,7 @@ function generateShop(run: RunState): ShopState {
       price: Math.round(nextInt(run.rng.shop, ...BASE_RELIC_PRICES[RELICS[id].rarity]) * mul),
       sold: false,
     })),
-    removePrice: Math.round(75 * mul),
+    removePrice: Math.round((75 + 50 * (run.shopRemovals ?? 0)) * mul),
     removeUsed: false,
   };
 }
@@ -520,11 +521,12 @@ export function shopBuyRelic(input: RunState, index: number): RunState {
 }
 export function shopRemoveCard(input: RunState, cardUid: string): RunState {
   const s = input.shop;
-  if (!s || s.removeUsed || input.gold < s.removePrice) return input;
+  if (input.screen !== 'shop' || !s || s.removeUsed || input.gold < s.removePrice) return input;
   if (!input.deck.some((c) => c.uid === cardUid)) return input;
   const run = clone(input);
   run.gold -= s.removePrice;
   run.shop!.removeUsed = true;
+  run.shopRemovals = (run.shopRemovals ?? 0) + 1;
   run.deck = run.deck.filter((c) => c.uid !== cardUid);
   applyJourneyHealth(run, 'remove');
   run.gold += relicJourneyBonus(run, 'remove', 'gold');

@@ -10,7 +10,7 @@ function won(floor: number, tier: 'normal' | 'elite' | 'boss') {
   return run;
 }
 describe('固定战斗金币与商店价格', () => {
-  it('65层所有商品和删牌价格均不涨价，七五折仍生效且货架与SL固定', () => {
+  it('65层所有商品和首次删牌价格均不随楼层涨价，七五折仍生效且货架与SL固定', () => {
     for (const discount of [false, true]) for (let floor = 0; floor < 65; floor++) {
       let run = R.newRun('PRICE-FIXED'); run.chapter = floor < 20 ? 1 : 2;
       if (discount) run.relics.push('merchant_scale');

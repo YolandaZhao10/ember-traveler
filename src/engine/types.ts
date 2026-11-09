@@ -497,6 +497,8 @@ export interface RunState {
   maxHp: number;
   gold: number;
   deck: CardInstance[];
+  /** 本局商店成功付费删牌次数，跨章节累计；营火和事件删牌不计入。 */
+  shopRemovals: number;
   relics: string[];
   combat: CombatState | null;
   reward: RewardState | null;

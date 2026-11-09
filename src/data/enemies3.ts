@@ -5,12 +5,12 @@ const cycle = (ctx: EnemyAiContext, order: string[]) => order[ctx.enemy.turn % o
 /** 星骸天穹：破甲、连击与辅助敌人的组合，需要按意图决定集火顺序。 */
 export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   {
-    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [28, 32], sprite: 'star_moth',
+    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [32, 36], sprite: 'star_moth',
     description: '星砂施加 1 层脆弱并塞入 1 张朽败，持续干扰防御；扑击与合翼之间仍有反攻窗口。',
     moves: [
       { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'frailty', count: 1 }] },
       { id: 'flutter', name: '碎翼扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-      { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 7 }] },
+      { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
     ], chooseMove: c => cycle(c, ['dust', 'flutter', 'wings', 'flutter']),
   },
   {
@@ -18,58 +18,59 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     description: '镜片以双击切割，随后重组。死亡时使你获得 1 层虚弱。',
     moves: [
       { id: 'shards', name: '飞镜', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-      { id: 'assemble', name: '聚镜', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'assemble', name: '聚镜', intent: 'defend_buff', actions: [{ kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
     ], onDeath: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }],
     chooseMove: c => cycle(c, ['shards', 'assemble', 'shards']),
   },
   {
-    id: 'astral_sentinel', name: '星轨卫士', tier: 'normal', hp: [52, 58], sprite: 'astral_sentinel',
+    id: 'astral_sentinel', name: '星轨卫士', tier: 'normal', hp: [58, 65], sprite: 'astral_sentinel',
     description: '星矛在架盾后刺击，再施加易伤。盾墙回合是蓄力的机会。',
     moves: [
-      { id: 'orbit', name: '环轨盾', intent: 'defend', actions: [{ kind: 'block', amount: 14 }] },
-      { id: 'spear', name: '贯星', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
+      { id: 'orbit', name: '环轨盾', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
+      { id: 'spear', name: '贯星', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }] },
       { id: 'mark', name: '星轨标记', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 6 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
     ], chooseMove: c => cycle(c, ['orbit', 'spear', 'mark', 'spear']),
   },
   {
-    id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [37, 42], sprite: 'wind_scribe',
+    id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [41, 47], sprite: 'wind_scribe',
     description: '将朽败写入弃牌堆，之后为所有同伴增加力量；独处时也能用风页攻击。',
     moves: [
       { id: 'page', name: '朽页', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'frailty', count: 1 }] },
       { id: 'chorus', name: '风中合诵', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
-      { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }] },
+      { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
     ], chooseMove: c => cycle(c, ['page', 'chorus', 'cut', 'cut']),
   },
   {
-    id: 'comet_hound', name: '彗尾猎犬', tier: 'normal', hp: [44, 50], sprite: 'comet_hound',
-    description: '扑击与三连咬交替，嗥叫时增加 1 力量并暂停攻击。',
+    id: 'comet_hound', name: '彗尾猎犬', tier: 'normal', hp: [49, 56], sprite: 'comet_hound',
+    description: '首回合彗星突袭造成16点基础伤害，仅使用一次，随后嗥叫整备。扑击与三连咬交替，嗥叫时增加 1 力量并暂停攻击。',
     moves: [
-      { id: 'lunge', name: '追彗扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
+      { id: 'opening', name: '彗星突袭', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
+      { id: 'lunge', name: '追彗扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
       { id: 'howl', name: '长夜嗥叫', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
       { id: 'maul', name: '星痕三噬', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }] },
-    ], chooseMove: c => cycle(c, ['lunge', 'howl', 'maul']),
+    ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : cycle(c, ['lunge', 'howl', 'maul']),
   },
   {
-    id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [50, 56], sprite: 'star_pilgrim',
+    id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [56, 63], sprite: 'star_pilgrim',
     description: '沉重的星仪兼具武器与护甲。重击后回复 4 生命，并把 1 张破绽塞入弃牌堆，放大后续攻击的威胁。',
     moves: [
-      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
-      { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }] },
+      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
+      { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
       { id: 'repair', name: '拾回星屑', intent: 'special', actions: [{ kind: 'heal', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'exposure', count: 1 }] },
     ], chooseMove: c => cycle(c, ['burden', 'fall', 'repair']),
   },
   {
-    id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [112, 120], sprite: 'moon_duelist',
+    id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [122, 130], sprite: 'moon_duelist',
     description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时停止攻击，格挡并增长 2 力量；把握这次整备，下一轮连击会更强。',
     moves: [
       { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
       { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
-      { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 21 }] },
-      { id: 'step', name: '月步', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+      { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
+      { id: 'step', name: '月步', intent: 'defend_buff', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     ], chooseMove: c => cycle(c, ['twins', 'mark', 'crescent', 'step']),
   },
   {
-    id: 'orrery_keeper', name: '星仪守望者', tier: 'elite', hp: [92, 100], sprite: 'orrery_keeper',
+    id: 'orrery_keeper', name: '星仪守望者', tier: 'elite', hp: [98, 106], sprite: 'orrery_keeper',
     description: '两只碎镜灵与他同行，共鸣、双击、迷雾依次循环。随从全部倒下后，不再施放迷雾，改为每次共鸣后连续两轮双击；已显示的意图不会改变。',
     moves: [
       { id: 'align', name: '星轨共鸣', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
@@ -79,7 +80,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
       ? ['align', 'rod', 'mist'] : ['align', 'rod', 'rod']),
   },
   {
-    id: 'shattered_titan', name: '崩星巨像', tier: 'elite', hp: [132, 140], sprite: 'shattered_titan',
+    id: 'shattered_titan', name: '崩星巨像', tier: 'elite', hp: [138, 146], sprite: 'shattered_titan',
     description: '开场有 2 荆棘。蓄盾后落锤、三连击；修补时以碎岩攻击，回复 8 生命并增长 1 力量，让下一轮进攻更强。每轮只有蓄盾时停止进攻。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
@@ -90,14 +91,14 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['rise', 'crush', 'shower', 'mend']),
   },
   {
-    id: 'eclipse_archon', name: '坠星司辰', tier: 'boss', hp: [260, 260], sprite: 'eclipse_archon',
-    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 24 格挡与 2 力量。之后重斩、星尘帷幕、三连击与屏障循环；屏障回合可以整备。',
+    id: 'eclipse_archon', name: '坠星司辰', tier: 'boss', hp: [290, 290], sprite: 'eclipse_archon',
+    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 28 点基础格挡与 3 力量，同时自身获得2层虚弱，让转阶段后的第一次攻击减伤。星尘帷幕施加脆弱并塞牌；之后重斩、帷幕、三连击与屏障循环；屏障回合可以整备，展开屏障时自身获得2层易伤，下一玩家回合可趁隙爆发。',
     moves: [
-      { id: 'scythe', name: '弦月镰', intent: 'attack', actions: [{ kind: 'attack', amount: 18 }] },
+      { id: 'scythe', name: '弦月镰', intent: 'attack', actions: [{ kind: 'attack', amount: 19 }] },
       { id: 'veil', name: '星尘帷幕', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
-      { id: 'orbits', name: '双轨交错', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }] },
-      { id: 'shell', name: '天穹屏障', intent: 'defend', actions: [{ kind: 'block', amount: 20 }] },
-      { id: 'awaken', name: '日蚀降临', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 24 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+      { id: 'orbits', name: '双轨交错', intent: 'attack', actions: [{ kind: 'attack', amount: 10, times: 2 }] },
+      { id: 'shell', name: '天穹屏障', intent: 'defend', actions: [{ kind: 'block', amount: 24 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
+      { id: 'awaken', name: '日蚀降临', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 28 }, { kind: 'status', status: 'weak', amount: 2, target: 'self' }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
       { id: 'eclipse', name: '坠星裁决', intent: 'attack', actions: [{ kind: 'attack', amount: 23 }] },
       { id: 'rain', name: '群星陨落', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
     ], checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,

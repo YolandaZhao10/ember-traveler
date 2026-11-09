@@ -13,9 +13,10 @@ export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'nightless_lord', name: '无昼之主', tier: 'boss', hp: [400, 400], sprite: 'nightless_lord',
-    description: '封存黎明的最终首领。永夜屏障限制每回合的生命损失，熄光敕令也会造成伤害。半血时清除负面状态、获得 30 点基础格挡与 3 力量。常规循环中每四轮只有终夜壁垒停止攻击，二阶段蓄盾后发动四连击。',
+    description: '封存黎明的最终首领。首回合裂晓重扫造成24点基础伤害，仅使用一次；永夜屏障限制每回合的生命损失，熄光敕令也会造成伤害。半血时清除负面状态、获得 30 点基础格挡与 3 力量。常规循环中每四轮只有终夜壁垒停止攻击，二阶段蓄盾后发动四连击。',
     maxHpLossPerTurn: 0.25,
     moves: [
+      { id: 'opening', name: '裂晓重扫', intent: 'attack', actions: [{ kind: 'attack', amount: 24 }] },
       { id: 'sweep', name: '永夜横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 21 }] },
       { id: 'edict', name: '熄光敕令', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'pulse', name: '暗日三鸣', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
@@ -24,7 +25,7 @@ export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
       { id: 'nightfall', name: '长夜终临', intent: 'attack', actions: [{ kind: 'attack', amount: 28 }] },
       { id: 'extinguish', name: '四重灭灯', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 4 }] },
     ], checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,
-    chooseMove: c => c.enemy.phase === 1 ? ['sweep', 'edict', 'pulse', 'wall'][c.enemy.turn % 4]
+    chooseMove: c => c.enemy.phase === 1 ? c.enemy.turn === 0 ? 'opening' : ['sweep', 'edict', 'pulse', 'wall'][c.enemy.turn % 4]
       : !c.enemy.flags.awakened ? 'awaken' : ['nightfall', 'wall', 'extinguish', 'edict'][(c.enemy.flags.p2turn ?? 0) % 4],
   },
 ];

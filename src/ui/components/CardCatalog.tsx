@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CARD_LIST, CARDS, cardAvailableTo } from '../../data/cards';
 import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { archetypeName, cardTypeName, describeCard } from '../../engine/cards';
@@ -20,6 +20,18 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
   const [query, setQuery] = useState('');
   const [upgraded, setUpgraded] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const listPosition = useRef({ scrollTop: 0, cardId: '' });
+  const showDetail = (id: string) => {
+    listPosition.current = { scrollTop: gridRef.current?.scrollTop ?? 0, cardId: id };
+    setSelected(id);
+  };
+  useLayoutEffect(() => {
+    // 详情与列表共用图鉴状态，返回时恢复原列表位置和键盘焦点。
+    if (selected || !gridRef.current || !listPosition.current.cardId) return;
+    gridRef.current.scrollTop = listPosition.current.scrollTop;
+    gridRef.current.querySelector<HTMLButtonElement>(`[data-card-id="${listPosition.current.cardId}"]`)?.focus({ preventScroll: true });
+  }, [selected]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -45,7 +57,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
   const detail = selected ? CARDS[selected] : null;
 
   return (
-    <Modal title="卡牌图鉴" onClose={closeOverlay} wide>
+    <Modal title="卡牌图鉴" onClose={selected ? () => setSelected(null) : closeOverlay} wide>
       {detail ? (
         <div className="catalog-detail">
           <button className="btn small ghost" onClick={() => setSelected(null)}>← 返回图鉴</button>
@@ -83,9 +95,9 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
             </>}
           </div>
           <p className="subtitle catalog-summary" aria-live="polite">共 {cards.length} 张 · {group === 'curse' ? '诅咒牌 · 无法打出或升级，点击查看效果' : <>{upgraded ? '升级版' : '基础版'} · {group === 'all' || group === 'shared' ? '点击卡牌对比升级效果' : includeShared ? '专属牌与通用牌' : '仅该角色专属牌'}</>}</p>
-          <div className="cardgrid catalog-grid">
+          <div className="cardgrid catalog-grid" ref={gridRef}>
             {cards.map((card) => (
-              <button className="catalog-entry" key={card.id} onClick={() => setSelected(card.id)} aria-label={`查看${card.name}`}>
+              <button className="catalog-entry" key={card.id} data-card-id={card.id} onClick={() => showDetail(card.id)} aria-label={`查看${card.name}`}>
                 <span className="catalog-owner">{ownerName(card)}</span>
                 <Card card={instance(card.id, upgraded && card.type !== 'curse')} size="sm" presentation />
               </button>

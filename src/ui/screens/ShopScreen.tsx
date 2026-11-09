@@ -65,7 +65,7 @@ export function ShopScreen() {
           <span style={{ fontSize: 28 }}>🔥</span>
           <div className="txt">
             <b>焚毁一张牌</b>
-            从牌组中永久移除一张牌。每家商店限一次。
+            从牌组中永久移除一张牌。每店限一次，下次基础价增加 50 金币。
           </div>
           <button
             className="btn small"

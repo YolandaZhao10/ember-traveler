@@ -113,7 +113,7 @@ describe('第三章与五站终章', () => {
     cs.enemies[0].hp=cs.enemies[0].maxHp/2+1; cs=playCard(cs,card.uid,'e0').state;
     expect(cs.enemies[0].phase).toBe(2); expect(cs.enemies[0].moveId).toBe('awaken');
     cs=enemyAct(endPlayerTurn(cs).state,'e0').state; expect(cs.enemies[0].flags.awakened).toBe(1);
-    expect(cs.enemies[0].moveId).not.toBe('awaken'); expect(cs.enemies[0].block).toBe(id==='eclipse_archon'?24:30);
+    expect(cs.enemies[0].moveId).not.toBe('awaken'); expect(cs.enemies[0].block).toBe(id==='eclipse_archon'?28:30);
   });
 });
 

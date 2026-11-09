@@ -20,7 +20,8 @@
     "audit:card-rarity": "vite-node scripts/audit-card-rarity.ts",
     "audit:card-similarity": "vite-node scripts/audit-card-similarity.ts",
     "audit:mystery": "vite-node scripts/audit-mystery.ts",
-    "audit:new-enemies": "vite-node scripts/audit-new-enemies.ts"
+    "audit:new-enemies": "vite-node scripts/audit-new-enemies.ts",
+    "audit:opening-pressure": "vite-node scripts/audit-opening-pressure.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

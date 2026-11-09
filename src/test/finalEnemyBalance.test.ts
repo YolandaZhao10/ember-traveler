@@ -74,7 +74,7 @@ describe('终章精英与首领攻防节奏', () => {
         expect([...cs.player.hand, ...cs.player.draw, ...cs.player.discard].some(c => c.defId === 'cold_ash')).toBe(true);
       }
     }
-    expect(moves).toEqual(['sweep', 'edict', 'pulse', 'wall']);
+    expect(moves).toEqual(['opening', 'edict', 'pulse', 'wall']);
     expect(hits).toEqual([true, true, true, false]);
     expect(cs.enemies[0].statuses.strength ?? 0).toBe(0);
     expect(cs.enemies[0].block).toBeGreaterThan(0);

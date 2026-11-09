@@ -180,8 +180,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05902777777777778,
-        "turns": 2.5
+        "hpLoss": 0.08159722222222222,
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
@@ -201,7 +201,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.008680555555555556,
+        "hpLoss": 0.022569444444444444,
         "turns": 4
       },
       "control": {
@@ -222,8 +222,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0625,
-        "turns": 2.125
+        "hpLoss": 0.08712121212121213,
+        "turns": 2
       },
       "control": {
         "wins": 8,
@@ -243,7 +243,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.022727272727272728,
+        "hpLoss": 0.03977272727272727,
         "turns": 1.75
       },
       "control": {
@@ -264,8 +264,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.01442307692307692,
-        "turns": 2.375
+        "hpLoss": 0.019230769230769232,
+        "turns": 2.5
       },
       "control": {
         "wins": 8,
@@ -285,7 +285,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05608974358974359,
+        "hpLoss": 0.07852564102564102,
         "turns": 1.875
       },
       "control": {
@@ -307,7 +307,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 2.625
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
@@ -327,8 +327,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.004807692307692308,
-        "turns": 2.25
+        "hpLoss": 0.01201923076923077,
+        "turns": 2.375
       },
       "control": {
         "wins": 8,
@@ -684,8 +684,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.171875,
-        "turns": 4.625
+        "hpLoss": 0.2482638888888889,
+        "turns": 4.5
       },
       "control": {
         "wins": 8,
@@ -705,8 +705,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.019097222222222224,
-        "turns": 8
+        "hpLoss": 0.04861111111111111,
+        "turns": 8.25
       },
       "control": {
         "wins": 8,
@@ -726,7 +726,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.07196969696969696,
+        "hpLoss": 0.11553030303030304,
         "turns": 3.25
       },
       "control": {
@@ -747,7 +747,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.10037878787878787,
+        "hpLoss": 0.12878787878787878,
         "turns": 2.875
       },
       "control": {
@@ -768,8 +768,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.046474358974358976,
-        "turns": 4.375
+        "hpLoss": 0.05128205128205128,
+        "turns": 5
       },
       "control": {
         "wins": 8,
@@ -789,7 +789,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.1362179487179487,
+        "hpLoss": 0.1858974358974359,
         "turns": 3.5
       },
       "control": {
@@ -810,7 +810,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.01682692307692308,
+        "hpLoss": 0.03605769230769231,
         "turns": 6.5
       },
       "control": {
@@ -831,7 +831,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.028846153846153844,
+        "hpLoss": 0.06971153846153846,
         "turns": 4.75
       },
       "control": {
@@ -874,14 +874,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.010416666666666666,
-        "turns": 3.5
+        "turns": 3.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.015625,
-        "turns": 2.875
+        "turns": 3.125
       }
     },
     {
@@ -895,7 +895,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.5
+        "turns": 1.625
       },
       "control": {
         "wins": 8,
@@ -936,14 +936,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.02884615384615385,
-        "turns": 2.375
+        "hpLoss": 0.046474358974358976,
+        "turns": 2.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.014423076923076924,
+        "hpLoss": 0.019230769230769232,
         "turns": 2.375
       }
     },
@@ -957,15 +957,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": -0.008012820512820512,
+        "hpLoss": -0.009615384615384616,
         "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.008012820512820512,
-        "turns": 1.5
+        "hpLoss": 0.004807692307692308,
+        "turns": 1.625
       }
     },
     {
@@ -978,15 +978,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04326923076923077,
-        "turns": 2.625
+        "hpLoss": 0.04567307692307692,
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.75
+        "hpLoss": 0.026442307692307696,
+        "turns": 2
       }
     },
     {
@@ -1000,14 +1000,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.007211538461538462,
-        "turns": 3.625
+        "turns": 3.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 3.25
+        "turns": 3.5
       }
     },
     {
@@ -1027,8 +1027,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.75
+        "hpLoss": 0.015625,
+        "turns": 2.125
       }
     },
     {
@@ -1042,14 +1042,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.001736111111111111,
-        "turns": 2.75
+        "turns": 2.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.005208333333333333,
-        "turns": 3.375
+        "turns": 3.5
       }
     },
     {
@@ -1062,8 +1062,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.022727272727272728,
-        "turns": 1.75
+        "hpLoss": 0.05113636363636363,
+        "turns": 1.875
       },
       "control": {
         "wins": 8,
@@ -1091,7 +1091,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.001893939393939394,
-        "turns": 1.5
+        "turns": 1.625
       }
     },
     {
@@ -1104,14 +1104,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04006410256410256,
+        "hpLoss": 0.03205128205128205,
         "turns": 2.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.03685897435897436,
+        "hpLoss": 0.032051282051282055,
         "turns": 2.25
       }
     },
@@ -1125,8 +1125,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.046474358974358976,
-        "turns": 1.5
+        "hpLoss": 0.056089743589743585,
+        "turns": 1.625
       },
       "control": {
         "wins": 8,
@@ -1168,14 +1168,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 3.5
+        "turns": 3.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.014423076923076924,
-        "turns": 3.625
+        "turns": 3.875
       }
     },
     {
@@ -1188,7 +1188,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.006944444444444444,
+        "hpLoss": 0.017361111111111112,
         "turns": 1.75
       },
       "control": {
@@ -1209,7 +1209,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
+        "hpLoss": 0.003472222222222222,
         "turns": 2.625
       },
       "control": {
@@ -1217,7 +1217,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 2.625
+        "turns": 2.75
       }
     },
     {
@@ -1251,8 +1251,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.25
+        "hpLoss": 0.017045454545454544,
+        "turns": 1.375
       },
       "control": {
         "wins": 8,
@@ -1272,14 +1272,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.016025641025641028,
-        "turns": 2.375
+        "hpLoss": 0.03044871794871795,
+        "turns": 2.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.017628205128205128,
+        "hpLoss": 0.019230769230769232,
         "turns": 2.375
       }
     },
@@ -1293,15 +1293,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0657051282051282,
-        "turns": 1.875
+        "hpLoss": 0.10416666666666666,
+        "turns": 2
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.03365384615384615,
-        "turns": 1.5
+        "hpLoss": 0.07371794871794872,
+        "turns": 1.875
       }
     },
     {
@@ -1314,7 +1314,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.014423076923076924,
+        "hpLoss": 0.02403846153846154,
         "turns": 1.875
       },
       "control": {
@@ -1343,7 +1343,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 3.25
+        "turns": 3.375
       }
     },
     {
@@ -1356,15 +1356,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.13368055555555555,
-        "turns": 3
+        "hpLoss": 0.1545138888888889,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.02430555555555556,
-        "turns": 2.75
+        "turns": 2.875
       }
     },
     {
@@ -1377,8 +1377,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04513888888888889,
-        "turns": 3
+        "hpLoss": 0.05034722222222223,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
@@ -1399,7 +1399,7 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.03598484848484849,
-        "turns": 1.875
+        "turns": 2
       },
       "control": {
         "wins": 8,
@@ -1419,8 +1419,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.005681818181818182,
-        "turns": 1.375
+        "hpLoss": 0.00946969696969697,
+        "turns": 1.75
       },
       "control": {
         "wins": 8,
@@ -1440,15 +1440,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.1266025641025641,
+        "hpLoss": 0.1346153846153846,
         "turns": 2.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.024038461538461536,
-        "turns": 2.5
+        "hpLoss": 0.03365384615384615,
+        "turns": 2.375
       }
     },
     {
@@ -1461,15 +1461,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.16666666666666669,
+        "hpLoss": 0.18269230769230768,
         "turns": 2.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.059294871794871785,
-        "turns": 2.375
+        "hpLoss": 0.06730769230769232,
+        "turns": 2.5
       }
     },
     {
@@ -1482,15 +1482,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.11538461538461538,
-        "turns": 2.75
+        "hpLoss": 0.13461538461538464,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.019230769230769232,
-        "turns": 2.375
+        "hpLoss": 0.021634615384615384,
+        "turns": 2.5
       }
     },
     {
@@ -1503,15 +1503,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05288461538461539,
+        "hpLoss": 0.05048076923076923,
         "turns": 4.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.036057692307692304,
-        "turns": 4.125
+        "hpLoss": 0.038461538461538464,
+        "turns": 4.25
       }
     },
     {
@@ -1524,7 +1524,7 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.08333333333333334,
+        "hpLoss": 0.16319444444444445,
         "turns": 3.125
       },
       "control": {
@@ -1545,15 +1545,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04861111111111112,
-        "turns": 2.625
+        "hpLoss": 0.08854166666666667,
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.020833333333333336,
-        "turns": 3.125
+        "hpLoss": 0.024305555555555552,
+        "turns": 3.375
       }
     },
     {
@@ -1566,14 +1566,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.022727272727272728,
+        "hpLoss": 0.0303030303030303,
         "turns": 1.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.011363636363636364,
+        "hpLoss": 0.013257575757575758,
         "turns": 1.625
       }
     },
@@ -1587,15 +1587,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.043560606060606064,
+        "hpLoss": 0.08901515151515152,
         "turns": 2.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.007575757575757576,
-        "turns": 1.5
+        "hpLoss": 0.017045454545454544,
+        "turns": 1.75
       }
     },
     {
@@ -1608,15 +1608,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.08974358974358974,
+        "hpLoss": 0.16506410256410256,
         "turns": 3.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.01282051282051282,
-        "turns": 2.625
+        "hpLoss": 0.016025641025641028,
+        "turns": 2.5
       }
     },
     {
@@ -1629,14 +1629,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.11698717948717949,
-        "turns": 2.5
+        "hpLoss": 0.17467948717948717,
+        "turns": 2.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05128205128205127,
+        "hpLoss": 0.0657051282051282,
         "turns": 2.375
       }
     },
@@ -1650,15 +1650,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.08653846153846154,
-        "turns": 3
+        "hpLoss": 0.20673076923076927,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.024038461538461536,
-        "turns": 2.625
+        "hpLoss": 0.03125,
+        "turns": 2.75
       }
     },
     {
@@ -1671,8 +1671,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04807692307692309,
-        "turns": 5.125
+        "hpLoss": 0.06490384615384616,
+        "turns": 5.5
       },
       "control": {
         "wins": 8,
@@ -1692,14 +1692,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.004261363636363636,
-        "turns": 1.625
+        "hpLoss": 0,
+        "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.008522727272727272,
+        "hpLoss": 0.009943181818181818,
         "turns": 1.875
       }
     },
@@ -1713,15 +1713,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.011904761904761904,
-        "turns": 3
+        "hpLoss": 0.03125,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.025297619047619048,
-        "turns": 3.5
+        "hpLoss": 0.04910714285714285,
+        "turns": 4.25
       }
     },
     {
@@ -1741,8 +1741,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.006756756756756757,
-        "turns": 1.625
+        "hpLoss": 0.008445945945945946,
+        "turns": 1.875
       }
     },
     {
@@ -1756,14 +1756,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.375
+        "turns": 1.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.001893939393939394,
-        "turns": 1.625
+        "hpLoss": 0,
+        "turns": 1.75
       }
     },
     {
@@ -1776,14 +1776,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.014627659574468084,
-        "turns": 2.25
+        "hpLoss": 0.027925531914893612,
+        "turns": 2.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0678191489361702,
+        "hpLoss": 0.07180851063829786,
         "turns": 2.5
       }
     },
@@ -1797,15 +1797,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": -0.005319148936170213,
+        "hpLoss": -0.007978723404255319,
         "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.02526595744680852,
-        "turns": 2.25
+        "hpLoss": 0.05585106382978724,
+        "turns": 2.625
       }
     },
     {
@@ -1819,14 +1819,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.5
+        "turns": 2.125
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.020833333333333332,
-        "turns": 2.25
+        "turns": 2.375
       }
     },
     {
@@ -1840,14 +1840,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 3.25
+        "turns": 3.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.014583333333333334,
-        "turns": 3.375
+        "hpLoss": 0.016666666666666666,
+        "turns": 3.625
       }
     },
     {
@@ -1861,14 +1861,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.5
+        "turns": 1.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.028409090909090908,
-        "turns": 1.75
+        "hpLoss": 0.09659090909090909,
+        "turns": 1.875
       }
     },
     {
@@ -1881,15 +1881,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.06547619047619048,
-        "turns": 2.375
+        "hpLoss": 0.12351190476190477,
+        "turns": 2.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 2.625
+        "turns": 2.75
       }
     },
     {
@@ -1902,14 +1902,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.5
+        "hpLoss": 0.02195945945945946,
+        "turns": 1.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0033783783783783786,
+        "hpLoss": 0,
         "turns": 1.5
       }
     },
@@ -1924,14 +1924,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.25
+        "turns": 1.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.125
+        "hpLoss": 0.001893939393939394,
+        "turns": 1.375
       }
     },
     {
@@ -1944,15 +1944,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.017287234042553192,
+        "hpLoss": 0.0199468085106383,
         "turns": 2.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.022606382978723406,
-        "turns": 2.375
+        "hpLoss": 0.0651595744680851,
+        "turns": 2.75
       }
     },
     {
@@ -1965,14 +1965,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": -0.003989361702127659,
-        "turns": 1.75
+        "hpLoss": -0.007978723404255319,
+        "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.12898936170212766,
+        "hpLoss": 0.1901595744680851,
         "turns": 2
       }
     },
@@ -1987,14 +1987,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.5
+        "turns": 2
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05625,
-        "turns": 1.75
+        "hpLoss": 0.08541666666666667,
+        "turns": 2.125
       }
     },
     {
@@ -2007,8 +2007,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.13541666666666669,
-        "turns": 2.625
+        "hpLoss": 0.16250000000000003,
+        "turns": 2.875
       },
       "control": {
         "wins": 8,
@@ -2035,8 +2035,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0014204545454545455,
-        "turns": 1.875
+        "hpLoss": 0.004261363636363636,
+        "turns": 2
       }
     },
     {
@@ -2049,15 +2049,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.03571428571428571,
-        "turns": 3.875
+        "hpLoss": 0.017857142857142856,
+        "turns": 4.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.02827380952380952,
-        "turns": 3.75
+        "hpLoss": 0.07291666666666666,
+        "turns": 4.25
       }
     },
     {
@@ -2070,15 +2070,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0033783783783783786,
-        "turns": 1.625
+        "hpLoss": 0.006756756756756757,
+        "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0033783783783783786,
-        "turns": 1.75
+        "hpLoss": 0.013513513513513514,
+        "turns": 2.125
       }
     },
     {
@@ -2092,14 +2092,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.625
+        "turns": 1.875
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.625
+        "turns": 1.875
       }
     },
     {
@@ -2112,15 +2112,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04122340425531915,
+        "hpLoss": 0.05319148936170213,
         "turns": 2.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04388297872340426,
-        "turns": 2.625
+        "hpLoss": 0.11037234042553191,
+        "turns": 3.125
       }
     },
     {
@@ -2133,8 +2133,8 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.02393617021276596,
-        "turns": 2.375
+        "hpLoss": 0.025265957446808512,
+        "turns": 2.5
       },
       "control": {
         "wins": 8,
@@ -2155,14 +2155,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0.008333333333333333,
-        "turns": 2.375
+        "turns": 2.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 2.5
+        "hpLoss": 0.0020833333333333333,
+        "turns": 2.75
       }
     },
     {
@@ -2176,14 +2176,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 3.125
+        "turns": 3.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 3.375
+        "hpLoss": 0.0020833333333333333,
+        "turns": 3.75
       }
     },
     {
@@ -2196,15 +2196,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.015625,
-        "turns": 2.875
+        "hpLoss": 0.018465909090909092,
+        "turns": 3.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.21306818181818182,
-        "turns": 3.125
+        "hpLoss": 0.2911931818181818,
+        "turns": 3.25
       }
     },
     {
@@ -2217,14 +2217,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.12797619047619047,
-        "turns": 2.75
+        "hpLoss": 0.12351190476190475,
+        "turns": 3.125
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.01636904761904762,
+        "hpLoss": 0.04017857142857143,
         "turns": 2.75
       }
     },
@@ -2238,14 +2238,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
+        "hpLoss": 0.011824324324324325,
         "turns": 1.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
+        "hpLoss": 0.057432432432432436,
         "turns": 1.75
       }
     },
@@ -2263,11 +2263,11 @@
         "turns": 2
       },
       "control": {
-        "wins": 8,
+        "wins": 7,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.08143939393939394,
-        "turns": 2.5
+        "hpLoss": 0.2121212121212121,
+        "turns": 3.125
       }
     },
     {
@@ -2280,15 +2280,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.05585106382978724,
-        "turns": 3.375
+        "hpLoss": 0.04255319148936171,
+        "turns": 3.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.1196808510638298,
-        "turns": 3.625
+        "hpLoss": 0.16755319148936168,
+        "turns": 4.25
       }
     },
     {
@@ -2301,15 +2301,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.025265957446808505,
-        "turns": 2.5
+        "hpLoss": 0.06382978723404255,
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.2021276595744681,
-        "turns": 3
+        "hpLoss": 0.2792553191489362,
+        "turns": 3.125
       }
     },
     {
@@ -2322,15 +2322,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.06041666666666667,
-        "turns": 2.375
+        "hpLoss": 0.09375000000000001,
+        "turns": 2.75
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.11458333333333333,
-        "turns": 3.25
+        "hpLoss": 0.1708333333333333,
+        "turns": 3.375
       }
     },
     {
@@ -2343,15 +2343,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.17500000000000002,
-        "turns": 4.25
+        "hpLoss": 0.2041666666666667,
+        "turns": 4.625
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.010416666666666666,
-        "turns": 5.125
+        "hpLoss": 0.020833333333333332,
+        "turns": 4.75
       }
     },
     {
@@ -2364,15 +2364,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.07244318181818182,
-        "turns": 2.875
+        "hpLoss": 0.06392045454545454,
+        "turns": 3.25
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.017045454545454544,
-        "turns": 2.625
+        "hpLoss": 0.015625,
+        "turns": 2.75
       }
     },
     {
@@ -2385,14 +2385,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.017857142857142856,
-        "turns": 3.125
+        "hpLoss": 0.03720238095238095,
+        "turns": 4
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.00744047619047619,
+        "hpLoss": 0.010416666666666666,
         "turns": 3.125
       }
     },
@@ -2406,15 +2406,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.375
+        "hpLoss": 0.006756756756756757,
+        "turns": 2
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 1.125
+        "hpLoss": 0.006756756756756757,
+        "turns": 1.875
       }
     },
     {
@@ -2428,14 +2428,14 @@
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.75
+        "turns": 2
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
         "hpLoss": 0,
-        "turns": 1.625
+        "turns": 1.875
       }
     },
     {
@@ -2448,15 +2448,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.0651595744680851,
-        "turns": 3.375
+        "hpLoss": 0.12101063829787233,
+        "turns": 3.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.014627659574468085,
-        "turns": 2.75
+        "hpLoss": 0.009308510638297872,
+        "turns": 3
       }
     },
     {
@@ -2469,14 +2469,14 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.09840425531914894,
-        "turns": 3
+        "hpLoss": 0.1023936170212766,
+        "turns": 3.125
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": -0.0013297872340425532,
+        "hpLoss": 0.029255319148936167,
         "turns": 2.75
       }
     },
@@ -2490,15 +2490,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.04375,
-        "turns": 3
+        "hpLoss": 0.075,
+        "turns": 3.5
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 2.625
+        "hpLoss": 0.0020833333333333333,
+        "turns": 2.875
       }
     },
     {
@@ -2511,15 +2511,15 @@
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0.008333333333333333,
-        "turns": 6.25
+        "hpLoss": 0.00625,
+        "turns": 6.375
       },
       "control": {
         "wins": 8,
         "stalled": 0,
         "invalid": 0,
-        "hpLoss": 0,
-        "turns": 4.75
+        "hpLoss": 0.004166666666666667,
+        "turns": 5.25
       }
     }
   ],

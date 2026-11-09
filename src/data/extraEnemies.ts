@@ -16,13 +16,14 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'ash_duelist', name: '灰衣决斗者', tier: 'normal', hp: [34, 38], sprite: 'ash_duelist',
-    description: '斩击后准备反击架势：获得7格挡与2荆棘，下次回斩前移除这2荆棘。若选招时你的格挡至少8，改用佯攻施加脆弱。已显示的意图不会临时改变。',
+    description: '首回合拔刃突袭造成12点基础伤害，之后不再使用；斩击后准备反击架势：获得7格挡与2荆棘，下次回斩前移除这2荆棘。若选招时你的格挡至少8，改用佯攻施加脆弱。已显示的意图不会临时改变。',
     moves: [
+      { id: 'opening', name: '拔刃突袭', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
       { id: 'slash', name: '试探斩', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
       { id: 'parry', name: '反击架势', intent: 'defend_buff', actions: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }] },
       { id: 'riposte', name: '收势回斩', intent: 'attack', actions: [{ kind: 'status', status: 'thorns', amount: -2, target: 'self' }, { kind: 'attack', amount: 9 }] },
       { id: 'feint', name: '绕盾佯攻', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
-    ], chooseMove: c => last(c) === 'parry' ? 'riposte' : last(c) === 'slash' ? (c.player.block >= 8 ? 'feint' : 'parry') : 'slash',
+    ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : last(c) === 'parry' ? 'riposte' : ['slash', 'opening'].includes(last(c)) ? (c.player.block >= 8 ? 'feint' : 'parry') : 'slash',
   },
   {
     id: 'grave_lamplighter', name: '守灯人', tier: 'normal', hp: [24, 28], sprite: 'grave_lamplighter',
@@ -34,7 +35,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['knock', 'mend', 'ash']),
   },
   {
-    id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [48, 54], sprite: 'pressure_boiler',
+    id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [50, 57], sprite: 'pressure_boiler',
     description: '加压获得8格挡与2力量，喷汽后移除这2力量并自损5生命（不会自杀）；冷却时轻击并暴露2层易伤。爆发后是反攻窗口。',
     moves: [
       { id: 'pressure', name: '封阀加压', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
@@ -43,7 +44,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['pressure', 'vent', 'cool']),
   },
   {
-    id: 'quench_smith', name: '淬火匠', tier: 'normal', hp: [38, 44], sprite: 'quench_smith',
+    id: 'quench_smith', name: '淬火匠', tier: 'normal', hp: [40, 46], sprite: 'quench_smith',
     description: '交替锤击与护身锤。选招时若正在燃烧，会改为淬火：净化自身并获得6格挡，两次淬火之间至少两次其他行动。可在淬火后重新点燃。',
     moves: [
       { id: 'hammer', name: '锻打', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
@@ -53,40 +54,41 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
       ? 'quench' : last(c) === 'hammer' ? 'guard' : 'hammer',
   },
   {
-    id: 'slag_saw', name: '炉轨锯轮', tier: 'normal', hp: [40, 46], sprite: 'slag_saw',
-    description: '三连试切后磨齿增加2力量，再发动五连锯，随后移除这2力量。卡齿回合只防御并使自身虚弱，荆棘与减伤能克制密集连击。',
+    id: 'slag_saw', name: '炉轨锯轮', tier: 'normal', hp: [42, 48], sprite: 'slag_saw',
+    description: '首回合冲轨三切每段4点基础伤害，仅使用一次；三连试切后磨齿增加2力量，再发动五连锯，随后移除这2力量。卡齿回合只防御并使自身虚弱，荆棘与减伤能克制密集连击。',
     moves: [
+      { id: 'opening', name: '冲轨三切', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }] },
       { id: 'cut', name: '三齿试切', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 3 }] },
       { id: 'sharpen', name: '磨齿提速', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
       { id: 'saw', name: '五齿连锯', intent: 'attack', actions: [{ kind: 'attack', amount: 2, times: 5 }, { kind: 'status', status: 'strength', amount: -2, target: 'self' }] },
       { id: 'jam', name: '卡齿停转', intent: 'defend', actions: [{ kind: 'block', amount: 5 }, { kind: 'status', status: 'weak', amount: 2, target: 'self' }] },
-    ], chooseMove: c => cycle(c, ['cut', 'sharpen', 'saw', 'jam']),
+    ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : cycle(c, ['cut', 'sharpen', 'saw', 'jam']),
   },
   {
-    id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [46, 52], sprite: 'sealed_archivist',
+    id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [52, 58], sprite: 'sealed_archivist',
     description: '仅开场行动塞入1张会保留的重负（只限本场），随后斩页、封书防护、双刃轮换。弃置或消耗重负可解放手牌空间。',
     moves: [
       { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
-      { id: 'cut', name: '断章斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
+      { id: 'cut', name: '断章斩', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
       { id: 'close', name: '合卷禁声', intent: 'defend_buff', actions: [{ kind: 'block', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
       { id: 'twins', name: '禁页双刃', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
     ], chooseMove: c => c.enemy.turn === 0 ? 'seal' : ['cut', 'close', 'twins'][(c.enemy.turn - 1) % 3],
   },
   {
-    id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [44, 50], sprite: 'phase_lancer',
+    id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [49, 56], sprite: 'phase_lancer',
     description: '锁定时自身获得2层易伤，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，可趁锁定回合击杀或削弱。',
     moves: [
       { id: 'lock', name: '裂隙锁定', intent: 'special', actions: [{ kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
       { id: 'pierce', name: '穿隙刺', intent: 'attack', actions: [{ kind: 'attack', amount: 8, piercing: true }] },
-      { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 10 }] },
+      { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
     ], chooseMove: c => cycle(c, ['lock', 'pierce', 'sweep']),
   },
   {
-    id: 'orbit_gambler', name: '逆轨棋士', tier: 'normal', hp: [50, 56], sprite: 'orbit_gambler',
-    description: '落子回合只获得8格挡。之后选招时，若你的格挡至少10就准备14伤害破阵并施加脆弱，否则准备三连击；不会随你本回合出牌改变已显示的意图。',
+    id: 'orbit_gambler', name: '逆轨棋士', tier: 'normal', hp: [56, 63], sprite: 'orbit_gambler',
+    description: '落子回合只获得8格挡。之后选招时，若你的格挡至少10就准备15伤害破阵并施加脆弱，否则准备三连击；不会随你本回合出牌改变已显示的意图。',
     moves: [
       { id: 'place', name: '布下星局', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
-      { id: 'break', name: '破阵一击', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 14 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
+      { id: 'break', name: '破阵一击', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 15 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
       { id: 'triple', name: '三子追击', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
     ], chooseMove: c => c.enemy.turn % 3 === 0 ? 'place' : c.player.block >= 10 ? 'break' : 'triple',
   },
