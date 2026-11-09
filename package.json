@@ -1,0 +1,26 @@
+{
+  "name": "ember-traveler",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "package:play": "npm run build && node scripts/package-game.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "sim": "vitest run src/test/simulation.test.ts"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.5"
+  }
+}

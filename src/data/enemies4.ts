@@ -1,0 +1,33 @@
+import type { EnemyDef, EncounterDef } from '../engine/types';
+
+export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
+  {
+    id: 'last_warden', name: '终庭执卫', tier: 'elite', hp: [150, 150], sprite: 'last_warden',
+    description: '最后一道守卫。先举盾施加易伤，随后重斩与双击；每轮收剑时获得 1 力量。',
+    moves: [
+      { id: 'seal', name: '封庭敕令', intent: 'special', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'verdict', name: '断路重斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
+      { id: 'twins', name: '守门双击', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }] },
+      { id: 'sheathe', name: '收剑立誓', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    ], chooseMove: c => ['seal', 'verdict', 'twins', 'sheathe'][c.enemy.turn % 4],
+  },
+  {
+    id: 'nightless_lord', name: '无昼之主', tier: 'boss', hp: [320, 320], sprite: 'nightless_lord',
+    description: '封存黎明的最终首领。半血时吞没天光，清除负面状态、获得 30 格挡与 3 力量。二阶段的长夜重击后有一次蓄盾回合，下一次将发动四连击。',
+    moves: [
+      { id: 'sweep', name: '永夜横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 21 }] },
+      { id: 'edict', name: '熄光敕令', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'pulse', name: '暗日三鸣', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
+      { id: 'wall', name: '终夜壁垒', intent: 'defend', actions: [{ kind: 'block', amount: 24 }] },
+      { id: 'awaken', name: '吞没天光', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 30 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
+      { id: 'nightfall', name: '长夜终临', intent: 'attack', actions: [{ kind: 'attack', amount: 28 }] },
+      { id: 'extinguish', name: '四重灭灯', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 4 }] },
+    ], checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,
+    chooseMove: c => c.enemy.phase === 1 ? ['sweep', 'edict', 'pulse', 'wall'][c.enemy.turn % 4]
+      : !c.enemy.flags.awakened ? 'awaken' : ['nightfall', 'wall', 'extinguish', 'edict'][(c.enemy.flags.p2turn ?? 0) % 4],
+  },
+];
+export const CHAPTER_FOUR_ENCOUNTERS: EncounterDef[] = [
+  { id: 'final_elite_warden', enemies: ['last_warden'], tier: 'elite', chapter: 4 },
+  { id: 'final_boss_lord', enemies: ['nightless_lord'], tier: 'boss', chapter: 4 },
+];

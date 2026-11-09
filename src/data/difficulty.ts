@@ -1,0 +1,33 @@
+import type { RunDifficulty } from '../engine/types';
+
+export const STANDARD_DIFFICULTY: RunDifficulty = {
+  enemyHealth: 100, enemyIntent: 100, bossHealth: 100, bossIntent: 100, gold: 100, relicRarity: 100, cardRarity: 100,
+};
+export const DIFFICULTY_PRESETS: { name: string; settings: RunDifficulty }[] = [
+  { name: '轻松', settings: { enemyHealth: 75, enemyIntent: 80, bossHealth: 75, bossIntent: 80, gold: 150, relicRarity: 200, cardRarity: 200 } },
+  { name: '标准', settings: STANDARD_DIFFICULTY },
+  { name: '挑战', settings: { ...STANDARD_DIFFICULTY, enemyHealth: 130, enemyIntent: 125, bossHealth: 130, bossIntent: 125 } },
+];
+export const DIFFICULTY_FIELDS: { key: keyof RunDifficulty; label: string; help: string }[] = [
+  { key: 'enemyHealth', label: '怪物生命', help: '普通怪物与精英的生命，叠加楼层强化。' },
+  { key: 'gold', label: '金币掉落', help: '战斗金币奖励，不改变初始金币和事件固定金币。' },
+  { key: 'relicRarity', label: '遗物稀有度倾向', help: '越高越容易获得稀有遗物；百分比表示倾向强度，并非掉落概率。' },
+  { key: 'cardRarity', label: '卡牌稀有度倾向', help: '越高越容易获得稀有卡；首领和指定稀有度奖励不变。' },
+  { key: 'enemyIntent', label: '怪物攻击意图', help: '普通怪物与精英的伤害和格挡，保留出招顺序。' },
+  { key: 'bossIntent', label: 'Boss 攻击意图', help: '首领的伤害和格挡，保留阶段切换与出招顺序。' },
+  { key: 'bossHealth', label: 'Boss 生命', help: '独立调整首领生命，叠加楼层强化。' },
+];
+
+/** 旧三档精确迁移到等效百分比，数值只接受有限的 50–200 整数。 */
+export function difficultyPercent(key: keyof RunDifficulty, value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.max(50, Math.min(200, Math.round(value)));
+  if (value === 'normal') return 100;
+  const range = key === 'gold' ? [75, 150] : key.endsWith('Health') ? [75, 130] : key.endsWith('Intent') ? [80, 125] : [50, 200];
+  return value === 'low' ? range[0] : value === 'high' ? range[1] : 100;
+}
+export function normalizeDifficulty(input?: Partial<RunDifficulty> | null): RunDifficulty {
+  return Object.fromEntries(DIFFICULTY_FIELDS.map(({ key }) => [key, difficultyPercent(key, input?.[key])])) as unknown as RunDifficulty;
+}
+export function difficultyName(settings: RunDifficulty): string {
+  return DIFFICULTY_PRESETS.find(p => DIFFICULTY_FIELDS.every(f => p.settings[f.key] === difficultyPercent(f.key, settings[f.key])))?.name ?? '自定义';
+}
