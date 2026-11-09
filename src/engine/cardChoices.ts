@@ -11,11 +11,13 @@ function effectRole(effect: Effect): CardRole | null {
     case 'damagePerEmber':
     case 'damagePerBurn':
     case 'consumeBurn':
+    case 'consumeVulnerable':
     case 'spreadBurn':
     case 'removeBlock':
       return 'offense';
     case 'block':
     case 'blockPerBurn':
+    case 'blockPerHand':
     case 'heal':
     case 'clearDebuffs':
       return 'defense';

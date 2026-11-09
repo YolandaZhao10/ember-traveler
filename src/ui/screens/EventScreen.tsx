@@ -1,7 +1,7 @@
 import { Backdrop } from '../components/Art';
 import { CHAPTERS } from '../../data/chapters';
 import { EVENTS } from '../../data/events';
-import { canUpgrade, eventChoiceUnavailableReason, eventRelicChoiceNote, eventRelicPreviews } from '../../engine/run';
+import { canUpgrade, eventChoiceUnavailableReason, eventRelicChoiceNote, eventRelicPreviews, eventCursePreviews } from '../../engine/run';
 import { eventChoose, eventLeave, eventPick, openOverlay, useGame } from '../store';
 
 export function EventScreen() {
@@ -43,6 +43,10 @@ export function EventScreen() {
                   {eventRelicPreviews(run, c.id).map((relic, index) => <span className="event-relic-preview" key={index}>
                     <strong>{relic.icon} {relic.name}<small>{relic.probability < 1 ? `${Math.round(relic.probability * 100)}% 概率获得` : '奖励详情'}</small></strong>
                     <span>{relic.description}</span>
+                  </span>)}
+                  {eventCursePreviews(run, c.id).map((curse, index) => <span className="event-relic-preview event-curse-preview" key={`curse-${index}`}>
+                    <strong>诅咒 · {curse.name}<small>{curse.probability < 1 ? `${Number((curse.probability * 100).toFixed(2))}% 概率加入牌组` : '将加入牌组'}</small></strong>
+                    <span>{curse.description}</span>
                   </span>)}
                 </button>
               );

@@ -68,7 +68,7 @@ add('traveler', 'rare', [
   P('steadfast_guard', '不动阵地', 'bulwark', 2, [status('metallicize', 6), status('thorns', 4)], [status('metallicize', 8), status('thorns', 5)]),
   S('bastion_oath', '壁垒誓约', 'bulwark', 2, [block(18), status('barricade', 1)], [block(24), status('barricade', 1)], { exhaust: true }),
   A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock', bonus: 6, mult: 2 }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 10, mult: 2 }, status('weak', 3, 'target')]),
-  S('lantern_shelter', '灯下庇护', 'bulwark', 1, [{ kind: 'emberBurst', blockPer: 3 }, draw(2)], [{ kind: 'emberBurst', blockPer: 4 }, draw(2)]),
+  S('lantern_shelter', '灯下庇护', 'bulwark', 1, [ember(-3), { kind: 'clearDebuffs' }, block(20)], [ember(-3), { kind: 'clearDebuffs' }, block(28)], { requireEmber: 3, retain: true }),
   P('long_road', '漫长守望', 'bulwark', 2, [status('study', 1), status('metallicize', 4)], [status('study', 1), status('metallicize', 6)]),
   A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(2), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(2), status('energyNext', 2))], { target: 'all_enemies' }),
 ]);
@@ -77,7 +77,7 @@ add('traveler', 'rare', [
 add('picker', 'common', [
   A('cinder_hook', '火钳勾击', 'cinder', 1, [when(burning, draw(1)), hit(7), status('burn', 2, 'target')], [when(burning, draw(1)), hit(10), status('burn', 3, 'target')]),
   A('charred_dart', '炭刺', 'cinder', 0, [hit(3), when(burning, block(2))], [hit(5), when(burning, block(3))]),
-  S('smoke_screen', '烟屏', 'cinder', 1, [block(9), status('weak', 1, 'target')], [block(12), status('weak', 1, 'target')], { target: 'enemy' }),
+  S('smoke_screen', '烟屏', 'cinder', 1, [block(6), { kind: 'blockPerBurn', amount: 1, max: 8 }, status('weak', 1, 'target')], [block(9), { kind: 'blockPerBurn', amount: 1, max: 12 }, status('weak', 1, 'target')], { target: 'enemy' }),
   S('tend_coals', '拨炭', 'cinder', 1, [status('burn', 3, 'target'), draw(1)], [status('burn', 4, 'target'), draw(1)], { target: 'enemy' }),
   A('scalding_sweep', '灼灰横扫', 'cinder', 1, [hit(4, { aoe: true }), status('burn', 1, 'all')], [hit(6, { aoe: true }), status('burn', 1, 'all')], { target: 'all_enemies' }),
   S('coal_wrap', '裹炭', 'cinder', 1, [block(8), when({ kind: 'emberAtLeast', value: 4 }, ember(2))], [block(11), when({ kind: 'emberAtLeast', value: 4 }, ember(2))]),
@@ -87,7 +87,7 @@ add('picker', 'common', [
   S('salvage_scraps', '捡拾残页', 'ash', 1, [recover(1), block(4)], [recover(1), block(7)]),
   S('sift_ash', '筛灰', 'ash', 1, [exhaust(1), draw(2)], [exhaust(1), draw(3)]),
   S('pocket_coals', '藏炭', 'ash', 0, [exhaust(1), ember(3)], [exhaust(1), ember(4)], { exhaust: true }),
-  A('buried_knife', '埋灰短刃', 'ash', 1, [hit(12), draw(1)], [hit(16), draw(1)], { exhaust: true }),
+  A('buried_knife', '埋灰短刃', 'ash', 1, [hit(14), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], [hit(19), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], { exhaust: true }),
 ]);
 add('picker', 'uncommon', [
   S('smoke_cover', '烟幕护身', 'cinder', 1, [exhaust(1), block(7), status('weak', 1, 'all')], [exhaust(1), block(10), status('weak', 2, 'all')]),
@@ -129,8 +129,8 @@ add('oathbound', 'common', [
   A('line_breaker', '破阵横扫', 'might', 2, [strength(2), hit(7, { aoe: true }), when(wounded, block(6))], [strength(3), hit(10, { aoe: true }), when(wounded, block(8))], { target: 'all_enemies' }),
   A('double_punch', '双拳', 'might', 1, [hit(4, { times: 2 }), strength(1)], [hit(6, { times: 2 }), strength(1)]),
   S('battle_breath', '战息', 'might', 1, [block(7), strength(1)], [block(10), strength(2)]),
-  A('iron_elbow', '铁肘', 'might', 1, [hit(6), block(5)], [hit(9), block(7)]),
-  A('threatening_cut', '威吓斩', 'might', 1, [hit(6), status('weak', 1, 'target')], [hit(9), status('weak', 2, 'target')]),
+  A('iron_elbow', '铁肘', 'might', 1, [hit(6), block(4), when({ kind: 'strengthAtLeast', value: 3 }, block(6))], [hit(9), block(6), when({ kind: 'strengthAtLeast', value: 3 }, block(8))]),
+  A('threatening_cut', '威吓斩', 'might', 1, [hit(8), when({ kind: 'strengthAtLeast', value: 3 }, status('weak', 2, 'target'))], [hit(11), when({ kind: 'strengthAtLeast', value: 3 }, status('weak', 3, 'target'))]),
   S('gather_fury', '聚怒', 'might', 0, [strength(2), when(wounded, draw(1))], [strength(3), when(wounded, draw(1))], { exhaust: true }),
 ]);
 add('oathbound', 'uncommon', [
@@ -166,7 +166,7 @@ add('oathbound', 'rare', [
 add('scholar', 'common', [
   S('echo_veil', '余响护幕', 'echo', 1, [block(8), when(echo, draw(1))], [block(12), when(echo, draw(1))]),
   A('whisper_needle', '低语针', 'echo', 0, [hit(2), when(echo, ember(1))], [hit(4), when(echo, ember(1))]),
-  A('reverberant_cut', '震音斩', 'echo', 1, [hit(9), block(6)], [hit(12), block(8)]),
+  A('reverberant_cut', '震音斩', 'echo', 1, [hit(9), { kind: 'blockPerHand', amount: 2, max: 8 }], [hit(12), { kind: 'blockPerHand', amount: 2, max: 12 }]),
   S('quiet_sentence', '静默句', 'echo', 1, [status('weak', 2, 'target'), draw(1)], [status('weak', 3, 'target'), draw(1)], { target: 'enemy' }),
   A('rune_splinters', '符文碎屑', 'echo', 1, [hit(4, { aoe: true }), ember(1), when(echo, draw(1))], [hit(6, { aoe: true }), ember(2), when(echo, draw(1))], { target: 'all_enemies' }),
   S('listen_to_ash', '听灰', 'echo', 0, [exhaust(1), draw(2), when(echo, ember(2))], [exhaust(1), draw(3), when(echo, ember(3))], { exhaust: true }),
@@ -180,10 +180,10 @@ add('scholar', 'common', [
   S('ink_reserve', '储墨', 'focus', 1, [block(5), ember(2), when(echo, status('energyNext', 1))], [block(8), ember(3), when(echo, status('energyNext', 1))], { retain: true }),
 ]);
 add('scholar', 'uncommon', [
-  A('refracted_blade', '折光刃', 'echo', 1, [hit(6, { times: 2 })], [hit(8, { times: 2 })]),
+  A('refracted_blade', '折光刃', 'echo', 1, [when(echo, { kind: 'doubleStatus', status: 'vulnerable' }), hit(6, { times: 2 })], [when(echo, { kind: 'doubleStatus', status: 'vulnerable' }), hit(8, { times: 2 })]),
   S('harmonic_shield', '和声盾', 'echo', 1, [block(11), when(echo, ember(3))], [block(15), when(echo, ember(4))]),
-  A('resounding_bell', '鸣钟', 'echo', 2, [hit(12, { aoe: true }), status('weak', 1, 'all')], [hit(16, { aoe: true }), status('weak', 2, 'all')], { target: 'all_enemies' }),
-  S('woven_words', '编织咒语', 'echo', 1, [draw(2), block(5)], [draw(3), block(5)]),
+  A('resounding_bell', '鸣钟', 'echo', 2, [hit(16, { aoe: true }), when(echo, status('energyNext', 1))], [hit(22, { aoe: true }), when(echo, status('energyNext', 2))], { target: 'all_enemies' }),
+  S('woven_words', '编织咒语', 'echo', 1, [draw(2), { kind: 'blockPerHand', amount: 2, max: 12 }], [draw(3), { kind: 'blockPerHand', amount: 2, max: 16 }]),
   P('opening_chord', '开篇和弦', 'echo', 1, [status('echo', 2), block(6)], [status('echo', 3), block(8)]),
   A('fractured_rune', '破碎符文', 'echo', 1, [hit(8), when(echo, { kind: 'chargeHand', amount: 1 })], [hit(12), when(echo, { kind: 'chargeHand', amount: 1 })]),
   S('sealed_page', '封存咒页', 'focus', 0, [status('energyNext', 2)], [status('energyNext', 3)], { retain: true, exhaust: true }),
@@ -197,12 +197,12 @@ add('scholar', 'rare', [
   P('silent_prelude', '寂静序曲', 'echo', 2, [status('resonance', 1), status('arcaneWard', 2)], [status('resonance', 1), status('arcaneWard', 3)], { upgradeCost: 2 }),
   A('endless_sentence', '长句终结', 'echo', 2, [hit(5, { times: 3 }), when(echo, draw(2))], [hit(7, { times: 3 }), when(echo, draw(3))]),
   S('grand_recitation', '宏大咏唱', 'echo', 1, [draw(3), ember(3), status('echo', 1)], [draw(4), ember(4), status('echo', 1)], { exhaust: true }),
-  A('shattered_chorus', '破碎合唱', 'echo', 2, [hit(7, { times: 2, aoe: true }), status('vulnerable', 2, 'all')], [hit(10, { times: 2, aoe: true }), status('vulnerable', 3, 'all')], { target: 'all_enemies' }),
+  A('shattered_chorus', '破碎合唱', 'echo', 2, [{ kind: 'consumeVulnerable', damagePer: 6, aoe: true }, hit(18, { aoe: true })], [{ kind: 'consumeVulnerable', damagePer: 8, aoe: true }, hit(26, { aoe: true })], { target: 'all_enemies' }),
   P('living_manuscript', '活页秘典', 'echo', 3, [status('resonance', 1), status('study', 1)], [status('resonance', 1), status('study', 1)], { upgradeCost: 2 }),
   A('falling_stars', '群星坠落', 'focus', 2, [hit(14, { aoe: true }), status('vulnerable', 2, 'all'), status('energyNext', 1)], [hit(18, { aoe: true }), status('vulnerable', 3, 'all'), status('energyNext', 1)], { target: 'all_enemies', retain: true, charge: { damage: 3 } }),
   S('timeless_ward', '恒久护印', 'focus', 1, [block(16), status('energyNext', 2)], [block(22), status('energyNext', 3)], { retain: true, charge: { block: 3 }, exhaust: true }),
   S('future_memory', '未来记忆', 'focus', 0, [draw(2), { kind: 'chargeHand', amount: 2 }], [draw(3), { kind: 'chargeHand', amount: 3 }], { retain: true, exhaust: true }),
-  A('singularity', '归一', 'focus', 2, [hit(16, { perHandCard: 1 })], [hit(22, { perHandCard: 1 })], { retain: true, charge: { damage: 4 } }),
+  A('singularity', '归一', 'focus', 2, [hit(18, { perHandCard: 3 }), { kind: 'discardRandom', count: 'all' }], [hit(24, { perHandCard: 4 }), { kind: 'discardRandom', count: 'all' }], { retain: true, charge: { damage: 4 } }),
   P('astral_shelter', '星界庇护', 'focus', 2, [status('arcaneWard', 4), status('dexterity', 2)], [status('arcaneWard', 5), status('dexterity', 3)]),
   S('sealed_sanctuary', '封印圣所', 'focus', 2, [block(22), status('regen', 3)], [block(28), status('regen', 4)], { retain: true, exhaust: true }),
 ]);

@@ -720,6 +720,13 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
 
 function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView) {
   const p = cs.player;
+  const onEmberSpent = (amount: number) => {
+    if (amount <= 0 || !view || view.type === 'curse' || !p.statuses.spentEmberDraw || p.turnFlags.spentEmberDraw || p.hp <= 0 || cs.outcome !== 'ongoing') return;
+    p.turnFlags.spentEmberDraw = 1;
+    gainBlock(p, p.statuses.spentEmberDraw * 6, ev, cs);
+    drawCards(cs, p.statuses.spentEmberDraw, ev);
+    log(cs, ev, `长明：获得 ${p.statuses.spentEmberDraw * 6} 点格挡，抽 ${p.statuses.spentEmberDraw} 张牌`);
+  };
   const chargeDmg = view?.charge?.damage ? view.charge.damage * view.bonus : 0;
   const chargeBlk = view?.charge?.block ? view.charge.block * view.bonus : 0;
   const targets = (aoe: boolean | undefined): EnemyState[] => {
@@ -738,8 +745,10 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
   };
   const spendEmber = (): number => {
     let e = p.ember;
+    const actual = p.ember;
     if (cs.relics.includes('ember_censer')) e = Math.max(T.censerMinimumEmber, e);
     gainEmber(cs, -p.ember, ev, false);
+    onEmberSpent(actual);
     return e;
   };
 
@@ -751,6 +760,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         let extra = chargeDmg;
         if (e.strengthMult) extra += (p.statuses.strength ?? 0) * e.strengthMult;
         if (e.perHandCard) extra += p.hand.length * e.perHandCard;
+        if (e.perExhaustedCard) extra += Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? 0);
         for (let i = 0; i < times; i++) {
           const ts = targets(e.aoe);
           if (ts.length === 0) break;
@@ -862,6 +872,23 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           log(cs, ev, `借助 ${t.name} 的燃烧获得 ${b} 点格挡`);
         }
         break;
+      case 'blockPerHand': {
+        const b = calcBlock(Math.min(p.hand.length * e.amount, e.max), p.statuses);
+        gainBlock(p, b, ev, cs);
+        log(cs, ev, `手牌护盾：获得 ${b} 点格挡`);
+        break;
+      }
+      case 'consumeVulnerable':
+        for (const t of targets(e.aoe)) {
+          if (cs.outcome !== 'ongoing') break;
+          const n = t.statuses.vulnerable ?? 0;
+          if (n <= 0) continue;
+          delete t.statuses.vulnerable;
+          ev.push({ type: 'status', targetId: t.id, status: 'vulnerable', amount: -n });
+          const r = hit(n * e.damagePer, t);
+          log(cs, ev, `击碎 ${t.name} 的 ${n} 层易伤，造成 ${r.lost} 点生命伤害`);
+        }
+        break;
       case 'draw':
         drawCards(cs, e.amount, ev);
         break;
@@ -876,9 +903,12 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       case 'energy':
         p.energy += e.amount;
         break;
-      case 'gainEmber':
+      case 'gainEmber': {
+        const before = p.ember;
         gainEmber(cs, e.amount, ev, e.amount > 0);
+        onEmberSpent(before - p.ember);
         break;
+      }
       case 'emberBurst': {
         const n = spendEmber();
         log(cs, ev, `消耗 ${n} 点余烬`);

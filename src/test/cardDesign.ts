@@ -37,6 +37,8 @@ function normalizeEffect(effect: Effect, mode: Mode): NormalizedEffect {
       omitDefault('times', 1);
       omitDefault('strengthMult', 0);
       omitDefault('perHandCard', 0);
+      omitDefault('perExhaustedCard', 0);
+      if (!effect.perExhaustedCard) delete e.exhaustBonusMax;
       omitDefault('lifesteal', false);
       if (!effect.lifesteal || effect.lifestealCap === Infinity) delete e.lifestealCap;
       break;

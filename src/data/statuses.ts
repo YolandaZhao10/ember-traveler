@@ -1,6 +1,7 @@
 import type { StatusDef, StatusId } from '../engine/types';
 
 export const STATUSES: Record<StatusId, StatusDef> = {
+  spentEmberDraw: { id: 'spentEmberDraw', name: '长明', kind: 'power', description: n => `每回合首次因打出卡牌实际消耗余烬时，获得 ${n * 6} 点格挡并抽 ${n} 张牌。` },
   comboFlow: { id: 'comboFlow', name: '续势', kind: 'power', description: n => `每回合打出第 3 张攻击牌后，获得 ${n} 点能量。重放不计数。` },
   guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
   ashInsight: { id: 'ashInsight', name: '灰中启示', kind: 'power', description: n => `每回合生效后的前 2 次消耗，每次抽 ${n} 张牌。` },

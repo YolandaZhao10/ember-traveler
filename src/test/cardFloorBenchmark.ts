@@ -84,7 +84,7 @@ function turnValue(input: CombatState, knownUids: Set<string>, engines = false):
     const weights = { comboFlow: 5, guardReserve: 0.7, ashInsight: 6, bloodDraw: 4, chargeMaster: 6,
       ashFeast: 2, kindling: 2, echo: 4, resonance: 9, mirror: 6, tempo: 6, crescendo: 3,
       study: 6, dexterity: 3, thorns: 2, pyre: 4, everburn: 5, arcaneWard: 3,
-      bloodArmor: 2, bloodRage: 4, demonHeart: 5, forge: 3, emberHeart: 2 };
+      bloodArmor: 2, bloodRage: 4, demonHeart: 5, forge: 3, emberHeart: 2, spentEmberDraw: 4 };
     for (const [status, weight] of Object.entries(weights)) future += (p.statuses[status as keyof typeof weights] ?? 0) * weight;
   }
   // endPlayerTurn 已实际保留并蓄力；仅计一部分下回合潜力，不能用纸面蓄力掩盖当前失血。

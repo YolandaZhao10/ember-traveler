@@ -57,9 +57,11 @@ export type StatusId =
   | 'ashInsight'
   | 'bloodDraw'
   | 'chargeMaster'
+  | 'spentEmberDraw'
   | 'arcaneWard';
 
 export type Condition =
+  | { kind: 'strengthAtLeast'; value: number }
   | { kind: 'emberAtLeast'; value: number }
   | { kind: 'attacksThisTurnAtLeast'; value: number }
   | { kind: 'cardsThisTurnAtLeast'; value: number }
@@ -71,7 +73,7 @@ export type Condition =
   | { kind: 'hasEcho' };
 
 export type Effect =
-  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number }
+  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number }
   | { kind: 'damagePerHpLost'; mult: number }
   | { kind: 'loseHp'; amount: number }
   | { kind: 'tempStrength'; amount: number }
@@ -84,6 +86,8 @@ export type Effect =
   | { kind: 'damagePerEmber'; amount: number; per?: number }
   | { kind: 'block'; amount: number }
   | { kind: 'blockPerBurn'; amount: number; max: number }
+  | { kind: 'blockPerHand'; amount: number; max: number }
+  | { kind: 'consumeVulnerable'; damagePer: number; aoe?: boolean }
   | { kind: 'draw'; amount: number }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }

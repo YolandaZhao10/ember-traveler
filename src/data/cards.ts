@@ -552,20 +552,20 @@ def({
   type: 'skill',
   rarity: 'rare',
   archetype: 'ember',
-  cost: 1,
+  cost: 0,
   target: 'self',
   exhaust: true,
   requireEmber: 4,
   effects: [
     { kind: 'gainEmber', amount: -4 },
-    { kind: 'heal', amount: 10 },
-    { kind: 'block', amount: 10 },
+    { kind: 'heal', amount: 14 },
+    { kind: 'clearDebuffs' },
   ],
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -4 },
-      { kind: 'heal', amount: 14 },
-      { kind: 'block', amount: 14 },
+      { kind: 'heal', amount: 18 },
+      { kind: 'clearDebuffs' },
     ],
   },
 });
@@ -757,8 +757,8 @@ def({
   cost: 1,
   target: 'enemy',
   exhaust: true,
-  effects: [{ kind: 'damage', amount: 20 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 28 }] },
+  effects: [{ kind: 'damage', amount: 18, perExhaustedCard: 2, exhaustBonusMax: 12 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 25, perExhaustedCard: 3, exhaustBonusMax: 18 }] },
 });
 def({
   id: 'ash_feast',
@@ -1009,8 +1009,8 @@ def({
   owner: 'oathbound',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 24 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 32 }] },
+  effects: [{ kind: 'damage', amount: 24 }, { kind: 'conditional', cond: { kind: 'strengthAtLeast', value: 3 }, then: [{ kind: 'energy', amount: 1 }] }],
+  upgrade: { effects: [{ kind: 'damage', amount: 32 }, { kind: 'conditional', cond: { kind: 'strengthAtLeast', value: 3 }, then: [{ kind: 'energy', amount: 1 }] }] },
 });
 def({
   id: 'overpower',

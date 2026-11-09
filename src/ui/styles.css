@@ -2312,3 +2312,5 @@ h3 {
 .choice .event-relic-preview strong { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; color: #734b14; font-size: 14px; }
 .choice .event-relic-preview small { font-size: 11px; font-weight: 400; }
 .choice .event-relic-preview > span { color: #574630; font-size: 13px; }
+.event-curse-preview { border-left-color: #8b4555; background: #8b455510; }
+.choice .event-curse-preview strong { color: #7b3346; }

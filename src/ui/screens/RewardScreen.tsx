@@ -23,6 +23,7 @@ export function RewardScreen() {
         <div className={`rewardrow panel ${r.goldTaken ? 'taken' : ''}`}>
           <div className="lbl">
             <span style={{ fontSize: 22 }}>🪙</span> {r.gold} 金币
+            {!r.goldTaken && <small style={{ color: 'var(--text-dim)', fontWeight: 400 }}>离开时自动拾取</small>}
           </div>
           <button className="btn small" onClick={() => rewardTakeGold()} disabled={r.goldTaken}>
             {r.goldTaken ? '已领取' : '领取'}

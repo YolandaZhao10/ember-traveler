@@ -13,6 +13,8 @@ import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
 import { ensureEncounterPlan, plannedEncounter } from './encounters';
 import { distinctRewardPool } from './cardChoices';
+import { describeCard } from './cards';
+import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
@@ -672,6 +674,37 @@ export function eventRelicPreviews(run: RunState, choiceId: string): EventRelicP
           : pool.length ? { name: outcome.kind === 'eventRelic' ? '随机问号专属遗物' : '随机遗物', icon: '🎁', probability,
             description: outcome.kind === 'eventRelic' ? '从尚未持有的问号专属遗物中随机获得一件，具体效果在获得后揭晓。' : '从可获得的常规或问号专属遗物中随机获得一件，具体效果在获得后揭晓。' }
           : { name: '50 金币', icon: '🪙', probability, description: '可获得的遗物已集齐，此次遗物奖励改为 50 金币。' });
+      }
+    }
+  };
+  if (choice) walk(choice.outcomes);
+  return previews;
+}
+
+export interface EventCursePreview {
+  cardId: string;
+  name: string;
+  description: string;
+  probability: number;
+}
+
+/** 只读实际分支，不抽取随机结果；说明与诅咒结算共用卡牌定义。 */
+export function eventCursePreviews(run: RunState, choiceId: string): EventCursePreview[] {
+  const choice = run.event && EVENTS[run.event.eventId]?.choices.find(c => c.id === choiceId);
+  const previews: EventCursePreview[] = [];
+  const walk = (outcomes: EventOutcome[], probability = 1) => {
+    for (const outcome of outcomes) {
+      if (probability <= 0) continue;
+      if (outcome.kind === 'chance') {
+        walk(outcome.success, probability * outcome.p);
+        walk(outcome.fail, probability * (1 - outcome.p));
+      } else if (outcome.kind === 'curse' || outcome.kind === 'card' && outcome.cardId && CARDS[outcome.cardId]?.type === 'curse') {
+        const cardId = outcome.cardId!;
+        const def = CARDS[cardId];
+        if (!def || def.type !== 'curse') continue;
+        const statusNotes = (def.handEndEffects ?? []).flatMap(e => e.kind === 'status' ? [STATUSES[e.status].description(e.amount)] : []);
+        previews.push({ cardId, name: def.name, probability,
+          description: [describeCard({ uid: 'curse-preview', defId: cardId, upgraded: false }, null), ...statusNotes].join(' ') });
       }
     }
   };

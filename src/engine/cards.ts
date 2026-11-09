@@ -69,6 +69,7 @@ export function calcBlock(base: number, owner: Statuses): number {
 
 export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity | null = null, charge = 0): boolean {
   switch (cond.kind) {
+    case 'strengthAtLeast': return (p.statuses.strength ?? 0) >= cond.value;
     case 'exhaustedThisTurn': return (p.turnFlags.exhausted ?? 0) > 0;
     case 'charged': return charge >= cond.value;
     case 'targetBurning':
@@ -90,6 +91,7 @@ export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity 
 
 function condText(cond: Condition): string {
   switch (cond.kind) {
+    case 'strengthAtLeast': return `若力量 ≥ ${cond.value}`;
     case 'exhaustedThisTurn': return '若本回合消耗过牌';
     case 'charged': return `若本牌已蓄力至少 ${cond.value} 层`;
     case 'emberAtLeast':
@@ -174,6 +176,10 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
           notes.push(`，手牌中每有一张牌 +${e.perHandCard}`);
           if (ctx) extra += Math.max(0, ctx.player.hand.length - 1) * e.perHandCard;
         }
+        if (e.perExhaustedCard) {
+          notes.push(`，消耗区每张牌 +${e.perExhaustedCard}（最多 +${e.exhaustBonusMax ?? 0}）`);
+          if (ctx) extra += Math.min(ctx.player.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? 0);
+        }
         const healing = e.lifesteal ? `，按实际扣除的敌人生命回复生命${e.lifestealCap === undefined ? '' : `（每次命中最多 ${e.lifestealCap} 点）`}` : '';
         parts.push(`${t}造成 ${dmgText(e.amount, ctx, extra)} 点伤害${times}${notes.join('')}${healing}`);
         break;
@@ -239,6 +245,14 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`获得等于目标燃烧层数 × ${e.amount} 的基础格挡（基础上限 ${e.max}）${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
         break;
       }
+      case 'blockPerHand':
+        // 前置抽牌、消耗触发可能改变手牌；只给出结算公式，不假报抽牌结果。
+        parts.push(`结算时每张手牌获得 ${e.amount} 点基础格挡（基础上限 ${e.max}）`);
+        break;
+      case 'consumeVulnerable':
+        parts.push(`移除${e.aoe ? '所有敌人' : '目标'}的全部易伤，每层造成 ${e.damagePer} 点基础伤害（移除后结算攻击修正）`);
+        if (ctx?.target) delete ctx.target.statuses.vulnerable;
+        break;
       case 'draw':
         parts.push(`抽 ${e.amount} 张牌`);
         break;

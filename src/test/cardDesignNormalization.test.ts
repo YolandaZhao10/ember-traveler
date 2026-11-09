@@ -42,6 +42,7 @@ describe('卡牌效果相似性规范化', () => {
 
   const defaults: [string, Effect, Effect][] = [
     ['攻击默认参数', damage, { ...damage, times: 1, aoe: false, strengthMult: 0, perHandCard: 0, lifesteal: false }],
+    ['消耗区成长默认参数', damage, { ...damage, perExhaustedCard: 0, exhaustBonusMax: 12 }],
     ['格挡攻击默认参数', { kind: 'damageByBlock' }, { kind: 'damageByBlock', mult: 1, bonus: 0, aoe: false, consume: false }],
     ['余烬伤害默认倍率', { kind: 'damagePerEmber', amount: 2 }, { kind: 'damagePerEmber', amount: 2, per: 1 }],
     ['余烬爆发缺省分支', { kind: 'emberBurst', damagePer: 3 }, { kind: 'emberBurst', damagePer: 3, blockPer: 0 }],
