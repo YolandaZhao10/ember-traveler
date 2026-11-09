@@ -1,7 +1,7 @@
 {
   "name": "ember-traveler",
   "private": true,
-  "version": "0.1.10",
+  "version": "0.1.11",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "sim": "vitest run src/test/simulation.test.ts",
     "audit:balance": "vite-node scripts/audit-balance.ts",
     "audit:card-floor": "vite-node scripts/audit-card-floor.ts",
+    "audit:third-elites": "vite-node scripts/audit-third-elites.ts",
     "audit:relics": "vite-node scripts/audit-relics.ts"
   },
   "dependencies": {

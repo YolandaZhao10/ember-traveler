@@ -60,32 +60,33 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [112, 120], sprite: 'moon_duelist',
-    description: '双刃、标记与重斩依次发动。月步时只格挡并增长力量，注意下一轮连击。',
+    description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时停止攻击，格挡并增长 2 力量；把握这次整备，下一轮连击会更强。',
     moves: [
       { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
-      { id: 'mark', name: '蚀影印', intent: 'debuff', actions: [{ kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 21 }] },
-      { id: 'step', name: '月步', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'step', name: '月步', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     ], chooseMove: c => cycle(c, ['twins', 'mark', 'crescent', 'step']),
   },
   {
     id: 'orrery_keeper', name: '星仪守望者', tier: 'elite', hp: [92, 100], sprite: 'orrery_keeper',
-    description: '两只碎镜灵与他同行。校准星轨会强化所有同伴，随后以星杖发动双击。',
+    description: '两只碎镜灵与他同行，共鸣、双击、迷雾依次循环。随从全部倒下后，不再施放迷雾，改为每次共鸣后连续两轮双击；已显示的意图不会改变。',
     moves: [
       { id: 'align', name: '星轨共鸣', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
       { id: 'rod', name: '双星杖', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 2 }] },
       { id: 'mist', name: '迷星雾', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
-    ], chooseMove: c => cycle(c, ['align', 'rod', 'mist']),
+    ], chooseMove: c => cycle(c, c.allies.some(ally => ally.id !== c.enemy.id && ally.hp > 0)
+      ? ['align', 'rod', 'mist'] : ['align', 'rod', 'rod']),
   },
   {
     id: 'shattered_titan', name: '崩星巨像', tier: 'elite', hp: [132, 140], sprite: 'shattered_titan',
-    description: '开场有 2 荆棘。先蓄盾，落锤后散出镜片，修补时短暂停止进攻。',
+    description: '开场有 2 荆棘。蓄盾后落锤、三连击；修补时以碎岩攻击，回复 8 生命并增长 1 力量，让下一轮进攻更强。每轮只有蓄盾时停止进攻。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
       { id: 'rise', name: '拔起星岩', intent: 'defend', actions: [{ kind: 'block', amount: 18 }] },
       { id: 'crush', name: '崩天锤', intent: 'attack', actions: [{ kind: 'attack', amount: 24 }] },
       { id: 'shower', name: '碎星雨', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
-      { id: 'mend', name: '重聚星骸', intent: 'special', actions: [{ kind: 'heal', amount: 8 }] },
+      { id: 'mend', name: '重聚星骸', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
     ], chooseMove: c => cycle(c, ['rise', 'crush', 'shower', 'mend']),
   },
   {
