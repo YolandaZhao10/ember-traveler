@@ -84,7 +84,7 @@ describe('第三章与五站终章', () => {
   it('v11第二章已通关存档接入第三章，保留战利品和随机流，不重复发奖', () => {
     const values = storage(); const old = claim(win(boss(2))); old.version = 11; old.screen = 'victory'; old.endMessage = '永燃炉心已熄灭'; old.checkpoint!.version = 11;
     values.set('ember-traveler:save', JSON.stringify(old)); const loaded = loadRun()!;
-    expect(loaded.screen).toBe('chapter'); expect(loaded.endMessage).toBeNull(); expect(loaded.version).toBe(13);
+    expect(loaded.screen).toBe('chapter'); expect(loaded.endMessage).toBeNull(); expect(loaded.version).toBe(R.SAVE_VERSION);
     for (const key of ['deck','relics','gold','hp','maxHp','stats','rng'] as const) expect(loaded[key]).toEqual(old[key]);
     expect(R.enterNextChapter(loaded).chapter).toBe(3); saveRun(loaded); expect(loadRun()).toEqual(loaded);
     expect(R.resetCurrentNode(loaded).reward!.chapterComplete).toBe(2);

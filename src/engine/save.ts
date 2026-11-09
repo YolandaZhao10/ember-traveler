@@ -34,6 +34,19 @@ function migrateLayout(input: Snapshot): Snapshot {
   run.elapsedMs = Number.isFinite(run.elapsedMs) ? Math.max(0, run.elapsedMs) : 0;
   run.difficulty = normalizeDifficulty(run.difficulty);
   if (run.combat) ensurePowerInstances(run.combat.player);
+  if (input.version < 14 && run.combat) {
+    // 旧版偷窃只记账、战后才扣钱。仅把存活敌人尚未归还的账目转成实际扣款。
+    // 旧日志可能已截断，按敌人顺序限额分配，确保绝不凭空生成返还金币。
+    let available = run.gold;
+    for (const enemy of run.combat.enemies) {
+      if (enemy.flags.stolenGold === undefined) continue;
+      const held = enemy.hp > 0 && run.combat.outcome !== 'won'
+        ? Math.min(available, Math.max(0, enemy.flags.stolenGold)) : 0;
+      enemy.flags.stolenGold = held;
+      available -= held;
+    }
+    run.gold = run.combat.gold = available;
+  }
   if (input.version < 12 && run.chapter !== 4) expandLegacyRoutes(map, run.visited);
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {

@@ -346,6 +346,8 @@ export interface CombatDifficulty {
 }
 
 export interface CombatState {
+  /** 当前可用金币；偷窃立即扣除，击杀对应敌人时返还。 */
+  gold: number;
   /** 旧存档中的当前战斗可不带强化；新遭遇按楼层固定强化。 */
   difficulty?: CombatDifficulty;
   encounterId: string;

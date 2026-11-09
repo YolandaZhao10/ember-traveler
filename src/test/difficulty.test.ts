@@ -88,7 +88,7 @@ describe('逐层难度与20层迁移', () => {
   it.each<ChapterId>([1, 2])('第%s章旧战斗与SL完整保留，旧路线增加8层且始终连接首领', chapter => {
     const old = legacy(chapter); storage(old);
     const loaded = loadRun()!;
-    expect(loaded.version).toBe(13); expect(loaded.map.rows).toBe(20); expect(validateMap(loaded.map)).toBe(true);
+    expect(loaded.version).toBe(R.SAVE_VERSION); expect(loaded.map.rows).toBe(20); expect(validateMap(loaded.map)).toBe(true);
     expect(loaded.combat).toEqual(old.combat); expect(loaded.rng).toEqual(old.rng); expect(loaded.deck).toEqual(old.deck);
     expect(loaded.floor).toBe(chapter === 1 ? 0 : 20);
     expect(R.resetCurrentNode(loaded).combat).toEqual(old.combat);

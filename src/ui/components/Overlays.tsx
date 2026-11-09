@@ -133,6 +133,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
       return (
         <Modal title={e.name} onClose={closeOverlay}>
           <p>{def.description}</p>
+          {(e.flags.stolenGold ?? 0) > 0 && <p>已偷走 <b>{e.flags.stolenGold}</b> 金币，击败它后全额返还。</p>}
           {cs.difficulty && <p className="subtitle">第 {cs.difficulty.floor} 层 · {cs.tier === 'elite' ? '精英额外强化' : cs.tier === 'boss' ? '首领强化' : '逐层强化'}<br />生命 ×{cs.difficulty.healthMultiplier.toFixed(2)} · 攻击 ×{cs.difficulty.attackMultiplier.toFixed(2)} · 格挡 ×{cs.difficulty.blockMultiplier.toFixed(2)}</p>}
           <p>
             <b>下一步：</b>
@@ -220,7 +221,7 @@ function describeAction(a: import('../../engine/types').EnemyAction, self: impor
     case 'loseHp':
       return `失去 ${a.amount} 点生命`;
     case 'stealGold':
-      return `偷走 ${a.amount} 金币（战后结算）`;
+      return `偷走最多 ${a.amount} 金币（击败它后返还）`;
     case 'addCardToDiscard':
       return `向弃牌堆塞入 ${a.count} 张「${CARDS[a.cardId].name}」（仅本场战斗）：${describeCard({ uid: 'intent', defId: a.cardId, upgraded: false }, null)}`;
     case 'clearDebuffs':

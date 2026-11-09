@@ -112,7 +112,7 @@ describe('地图、章节战利品和掉落成长', () => {
     const { checkpoint: _checkpoint, ...snapshot } = copy(run); run.checkpoint = snapshot;
     const rng = copy(run.rng); const deck = copy(run.deck);
     values.set('ember-traveler:save', JSON.stringify(run));
-    const loaded = loadRun()!; expect(loaded.version).toBe(13); expect(loaded.rng).toEqual(rng); expect(loaded.deck).toEqual(deck);
+    const loaded = loadRun()!; expect(loaded.version).toBe(R.SAVE_VERSION); expect(loaded.rng).toEqual(rng); expect(loaded.deck).toEqual(deck);
     expect(loaded.map.nodes['old-3'].type).toBe('combat'); expect(validateMap(loaded.map)).toBe(true);
     for (let row = 0; row < 19; row++) expect(Object.values(loaded.map.nodes).filter(n => n.row === row).length).toBeGreaterThanOrEqual(3);
     expect(R.resetCurrentNode(loaded).map).toEqual(loaded.map);

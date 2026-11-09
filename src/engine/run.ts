@@ -7,13 +7,13 @@ import { EVENTS, EVENT_LIST } from '../data/events';
 import { RELICS, relicPool, relicAvailableTo } from '../data/relics';
 import { CHAPTER_RELICS } from '../data/chapterRelics';
 import { EVENT_RELICS, SHOP_RELICS } from '../data/specialRelics';
-import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, stolenGold, type StepResult } from './combat';
+import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type StepResult } from './combat';
 import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -169,9 +169,10 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
   const enc = pick(run.rng.combat, fresh.length ? fresh : pool);
   run.seenEncounters.push(enc.id);
-  const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty));
+  const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty), run.gold);
   run.rng.combat.s = res.state.rng.s;
   run.combat = res.state;
+  run.gold = res.state.gold;
   run.screen = 'combat';
   return run;
 }
@@ -180,6 +181,7 @@ function applyCombatStep(input: RunState, step: StepResult): { run: RunState; ev
   if (step.events.length === 0 && step.state === input.combat) return { run: input, events: [] };
   const run = clone(input);
   run.combat = step.state;
+  run.gold = step.state.gold;
   run.rng.combat.s = step.state.rng.s;
   run.hp = step.state.player.hp;
   return { run, events: step.events };
@@ -224,6 +226,7 @@ export function finishCombat(input: RunState): RunState {
   if (!cs || cs.outcome === 'ongoing') return input;
   const run = clone(input);
   run.hp = cs.player.hp;
+  run.gold = cs.gold;
   run.uidCounter = Math.max(run.uidCounter, cs.uidCounter);
   if (cs.outcome === 'lost') {
     run.screen = 'gameover';
@@ -237,8 +240,6 @@ export function finishCombat(input: RunState): RunState {
   // 战斗中新增的牌（如诅咒）不会进入牌组——仅战斗内有效
   if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + 6);
   if (run.relics.includes('red_vial') && cs.player.selfHpLost > 0) run.hp = Math.min(run.maxHp, run.hp + Math.floor(cs.player.selfHpLost / 2));
-  const stolen = stolenGold(cs);
-  if (stolen) run.gold = Math.max(0, run.gold - stolen);
   applyJourneyHealth(run, 'victory', cs.tier);
   const bonusGold = relicJourneyBonus(run, 'victory', 'gold', cs.tier);
   if (cs.tier === 'boss') {

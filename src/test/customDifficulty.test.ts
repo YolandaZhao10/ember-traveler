@@ -101,7 +101,7 @@ describe('新旅程自定义难度', () => {
     const data = store(); let run = R.newRun('LEGACY-7'); run = R.travelTo(run, run.map.startIds[0]);
     const legacy = JSON.parse(JSON.stringify(run)); legacy.version = 7; delete legacy.difficulty; delete legacy.checkpoint.difficulty;
     data.set('ember-traveler:save', JSON.stringify(legacy)); const restored = loadRun()!;
-    expect(restored.version).toBe(13); expect(restored.difficulty).toEqual(STANDARD_DIFFICULTY);
+    expect(restored.version).toBe(R.SAVE_VERSION); expect(restored.difficulty).toEqual(STANDARD_DIFFICULTY);
     expect(restored.map).toEqual(run.map); expect(restored.combat).toEqual(run.combat);
     expect(restored.checkpoint!.difficulty).toEqual(STANDARD_DIFFICULTY);
     saveRun(restored); expect(loadRun()).toEqual(restored);

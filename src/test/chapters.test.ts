@@ -156,7 +156,7 @@ describe('前三章连续旅程', () => {
     values.set('ember-traveler:save', JSON.stringify(old));
     const loaded = loadRun()!;
     expect(loaded.screen).toBe('reward');
-    expect(loaded.version).toBe(13);
+    expect(loaded.version).toBe(R.SAVE_VERSION);
     expect(loaded.chapter).toBe(1);
     expect(loaded.stats).toEqual(old.stats);
     expect(loaded.deck).toEqual(old.deck);

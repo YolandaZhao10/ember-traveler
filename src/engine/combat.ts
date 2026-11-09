@@ -346,9 +346,11 @@ export function createCombat(
   uidStart: number,
   character: CharacterId = 'traveler',
   difficulty?: CombatDifficulty,
+  gold = 0,
 ): StepResult {
   const ev: CombatEvent[] = [];
   const cs: CombatState = {
+    gold,
     difficulty,
     encounterId,
     tier,
@@ -987,6 +989,12 @@ function handleEnemyDeaths(cs: CombatState, ev: CombatEvent[]) {
     d.flags.deadHandled = 1;
     d.moveId = null;
     log(cs, ev, `${d.name} 倒下了`);
+    const returnedGold = d.flags.stolenGold ?? 0;
+    if (returnedGold > 0) {
+      d.flags.stolenGold = 0;
+      cs.gold += returnedGold;
+      log(cs, ev, `追回 ${d.name} 偷走的 ${returnedGold} 金币`);
+    }
     const ddef = ENEMIES[d.defId];
     if (ddef.onDeath) {
       for (const a of ddef.onDeath) applyEnemyAction(cs, d, a, ev);
@@ -1214,10 +1222,13 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       ev.push({ type: 'damage', targetId: e.id, amount: a.amount, blocked: 0, source: 'enemy' });
       log(cs, ev, `${e.name} 失去 ${a.amount} 点生命`);
       break;
-    case 'stealGold':
-      e.flags.stolenGold = (e.flags.stolenGold ?? 0) + a.amount;
-      log(cs, ev, `${e.name} 偷走了 ${a.amount} 金币！`);
+    case 'stealGold': {
+      const amount = Math.min(cs.gold, a.amount);
+      cs.gold -= amount;
+      e.flags.stolenGold = (e.flags.stolenGold ?? 0) + amount;
+      log(cs, ev, amount > 0 ? `${e.name} 偷走了 ${amount} 金币！击败它可追回。` : `${e.name} 没有偷到金币。`);
       break;
+    }
     case 'addCardToDiscard':
       for (let i = 0; i < a.count; i++) p.discard.push({ uid: newUid(cs), defId: a.cardId, upgraded: false });
       log(cs, ev, `${a.count} 张「${CARDS[a.cardId].name}」被塞进你的弃牌堆（仅本场战斗）`);
@@ -1240,7 +1251,7 @@ export function startPlayerTurn(input: CombatState): StepResult {
   return { state: cs, events: ev };
 }
 
-/** 战斗中被偷走的金币总量 */
+/** 战斗中仍由敌人持有、尚未返还的金币总量。 */
 export function stolenGold(cs: CombatState): number {
   return cs.enemies.reduce((s, e) => s + (e.flags.stolenGold ?? 0), 0);
 }
