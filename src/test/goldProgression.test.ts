@@ -53,8 +53,8 @@ describe('固定战斗金币与商店价格', () => {
     expect(R.combatGoldRange(39, 'elite', 200)).toEqual([40, 60]);
     expect(R.combatGoldRange(39, 'boss', 50)).toEqual([38, 38]);
     const plain = won(25, 'normal'); const bonus = structuredClone(plain);
-    bonus.relics.push('coin_purse', 'pilgrim_reliquary');
-    expect(R.finishCombat(bonus).reward!.gold - R.finishCombat(plain).reward!.gold).toBe(20);
+    bonus.relics.push('coin_purse', 'wayfarer_coin');
+    expect(R.finishCombat(bonus).reward!.gold - R.finishCombat(plain).reward!.gold).toBe(8);
   });
   it('当店买入天平不重算旧货架，下一店才采用新折扣', () => {
     let run = R.newRun('BUY-DISCOUNT'); run.gold = 999;

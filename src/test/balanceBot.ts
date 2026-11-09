@@ -1,3 +1,4 @@
+import { RELIC_TUNING as T } from '../data/relicBalance';
 import { CARDS } from '../data/cards';
 import { calcBlock, calcDamage, viewCard } from '../engine/cards';
 import { aliveEnemies, enemyIntent } from '../engine/combat';
@@ -37,7 +38,7 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         dmg += Math.floor(p.ember / (e.per ?? 1)) * e.amount;
         break;
       case 'emberBurst': {
-        const n = Math.max(p.ember, cs.relics.includes('ember_censer') ? 3 : 0);
+        const n = Math.max(p.ember, cs.relics.includes('ember_censer') ? T.censerMinimumEmber : 0);
         if (e.damagePer) dmg += e.damagePer * n * (e.aoe ? aliveEnemies(cs).length : 1);
         if (e.blockPer) blk += calcBlock(e.blockPer * n, p.statuses);
         if (e.damagePer && target && e.damagePer * n >= target.hp + target.block) util += 10; // 能直接击杀

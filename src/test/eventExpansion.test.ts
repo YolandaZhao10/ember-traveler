@@ -85,7 +85,7 @@ describe('扩展问号事件', () => {
     const wish = R.eventChoose(event('wish_tree'), 'wish'); expect(wish.gold).toBe(135); expect(wish.relics).toContain('wishing_cinder');
     const mirror = R.eventChoose(event('mirror_alley'), 'reach'); expect(mirror.hp).toBe(29); expect(mirror.relics).toContain('mirror_shard');
     const mask = R.eventChoose(event('mask_procession'), 'join'); expect(mask.relics).toContain('nameless_mask'); expect(mask.deck.filter(c => c.defId === 'doubt')).toHaveLength(1);
-    const amber = R.eventChoose(event('deep_amber_clinic'), 'amber'); expect(amber.gold).toBe(115); expect(amber.maxHp).toBe(86); expect(amber.hp).toBe(54);
+    const amber = R.eventChoose(event('deep_amber_clinic'), 'amber'); expect(amber.gold).toBe(115); expect(amber.maxHp).toBe(82); expect(amber.hp).toBe(40);
     const crown = R.eventChoose(event('deep_empty_throne'), 'crown'); expect(crown.maxHp).toBe(66); expect(crown.relics).toContain('hollow_crown');
   });
   it.each([['buried_standard', 'lift', 'buried_banner', 9], ['deep_star_crane', 'climb', 'vagrant_star', 13]] as const)('%s的风险分支能成功也能失败，失败不发遗物且SL不能重掷', (id, choice, relic, damage) => {

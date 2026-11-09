@@ -1,7 +1,8 @@
 import type { Archetype, CharacterId, RelicDef } from '../engine/types';
-import { EXPANDED_RELICS, EXCLUSIVE_RELICS } from './extraRelics';
+import { defineRelic, EXPANDED_RELICS, EXCLUSIVE_RELICS } from './extraRelics';
 import { CHAPTER_RELICS } from './chapterRelics';
 import { EVENT_RELICS, SHOP_RELICS } from './specialRelics';
+import { RELIC_TUNING as T } from './relicBalance';
 
 /**
  * 遗物定义。原遗物保留按 id 触发；扩展遗物以结构化规则驱动结算和描述。
@@ -25,7 +26,7 @@ def({
   name: '燧石',
   rarity: 'common',
   icon: '🪨',
-  description: '每回合打出的第一张攻击牌伤害 +4。',
+  description: `每回合打出的第一张攻击牌伤害 +${T.flintDamage}。`,
   archetype: 'combo',
 });
 def({
@@ -89,7 +90,7 @@ def({
   name: '余火香炉',
   rarity: 'uncommon',
   icon: '🔥',
-  description: '战斗开始时，若余烬为 0 则获得 4 点余烬；消耗余烬的卡牌至少按 3 点结算。',
+  description: `战斗开始时，若余烬为 0 则获得 ${T.censerOpeningEmber} 点余烬；消耗余烬的卡牌至少按 ${T.censerMinimumEmber} 点结算。`,
   archetype: 'ember',
 });
 def({
@@ -97,7 +98,7 @@ def({
   name: '旅人水壶',
   rarity: 'common',
   icon: '🫙',
-  description: '每场战斗胜利后回复 6 点生命。',
+  description: `每场战斗胜利后回复 ${T.canteenHeal} 点生命。`,
 });
 def({
   id: 'merchant_scale',
@@ -208,14 +209,7 @@ def({
   description: '每场战斗开始时获得 1 层回响（下一张牌触发两次）。',
   archetype: 'echo',
 });
-def({
-  id: 'old_tome',
-  name: '旧书',
-  rarity: 'uncommon',
-  icon: '📖',
-  description: '每场战斗开始时额外获得 1 层回响。',
-  archetype: 'echo',
-});
+def(defineRelic('old_tome', '旧书', 'uncommon', '📖', [{ trigger: 'powerPlayed', nth: 1, effects: [{ kind: 'status', status: 'echo', amount: 1 }] }], 'echo'));
 def({
   id: 'tuning_fork',
   name: '音叉',
@@ -229,7 +223,7 @@ def({
   name: '透镜',
   rarity: 'uncommon',
   icon: '🔍',
-  description: '每回合开始时，若手牌中有保留下来的牌，获得 1 点能量。',
+  description: `第 ${T.lensInterval}、${T.lensInterval * 2}、${T.lensInterval * 3}……回合开始时，若手中有保留牌，获得 1 点能量。`,
   archetype: 'focus',
 });
 
@@ -250,10 +244,10 @@ const EXTRA_RELICS: RelicDef[] = [
   { id: 'blood_pendant', name: '血滴坠饰', rarity: 'uncommon', icon: '💧', archetype: 'blood', description: '每回合第一次因卡牌失去生命时，抽 1 张牌。' },
   { id: 'crystal_chime', name: '水晶风铃', rarity: 'uncommon', icon: '🎐', archetype: 'echo', description: '每回合第一次触发回响或镜像时，获得 5 点格挡。' },
   { id: 'bastion_core', name: '堡垒核心', rarity: 'rare', icon: '🏰', archetype: 'bulwark', description: '回合结束时，若格挡不少于 15，获得 1 层蓄能（下回合 +1 能量）。' },
-  { id: 'phoenix_ash', name: '余灰灵种', rarity: 'rare', icon: '🌱', archetype: 'ash', description: '每回合第一次有牌被消耗时，回复 2 点生命。' },
+  { id: 'phoenix_ash', name: '余灰灵种', rarity: 'rare', icon: '🌱', archetype: 'ash', description: `每回合第一次有牌被消耗时，回复 ${T.phoenixHeal} 点生命。` },
   { id: 'war_standard', name: '不屈战旗', rarity: 'rare', icon: '🚩', archetype: 'might', description: '回合结束时，若本回合打出至少 3 张攻击牌，获得 1 点力量。' },
   { id: 'star_chart', name: '旧世星图', rarity: 'rare', icon: '🌌', archetype: 'focus', description: '回合结束时，每张保留的蓄力牌额外蓄力 1 次。' },
-  { id: 'dawn_crystal', name: '破晓晶石', rarity: 'rare', icon: '💎', description: '每场战斗的第一回合额外获得 1 点能量和 2 点余烬。' },
+  defineRelic('dawn_crystal', '破晓晶石', 'rare', '💎', [{ trigger: 'turnEnd', nth: 1, when: [{ kind: 'energyAtLeast', value: 1 }], effects: [{ kind: 'status', status: 'energyNext', amount: 2 }, { kind: 'ember', amount: 2 }] }]),
   { id: 'pilgrim_seal', name: '朝圣者印章', rarity: 'rare', icon: '🕊️', description: '在营火锻造升级卡牌时，回复 5 点生命。' },
   { id: 'clockwork_sun', name: '发条日轮', rarity: 'rare', icon: '☀️', description: '每场战斗的第 3、6、9……回合开始时，额外获得 1 点能量并多抽 1 张牌。' },
 ];

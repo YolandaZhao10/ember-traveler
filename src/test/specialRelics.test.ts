@@ -70,13 +70,13 @@ describe('问号与商店专属遗物的渠道和持久化', () => {
     const base = R.newRun('CAMP-SPECIAL'); base.gold = 1000; base.hp = 20;
     base.relics.push('purifying_brazier', 'smith_contract', 'caravan_hearth', 'forge_savings');
     const shop = enter(structuredClone(base), 'shop'); const removed = R.shopRemoveCard(shop, shop.deck[0].uid);
-    expect(removed.maxHp).toBe(75); expect(removed.hp).toBe(28); expect(R.shopRemoveCard(removed, removed.deck[0].uid)).toBe(removed);
+    expect(removed.maxHp).toBe(74); expect(removed.hp).toBe(26); expect(R.shopRemoveCard(removed, removed.deck[0].uid)).toBe(removed);
     const rest = enter(structuredClone(base), 'rest');
     const cancelled = R.restCancelUpgrade(R.restStartUpgrade(rest)); expect(cancelled.gold).toBe(rest.gold); expect(cancelled.hp).toBe(rest.hp);
     const upgraded = R.restUpgrade(rest, rest.deck[0].uid);
-    expect(upgraded.gold).toBe(1022); expect(upgraded.maxHp).toBe(74); expect(upgraded.hp).toBe(27);
+    expect(upgraded.gold).toBe(1016); expect(upgraded.maxHp).toBe(73); expect(upgraded.hp).toBe(26);
     expect(R.restUpgrade(upgraded, upgraded.deck[1].uid)).toBe(upgraded); expect(R.resetCurrentNode(upgraded)).toEqual(rest);
-    const healed = R.restHeal(rest); expect(healed.gold).toBe(1028); expect(healed.maxHp).toBe(75); expect(healed.hp).toBe(50);
+    const healed = R.restHeal(rest); expect(healed.gold).toBe(1030); expect(healed.maxHp).toBe(73); expect(healed.hp).toBe(41);
   });
 });
 

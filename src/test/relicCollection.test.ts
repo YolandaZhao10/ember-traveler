@@ -140,7 +140,7 @@ describe('逐件验证新增战斗遗物的真实结算', () => {
           actual.state.enemies.forEach((enemy, i) => expect(plain.state.enemies[i].hp - enemy.hp).toBe(effect.amount));
           break;
         case 'damageLowest': expect(plain.state.enemies[0].hp - actual.state.enemies[0].hp).toBe(effect.amount); expect(actual.state.enemies[1].hp).toBe(plain.state.enemies[1].hp); break;
-        case 'charge': expect(a.hand.find(c => c.uid === 'retained')!.bonus! - b.hand.find(c => c.uid === 'retained')!.bonus!).toBe(effect.amount); break;
+        case 'charge': expect((a.hand.find(c => c.uid === 'retained')!.bonus ?? 0) - (b.hand.find(c => c.uid === 'retained')!.bonus ?? 0)).toBe(effect.amount); break;
         case 'cleanse': expect(a.statuses[effect.status] ?? 0).toBe(0); break;
       }
     }
@@ -192,38 +192,40 @@ describe('逐件验证新增旅程遗物与SL', () => {
   });
 });
 
-describe('加强后的章节遗物', () => {
-  it('钟楼主齿轮在第4与第8张各触发一次，钟楼大摆锤每回合供能和抽牌', () => {
+describe('章节遗物的触发频率', () => {
+  it('钟楼主齿轮每回合仅第4张触发一次，钟楼大摆锤隔回合供能', () => {
     let cs = battle(); cs.relics = ['clocktower_gear'];
     const openingEnergy = cs.player.energy; const events: CombatEvent[] = [];
     for (let i = 0; i < 8; i++) {
       const uid = `gear-${i}`; cs.player.hand.push(card('quick_stab', uid));
       const step = playCard(cs, uid, 'e0'); cs = step.state; events.push(...step.events);
     }
-    expect(events.filter(e => e.type === 'relic' && e.relicId === 'clocktower_gear')).toHaveLength(2);
-    expect(cs.player.energy).toBe(openingEnergy + 2); expect(cs.player.block).toBe(16);
-    expect(cs.player.draw).toHaveLength(58);
+    expect(events.filter(e => e.type === 'relic' && e.relicId === 'clocktower_gear')).toHaveLength(1);
+    expect(cs.player.energy).toBe(openingEnergy + 1); expect(cs.player.block).toBe(6);
+    expect(cs.player.draw).toHaveLength(59);
     cs = battle(); cs.relics = ['belltower_pendulum'];
     for (let i = 0; i < 4; i++) {
       cs.player.hand = []; cs = startPlayerTurn(endPlayerTurn(cs).state).state;
-      expect(cs.player.energy).toBe(4); expect(cs.player.hand).toHaveLength(6);
+      expect(cs.player.energy).toBe(cs.turn % 2 === 0 ? 4 : 3); expect(cs.player.hand).toHaveLength(5);
     }
   });
 });
 
 describe('遗物组合、死亡与存档边界', () => {
   it('首次与第N次触发不会因回响增加出牌次数，下一回合重新计数', () => {
-    let cs = battle('traveler'); cs.relics = ['brass_knuckle', 'roadward_pin']; cs.player.statuses.echo = 2;
+    let cs = battle('traveler'); cs.relics = ['brass_knuckle', 'roadward_pin']; cs.player.statuses.echo = 2; cs.player.block = 5;
     for (let i = 0; i < 3; i++) { cs.player.hand.push(card('strike', `q${i}`)); cs = playCard(cs, `q${i}`, 'e0').state; }
-    expect(cs.player.ember).toBe(2); expect(cs.player.block).toBe(4);
+    expect(cs.player.ember).toBe(1); expect(cs.player.block).toBe(5); expect(cs.enemies[0].statuses.vulnerable).toBe(1);
     cs = startPlayerTurn(endPlayerTurn(cs).state).state;
     cs.player.hand.push(card('strike', 'again')); cs = playCard(cs, 'again', 'e0').state;
-    expect(cs.player.ember).toBe(3); expect(cs.player.block).toBe(0);
+    expect(cs.player.ember).toBe(2); expect(cs.player.block).toBe(0);
   });
   it('开场抽牌和遗物余烬尊重上限，遗物余烬不再触发卡牌沙漏加成', () => {
     const deck = Array.from({ length: 30 }, (_, i) => card('strike', `c${i}`));
     const cs = createCombat('open', ['furnace_drone'], 'normal', deck, 35, 100, ['ash_compass', 'copper_feather', 'scribe_scroll', 'lantern_archive', 'ember_seed', 'ash_hourglass'], makeRng('OPEN', 'c'), 100).state;
-    expect(cs.player.hand).toHaveLength(10); expect(cs.player.ember).toBe(4); expect(cs.player.block).toBe(6);
+    expect(cs.player.hand).toHaveLength(9); expect(cs.player.ember).toBe(4); expect(cs.player.block).toBe(4);
+    const capped = createCombat('cap', ['furnace_drone'], 'normal', deck, 35, 100, [...cs.relics, 'crowned_lantern', 'dawn_crystal', 'ember_lantern'], makeRng('OPEN', 'c'), 100).state;
+    expect(capped.player.hand).toHaveLength(10); expect(capped.player.ember).toBe(10);
     const next = startPlayerTurn(endPlayerTurn(cs).state).state;
     expect(next.player.hand).toHaveLength(6); expect(next.player.ember).toBe(4);
   });
@@ -251,9 +253,9 @@ describe('遗物组合、死亡与存档边界', () => {
   it('旧遗物与新增蓄力叠加只在回合结束发生一次', () => {
     const cs = battle('scholar'); cs.relics = ['star_chart', 'library_hourglass', 'infinity_quill']; cs.player.hand = [card('rune_shield', 'keep'), card('meditate', 'plain')];
     const result = endPlayerTurn(cs).state;
-    expect(result.player.hand.find(c => c.uid === 'keep')!.bonus).toBe(5);
+    expect(result.player.hand.find(c => c.uid === 'keep')!.bonus).toBe(2);
     expect(result.player.hand.find(c => c.uid === 'plain')!.bonus).toBeUndefined();
-    expect(result.player.statuses.echo).toBe(1); expect(endPlayerTurn(result).state).toBe(result);
+    expect(result.player.statuses.echo ?? 0).toBe(0); expect(result.player.statuses.energyNext).toBe(1); expect(result.player.block).toBe(5); expect(endPlayerTurn(result).state).toBe(result);
   });
   it('专属遗物计数随刷新保持，战斗SL回到原始触发进度', () => {
     const values = new Map<string, string>(); vi.stubGlobal('localStorage', { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, val: string) => values.set(key, val), removeItem: (key: string) => values.delete(key) });

@@ -2,6 +2,7 @@ import { CARDS } from '../data/cards';
 import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
 import { RELICS } from '../data/relics';
+import { RELIC_TUNING as T } from '../data/relicBalance';
 import { calcBlock, calcDamage, checkCondition, viewCard, type CardView } from './cards';
 import { scaleEnemyValue } from './difficulty';
 import { ensurePowerInstances } from './powers';
@@ -269,7 +270,7 @@ function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[]) {
   if (p.turnFlags.exhausted === 1) {
     if (cs.relics.includes('coal_pouch')) { gainEmber(cs, 1, ev, false); relicProc(cs, 'coal_pouch', ev); }
     if (cs.relics.includes('phoenix_ash') && p.hp > 0) {
-      const healed = Math.min(2, p.maxHp - p.hp); p.hp += healed;
+      const healed = Math.min(T.phoenixHeal, p.maxHp - p.hp); p.hp += healed;
       ev.push({ type: 'heal', targetId: p.id, amount: healed }); relicProc(cs, 'phoenix_ash', ev);
     }
   }
@@ -424,9 +425,9 @@ export function createCombat(
     log(cs, ev, '余烬灯：获得 2 点余烬');
   }
   if (cs.relics.includes('ember_censer') && cs.player.ember === 0) {
-    gainEmber(cs, 4, ev, false);
+    gainEmber(cs, T.censerOpeningEmber, ev, false);
     ev.push({ type: 'relic', relicId: 'ember_censer' });
-    log(cs, ev, '余火香炉：获得 4 点余烬');
+    log(cs, ev, `余火香炉：获得 ${T.censerOpeningEmber} 点余烬`);
   }
   if (cs.relics.includes('thorn_crown')) {
     addStatus(cs.player, 'thorns', 3, ev);
@@ -449,11 +450,7 @@ export function createCombat(
     ev.push({ type: 'relic', relicId: 'echo_stone' });
     log(cs, ev, '回响石：获得 1 层回响');
   }
-  if (cs.relics.includes('old_tome')) {
-    addStatus(cs.player, 'echo', 1, ev);
-    ev.push({ type: 'relic', relicId: 'old_tome' });
-    log(cs, ev, '旧书：获得 1 层回响');
-  }
+
   if (cs.relics.includes('watchers_eye')) {
     for (const e of cs.enemies) addStatus(e, 'vulnerable', 1, ev);
     ev.push({ type: 'relic', relicId: 'watchers_eye' });
@@ -500,7 +497,6 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
     }
   }
   p.energy = p.maxEnergy;
-  if (cs.turn === 1 && cs.relics.includes('dawn_crystal')) { p.energy += 1; gainEmber(cs, 2, ev, false); relicProc(cs, 'dawn_crystal', ev); }
   if (cs.turn % 3 === 0 && cs.relics.includes('clockwork_sun')) { p.energy += 1; relicProc(cs, 'clockwork_sun', ev); }
   if (cs.turn === 1 && cs.relics.includes('rune_stone')) {
     p.energy += 1;
@@ -511,7 +507,7 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
     log(cs, ev, `蓄能：获得 ${p.statuses.energyNext} 点能量`);
     delete p.statuses.energyNext;
   }
-  if (cs.turn > 1 && cs.relics.includes('lens') && p.hand.length > 0) {
+  if (cs.turn % T.lensInterval === 0 && cs.relics.includes('lens') && p.hand.some(card => viewCard(card).retain)) {
     p.energy += 1;
     ev.push({ type: 'relic', relicId: 'lens' });
     log(cs, ev, '透镜：获得 1 点能量');
@@ -586,7 +582,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   let extraDamage = 0;
   if (v.type === 'attack') {
     if (isFirstAttack && cs.relics.includes('flint')) {
-      extraDamage += 4;
+      extraDamage += T.flintDamage;
       ev.push({ type: 'relic', relicId: 'flint' });
     }
     if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
@@ -701,7 +697,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
   };
   const spendEmber = (): number => {
     let e = p.ember;
-    if (cs.relics.includes('ember_censer')) e = Math.max(3, e);
+    if (cs.relics.includes('ember_censer')) e = Math.max(T.censerMinimumEmber, e);
     gainEmber(cs, -p.ember, ev, false);
     return e;
   };

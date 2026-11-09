@@ -224,7 +224,7 @@ describe('战斗基础', () => {
       isFirstAttack: true,
       crescendoBonus: 0,
     });
-    expect(text).toContain('12'); // 6 + 2 + 4
+    expect(text).toContain('11'); // 6 + 2 + 3
     expect(CARDS.strike).toBeDefined();
   });
 

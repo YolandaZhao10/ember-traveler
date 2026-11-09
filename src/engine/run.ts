@@ -1,3 +1,4 @@
+import { RELIC_TUNING as T } from '../data/relicBalance';
 import { CARD_LIST, CARDS, cardAvailableTo } from '../data/cards';
 import { CHARACTERS } from '../data/characters';
 import { difficultyPercent, normalizeDifficulty } from '../data/difficulty';
@@ -238,7 +239,7 @@ export function finishCombat(input: RunState): RunState {
   if (cs.tier === 'elite') run.stats.elitesKilled += 1;
   run.stats.floorsCleared += 1;
   // 战斗中新增的牌（如诅咒）不会进入牌组——仅战斗内有效
-  if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + 6);
+  if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + T.canteenHeal);
   if (run.relics.includes('red_vial') && cs.player.selfHpLost > 0) run.hp = Math.min(run.maxHp, run.hp + Math.floor(cs.player.selfHpLost / 2));
   applyJourneyHealth(run, 'victory', cs.tier);
   const bonusGold = relicJourneyBonus(run, 'victory', 'gold', cs.tier);

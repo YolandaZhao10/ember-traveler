@@ -15,11 +15,12 @@ function play(cs: CombatState, defId: string) { return playCard(cs, cs.player.ha
 const next = (cs: CombatState) => startPlayerTurn(endPlayerTurn(cs).state).state;
 
 describe('新增21个遗物的真实触发', () => {
-  it('磨石、盾铆、破晓晶石只在开场触发，后续回合不重复', () => {
+  it('磨石和盾铆只在开场触发，破晓晶石需首回合节省能量并在第二回合兑现', () => {
     let cs = battle(['whetstone', 'shield_rivet', 'dawn_crystal']);
     expect(cs.player.statuses.strength).toBe(1); expect(cs.player.block).toBe(8);
-    expect(cs.player.energy).toBe(4); expect(cs.player.ember).toBe(2);
-    cs = next(cs); expect(cs.player.statuses.strength).toBe(1); expect(cs.player.block).toBe(0); expect(cs.player.energy).toBe(3);
+    expect(cs.player.energy).toBe(3); expect(cs.player.ember).toBe(0);
+    cs = next(cs); expect(cs.player.statuses.strength).toBe(1); expect(cs.player.block).toBe(0); expect(cs.player.energy).toBe(5); expect(cs.player.ember).toBe(2);
+    cs = next(cs); expect(cs.player.energy).toBe(3); expect(cs.player.ember).toBe(2);
   });
   it('踏灰靴、墨井、决斗扣环按出牌次数触发，回响不会伪造额外出牌数', () => {
     let cs = battle(['trail_boots', 'ink_well', 'duelist_clasp'], ['quick_stab', 'quick_stab', 'defend', 'defend']);
@@ -31,13 +32,13 @@ describe('新增21个遗物的真实触发', () => {
   });
   it('炭灰袋与灵种每回合仅第一次消耗触发，窑芯需要至少两张', () => {
     let cs = battle(['coal_pouch', 'phoenix_ash', 'kiln_spark'], ['pick_up', 'bone_ash']);
-    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(62); expect(cs.player.ember).toBe(1);
+    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(1);
     expect(endPlayerTurn(cs).state.enemies[0].statuses.burn ?? 0).toBe(0);
-    cs = play(cs, 'bone_ash'); expect(cs.player.hp).toBe(62); expect(cs.player.ember).toBe(1);
+    cs = play(cs, 'bone_ash'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(1);
     cs = endPlayerTurn(cs).state; expect(cs.enemies[0].statuses.burn).toBe(2);
     expect(endPlayerTurn(cs).state).toBe(cs);
     cs = startPlayerTurn(cs).state; cs.player.hand.push({ uid: 'again', defId: 'pick_up', upgraded: false });
-    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(64); expect(cs.player.ember).toBe(2);
+    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(62); expect(cs.player.ember).toBe(2);
   });
   it('烟灰面罩需要存活燃烧敌人，格挡在新回合清除之后获得', () => {
     let cs = battle(['soot_mask']); expect(cs.player.block).toBe(0);

@@ -1,3 +1,4 @@
+import { RELIC_TUNING as T } from '../data/relicBalance';
 import { CARDS } from '../data/cards';
 import { STATUSES } from '../data/statuses';
 import type { CardDef, CardInstance, Condition, Effect, Entity, PlayerCombat, Statuses } from './types';
@@ -116,7 +117,7 @@ export interface DescribeContext {
 /** 将伤害数值按当前状态修正；无上下文时返回基础值 */
 function dmgText(base: number, ctx: DescribeContext | null, extra = 0): string {
   if (!ctx) return `${base}`;
-  const bonus = extra + ctx.crescendoBonus + (ctx.isFirstAttack && ctx.relics.includes('flint') ? 4 : 0);
+  const bonus = extra + ctx.crescendoBonus + (ctx.isFirstAttack && ctx.relics.includes('flint') ? T.flintDamage : 0);
   const v = calcDamage(base, ctx.player.statuses, ctx.target?.statuses ?? null, bonus);
   if (v !== base) return `${v}`;
   return `${base}`;
@@ -131,7 +132,7 @@ function blockText(base: number, ctx: DescribeContext | null): string {
 function emberSpendAmount(ctx: DescribeContext | null): number | null {
   if (!ctx) return null;
   let e = ctx.player.ember;
-  if (ctx.relics.includes('ember_censer')) e = Math.max(3, e);
+  if (ctx.relics.includes('ember_censer')) e = Math.max(T.censerMinimumEmber, e);
   return e;
 }
 
