@@ -66,3 +66,4 @@ for(const enc of ENCOUNTERS.filter(e=>!e.chapter && e.tier!=='boss')) {
 }
 
 console.log(JSON.stringify({ note: '双副本循环筛查与无防御压力诊断，不能代替真实对局胜率。', cards: CARD_LIST.length, monsters: Object.keys(ENEMIES).length, loops, pairsChecked: pairs.length, pairLoops, encounters, calibration }, null, 2));
+if (loops.length || pairLoops.length || pairs.some(([a,b]) => probePair(a,b).invalid)) process.exitCode = 1;

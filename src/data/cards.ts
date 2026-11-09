@@ -674,8 +674,8 @@ def({
   owner: 'picker',
   cost: 2,
   target: 'self',
-  effects: [{ kind: 'status', status: 'pyre', amount: 2, target: 'self' }, { kind: 'status', status: 'burn', amount: 3, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'pyre', amount: 3, target: 'self' }, { kind: 'status', status: 'burn', amount: 5, target: 'all' }] },
+  effects: [{ kind: 'status', status: 'burningRelay', amount: 4, target: 'self' }, { kind: 'status', status: 'burn', amount: 14, target: 'all' }],
+  upgrade: { effects: [{ kind: 'status', status: 'burningRelay', amount: 6, target: 'self' }, { kind: 'status', status: 'burn', amount: 21, target: 'all' }] },
   flavor: '灰烬城的葬礼只有一种形式。',
 });
 def({
@@ -937,10 +937,10 @@ def({
   rarity: 'rare',
   archetype: 'blood',
   owner: 'oathbound',
-  cost: 2,
+  cost: 1,
   target: 'self',
-  effects: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'bloodArmor', amount: 4, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 17 }, { kind: 'status', status: 'bloodArmor', amount: 6, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'recoveryArmor', amount: 12, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 17 }, { kind: 'status', status: 'recoveryArmor', amount: 18, target: 'self' }] },
 });
 def({
   id: 'sanguine',

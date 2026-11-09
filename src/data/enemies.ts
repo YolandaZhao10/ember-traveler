@@ -36,7 +36,7 @@ def({
   id: 'tomb_puppet',
   name: '守墓傀儡',
   tier: 'normal',
-  hp: [28, 32],
+  hp: [30, 34],
   sprite: 'puppet',
   description: '重击后抖落墓灰，将 1 张灰烬塞入弃牌堆；随后支撑躯壳，留下两个不攻击的回合。',
   moves: [
@@ -51,7 +51,7 @@ def({
   id: 'stray_ember',
   name: '流浪余火',
   tier: 'normal',
-  hp: [18, 22],
+  hp: [20, 24],
   sprite: 'ember',
   description: '失去主人的火种，漫无目的地灼烧一切。',
   moves: [
@@ -73,7 +73,7 @@ def({
   id: 'bone_spider',
   name: '蚀骨蛛',
   tier: 'normal',
-  hp: [20, 24],
+  hp: [22, 26],
   sprite: 'spider',
   description: '牙上淬着让人无力的毒。',
   moves: [
@@ -115,7 +115,7 @@ def({
   id: 'rubble_golem',
   name: '碎石魔像',
   tier: 'normal',
-  hp: [40, 46],
+  hp: [43, 49],
   sprite: 'golem',
   description: '古城的碎石自己站了起来。每次挥击都很沉。',
   moves: [
@@ -240,7 +240,7 @@ def({
   id: 'ash_sovereign',
   name: '灰烬之王',
   tier: 'boss',
-  hp: [125, 125],
+  hp: [135, 135],
   sprite: 'sovereign',
   description: '古城最后的主人。生命降至一半时，王冠下的余烬会重新燃起：清除负面状态、获得格挡与力量，并让你虚弱、脆弱。',
   moves: [
@@ -419,7 +419,7 @@ def({
   id: 'bell_heart',
   name: '钟楼之心',
   tier: 'boss',
-  hp: [130, 130],
+  hp: [141, 141],
   sprite: 'bellheart',
   description: '古城钟楼的机械核心。钟声削弱你，齿轮保护它；生命减半后失控，连击、钟鸣、碎钟后会重整齿轮，留出反攻回合。',
   moves: [

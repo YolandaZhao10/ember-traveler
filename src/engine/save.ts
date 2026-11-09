@@ -86,9 +86,12 @@ function migrateLayout(input: Snapshot): Snapshot {
 const KEY = 'ember-traveler:save';
 const SETTINGS_KEY = 'ember-traveler:settings';
 
+export type ArtStyle = 'detailed' | 'simple';
+
 export interface Settings {
   sound: boolean;
   fastAnim: boolean;
+  artStyle: ArtStyle;
 }
 
 function storage(): Storage | null {
@@ -152,11 +155,18 @@ export function loadSettings(): Settings {
   const s = storage();
   try {
     const raw = s?.getItem(SETTINGS_KEY);
-    if (raw) return { sound: true, fastAnim: false, ...JSON.parse(raw) };
+    if (raw) {
+      const value = JSON.parse(raw);
+      return {
+        sound: typeof value?.sound === 'boolean' ? value.sound : true,
+        fastAnim: typeof value?.fastAnim === 'boolean' ? value.fastAnim : false,
+        artStyle: value?.artStyle === 'simple' ? 'simple' : 'detailed',
+      };
+    }
   } catch {
     /* ignore */
   }
-  return { sound: true, fastAnim: false };
+  return { sound: true, fastAnim: false, artStyle: 'detailed' };
 }
 
 export function saveSettings(st: Settings) {

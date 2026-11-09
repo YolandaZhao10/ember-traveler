@@ -36,7 +36,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('第三章精英攻防节奏', () => {
   it.each(DIFFICULTY_PRESETS.flatMap(p => [44, 51, 57].map(floor => ({ name: p.name, settings: p.settings, floor }))))(
-    '$name 第$floor层的剑侍与巨像每轮三攻一整备，意图与真实损血一致', ({ floor, settings }) => {
+    '$name 第$floor层的剑侍月步轻击、巨像三攻一整备，意图与真实损血一致', ({ floor, settings }) => {
       for (const id of ['moon_duelist', 'shattered_titan']) {
         let cs = battle([id], floor, settings);
         const hits: number[] = [];
@@ -46,8 +46,8 @@ describe('第三章精英攻防节奏', () => {
           hits.push(result.actions.filter(a => a.attacks).length);
           moves.push(result.actions[0].move!);
         }
-        expect(hits.slice(0, 4).reduce((sum, n) => sum + n, 0)).toBe(3);
-        expect(hits.slice(4).reduce((sum, n) => sum + n, 0)).toBe(3);
+        expect(hits.slice(0, 4).reduce((sum, n) => sum + n, 0)).toBe(id === 'moon_duelist' ? 4 : 3);
+        expect(hits.slice(4).reduce((sum, n) => sum + n, 0)).toBe(id === 'moon_duelist' ? 4 : 3);
         expect(moves.slice(4)).toEqual(moves.slice(0, 4));
         expect(cs.enemies[0].block).toBeGreaterThanOrEqual(0);
         expect(cs.outcome).toBe('ongoing');
@@ -55,7 +55,7 @@ describe('第三章精英攻防节奏', () => {
     },
   );
 
-  it('剑侍先轻斩再施加易伤，下一重斩吃到易伤；月步仍留空档但强化下轮双击', () => {
+  it('剑侍先轻斩再施加易伤，下一重斩吃到易伤；月步轻击后强化下轮双击', () => {
     let cs = battle(['moon_duelist']);
     const first = round(cs); cs = first.state;
     const mark = round(cs); cs = mark.state;
@@ -67,7 +67,7 @@ describe('第三章精英攻防节奏', () => {
     const cleanCrescent = round(clean);
     expect(markedCrescent.actions[0].damage).toBe(Math.floor(cleanCrescent.actions[0].damage * 1.5));
     const step = round(cs); cs = step.state;
-    expect(step.actions[0].damage).toBe(0);
+    expect(step.actions[0].damage).toBeGreaterThan(0);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
     expect(cs.enemies[0].statuses.strength).toBe(2);
     expect(round(cs).actions[0].damage).toBeGreaterThan(first.actions[0].damage);

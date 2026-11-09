@@ -143,6 +143,12 @@ button:disabled {
 .title-screen > button.title-menu { position: absolute; top: 18px; right: 20px; }
 .menu-actions { display: flex; flex-direction: column; gap: 10px; overflow: auto; }
 .menu-note { margin: -2px 0 4px; font-size: 12px; text-align: center; }
+.art-style-picker { margin: 0; padding: 10px; border: 1px solid var(--gold-dim); border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.art-style-picker legend { padding: 0 5px; color: var(--gold); }
+.art-style-picker label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 6px; border: 1px solid var(--gold-dim); border-radius: 6px; cursor: pointer; }
+.art-style-picker label.selected { color: var(--gold); border-color: var(--gold); background: #c9a24a16; }
+.art-style-picker input { accent-color: var(--gold); }
+.art-style-picker p { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; color: var(--text-dim); font-size: 12px; }
 .catalog-tabs, .catalog-filters { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
 .catalog-filters input, .catalog-filters select {
   border: 1px solid rgba(201, 162, 74, 0.35);
@@ -2328,3 +2334,9 @@ h3 {
 
 .replay-choice { background: transparent; padding: 4px; border: 2px solid transparent; border-radius: 12px; cursor: pointer; color: inherit; }
 .replay-choice.selected, .replay-choice:focus-visible { border-color: var(--gold); outline: none; }
+
+/* 长效果先让出插画高度，避免把每回合上限等规则裁掉。 */
+.card.long-description .cart { height: 46px; flex-shrink: 0; }
+.card.sm.long-description .cart { height: 24px; }
+.card.lg.long-description .cart { height: 86px; }
+.card.long-description .cdesc { line-height: 1.2; }

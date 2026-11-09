@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { CARD_LIST, CARDS } from '../src/data/cards';
 import { describeCard, viewDef } from '../src/engine/cards';
-import { cardDesign, cardMechanics, effectDesign } from '../src/test/cardDesign';
+import { cardDesign, cardMechanics, containsPowerCore, effectDesign } from '../src/test/cardDesign';
 import type { CardDef } from '../src/engine/types';
 const arg = (name: string) => { const i = process.argv.indexOf(name); return i < 0 ? undefined : process.argv[i + 1]; };
 if (arg('--cards')) for (const c of JSON.parse(readFileSync(arg('--cards')!, 'utf8')) as CardDef[]) CARDS[c.id] = c;
@@ -24,6 +24,9 @@ const report = {
  exactMechanics: collisions(cardMechanics),
  rewardEffectIdentity: collisions((id,up)=>{const v=viewDef(id,up);return effectDesign(v.effects,'exact')+effectDesign(v.handEndEffects,'exact');},true),
  globalRewardDesign: collisions(cardDesign,true),
+ powerCoverage: [...new Map(variants.flatMap(a => variants.filter(b => a.id !== b.id && CARDS[a.id].type === 'power' && CARDS[b.id].type === 'power'
+   && containsPowerCore(viewDef(a.id, a.upgraded).effects, viewDef(b.id, b.upgraded).effects))
+   .map(b => [[a.id,b.id].sort().join('/'), {contained: a.id, covering: b.id} ] as const))).values()],
  ledger: CARD_LIST.map(c=>({id:c.id,name:c.name,owner:c.owner??'shared',rarity:c.rarity,
   base:describeCard({uid:'a',defId:c.id,upgraded:false},null),
   upgrade:c.type==='curse'?null:describeCard({uid:'a',defId:c.id,upgraded:true},null)})),
@@ -31,4 +34,4 @@ const report = {
 };
 if(arg('--output'))writeFileSync(arg('--output')!,JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,ledger:undefined},null,2));
-if(report.exactMechanics.length||report.rewardEffectIdentity.length||report.globalRewardDesign.length)process.exitCode=1;
+if(report.exactMechanics.length||report.rewardEffectIdentity.length||report.globalRewardDesign.length||report.powerCoverage.length)process.exitCode=1;

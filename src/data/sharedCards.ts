@@ -26,6 +26,8 @@ function add(rarity: 'common' | 'uncommon' | 'rare', entries: Entry[]) {
 
 // 四角色共享：旅行补给、余烬积蓄与释放；强力恢复、爆发资源用消耗限制循环。
 add('common', [
+  S('coal_credit', '燃烬借力', 0, [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1)], [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1), block(5)], { requireEmber: 2, exhaust: true }),
+  S('ember_sift', '烬中翻阅', 0, [ember(-2), draw(2), discard(1)], [ember(-2), draw(3), discard(1)], { requireEmber: 2, exhaust: true }),
   A('stone_throw', '投石', 0, [discard(1), hit(8), draw(1)], [discard(1), hit(11), draw(1)], { exhaust: true }),
   S('camp_guard', '守夜', 1, [block(7), when(coals(3), block(2))], [block(9), when(coals(3), block(3))]),
   A('sweeping_embers', '扫火', 1, [hit(6, { aoe: true }), ember(1)], [hit(8, { aoe: true }), ember(1)], { target: 'all_enemies' }),
@@ -58,11 +60,11 @@ add('uncommon', [
   A('sharpened_coal', '淬炭刃', 1, [hit(8), status('strength', 1)], [hit(12), status('strength', 1)], { exhaust: true }),
 ]);
 add('rare', [
-  P('crown_of_sparks', '火星冠冕', 2, [status('emberHeart', 2), status('strength', 2)], [status('emberHeart', 3), status('strength', 3)]),
+  P('crown_of_sparks', '火星冠冕', 2, [status('sparkCrown', 4)], [status('sparkCrown', 6)]),
   A('final_conflagration', '终夜焚天', 2, [{ kind: 'emberBurst', damagePer: 4, aoe: true }, { kind: 'status', status: 'weak', amount: 1, target: 'all' }], [{ kind: 'emberBurst', damagePer: 5, aoe: true }, { kind: 'status', status: 'weak', amount: 2, target: 'all' }], { target: 'all_enemies' }),
   A('smoldering_star', '闷燃之星', 2, [hit(18), when(coals(8), status('burn', 8, 'target'), status('vulnerable', 2, 'target'))], [hit(22), when(coals(8), status('burn', 12, 'target'), status('vulnerable', 3, 'target'))]),
-  P('bonfire_shelter', '篝火避难所', 2, [ember(-5), status('metallicize', 8), status('regen', 2)], [ember(-5), status('metallicize', 11), status('regen', 3)], { requireEmber: 5 }),
-  S('phoenix_respite', '涅槃之息', 1, [ember(-6), heal(10), status('regen', 3)], [ember(-6), heal(14), status('regen', 4)], { requireEmber: 6, exhaust: true }),
+  P('bonfire_shelter', '篝火避难所', 1, [status('emberBastion', 18)], [status('emberBastion', 24)]),
+  S('phoenix_respite', '涅槃之息', 1, [ember(-6), heal(10), status('regen', 4)], [ember(-6), heal(14), status('regen', 5)], { requireEmber: 6, exhaust: true }),
   S('embers_to_dawn', '燃尽迎曦', 0, [ember(-5), energy(3), draw(2), status('strength', 2)], [ember(-5), energy(3), draw(3), status('strength', 3)], { requireEmber: 5, exhaust: true }),
   P('lasting_light', '长明灯', 1, [status('spentEmberDraw', 1)], [status('spentEmberDraw', 2)]),
   A('lantern_procession', '百灯夜行', 2, [hit(14, { aoe: true }), ember(3), block(8)], [hit(18, { aoe: true }), ember(4), block(11)], { target: 'all_enemies' }),

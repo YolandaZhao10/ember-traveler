@@ -37,6 +37,7 @@ function effectRole(effect: Effect): CardRole | null {
     case 'gainEmber':
     case 'energy':
       return effect.amount > 0 ? 'engine' : null;
+    case 'convertResource':
     case 'draw':
     case 'doubleEmber':
     case 'chargeHand':

@@ -24,17 +24,17 @@ function play(cs: CombatState, id: string, target: string | null = null): Combat
 }
 
 describe('专属卡牌的不同用途', () => {
-  it.each([false, true])('漫长守望提供持续抽牌和护甲，不替代固守保留格挡（升级=%s）', up => {
+  it.each([false, true])('漫长守望保留能量换下回合抽牌和护甲，不替代固守保留格挡（升级=%s）', up => {
     let cs = battle('long_road', up);
     cs.player.block = 10;
     cs = play(cs, 'long_road');
-    expect(cs.player.statuses.study).toBe(1);
+    expect(cs.player.statuses.patientGuard).toBe(up ? 11 : 8);
     expect(cs.player.statuses.barricade ?? 0).toBe(0);
     cs = endPlayerTurn(cs).state;
-    expect(cs.player.block).toBe(up ? 16 : 14);
+    expect(cs.player.block).toBe(up ? 21 : 18);
     cs = startPlayerTurn(cs).state;
     expect(cs.player.block).toBe(0);
-    expect(cs.player.hand).toHaveLength(6);
+    expect(cs.player.hand).toHaveLength(7);
   });
 
   it.each([false, true])('追风步提供有门槛的临时力量，不再返还能量（升级=%s）', up => {

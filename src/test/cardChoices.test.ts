@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CARD_LIST, CARDS, cardAvailableTo } from '../data/cards';
 import { cardRole, distinctRewardPool } from '../engine/cardChoices';
-import { makeRng, pick, weightedPick } from '../engine/rng';
+import { chance, makeRng, pick, weightedPick } from '../engine/rng';
 import * as R from '../engine/run';
 import type { CardDef, CharacterId, RunState } from '../engine/types';
 import { rewardDeckSummary } from '../ui/rewardDeckSummary';
@@ -14,8 +14,12 @@ function unfilteredChoices(run: RunState, tier: R.CardRewardTier, n: number): Ca
   const selected: CardDef[] = [];
   while (selected.length < n) {
     const rarity = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
-    const pool = CARD_LIST.filter(card => card.rarity === rarity && !selected.some(c => c.id === card.id)
+    let pool = CARD_LIST.filter(card => card.rarity === rarity && !selected.some(c => c.id === card.id)
       && (tier === 'boss' ? card.owner === run.character : cardAvailableTo(card, run.character)));
+    if (tier === 'normal' || tier === 'elite') {
+      const shared = chance(run.rng.reward, .25);
+      pool = pool.filter(c => shared ? !c.owner : c.owner === run.character);
+    }
     if (pool.length) selected.push(pick(run.rng.reward, pool));
   }
   return selected;
@@ -77,7 +81,8 @@ describe('卡牌奖励功能分工', () => {
         expect(defs.map(card => card.rarity)).toEqual(original.map(card => card.rarity));
         expect(defs.slice(0, 2)).toEqual(original.slice(0, 2));
         expect(new Set(defs.map(card => card.id)).size).toBe(3);
-        expect(new Set(defs.map(cardRole)).size).toBeGreaterThan(1);
+        if (tier === 'boss') expect(new Set(defs.map(cardRole)).size).toBeGreaterThan(1);
+        expect(defs.map(c => c.owner)).toEqual(original.map(c => c.owner));
         for (const card of defs) {
           expect(cardAvailableTo(card, character)).toBe(true);
           if (tier === 'boss') expect(card).toMatchObject({ owner: character, rarity: 'rare' });

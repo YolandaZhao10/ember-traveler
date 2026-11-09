@@ -1,7 +1,7 @@
 {
   "name": "ember-traveler",
   "private": true,
-  "version": "0.1.19",
+  "version": "0.1.20",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -22,7 +22,9 @@
     "audit:mystery": "vite-node scripts/audit-mystery.ts",
     "audit:new-enemies": "vite-node scripts/audit-new-enemies.ts",
     "audit:opening-pressure": "vite-node scripts/audit-opening-pressure.ts",
-    "audit:blood-replay": "vite-node scripts/audit-blood-replay.ts"
+    "audit:blood-replay": "vite-node scripts/audit-blood-replay.ts",
+    "audit:sustain": "vite-node scripts/audit-sustain.ts",
+    "audit:power-builds": "vite-node scripts/audit-power-builds.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

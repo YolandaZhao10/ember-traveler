@@ -1,7 +1,7 @@
 import { expect, it, describe } from 'vitest';
 import { CARD_LIST } from '../data/cards';
 import { describeCard, viewDef } from '../engine/cards';
-import { canPlayCard, endPlayerTurn, playCard, startPlayerTurn } from '../engine/combat';
+import { canPlayCard, endPlayerTurn, playCard } from '../engine/combat';
 import { rarityFixture, rarityProbe, RARITY_CONTEXTS } from './cardRarityAudit';
 import type { CombatState } from '../engine/types';
 const use = (cs: CombatState) => playCard(cs, cs.player.hand[0].uid, viewDef(cs.player.hand[0].defId).target === 'enemy' ? 'e0' : null).state;
@@ -22,10 +22,10 @@ describe('全卡表基础/升级效果审查', () => {
    if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}
   }
  });
- it('五个可获得牌池保持原稀有度配额，血誓者另增一张罕见重放牌',()=>{
+ it('每角色增加两张罕见资源牌，血誓者另有重放牌、通用池另增两张普通转换牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([20,owner === 'oathbound' ? 19 : 18,15]);
+   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([owner === undefined ? 22 : 20,owner === undefined ? 18 : owner === 'oathbound' ? 21 : 20,15]);
   }
  });
 });
@@ -61,26 +61,10 @@ describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s
   expect(after.player.energy).toBe(3);expect(after.enemies[0].statuses.burn??0).toBe(0);
   expect(after.player.exhaust.some(c=>c.defId==='white_hot')).toBe(true);
  });
- it('血色盟约比血契更侧重重复卖血成长，不能免费获得收益',()=>{
-  let cs=use(setup('crimson_covenant',up));
-  expect(cs.player.statuses.strength??0).toBe(0);
-  cs.player.hand=[{uid:'blood',defId:'blood_edge',upgraded:false}];
-  const hp=cs.player.hp;cs=playCard(cs,'blood','e0').state;
-  expect(cs.player.hp).toBe(hp-2);expect(cs.player.statuses.strength).toBe(up?3:2);
-  expect(cs.player.block).toBe(up?4:3);expect(cs.player.energy).toBe(0);
- });
- it('不动阵地与战意化身具有比一费基础能力更高的反击收益',()=>{
+ it('不动阵地保留持续格挡与荆棘收益',()=>{
   let guard=use(setup('steadfast_guard',up));
   expect(guard.player.statuses.thorns).toBe(up?5:4);
   guard=endPlayerTurn(guard).state;expect(guard.player.block).toBe(up?8:6);
-  const avatar=use(setup('war_avatar',up));
-  expect(avatar.player.statuses.strength).toBeGreaterThan(use(setup('inflame',up)).player.statuses.strength!);
-  expect(avatar.player.statuses.thorns).toBe(up?5:4);
- });
- it('铁血两费部署，同时提供成长与当回合防护',()=>{
-  let cs=use(setup('iron_blooded',up));expect(cs.player.energy).toBe(1);
-  cs=endPlayerTurn(cs).state;expect(cs.player.block).toBe(up?7:5);
-  cs=startPlayerTurn(cs).state;expect(cs.player.statuses.strength).toBe(up?2:1);
  });
  it('恒久护印给予更大的单次防护和蓄能；普通调息保持可循环优势',()=>{
   const rare=use(setup('timeless_ward',up)),common=use(setup('measured_breath',up));
@@ -88,11 +72,6 @@ describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s
   expect(rare.player.statuses.energyNext).toBeGreaterThan(common.player.statuses.energyNext!);
   expect(rare.player.exhaust.some(c=>c.defId==='timeless_ward')).toBe(true);
   expect(common.player.discard.some(c=>c.defId==='measured_breath')).toBe(true);
- });
- it('火星冠冕比火种之心更快产出余烬，并提供力量；仍需两能量部署',()=>{
-  const cs=use(setup('crown_of_sparks',up));expect(cs.player.energy).toBe(1);
-  expect(cs.player.statuses.emberHeart).toBeGreaterThan(use(setup('ember_heart',up)).player.statuses.emberHeart!);
-  expect(cs.player.statuses.strength).toBe(up?3:2);
  });
  it('开篇和弦是一费一次部署，出牌后移除且不会触发消耗收益',()=>{
   const cs=setup('opening_chord',up);cs.player.energy=1;cs.player.statuses.ashFeast=4;

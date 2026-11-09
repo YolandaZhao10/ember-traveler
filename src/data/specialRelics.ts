@@ -11,7 +11,7 @@ const relic = (source: 'event' | 'shop', id: string, name: string, icon: string,
 /** 只从问号事件的随机奖励或对应故事中获得，不进入精英、商店或章节奖励池。 */
 export const EVENT_RELICS: RelicDef[] = [
   relic('event', 'nameless_mask', '无名面具', '🎭', [start([{ kind: 'enemyStatus', status: 'weak', amount: 2, target: 'all' }, { kind: 'block', amount: 6 }])]),
-  relic('event', 'wishing_cinder', '许愿余烬', '🌠', [start([{ kind: 'ember', amount: 3 }, { kind: 'status', status: 'regen', amount: 1 }])]),
+  relic('event', 'wishing_cinder', '许愿余烬', '🌠', [start([{ kind: 'ember', amount: 3 }, { kind: 'status', status: 'regen', amount: 4 }])]),
   relic('event', 'lost_hour', '遗失的一刻', '⌛', [{ trigger: 'turnStart', nth: 2, effects: [{ kind: 'energy', amount: 1 }, { kind: 'draw', amount: 1 }] }]),
   relic('event', 'mirror_shard', '镜中残影', '🪞', [{ trigger: 'turnEnd', nth: 1, effects: [{ kind: 'status', status: 'echo', amount: 1 }, { kind: 'block', amount: 6 }] }]),
   relic('event', 'buried_banner', '地底誓旗', '🚩', [start([{ kind: 'status', status: 'strength', amount: 1 }, { kind: 'enemyStatus', status: 'vulnerable', amount: 1, target: 'all' }])]),

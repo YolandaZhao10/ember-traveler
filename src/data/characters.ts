@@ -60,7 +60,7 @@ export const CHARACTERS: Record<CharacterId, CharacterDef> = {
     starterRelic: 'blood_seal',
     archetypes: ['basic', 'blood', 'might', 'ember'],
     routes: [
-      { name: '血誓', text: '主动失血补牌、换力量与格挡，再用吸血回补风险。' },
+      { name: '血誓', text: '失血换节奏，吸血回补；可组合失血起甲与实际治疗转甲。' },
       { name: '狂力', text: '安排临时力量的爆发回合，用多段与力量倍率收割。' },
       { name: '余烬', text: '与其他角色共享的余烬卡池。' },
     ],

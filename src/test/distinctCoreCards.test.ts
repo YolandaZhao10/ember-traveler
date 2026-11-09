@@ -89,17 +89,13 @@ describe('基础与通用卡牌的不同用途', () => {
     expect(result.player.hand).toHaveLength(up ? 3 : 2);
     expect(result.player.exhaust).toHaveLength(0);
   });
-  it.each([false, true])('篝火避难所消耗余烬建立持续防御，不再只是一次大格挡（升级=%s）', up => {
+  it.each([false, true])('篝火避难所每回合支付余烬维持防御（升级=%s）', up => {
     const cs = battle('bonfire_shelter', up); cs.player.ember = 5;
     const result = playCard(cs, 'bonfire_shelter', null).state;
-    expect(result.player.ember).toBe(0);
-    expect(result.player.energy).toBe(1);
-    expect(result.player.block).toBe(0);
-    expect(result.player.statuses.metallicize).toBe(up ? 11 : 8);
-    expect(result.player.statuses.regen).toBe(up ? 3 : 2);
+    expect(result.player.ember).toBe(5); expect(result.player.energy).toBe(2);
+    expect(result.player.block).toBe(0); expect(result.player.statuses.emberBastion).toBe(up ? 24 : 18);
     const ended = endPlayerTurn(result).state;
-    expect(ended.player.block).toBe(up ? 11 : 8);
-    expect(ended.player.hp).toBe(30 + (up ? 3 : 2));
-    expect(result.player.discard).toHaveLength(0);
+    expect(ended.player.block).toBe(up ? 24 : 18); expect(ended.player.ember).toBe(2);
+    expect(ended.player.hp).toBe(30); expect(result.player.discard).toHaveLength(0);
   });
 });

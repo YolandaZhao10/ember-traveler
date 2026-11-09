@@ -58,6 +58,10 @@ export type StatusId =
   | 'bloodDraw'
   | 'chargeMaster'
   | 'spentEmberDraw'
+  | 'bloodOath' | 'recoveryArmor' | 'temperedMight' | 'furyWard'
+  | 'vanguardCycle' | 'patientGuard' | 'drawNext'
+  | 'emberConduit' | 'ashRecall' | 'burningRelay' | 'sparkCrown'
+  | 'chargedEcho' | 'repriseStudy' | 'retainedWard' | 'emberBastion'
   | 'arcaneWard';
 
 export type Condition =
@@ -89,6 +93,7 @@ export type Effect =
   | { kind: 'blockPerHand'; amount: number; max: number }
   | { kind: 'consumeVulnerable'; damagePer: number; aoe?: boolean }
   | { kind: 'draw'; amount: number }
+  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge'; per: number; max: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number }

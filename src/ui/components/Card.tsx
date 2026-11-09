@@ -23,7 +23,7 @@ export function Card({ card, size = 'md', ctx = null, energy, unplayable, showFl
   const v = viewCard(card);
   const desc = describeCard(card, ctx);
   const notEnough = energy !== undefined && v.cost > energy;
-  const cls = ['card', v.type, `rarity-${v.rarity}`, size, v.upgraded ? 'upgraded' : '', unplayable ? 'unplayable' : ''].join(' ');
+  const cls = ['card', v.type, `rarity-${v.rarity}`, size, desc.length > (size === 'sm' ? 35 : 70) ? 'long-description' : '', v.upgraded ? 'upgraded' : '', unplayable ? 'unplayable' : ''].join(' ');
   return (
     <div className={cls} onClick={onClick} role={presentation ? undefined : 'button'} aria-label={presentation ? undefined : `${v.name}，${cardTypeName(v.type)}，费用 ${v.cost}`}>
       {v.type !== 'curse' && <div className={`cost ${notEnough ? 'notenough' : ''}`}>{v.cost}</div>}

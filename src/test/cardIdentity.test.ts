@@ -47,9 +47,9 @@ describe('卡牌效果身份与升级边界', () => {
   });
   it.each([false, true])('火葬与猩红护甲有立即收益，区别于升级后的低稀有度能力（升级=%s）', up => {
     const fire = play('cremation', up); const armor = play('crimson_mail', up);
-    expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 5 : 3, up ? 5 : 3]);
-    expect(fire.player.statuses.pyre).toBe(up ? 3 : 2);
-    expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.bloodArmor).toBe(up ? 6 : 4);
+    expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 21 : 14, up ? 21 : 14]);
+    expect(fire.player.statuses.burningRelay).toBe(up ? 6 : 4);
+    expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.recoveryArmor).toBe(up ? 18 : 12);
     expect(play('coal_heart', true).enemies[0].statuses.burn ?? 0).toBe(0);
     expect(play('blood_watch', true).player.block).toBe(0);
   });

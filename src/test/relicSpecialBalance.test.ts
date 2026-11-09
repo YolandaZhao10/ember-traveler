@@ -24,12 +24,12 @@ function enter(run: RunState, type: 'shop' | 'rest') {
 }
 
 describe('问号遗物的收益上限和独立用途', () => {
-  it('许愿余烬的四回合免费治疗不超过4，开场余烬不超过3', () => {
+  it('许愿余烬的治疗总量为10且四回合后耗尽，开场余烬不超过3', () => {
     let cs = battle(['wishing_cinder']);
     expect(cs.player.ember).toBeLessThanOrEqual(3);
     const initialHp = cs.player.hp;
     for (let turn = 0; turn < 4; turn++) cs = next(cs);
-    expect(cs.player.hp - initialHp).toBe(4);
+    expect(cs.player.hp - initialHp).toBe(10);
   });
 
   it('镜中残影在首回合结束才准备回响，不放大第一张攻击且不重复赠送', () => {

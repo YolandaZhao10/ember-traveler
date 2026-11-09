@@ -18,7 +18,7 @@ export function DiscardReplay({ cardUid }: { cardUid: string }) {
   const targeted = choice && viewCard(choice).target === 'enemy';
   const validTarget = !targeted || enemies.some(e => e.id === targetId);
   return <Modal title="血誓重演 · 选择要重放的牌" onClose={closeOverlay} wide>
-    <p className="subtitle">确认时支付 {viewCard(source).cost} 能量，并消耗血誓重演。所选牌免能量重放一次，其他代价照常支付，原牌不移动。不能选择能力、诅咒或重放牌。</p>
+    <p className="subtitle">确认时支付 {viewCard(source).cost} 能量，并消耗血誓重演。所选牌免能量重放一次，其他代价照常支付；结算后弃置，带消耗则消耗。不能选择能力、诅咒或重放牌。</p>
     <div className="replay-choices cardgrid">
       {choices.map(c => <button className={`replay-choice ${c.uid === choiceUid ? 'selected' : ''}`} key={c.uid} aria-label={`重放${viewCard(c).name}`} aria-pressed={c.uid === choiceUid} onClick={() => {
           setChoiceUid(c.uid);

@@ -1,6 +1,21 @@
 import type { StatusDef, StatusId } from '../engine/types';
 
 export const STATUSES: Record<StatusId, StatusDef> = {
+  emberBastion: { id: 'emberBastion', name: '燃料壁垒', kind: 'power', description: n => `每回合结束时，若至少有 3 点余烬，自动消耗 3 点并获得 ${n} 格挡；不足则不触发。` },
+  bloodOath: { id: 'bloodOath', name: '血色盟约', kind: 'power', description: n => `每回合生效后因卡牌累计失去至少 4 生命且存活时，回复 ${n} 生命（不超过本次累计失血）并获得 1 能量。每回合仅一次。` },
+  recoveryArmor: { id: 'recoveryArmor', name: '回生甲', kind: 'power', description: n => `每实际回复 1 生命获得 1 格挡，每回合最多 ${n} 格挡；满血时不触发。` },
+  temperedMight: { id: 'temperedMight', name: '淬血', kind: 'power', description: n => `每回合生效后打出第 2 张攻击牌时，将最多 ${n} 点已有临时力量转为永久力量。不会凭空获得力量。` },
+  furyWard: { id: 'furyWard', name: '怒铠', kind: 'power', description: n => `因卡牌获得临时力量时，获得其数值 2 倍的格挡，每回合最多 ${n} 格挡。` },
+  vanguardCycle: { id: 'vanguardCycle', name: '攻守轮替', kind: 'power', description: n => `生效后交替打出技能和攻击，每完成一对获得 ${n} 格挡并抽 1 张牌。每回合前 2 对生效，已配对的牌不重复使用。` },
+  patientGuard: { id: 'patientGuard', name: '守候', kind: 'power', description: n => `回合结束时，若仍有能量未使用，获得 ${n} 格挡且下回合多抽 2 张牌。` },
+  drawNext: { id: 'drawNext', name: '预备', kind: 'buff', description: n => `下回合开始时多抽 ${n} 张牌，然后移除此状态。` },
+  emberConduit: { id: 'emberConduit', name: '炉膛导流', kind: 'power', description: n => `每回合首次因一张牌实际消耗至少 3 点余烬时，对所有敌人施加 ${n} 层燃烧。` },
+  ashRecall: { id: 'ashRecall', name: '灰烬储备', kind: 'power', description: n => `每回合生效后第 2 次消耗时，获得 ${n} 格挡，并从消耗区取回 1 张费用最高的牌。每回合仅一次。` },
+  burningRelay: { id: 'burningRelay', name: '葬火传播', kind: 'power', description: n => `敌人死亡时，将其剩余燃烧（至少 ${n} 层）施加给所有其他敌人。每名死者仅触发一次。` },
+  sparkCrown: { id: 'sparkCrown', name: '火星加冕', kind: 'power', description: n => `每回合首次因卡牌实际消耗余烬时，获得等于此次消耗量的临时力量，最多 ${n} 点。` },
+  chargedEcho: { id: 'chargedEcho', name: '蓄音', kind: 'power', description: n => `每回合首张蓄力至少 2 的牌结算后，获得 ${n} 格挡和 1 层回响，留给下一张手动打出的牌。` },
+  repriseStudy: { id: 'repriseStudy', name: '重奏研习', kind: 'power', description: n => `每回合生效后实际完成第 2 次回响或镜像重放后，抽 ${n} 张牌并获得 1 能量。每回合仅一次。` },
+  retainedWard: { id: 'retainedWard', name: '星界护幕', kind: 'power', description: n => `每回合结束时，自动消耗手牌中蓄力最少的一张牌的 1 点蓄力：获得 ${n} 格挡并获得 1 层荆棘。只触发一次；无蓄力则不触发。` },
   spentEmberDraw: { id: 'spentEmberDraw', name: '长明', kind: 'power', description: n => `每回合首次因打出卡牌实际消耗余烬时，获得 ${n * 6} 点格挡并抽 ${n} 张牌。` },
   comboFlow: { id: 'comboFlow', name: '续势', kind: 'power', description: n => `每回合打出第 3 张攻击牌后，获得 ${n} 点能量。回响与镜像重放也计数。` },
   guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
@@ -116,7 +131,8 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     id: 'regen',
     name: '再生',
     kind: 'buff',
-    description: (n) => `每回合结束时回复 ${n} 点生命。`,
+    decays: true,
+    description: (n) => `每回合结束时回复 ${n} 点生命，然后再生减少 1 层；耗尽后停止治疗。`,
   },
   ashFeast: {
     id: 'ashFeast',
@@ -156,7 +172,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   },
   bloodArmor: {
     id: 'bloodArmor',
-    name: '猩红护甲',
+    name: '血甲',
     kind: 'power',
     description: (n) => `每当你失去生命时，获得 ${n} 点格挡。`,
   },
@@ -176,7 +192,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     id: 'echo',
     name: '回响',
     kind: 'buff',
-    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次，每次分别计入出牌次数，只支付一次能量。`,
+    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次，每次分别计入出牌次数，只支付一次能量；其他代价照付。余烬不足时跳过重放，本次回响机会仍消耗。`,
   },
   resonance: {
     id: 'resonance',

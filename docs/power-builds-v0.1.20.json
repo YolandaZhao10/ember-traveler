@@ -1,0 +1,1855 @@
+{
+  "note": "14张重做能力，配套合法支持牌，基础/升级×单体/群体/精英，每组8种子，同策略同牌序新旧对照。按单场胜率下降25个百分点/额外损血20%作严重退化护栏；仅用于部署与构筑收益检查，不是全局胜率。",
+  "fights": 1344,
+  "rows": [
+    {
+      "id": "vanguard_oath",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.05729166666666667,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.034722222222222224,
+        "turns": 3.875
+      }
+    },
+    {
+      "id": "vanguard_oath",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.3802083333333333,
+        "turns": 9.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.31423611111111116,
+        "turns": 7.625
+      }
+    },
+    {
+      "id": "vanguard_oath",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.32465277777777773,
+        "turns": 11.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.3454861111111111,
+        "turns": 8.25
+      }
+    },
+    {
+      "id": "vanguard_oath",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.017361111111111112,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.015625,
+        "turns": 3
+      }
+    },
+    {
+      "id": "vanguard_oath",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.03819444444444445,
+        "turns": 6
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.0920138888888889,
+        "turns": 5
+      }
+    },
+    {
+      "id": "vanguard_oath",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.10937499999999999,
+        "turns": 7.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.12152777777777779,
+        "turns": 5.625
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.008680555555555556,
+        "turns": 5.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.006944444444444444,
+        "turns": 5.375
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.1388888888888889,
+        "turns": 10
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.10243055555555555,
+        "turns": 8.75
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.14756944444444445,
+        "turns": 13
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.09895833333333331,
+        "turns": 10.625
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.005208333333333333,
+        "turns": 4.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.005208333333333333,
+        "turns": 4.375
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.012152777777777776,
+        "turns": 7.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.01909722222222222,
+        "turns": 6.5
+      }
+    },
+    {
+      "id": "long_road",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.050347222222222224,
+        "turns": 7.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.050347222222222224,
+        "turns": 7.625
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.0321969696969697,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.0321969696969697,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.11742424242424243,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.15340909090909088,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.2481060606060606,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.29166666666666663,
+        "turns": 3.875
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.03787878787878789,
+        "turns": 2.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.03787878787878789,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.007575757575757576,
+        "turns": 2.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.03598484848484848,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "cremation",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.23295454545454541,
+        "turns": 3.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.24810606060606055,
+        "turns": 3.5
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.10984848484848483,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.0928030303030303,
+        "turns": 3.25
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.3712121212121212,
+        "turns": 5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.38825757575757575,
+        "turns": 5
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.615530303030303,
+        "turns": 5.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.5189393939393939,
+        "turns": 4.875
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.045454545454545456,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.03787878787878789,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.18371212121212116,
+        "turns": 4.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.1496212121212121,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "undying_furnace",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.3503787878787879,
+        "turns": 4
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.3352272727272727,
+        "turns": 3.875
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.022727272727272728,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.005681818181818182,
+        "turns": 2
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.0909090909090909,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.026515151515151516,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.2234848484848485,
+        "turns": 5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.16098484848484848,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.005681818181818182,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.005681818181818182,
+        "turns": 1.875
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 3.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "ash_reserve",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.07575757575757576,
+        "turns": 4
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.0965909090909091,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": -0.004807692307692307,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": -0.017628205128205128,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.16987179487179488,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.07532051282051282,
+        "turns": 4.375
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.2548076923076923,
+        "turns": 5.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.14102564102564102,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": -0.016025641025641024,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": -0.014423076923076924,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.07211538461538461,
+        "turns": 4
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": -8.673617379884035e-19,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "crimson_covenant",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.06410256410256411,
+        "turns": 4.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.04967948717948718,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": -0.014423076923076924,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": -0.01282051282051282,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.08814102564102563,
+        "turns": 5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.09935897435897437,
+        "turns": 5.125
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.13942307692307693,
+        "turns": 6
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.10897435897435898,
+        "turns": 5.75
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": -0.014423076923076924,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": -0.004807692307692306,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.030448717948717948,
+        "turns": 4.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.030448717948717948,
+        "turns": 4.25
+      }
+    },
+    {
+      "id": "crimson_mail",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": -0.0016025641025641034,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.03365384615384615,
+        "turns": 5
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.0641025641025641,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.05769230769230769,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.18910256410256412,
+        "turns": 4.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.20673076923076925,
+        "turns": 4.125
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.32532051282051283,
+        "turns": 5.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.4310897435897436,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.041666666666666664,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.041666666666666664,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.06410256410256411,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.10576923076923077,
+        "turns": 3.5
+      }
+    },
+    {
+      "id": "war_avatar",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.16826923076923078,
+        "turns": 3.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.2932692307692307,
+        "turns": 4
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.09775641025641026,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.060897435897435896,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.2676282051282052,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.19871794871794873,
+        "turns": 4.875
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.4310897435897436,
+        "turns": 5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.36378205128205127,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.041666666666666664,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.041666666666666664,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.1330128205128205,
+        "turns": 3.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.07371794871794872,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "iron_blooded",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.2772435897435897,
+        "turns": 4
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.23557692307692304,
+        "turns": 4.25
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.004807692307692308,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.004807692307692308,
+        "turns": 3.25
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.07692307692307693,
+        "turns": 5.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.01201923076923077,
+        "turns": 4.25
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.11538461538461539,
+        "turns": 5.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.04326923076923077,
+        "turns": 4.375
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.009615384615384616,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.007211538461538462,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.014423076923076924,
+        "turns": 4.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "silent_prelude",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.05048076923076923,
+        "turns": 4.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.019230769230769232,
+        "turns": 4
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.09134615384615384,
+        "turns": 4.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.03365384615384615,
+        "turns": 4.25
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0.2620192307692308,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0.2620192307692308,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0.007211538461538462,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 0,
+        "hpLoss": 0.007211538461538462,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.014423076923076924,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.024038461538461536,
+        "turns": 3.5
+      }
+    },
+    {
+      "id": "living_manuscript",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.09375,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.10336538461538461,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.002403846153846154,
+        "turns": 3.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0,
+        "turns": 3.875
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.028846153846153848,
+        "turns": 6.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.004807692307692308,
+        "turns": 5.875
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.014423076923076924,
+        "turns": 6.375
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.007211538461538462,
+        "turns": 6
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 4.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "astral_shelter",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.002403846153846154,
+        "turns": 5.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0,
+        "turns": 5
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.03645833333333333,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.03819444444444445,
+        "turns": 3.875
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.2638888888888889,
+        "turns": 5.625
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.22569444444444448,
+        "turns": 5.375
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.42881944444444453,
+        "turns": 6.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 8,
+        "hpLoss": 0.35937500000000006,
+        "turns": 5.875
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.01909722222222222,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.01909722222222222,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.09722222222222222,
+        "turns": 4.5
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.08680555555555555,
+        "turns": 4.25
+      }
+    },
+    {
+      "id": "crown_of_sparks",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.21180555555555552,
+        "turns": 4.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 7,
+        "hpLoss": 0.19618055555555558,
+        "turns": 4.625
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": false,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.015625,
+        "turns": 3.25
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 1,
+        "hpLoss": 0.03819444444444445,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": false,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.19270833333333334,
+        "turns": 7
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.2465277777777778,
+        "turns": 6.5
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": false,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.3055555555555555,
+        "turns": 6.75
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 5,
+        "hpLoss": 0.4444444444444445,
+        "turns": 7.125
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": true,
+      "stage": "single",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.005208333333333333,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 2,
+        "hpLoss": 0.01909722222222222,
+        "turns": 3
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": true,
+      "stage": "group",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 3,
+        "hpLoss": 0.10590277777777778,
+        "turns": 4.875
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 6,
+        "hpLoss": 0.08159722222222222,
+        "turns": 5
+      }
+    },
+    {
+      "id": "bonfire_shelter",
+      "upgraded": true,
+      "stage": "elite",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.1111111111111111,
+        "turns": 4.125
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "plays": 4,
+        "hpLoss": 0.1440972222222222,
+        "turns": 4.625
+      }
+    }
+  ],
+  "failures": []
+}

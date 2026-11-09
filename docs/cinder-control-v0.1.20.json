@@ -1,0 +1,53 @@
+{
+  "seeds": 50,
+  "rows": [
+    {
+      "route": "cinder",
+      "stage": "early-single",
+      "seeds": 50,
+      "wins": 50,
+      "stalled": 0,
+      "invalid": 0,
+      "resourcePlays": 0,
+      "hpLoss": 0.02878787878787879,
+      "enemyLeft": 0,
+      "turns": 2.06
+    },
+    {
+      "route": "cinder",
+      "stage": "early-group",
+      "seeds": 50,
+      "wins": 50,
+      "stalled": 0,
+      "invalid": 0,
+      "resourcePlays": 0,
+      "hpLoss": 0.04303030303030303,
+      "enemyLeft": 0,
+      "turns": 2.64
+    },
+    {
+      "route": "cinder",
+      "stage": "sky_boss_archon",
+      "seeds": 50,
+      "wins": 32,
+      "stalled": 0,
+      "invalid": 0,
+      "resourcePlays": 0,
+      "hpLoss": 0.7537837837837839,
+      "enemyLeft": 0.07897233201581026,
+      "turns": 7.02
+    },
+    {
+      "route": "cinder",
+      "stage": "final_boss_lord",
+      "seeds": 50,
+      "wins": 1,
+      "stalled": 0,
+      "invalid": 0,
+      "resourcePlays": 0,
+      "hpLoss": 0.9986486486486487,
+      "enemyLeft": 0.3361147540983606,
+      "turns": 7.26
+    }
+  ]
+}

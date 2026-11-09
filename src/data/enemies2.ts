@@ -15,7 +15,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['spit', 'bite']),
   },
   {
-    id: 'furnace_drone', name: '铸铁傀儡', tier: 'normal', hp: [42, 48], sprite: 'furnace_drone',
+    id: 'furnace_drone', name: '铸铁傀儡', tier: 'normal', hp: [46, 52], sprite: 'furnace_drone',
     description: '撑起铁壳时排出冷灰，向弃牌堆塞入 1 张冷灰，干扰余烬积累；随后连续挥锤。',
     moves: [
       { id: 'shell', name: '排灰铁壳', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
@@ -25,7 +25,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['shell', 'hammer', 'pound']),
   },
   {
-    id: 'chain_guard', name: '锁链卫兵', tier: 'normal', hp: [46, 52], sprite: 'chain_guard',
+    id: 'chain_guard', name: '锁链卫兵', tier: 'normal', hp: [50, 57], sprite: 'chain_guard',
     description: '空甲由锁链牵引。束缚施加 2 层易伤，下一击尤其危险；收链时可以反攻。',
     moves: [
       { id: 'bind', name: '束缚', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
@@ -35,7 +35,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['bind', 'pull', 'coil']),
   },
   {
-    id: 'cinder_stoker', name: '添火侍从', tier: 'normal', hp: [34, 38], sprite: 'cinder_stoker',
+    id: 'cinder_stoker', name: '添火侍从', tier: 'normal', hp: [37, 42], sprite: 'cinder_stoker',
     description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张冷灰塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
@@ -45,7 +45,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),
   },
   {
-    id: 'soot_seer', name: '烟尘先知', tier: 'normal', hp: [38, 42], sprite: 'soot_seer',
+    id: 'soot_seer', name: '烟尘先知', tier: 'normal', hp: [42, 46], sprite: 'soot_seer',
     description: '从黑烟中预言炉心的苏醒。烟幕混入一张疑惧，接着攻击并使你虚弱。',
     moves: [
       { id: 'smoke', name: '烟幕', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
@@ -55,7 +55,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['smoke', 'gaze', 'flare']),
   },
   {
-    id: 'iron_hound', name: '铁颚猎兽', tier: 'normal', hp: [40, 46], sprite: 'iron_hound',
+    id: 'iron_hound', name: '铁颚猎兽', tier: 'normal', hp: [44, 50], sprite: 'iron_hound',
     description: '以齿轮为关节的猎兽。扑咬后蓄力，下次连咬会更疼。',
     moves: [
       { id: 'pounce', name: '扑咬', intent: 'attack', actions: [{ kind: 'attack', amount: 10 }] },
@@ -65,7 +65,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['pounce', 'coil', 'maul']),
   },
   {
-    id: 'forge_knight', name: '锻炉骑士', tier: 'elite', hp: [101, 109], sprite: 'forge_knight',
+    id: 'forge_knight', name: '锻炉骑士', tier: 'elite', hp: [107, 115], sprite: 'forge_knight',
     description: '护甲尚未冷却的骑士。开场有 2 层荆棘；格挡、重斩、连斩依次循环。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
@@ -86,7 +86,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     chooseMove: ctx => cycle(ctx, ['order', 'rod', 'guard']),
   },
   {
-    id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [113, 122], sprite: 'slag_colossus',
+    id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [119, 129], sprite: 'slag_colossus',
     description: '熔渣凝结成的重型躯壳。积蓄力量后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
     moves: [
       { id: 'gather', name: '聚渣', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },

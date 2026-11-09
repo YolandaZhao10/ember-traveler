@@ -1,3 +1,4 @@
+import { convertResource, conversionText } from './resourceConversion';
 import { RELIC_TUNING as T } from '../data/relicBalance';
 import { EMBER_MAX } from './constants';
 import { CARDS } from '../data/cards';
@@ -147,7 +148,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
   // 同一张牌先增力量再攻击时，后续数字要使用增长后的力量；预览不能修改战斗。
   if (ctx) ctx = {
     ...ctx,
-    player: { ...ctx.player, statuses: { ...ctx.player.statuses }, turnFlags: { ...ctx.player.turnFlags } },
+    player: { ...ctx.player, hand: ctx.player.hand.map(c => ({ ...c })), statuses: { ...ctx.player.statuses }, turnFlags: { ...ctx.player.turnFlags } },
     target: ctx.target ? { ...ctx.target, statuses: { ...ctx.target.statuses } } : null,
   };
   const previewStrength = (amount: number) => {
@@ -157,6 +158,20 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       amount++;
     }
     ctx.player.statuses.strength = (ctx.player.statuses.strength ?? 0) + amount;
+  };
+  const previewEmberSpend = (amount: number) => {
+    if (!ctx) return;
+    const spent = Math.min(ctx.player.ember, amount);
+    ctx.player.ember -= spent;
+    if (spent <= 0) return;
+    if (ctx.player.statuses.sparkCrown && !ctx.player.turnFlags.sparkCrown) {
+      ctx.player.turnFlags.sparkCrown = 1;
+      previewStrength(Math.min(spent, ctx.player.statuses.sparkCrown));
+    }
+    if (spent >= 3 && ctx.player.statuses.emberConduit && !ctx.player.turnFlags.emberConduit) {
+      ctx.player.turnFlags.emberConduit = 1;
+      if (ctx.target) ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) + ctx.player.statuses.emberConduit;
+    }
   };
   const parts: string[] = [];
   const chargeDmg = view?.charge?.damage ? view.charge.damage * view.bonus : 0;
@@ -253,6 +268,11 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`移除${e.aoe ? '所有敌人' : '目标'}的全部易伤，每层造成 ${e.damagePer} 点基础伤害（移除后结算攻击修正）`);
         if (ctx?.target) delete ctx.target.statuses.vulnerable;
         break;
+      case 'convertResource': {
+        const earned = ctx ? convertResource(ctx.player, ctx.target, e) : null;
+        parts.push(conversionText(e) + (earned === null ? '' : `（当前 ${earned}）`));
+        break;
+      }
       case 'draw':
         parts.push(`抽 ${e.amount} 张牌`);
         break;
@@ -266,10 +286,15 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (e.amount >= 0) {
           const bonus = ctx && ctx.relics.includes('ash_hourglass') ? 1 : 0;
           parts.push(`获得 ${e.amount + bonus} 点余烬`);
-        } else parts.push(`消耗 ${-e.amount} 点余烬`);
+          if (ctx) ctx.player.ember = Math.min(EMBER_MAX, ctx.player.ember + e.amount + bonus);
+        } else {
+          parts.push(`消耗 ${-e.amount} 点余烬`);
+          previewEmberSpend(-e.amount);
+        }
         break;
       case 'emberBurst': {
         const spend = emberSpendAmount(ctx);
+        if (ctx) previewEmberSpend(ctx.player.ember);
         const segs: string[] = [];
         if (e.damagePer) {
           const t = e.aoe ? '对所有敌人' : '';
@@ -289,7 +314,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (STATUSES[e.status].kind === 'power' && e.target === 'self') {
           parts.push(STATUSES[e.status].description(e.amount).replace(/。$/, ''));
         } else if (e.target === 'self') {
-          parts.push(`获得 ${e.amount} 层${name}`);
+          parts.push(`获得 ${e.amount} 层${name}${e.status === 'regen' ? '（回合末治疗后减少1层）' : ''}`);
         } else {
           parts.push(`${tgt}施加 ${e.amount} 层${name}`);
         }
@@ -350,7 +375,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (ctx?.target && e.target !== 'self' && e.status === 'burn') ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
         break;
       case 'replayDiscard':
-        parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放牌；其他代价照常支付，原牌不移动）');
+        parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放牌；其他代价照付，原牌结算后弃置或消耗）');
         break;
       case 'returnExhausted':
         parts.push(e.selection === 'highestCost'

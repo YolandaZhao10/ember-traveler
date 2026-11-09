@@ -65,23 +65,23 @@ describe('扩展卡池与遗物配额', () => {
       expect(run.shop!.cards).toHaveLength(10);
     }
   });
-  it.each(characters)('%s 专属牌配额含血誓重演新增的罕见牌，初始牌另计', owner => {
+  it.each(characters)('%s 专属牌配额含两张资源牌与血誓重演，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(cards.filter(c => c.rarity === rarity)).toHaveLength(count + (owner === 'oathbound' && rarity === 'uncommon' ? 1 : 0));
+    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(cards.filter(c => c.rarity === rarity)).toHaveLength(count + (rarity === 'uncommon' ? (owner === 'oathbound' ? 3 : 2) : 0));
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
-  it('通用牌恰好普通20、罕见18、稀有15；初始和诅咒另计，四角色都能获得', () => {
+  it('通用牌普通22、罕见18、稀有15；初始和诅咒另计，四角色都能获得', () => {
     const shared = CARD_LIST.filter(c => !c.owner);
-    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
+    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count + (rarity === 'common' ? 2 : 0));
     expect(shared.filter(c => c.rarity === 'starter')).toHaveLength(3);
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
   });
-  it('卡牌283张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(283); expect(EXTRA_CHARACTER_CARDS).toHaveLength(144); expect(EXTRA_SHARED_CARDS).toHaveLength(39);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(283);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(283);
+  it('卡牌293张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(293); expect(EXTRA_CHARACTER_CARDS).toHaveLength(152); expect(EXTRA_SHARED_CARDS).toHaveLength(41);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(293);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(293);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);

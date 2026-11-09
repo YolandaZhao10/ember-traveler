@@ -1,0 +1,128 @@
+{
+  "note": "已部署能力的极端资源循环压力，不是正常通关率。前四组使用各角色可获得牌；第五组刻意跨角色，属于不可自然取得的上界。24策略种子，基础/升级，各12回合；每回合200次手动操作护栏，包含弃牌选择、回响、消耗回收和实际治疗。两牌组合另枚举。未穷尽任意多牌策略。",
+  "pairs": 16770,
+  "pairMax": 11,
+  "rows": [
+    {
+      "scenario": "traveler",
+      "upgraded": false,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 2806,
+      "replays": 0,
+      "maxTurnPlays": 24,
+      "maxHeal": 32,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "traveler",
+      "upgraded": true,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 3529,
+      "replays": 0,
+      "maxTurnPlays": 41,
+      "maxHeal": 48,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "blood",
+      "upgraded": false,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 3770,
+      "replays": 154,
+      "maxTurnPlays": 26,
+      "maxHeal": 207,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "blood",
+      "upgraded": true,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 4745,
+      "replays": 200,
+      "maxTurnPlays": 54,
+      "maxHeal": 239,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "ash",
+      "upgraded": false,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 3116,
+      "replays": 0,
+      "maxTurnPlays": 27,
+      "maxHeal": 40,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "ash",
+      "upgraded": true,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 4069,
+      "replays": 0,
+      "maxTurnPlays": 40,
+      "maxHeal": 72,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "echo",
+      "upgraded": false,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 2774,
+      "replays": 0,
+      "maxTurnPlays": 23,
+      "maxHeal": 36,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "echo",
+      "upgraded": true,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 3514,
+      "replays": 0,
+      "maxTurnPlays": 30,
+      "maxHeal": 66,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "cross-character-upper-bound",
+      "upgraded": false,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 4935,
+      "replays": 398,
+      "maxTurnPlays": 46,
+      "maxHeal": 84,
+      "invalid": 0,
+      "limitHits": 0
+    },
+    {
+      "scenario": "cross-character-upper-bound",
+      "upgraded": true,
+      "seeds": 24,
+      "turns": 12,
+      "actions": 6007,
+      "replays": 284,
+      "maxTurnPlays": 71,
+      "maxHeal": 121,
+      "invalid": 0,
+      "limitHits": 0
+    }
+  ],
+  "failures": []
+}

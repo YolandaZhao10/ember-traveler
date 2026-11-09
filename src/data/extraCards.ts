@@ -63,13 +63,13 @@ add('traveler', 'rare', [
   A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 2))], { target: 'all_enemies' }),
   A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(2), hit(12))], [hit(26), when(attacks(2), hit(16))]),
   S('unbroken_stride', '不息步伐', 'combo', 0, [draw(2), when(attacks(3), status('echo', 1))], [draw(3), when(attacks(3), status('echo', 1))], { exhaust: true }),
-  P('vanguard_oath', '先锋誓言', 'combo', 2, [status('strength', 3), status('tempo', 1)], [status('strength', 4), status('tempo', 2)]),
+  P('vanguard_oath', '先锋誓言', 'combo', 2, [status('vanguardCycle', 4)], [status('vanguardCycle', 6)]),
   A('encircling_blades', '环刃', 'combo', 1, [hit(3, { times: 4 }), when(attacks(2), status('energyNext', 1))], [hit(4, { times: 4 }), when(attacks(2), status('energyNext', 2))]),
   P('steadfast_guard', '不动阵地', 'bulwark', 2, [status('metallicize', 6), status('thorns', 4)], [status('metallicize', 8), status('thorns', 5)]),
   S('bastion_oath', '壁垒誓约', 'bulwark', 2, [block(18), status('barricade', 1)], [block(24), status('barricade', 1)], { exhaust: true }),
   A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock', bonus: 6, mult: 2 }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 10, mult: 2 }, status('weak', 3, 'target')]),
   S('lantern_shelter', '灯下庇护', 'bulwark', 1, [ember(-3), { kind: 'clearDebuffs' }, block(20)], [ember(-3), { kind: 'clearDebuffs' }, block(28)], { requireEmber: 3, retain: true }),
-  P('long_road', '漫长守望', 'bulwark', 2, [status('study', 1), status('metallicize', 4)], [status('study', 1), status('metallicize', 6)]),
+  P('long_road', '漫长守望', 'bulwark', 2, [status('patientGuard', 8)], [status('patientGuard', 11)]),
   A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(2), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(2), status('energyNext', 2))], { target: 'all_enemies' }),
 ]);
 
@@ -108,8 +108,8 @@ add('picker', 'rare', [
   A('funeral_pyre', '送葬火炬', 'cinder', 2, [{ kind: 'consumeBurn', damagePer: 4 }, hit(14), status('burn', 5, 'target')], [{ kind: 'consumeBurn', damagePer: 5 }, hit(18), status('burn', 7, 'target')]),
   S('choking_embers', '窒息余火', 'cinder', 2, [status('burn', 6, 'all'), status('weak', 2, 'all'), status('frail', 2, 'all')], [status('burn', 8, 'all'), status('weak', 3, 'all'), status('frail', 3, 'all')]),
   S('white_hot', '白热', 'cinder', 1, [{ kind: 'burnToEmber', amount: 1, max: 10 }, energy(1), draw(2)], [{ kind: 'burnToEmber', amount: 1, max: 14 }, energy(1), draw(3)], { target: 'enemy', exhaust: true }),
-  P('undying_furnace', '不息炉膛', 'cinder', 2, [status('pyre', 2), status('emberHeart', 1)], [status('pyre', 3), status('emberHeart', 1)]),
-  P('ash_reserve', '灰烬储备', 'ash', 2, [status('ashFeast', 6), status('kindling', 8)], [status('ashFeast', 8), status('kindling', 12)]),
+  P('undying_furnace', '不息炉膛', 'cinder', 2, [status('emberConduit', 6)], [status('emberConduit', 9)]),
+  P('ash_reserve', '灰烬储备', 'ash', 1, [block(8), status('ashRecall', 8)], [block(12), status('ashRecall', 12)]),
   S('last_salvage', '终末打捞', 'ash', 1, [recover(3), block(10), status('energyNext', 1)], [recover(4), block(14), status('energyNext', 2)], { exhaust: true }),
   S('phoenix_breath', '灰中复苏', 'ash', 1, [exhaust(2), { kind: 'heal', amount: 12 }], [exhaust(2), { kind: 'heal', amount: 16 }], { exhaust: true }),
   A('ash_storm', '灰暴', 'ash', 2, [hit(16, { aoe: true }), exhaust(1), draw(2)], [hit(22, { aoe: true }), exhaust(1), draw(3)], { target: 'all_enemies', exhaust: true }),
@@ -149,18 +149,18 @@ add('oathbound', 'uncommon', [
   S('unshaken', '岿然', 'might', 1, [{ kind: 'clearDebuffs' }, block(9)], [{ kind: 'clearDebuffs' }, block(13)], { exhaust: true }),
 ]);
 add('oathbound', 'rare', [
-  S('oath_renewal', '誓血回生', 'blood', 1, [lose(4), status('regen', 3)], [lose(4), status('regen', 5)], { exhaust: true }),
+  S('oath_renewal', '誓血回生', 'blood', 1, [lose(4), status('regen', 5)], [lose(4), status('regen', 6)], { exhaust: true }),
   A('scarlet_harvest', '猩红收割', 'blood', 2, [hit(9, { aoe: true, lifesteal: true }), when(wounded, status('regen', 2))], [hit(13, { aoe: true, lifesteal: true }), when(wounded, status('regen', 3))], { target: 'all_enemies', exhaust: true }),
   S('final_offering', '最后献礼', 'blood', 0, [lose(4), { kind: 'discardRandom', count: 'all' }, draw(5)], [lose(3), { kind: 'discardRandom', count: 'all' }, draw(6)], { exhaust: true }),
-  P('crimson_covenant', '血色盟约', 'blood', 2, [status('bloodRage', 2), status('bloodArmor', 3)], [status('bloodRage', 3), status('bloodArmor', 4)]),
+  P('crimson_covenant', '血色盟约', 'blood', 1, [status('bloodOath', 2)], [status('bloodOath', 3)]),
   A('oath_judgement', '誓约裁决', 'blood', 2, [lose(3), hit(14), { kind: 'damagePerHpLost', mult: 4 }], [lose(3), hit(20), { kind: 'damagePerHpLost', mult: 5 }]),
   S('redoubt_of_blood', '血筑堡垒', 'blood', 2, [lose(4), block(24), status('barricade', 1)], [lose(4), block(30), status('barricade', 1)], { exhaust: true }),
   A('mountain_splitter', '断岳', 'might', 2, [{ kind: 'doubleStatus', status: 'strength', target: 'self' }, hit(12, { strengthMult: 1 })], [{ kind: 'doubleStatus', status: 'strength', target: 'self' }, hit(16, { strengthMult: 1 })], { exhaust: true }),
   A('titan_blows', '巨人连击', 'might', 3, [strength(2), hit(5, { times: 4 }), status('weak', 1, 'target')], [strength(3), hit(7, { times: 4 }), status('weak', 2, 'target')]),
-  P('war_avatar', '战意化身', 'might', 2, [status('strength', 4), status('thorns', 4)], [status('strength', 5), status('thorns', 5)]),
+  P('war_avatar', '战意化身', 'might', 1, [status('furyWard', 12)], [status('furyWard', 18)]),
   S('unstoppable_rage', '不可阻挡', 'might', 1, [lose(3), strength(6), draw(2)], [lose(3), strength(8), draw(3)], { exhaust: true }),
   A('earthbreaker', '撼地', 'might', 2, [hit(15, { strengthMult: 1, aoe: true }), status('weak', 2, 'all')], [hit(20, { strengthMult: 1, aoe: true }), status('weak', 3, 'all')], { target: 'all_enemies' }),
-  P('iron_blooded', '铁血', 'might', 2, [status('demonHeart', 1), status('metallicize', 5)], [status('demonHeart', 2), status('metallicize', 7)], { upgradeCost: 2 }),
+  P('iron_blooded', '铁血', 'might', 2, [status('temperedMight', 2)], [status('temperedMight', 3)]),
 ]);
 
 // 灰语学者：回响放大组合牌，保留蓄力牌提供跨回合规划。
@@ -195,15 +195,36 @@ add('scholar', 'uncommon', [
   P('quiet_observatory', '寂静观测', 'focus', 1, [status('arcaneWard', 1), status('metallicize', 4)], [status('arcaneWard', 2), status('metallicize', 5)]),
 ]);
 add('scholar', 'rare', [
-  P('silent_prelude', '寂静序曲', 'echo', 2, [status('resonance', 1), status('arcaneWard', 2)], [status('resonance', 1), status('arcaneWard', 3)], { upgradeCost: 2 }),
+  P('silent_prelude', '寂静序曲', 'echo', 2, [status('chargedEcho', 6)], [status('chargedEcho', 9)]),
   A('endless_sentence', '长句终结', 'echo', 2, [hit(5, { times: 3 }), when(echo, draw(2))], [hit(7, { times: 3 }), when(echo, draw(3))]),
   S('grand_recitation', '宏大咏唱', 'echo', 1, [draw(3), ember(3), status('echo', 1)], [draw(4), ember(4), status('echo', 1)], { exhaust: true }),
   A('shattered_chorus', '破碎合唱', 'echo', 2, [{ kind: 'consumeVulnerable', damagePer: 6, aoe: true }, hit(18, { aoe: true })], [{ kind: 'consumeVulnerable', damagePer: 8, aoe: true }, hit(26, { aoe: true })], { target: 'all_enemies' }),
-  P('living_manuscript', '活页秘典', 'echo', 3, [status('resonance', 1), status('study', 1)], [status('resonance', 1), status('study', 1)], { upgradeCost: 2 }),
+  P('living_manuscript', '活页秘典', 'echo', 2, [status('repriseStudy', 2)], [status('repriseStudy', 3)]),
   A('falling_stars', '群星坠落', 'focus', 2, [hit(14, { aoe: true }), status('vulnerable', 2, 'all'), status('energyNext', 1)], [hit(18, { aoe: true }), status('vulnerable', 3, 'all'), status('energyNext', 1)], { target: 'all_enemies', retain: true, charge: { damage: 3 } }),
   S('timeless_ward', '恒久护印', 'focus', 1, [block(16), status('energyNext', 2)], [block(22), status('energyNext', 3)], { retain: true, charge: { block: 3 }, exhaust: true }),
   S('future_memory', '未来记忆', 'focus', 0, [draw(2), { kind: 'chargeHand', amount: 2 }], [draw(3), { kind: 'chargeHand', amount: 3 }], { retain: true, exhaust: true }),
   A('singularity', '归一', 'focus', 2, [hit(18, { perHandCard: 3 }), { kind: 'discardRandom', count: 'all' }], [hit(24, { perHandCard: 4 }), { kind: 'discardRandom', count: 'all' }], { retain: true, charge: { damage: 4 } }),
-  P('astral_shelter', '星界庇护', 'focus', 2, [status('arcaneWard', 4), status('dexterity', 2)], [status('arcaneWard', 5), status('dexterity', 3)]),
+  P('astral_shelter', '星界庇护', 'focus', 2, [status('retainedWard', 6)], [status('retainedWard', 9)]),
   S('sealed_sanctuary', '封印圣所', 'focus', 2, [block(22), status('regen', 3)], [block(28), status('regen', 4)], { retain: true, exhaust: true }),
+]);
+
+
+// 角色资源转换：真实支付护甲/燃烧/临时力量/蓄力，或核销本回合计数。
+// 计数兑换不改变连击等原有触发，且不会因回响、重放或回收重复核销。
+const convert = (resource: Extract<Effect, { kind: 'convertResource' }>['resource'], per: number, max: number, reward: 'draw' | 'energy'): Effect => ({ kind: 'convertResource', resource, per, max, reward });
+add('traveler', 'uncommon', [
+  S('trail_supply', '战途补给', 'combo', 0, [convert('attacks', 1, 2, 'draw')], [convert('attacks', 1, 3, 'draw')], { exhaust: true }),
+  S('unburden_armor', '卸甲疾行', 'bulwark', 0, [convert('block', 10, 2, 'energy')], [convert('block', 10, 3, 'energy')], { exhaust: true }),
+]);
+add('picker', 'uncommon', [
+  S('ash_index', '灰中索引', 'ash', 0, [convert('exhausts', 1, 3, 'draw')], [convert('exhausts', 1, 4, 'draw')], { exhaust: true }),
+  S('borrow_flame', '借火鼓风', 'cinder', 0, [convert('burn', 4, 2, 'energy')], [convert('burn', 4, 3, 'energy')], { target: 'enemy', exhaust: true }),
+]);
+add('oathbound', 'uncommon', [
+  S('pulse_memory', '回脉忆战', 'blood', 0, [convert('healing', 2, 3, 'draw')], [convert('healing', 2, 4, 'draw')], { exhaust: true }),
+  S('borrow_fury', '借怒', 'might', 0, [convert('tempStrength', 2, 2, 'energy')], [convert('tempStrength', 2, 3, 'energy')], { exhaust: true }),
+]);
+add('scholar', 'uncommon', [
+  S('echo_footnotes', '回声批注', 'echo', 0, [convert('echoes', 1, 3, 'draw')], [convert('echoes', 1, 4, 'draw')], { exhaust: true }),
+  S('release_charge', '释能演算', 'focus', 0, [convert('charge', 2, 2, 'energy')], [convert('charge', 2, 3, 'energy')], { exhaust: true }),
 ]);

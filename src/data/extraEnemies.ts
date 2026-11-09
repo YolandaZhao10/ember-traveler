@@ -35,7 +35,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['knock', 'mend', 'ash']),
   },
   {
-    id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [50, 57], sprite: 'pressure_boiler',
+    id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [54, 62], sprite: 'pressure_boiler',
     description: '加压获得8格挡与2力量，喷汽后移除这2力量并自损5生命（不会自杀）；冷却时轻击并暴露2层易伤。爆发后是反攻窗口。',
     moves: [
       { id: 'pressure', name: '封阀加压', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
@@ -44,7 +44,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['pressure', 'vent', 'cool']),
   },
   {
-    id: 'quench_smith', name: '淬火匠', tier: 'normal', hp: [40, 46], sprite: 'quench_smith',
+    id: 'quench_smith', name: '淬火匠', tier: 'normal', hp: [44, 50], sprite: 'quench_smith',
     description: '交替锤击与护身锤。选招时若正在燃烧，会改为淬火：净化自身并获得6格挡，两次淬火之间至少两次其他行动。可在淬火后重新点燃。',
     moves: [
       { id: 'hammer', name: '锻打', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
@@ -54,7 +54,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
       ? 'quench' : last(c) === 'hammer' ? 'guard' : 'hammer',
   },
   {
-    id: 'slag_saw', name: '炉轨锯轮', tier: 'normal', hp: [42, 48], sprite: 'slag_saw',
+    id: 'slag_saw', name: '炉轨锯轮', tier: 'normal', hp: [46, 52], sprite: 'slag_saw',
     description: '首回合冲轨三切每段4点基础伤害，仅使用一次；三连试切后磨齿增加2力量，再发动五连锯，随后移除这2力量。卡齿回合只防御并使自身虚弱，荆棘与减伤能克制密集连击。',
     moves: [
       { id: 'opening', name: '冲轨三切', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }] },
@@ -65,7 +65,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : cycle(c, ['cut', 'sharpen', 'saw', 'jam']),
   },
   {
-    id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [52, 58], sprite: 'sealed_archivist',
+    id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [59, 65], sprite: 'sealed_archivist',
     description: '仅开场行动塞入1张会保留的重负（只限本场），随后斩页、封书防护、双刃轮换。弃置或消耗重负可解放手牌空间。',
     moves: [
       { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
@@ -75,7 +75,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => c.enemy.turn === 0 ? 'seal' : ['cut', 'close', 'twins'][(c.enemy.turn - 1) % 3],
   },
   {
-    id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [49, 56], sprite: 'phase_lancer',
+    id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [55, 63], sprite: 'phase_lancer',
     description: '锁定时自身获得2层易伤，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，可趁锁定回合击杀或削弱。',
     moves: [
       { id: 'lock', name: '裂隙锁定', intent: 'special', actions: [{ kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
@@ -84,7 +84,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['lock', 'pierce', 'sweep']),
   },
   {
-    id: 'orbit_gambler', name: '逆轨棋士', tier: 'normal', hp: [56, 63], sprite: 'orbit_gambler',
+    id: 'orbit_gambler', name: '逆轨棋士', tier: 'normal', hp: [63, 71], sprite: 'orbit_gambler',
     description: '落子回合只获得8格挡。之后选招时，若你的格挡至少10就准备15伤害破阵并施加脆弱，否则准备三连击；不会随你本回合出牌改变已显示的意图。',
     moves: [
       { id: 'place', name: '布下星局', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },

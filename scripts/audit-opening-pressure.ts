@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CHARACTERS } from '../src/data/characters';
 import { ENCOUNTERS, ENEMIES } from '../src/data/enemies';
@@ -24,11 +24,11 @@ const early: Record<string, string[]> = {
   focus: ['charged_blade','focus','measured_breath','surge_glyph','delayed_thrust','patient_study'],
 };
 // 同章、同层、同遭遇比较新旧定义，牌组、初始状态和随机序列保持相同。
-const cases: [string, string, number][] = args.includes('--chapters')
-  ? ENCOUNTERS.filter(e => e.chapter === 2 || e.chapter === 3).flatMap(e => {
-    const depths = e.tier === 'boss' ? [19] : e.tier === 'elite' ? [4, 11, 17]
+const cases: [string, string, number][] = (args.includes('--chapters') || args.includes('--late-game') || args.includes('--all-chapters'))
+  ? ENCOUNTERS.filter(e => args.includes('--all-chapters') || (args.includes('--late-game') ? e.chapter === 3 || e.chapter === 4 : e.chapter === 2 || e.chapter === 3)).flatMap(e => {
+    const depths = e.chapter === 4 ? [e.tier === 'boss' ? 4 : 1] : e.tier === 'boss' ? [19] : e.tier === 'elite' ? [4, 11, 17]
       : [...new Set([e.minFloor ?? 0, Math.min(e.maxFloor ?? 17, 17)])];
-    return depths.map(d => [e.id, e.id, (e.chapter! - 1) * 20 + d] as [string, string, number]);
+    return depths.map(d => [e.id, e.id, ((e.chapter ?? 1) - 1) * 20 + d] as [string, string, number]);
   }) : [
   ['alley_duel','alley_duel',3], ['lamplit_patrol','lamplit_patrol',10],
   ['deep_saw_track','deep_saw_track',21], ['deep_saw_ticks','deep_saw_ticks',28],
@@ -36,12 +36,13 @@ const cases: [string, string, number][] = args.includes('--chapters')
   ['sky_boss_archon','sky_boss_archon',59], ['final_boss_lord','final_boss_lord',64],
 ];
 const baselineDir = value('--baseline-dir');
-if (!baselineDir) throw new Error('需要 --baseline-dir，包含前一版本的四个敌人模块');
+if (!baselineDir && !value('--stats-baseline')) throw new Error('需要 --baseline-dir，包含前一版本的四个敌人模块');
 const current = { ...ENEMIES }, old = { ...ENEMIES };
-for (const [file, key] of [['enemies2-before-openers.ts','CHAPTER_TWO_ENEMIES'],['enemies3-before-openers.ts','CHAPTER_THREE_ENEMIES'],['enemies4-before-openers.ts','CHAPTER_FOUR_ENEMIES'],['extraEnemies-before-openers.ts','EXTRA_ENEMIES']]) {
+if (baselineDir) for (const [file, key] of [['enemies2-before-openers.ts','CHAPTER_TWO_ENEMIES'],['enemies3-before-openers.ts','CHAPTER_THREE_ENEMIES'],['enemies4-before-openers.ts','CHAPTER_FOUR_ENEMIES'],['extraEnemies-before-openers.ts','EXTRA_ENEMIES']]) {
   const module = await import(resolve(baselineDir, file));
   for (const enemy of module[key]) old[enemy.id] = enemy;
 }
+if (value('--stats-baseline')) for (const [id, stats] of Object.entries(JSON.parse(readFileSync(value('--stats-baseline')!, 'utf8')))) old[id] = { ...current[id], ...(stats as object) };
 function fight(cs: CombatState) {
   const hp = cs.player.hp; let actions = 0, invalid = false;
   const trace: unknown[] = [];
@@ -54,16 +55,22 @@ function fight(cs: CombatState) {
   }
   return { won: cs.outcome === 'won', stalled: cs.outcome === 'ongoing', invalid, turns: cs.turn, hpLoss: (hp - cs.player.hp) / hp, ...(args.includes('--trace') ? {trace} : {}) };
 }
-const rows = [];
+const rows: { id:string; reference:string; floor:number; route:string; seeds:number; candidate:{wins:number;stalled:number;invalid:number;hpLoss:number;turns:number}; control:{wins:number;stalled:number;invalid:number;hpLoss:number;turns:number} }[] = [];
+if (value('--reuse')) {
+  if (!value('--encounter') && !value('--route')) throw new Error('--reuse 必须限定重跑遭遇或路线');
+  const prior = JSON.parse(readFileSync(value('--reuse')!, 'utf8'));
+  if (prior.seeds !== seeds) throw new Error('不能混合不同种子数');
+  rows.push(...prior.rows.filter((r:typeof rows[number]) => !((!value('--encounter') || value('--encounter')!.split(',').includes(r.id)) && (!value('--route') || value('--route') === r.route))));
+}
 for (const [id, reference, floor] of cases) for (const build of BUILD_LOADOUTS) {
   if (value('--route') && value('--route') !== build.route || value('--encounter') && !value('--encounter')!.split(',').includes(id)) continue;
   const ch = CHARACTERS[build.character], chapter = Math.floor(floor / 20) + 1;
-  const ids = ['strike','strike','defend','defend',...ch.starterDeck.slice(-2),...(chapter === 1 ? early[build.route] : build.cards)];
+  const ids = ['strike','strike','defend','defend',...ch.starterDeck.slice(-2),...(chapter === 1 && floor < 12 ? early[build.route] : build.cards)];
   // 第二章仅取一件前章奖励和两件常规遗物，第三章再加第二章奖励；不提前给第三章奖励。
-  const relics = [ch.starterRelic, ...(chapter === 4 ? build.relics : chapter === 3 ? build.relics.filter(id => RELICS[id].chapter !== 3) : chapter === 2 ? [build.relics[0], ...build.relics.slice(2,4)] : [])];
+  const relics = [ch.starterRelic, ...(chapter === 4 ? build.relics : chapter === 3 ? build.relics.filter(id => RELICS[id].chapter !== 3) : chapter === 2 ? [build.relics[0], ...build.relics.slice(2,4)] : floor >= 12 ? build.relics.slice(2,4) : [])];
   const growth = relics.reduce((n,id) => n + (RELICS[id].journey ?? []).filter(r => r.trigger === 'obtain').flatMap(r => r.effects).reduce((s,e) => s + (e.kind === 'maxHp' ? e.amount : 0),0),0);
   const hp = ch.maxHp + growth;
-  const deck = ids.map((defId,i) => ({uid:`new-enemy-${i}`,defId,upgraded: chapter >= 3 ? i >= 6 : chapter === 2 && i >= 6 && i < 10}));
+  const deck = ids.map((defId,i) => ({uid:`new-enemy-${i}`,defId,upgraded: chapter >= 3 ? i >= 6 : (chapter === 2 || chapter === 1 && floor >= 12) && i >= 6 && i < 10}));
   const sample = (encounterId: string, baseline: boolean) => {
     Object.assign(ENEMIES, baseline ? old : current);
     const encounter = ENCOUNTERS.find(e => e.id === encounterId)!;
@@ -85,19 +92,19 @@ for (const chapter of [1,2,3,4]) for (const build of BUILD_LOADOUTS) {
   if (mean('candidate','wins') / seeds < mean('control','wins') / seeds - .25 || mean('candidate','hpLoss') > mean('control','hpLoss') + .25)
     failures.push(`第${chapter}章/${build.route}:同场景加强幅度超过护栏`);
 }
-if (args.includes('--chapters')) for (const row of rows) {
+if (args.includes('--chapters') || args.includes('--late-game') || args.includes('--all-chapters')) for (const row of rows) {
   const limit = row.floor < 40 ? .20 : .25;
   if (row.candidate.wins < row.control.wins - seeds * limit || row.candidate.hpLoss > row.control.hpLoss + limit)
     failures.push(`${row.id}/${row.floor + 1}层/${row.route}:单场景加强幅度超过护栏`);
 }
-for (const row of rows.filter(r => r.id === 'sky_boss_archon')) {
-  if (row.candidate.wins < row.control.wins - seeds * .25 || row.candidate.hpLoss > row.control.hpLoss + .25 || row.control.wins > 0 && row.candidate.wins === 0) failures.push(`第三章首领/${row.route}:单独压力护栏未通过`);
+for (const row of rows.filter(r => r.id === 'sky_boss_archon' || r.id === 'final_boss_lord')) {
+  if (row.candidate.wins < row.control.wins - seeds * .25 || row.candidate.hpLoss > row.control.hpLoss + .25 || row.control.wins > 0 && row.candidate.wins === 0) failures.push(`${row.id}/${row.route}:单独压力护栏未通过`);
 }
 for (const id of new Set(cases.map(c=>c[0]))) {
   const subset = rows.filter(r=>r.id===id);
   if (subset.length && !value('--route') && subset.every(r=>r.candidate.wins===0)) failures.push(`${id}:所有构筑零胜`);
 }
-const result = {note:'固定构筑、同章同层同遭遇前后对照；第三章不提前持有本章首领奖励，终章才带第三章遗物。按章节与流派检查胜率下降不超过25个百分点，生命损失比例不额外增加超过0.25；--chapters另逐场景检查第二章20%、第三章25%的同类护栏。第三章首领原有胜场的流派不得变成零胜；不得停滞或非法状态，不代表真人胜率。',seeds,rows,failures};
+const result = {note:'固定构筑、同章同层同遭遇前后对照；第三章不提前持有本章首领奖励，终章才带第三章遗物。按章节与流派检查胜率下降不超过25个百分点，额外损血不超过最大生命的25%；章节模式逐场检查前两章20%、后两章25%的同类护栏。第三章及终章首领原有胜场的流派不得变成零胜；不得停滞或非法状态，不代表真人胜率。',seeds,rows,failures};
 if(value('--output'))writeFileSync(value('--output')!,JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify({fights:rows.length*seeds*2,candidateWins:rows.reduce((s,r)=>s+r.candidate.wins,0),controlWins:rows.reduce((s,r)=>s+r.control.wins,0),failures},null,2));
 if(failures.length)process.exitCode=1;

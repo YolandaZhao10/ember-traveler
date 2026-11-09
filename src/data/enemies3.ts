@@ -5,7 +5,7 @@ const cycle = (ctx: EnemyAiContext, order: string[]) => order[ctx.enemy.turn % o
 /** 星骸天穹：破甲、连击与辅助敌人的组合，需要按意图决定集火顺序。 */
 export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   {
-    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [32, 36], sprite: 'star_moth',
+    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [36, 41], sprite: 'star_moth',
     description: '星砂施加 1 层脆弱并塞入 1 张朽败，持续干扰防御；扑击与合翼之间仍有反攻窗口。',
     moves: [
       { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'frailty', count: 1 }] },
@@ -15,15 +15,15 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'glass_wisp', name: '碎镜灵', tier: 'normal', hp: [32, 36], sprite: 'glass_wisp',
-    description: '镜片以双击切割，随后重组。死亡时使你获得 1 层虚弱。',
+    description: '镜片以双击切割，随后轻击并重组。死亡时使你获得 1 层虚弱。',
     moves: [
       { id: 'shards', name: '飞镜', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-      { id: 'assemble', name: '聚镜', intent: 'defend_buff', actions: [{ kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'assemble', name: '聚镜', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 1 }, { kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
     ], onDeath: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }],
     chooseMove: c => cycle(c, ['shards', 'assemble', 'shards']),
   },
   {
-    id: 'astral_sentinel', name: '星轨卫士', tier: 'normal', hp: [58, 65], sprite: 'astral_sentinel',
+    id: 'astral_sentinel', name: '星轨卫士', tier: 'normal', hp: [65, 73], sprite: 'astral_sentinel',
     description: '星矛在架盾后刺击，再施加易伤。盾墙回合是蓄力的机会。',
     moves: [
       { id: 'orbit', name: '环轨盾', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
@@ -32,26 +32,26 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['orbit', 'spear', 'mark', 'spear']),
   },
   {
-    id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [41, 47], sprite: 'wind_scribe',
-    description: '将朽败写入弃牌堆，之后为所有同伴增加力量；独处时也能用风页攻击。',
+    id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [46, 53], sprite: 'wind_scribe',
+    description: '将朽败写入弃牌堆，之后轻击并为所有同伴增加力量；独处时也能用风页攻击。',
     moves: [
       { id: 'page', name: '朽页', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'frailty', count: 1 }] },
-      { id: 'chorus', name: '风中合诵', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+      { id: 'chorus', name: '风中合诵', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
       { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
     ], chooseMove: c => cycle(c, ['page', 'chorus', 'cut', 'cut']),
   },
   {
-    id: 'comet_hound', name: '彗尾猎犬', tier: 'normal', hp: [49, 56], sprite: 'comet_hound',
-    description: '首回合彗星突袭造成16点基础伤害，仅使用一次，随后嗥叫整备。扑击与三连咬交替，嗥叫时增加 1 力量并暂停攻击。',
+    id: 'comet_hound', name: '彗尾猎犬', tier: 'normal', hp: [55, 63], sprite: 'comet_hound',
+    description: '首回合彗星突袭造成16点基础伤害，仅使用一次，随后嗥叫整备。扑击与三连咬交替，嗥叫时先轻击再增加 1 力量。',
     moves: [
       { id: 'opening', name: '彗星突袭', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
       { id: 'lunge', name: '追彗扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
-      { id: 'howl', name: '长夜嗥叫', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'howl', name: '长夜嗥叫', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
       { id: 'maul', name: '星痕三噬', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }] },
     ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : cycle(c, ['lunge', 'howl', 'maul']),
   },
   {
-    id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [56, 63], sprite: 'star_pilgrim',
+    id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [63, 71], sprite: 'star_pilgrim',
     description: '沉重的星仪兼具武器与护甲。重击后回复 4 生命，并把 1 张破绽塞入弃牌堆，放大后续攻击的威胁。',
     moves: [
       { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
@@ -60,13 +60,13 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => cycle(c, ['burden', 'fall', 'repair']),
   },
   {
-    id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [122, 130], sprite: 'moon_duelist',
-    description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时停止攻击，格挡并增长 2 力量；把握这次整备，下一轮连击会更强。',
+    id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [129, 137], sprite: 'moon_duelist',
+    description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时先轻击，再格挡并增长 2 力量；轻击弱于重斩，下一轮连击会更强。',
     moves: [
       { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
       { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
-      { id: 'step', name: '月步', intent: 'defend_buff', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+      { id: 'step', name: '月步', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     ], chooseMove: c => cycle(c, ['twins', 'mark', 'crescent', 'step']),
   },
   {
@@ -80,7 +80,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
       ? ['align', 'rod', 'mist'] : ['align', 'rod', 'rod']),
   },
   {
-    id: 'shattered_titan', name: '崩星巨像', tier: 'elite', hp: [138, 146], sprite: 'shattered_titan',
+    id: 'shattered_titan', name: '崩星巨像', tier: 'elite', hp: [145, 154], sprite: 'shattered_titan',
     description: '开场有 2 荆棘。蓄盾后落锤、三连击；修补时以碎岩攻击，回复 8 生命并增长 1 力量，让下一轮进攻更强。每轮只有蓄盾时停止进攻。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [

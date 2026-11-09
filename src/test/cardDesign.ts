@@ -1,5 +1,18 @@
 import type { Effect } from '../engine/types';
 import { viewDef } from '../engine/cards';
+import { STATUSES } from '../data/statuses';
+
+/** 持续能力的包含关系也算重复；自动加力量不因回合开始/结束而成为新设计。 */
+export function powerCore(effects: Effect[]): string[] {
+  return [...new Set(effects.flatMap(e => e.kind === 'status' && e.target === 'self' && e.amount > 0
+    && (STATUSES[e.status].kind === 'power' || ['strength', 'dexterity', 'thorns', 'ritual'].includes(e.status))
+    ? [e.status === 'ritual' || e.status === 'demonHeart' ? 'automaticStrength' : e.status] : []))].sort();
+}
+
+export function containsPowerCore(a: Effect[], b: Effect[]): boolean {
+  const core = powerCore(a), other = powerCore(b);
+  return core.length > 0 && core.every(effect => other.includes(effect));
+}
 
 type Mode = 'design' | 'exact';
 type NormalizedEffect = Record<string, unknown>;

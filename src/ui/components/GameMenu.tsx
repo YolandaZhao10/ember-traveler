@@ -1,5 +1,5 @@
 import type { CharacterId } from '../../engine/types';
-import { abandonRun, closeOverlay, openOverlay, quickReset, toTitle, toggleFastAnim, toggleSound, useGame } from '../store';
+import { abandonRun, changeArtStyle, closeOverlay, openOverlay, quickReset, toTitle, toggleFastAnim, toggleSound, useGame } from '../store';
 import { Modal } from './Common';
 import { DifficultySummary } from './DifficultyPicker';
 
@@ -19,6 +19,18 @@ export function GameMenu({ character }: { character?: CharacterId }) {
         </>}
         <button className="btn" onClick={() => openOverlay({ kind: 'catalog', character: character ?? (active ? run.character : undefined) })}>卡牌图鉴</button>
         <button className="btn" onClick={() => openOverlay({ kind: 'relicCatalog' })}>遗物图鉴</button>
+        <fieldset className="art-style-picker">
+          <legend>画风</legend>
+          <label className={settings.artStyle === 'detailed' ? 'selected' : ''}>
+            <input type="radio" name="art-style" value="detailed" checked={settings.artStyle === 'detailed'} onChange={() => changeArtStyle('detailed')} />
+            精细画风
+          </label>
+          <label className={settings.artStyle === 'simple' ? 'selected' : ''}>
+            <input type="radio" name="art-style" value="simple" checked={settings.artStyle === 'simple'} onChange={() => changeArtStyle('simple')} />
+            简易画风
+          </label>
+          <p>角色、怪物、卡面与背景同时切换，自动记住选择。</p>
+        </fieldset>
         <button className={`btn ${settings.sound ? '' : 'ghost'}`} onClick={toggleSound}>音效：{settings.sound ? '开' : '关'}</button>
         <button className={`btn ${settings.fastAnim ? '' : 'ghost'}`} onClick={toggleFastAnim}>快速动画：{settings.fastAnim ? '开' : '关'}</button>
         {active && <>

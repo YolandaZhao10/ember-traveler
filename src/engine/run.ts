@@ -16,8 +16,8 @@ import { resolveMystery } from './mystery';
 import { distinctRewardPool } from './cardChoices';
 import { describeCard } from './cards';
 import { STATUSES } from '../data/statuses';
-import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
-import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
+import { chance, makeRng, nextInt, pick, shuffle, weightedPick, type RngState } from './rng';
+import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
 export const SAVE_VERSION = 18;
 
@@ -374,6 +374,14 @@ export function cardRarityWeights(floor: number, tier: CardRewardTier, level: Di
   return weights;
 }
 
+/** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的75%权重。 */
+function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState): CardDef[] {
+  const shared = pool.filter(c => !c.owner), owned = pool.filter(c => c.owner === character);
+  if (!shared.length) return owned;
+  if (!owned.length) return shared;
+  return chance(rng, .25) ? shared : owned;
+}
+
 export function generateCardChoices(run: RunState, tier: CardRewardTier, n: number): CardInstance[] {
   const weights = cardRarityWeights(run.floor, tier, run.difficulty.cardRarity);
   const chosen: string[] = [];
@@ -382,7 +390,8 @@ export function generateCardChoices(run: RunState, tier: CardRewardTier, n: numb
     const r = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map((k) => ({ item: k, weight: weights[k] })));
     const pool = CARD_LIST.filter((c) => c.rarity === r && !chosen.includes(c.id) && (tier === 'boss' ? c.owner === run.character : cardAvailableTo(c, run.character)));
     if (!pool.length) continue;
-    const choices = n === 3 && tier !== 'shop' ? distinctRewardPool(pool, chosen.map(id => CARDS[id])) : pool;
+    const sourced = tier === 'normal' || tier === 'elite' ? rewardOwnerPool(pool, run.character, run.rng.reward) : pool;
+    const choices = n === 3 && tier !== 'shop' ? distinctRewardPool(sourced, chosen.map(id => CARDS[id])) : sourced;
     chosen.push(pick(run.rng.reward, choices).id);
   }
   return chosen.map((id) => makeCard(run, id));
@@ -791,7 +800,7 @@ function applyOutcomes(run: RunState, outcomes: EventOutcome[], texts: string[])
           const weights = cardRarityWeights(run.floor, 'normal', run.difficulty.cardRarity);
           const rarity = o.rarity ?? weightedPick(run.rng.event, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
           const pool = CARD_LIST.filter(c => cardAvailableTo(c, run.character) && c.rarity === rarity);
-          defId = pick(run.rng.event, pool).id;
+          defId = pick(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event)).id;
         }
         run.deck.push(makeCard(run, defId));
         texts.push(`获得卡牌「${CARDS[defId].name}」。`);

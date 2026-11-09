@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import type { ArtStyle } from '../engine/save';
 
 /**
  * 位图贴图清单：public/art/manifest.json 由 scripts/gen-art.mjs 生成。
@@ -7,6 +8,17 @@ import { useSyncExternalStore } from 'react';
 let manifest: Record<string, string> = {};
 let loaded = false;
 const listeners = new Set<() => void>();
+const simpleArt: Record<string, string> = {};
+let style: ArtStyle = 'detailed';
+
+/** 切换整套美术；保留已加载清单，切回精细模式时不重新请求。 */
+export function setArtStylePreference(value: ArtStyle) {
+  if (style === value) return;
+  style = value;
+  for (const listener of listeners) listener();
+}
+
+const selectedArt = () => style === 'simple' ? simpleArt : manifest;
 
 export function loadArtManifest() {
   if (loaded || typeof fetch === 'undefined') return;
@@ -30,10 +42,10 @@ export function useArt(): Record<string, string> {
       listeners.add(l);
       return () => listeners.delete(l);
     },
-    () => manifest,
+    selectedArt,
   );
 }
 
 export function artUrl(id: string): string | undefined {
-  return manifest[id];
+  return selectedArt()[id];
 }

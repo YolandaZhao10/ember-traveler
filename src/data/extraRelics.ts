@@ -94,7 +94,7 @@ export const EXPANDED_RELICS: RelicDef[] = [
   relic('ruby_coil', '红宝石线圈', 'rare', '🧿', [start([status('forge', 1)])]),
   relic('barbed_standard', '棘刃军旗', 'rare', '🚩', [start([status('thorns', 2), status('strength', 1)])]),
   relic('lantern_archive', '灯火档案', 'rare', '📚', [start([status('study', 1)])]),
-  relic('crimson_idol', '赤玉神像', 'rare', '🗿', [start([status('regen', 1), b(5)])]),
+  relic('crimson_idol', '赤玉神像', 'rare', '🗿', [start([status('regen', 4), b(5)])]),
   relic('obsidian_lens', '黑曜透镜', 'rare', '🔍', [start([enemy('burn', 4), enemy('vulnerable', 1)])]),
   relic('dawn_bell', '黎明钟', 'rare', '🔔', [start([status('echo', 1), d(1)], 2)]),
   relic('deep_clock', '深城时钟', 'rare', '🕰️', [periodic(4, [e(3), enemy('vulnerable', 1)])]),

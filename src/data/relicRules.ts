@@ -27,7 +27,7 @@ function effectText(e: RelicCombatEffect): string {
     case 'damageAll': return `对所有敌人造成 ${e.amount} 点固定伤害（可被格挡）`;
     case 'damageLowest': return `对生命最低的敌人造成 ${e.amount} 点固定伤害（可被格挡）`;
     case 'charge': return `手中每张保留的蓄力牌额外蓄力 ${e.amount} 次`;
-    case 'status': return `获得 ${e.amount} 层${STATUSES[e.status].name}`;
+    case 'status': return `获得 ${e.amount} 层${STATUSES[e.status].name}${e.status === 'regen' ? '（回合末治疗后减少1层）' : ''}`;
     case 'enemyStatus': return `对${e.target === 'all' ? '所有敌人' : '生命最低的敌人'}施加 ${e.amount} 层${STATUSES[e.status].name}`;
     case 'cleanse': return `移除自身 ${e.amount} 层${STATUSES[e.status].name}`;
   }
