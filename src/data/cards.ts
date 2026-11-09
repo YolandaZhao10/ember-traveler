@@ -517,12 +517,12 @@ def({
   requireEmber: 2,
   effects: [
     { kind: 'gainEmber', amount: -2 },
-    { kind: 'damage', amount: 15 },
+    { kind: 'damage', amount: 18 },
   ],
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -2 },
-      { kind: 'damage', amount: 20 },
+      { kind: 'damage', amount: 24 },
     ],
   },
 });
@@ -558,14 +558,14 @@ def({
   requireEmber: 4,
   effects: [
     { kind: 'gainEmber', amount: -4 },
-    { kind: 'heal', amount: 6 },
-    { kind: 'block', amount: 6 },
+    { kind: 'heal', amount: 10 },
+    { kind: 'block', amount: 10 },
   ],
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -4 },
-      { kind: 'heal', amount: 8 },
-      { kind: 'block', amount: 8 },
+      { kind: 'heal', amount: 14 },
+      { kind: 'block', amount: 14 },
     ],
   },
 });

@@ -114,7 +114,7 @@ const NODE_REWARDS: Record<MapNode['type'], string> = {
   rest: '休息、锻造、精简三选一。精简每章一次，会占用本次营火行动。',
 };
 
-function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
+export function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
   run: RunState;
   selected: MapNode | undefined;
   preview: boolean;
@@ -122,7 +122,7 @@ function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
   reachable: boolean;
   onSelect: (id: string) => void;
 }) {
-  const encounter = selected && selected.type !== 'combat' ? plannedEncounter(run, selected) : undefined;
+  const encounter = selected && selected.type === 'boss' ? plannedEncounter(run, selected) : undefined;
   const route = selected ? previewRoute(run.map, selected.id) : null;
   const enemies = encounter ? [...new Set(encounter.enemies)].map((id) => ({ enemy: ENEMIES[id], count: encounter.enemies.filter((enemyId) => enemyId === id).length })) : [];
   const distance = (value: number | null) => value === null ? '后路没有' : value === 0 ? '本站' : `最快 ${value} 层后`;
@@ -141,7 +141,7 @@ function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
           <div><dt>精英</dt><dd>{route.elites.min === route.elites.max ? route.elites.min : `${route.elites.min}–${route.elites.max}`} 场</dd></div>
         </dl><p className="route-note">包含所选节点；亮线为可达后路。“最快”取最近支路，精英数量随分叉选择变化。</p></section>}
         {!reachable && selected.id !== run.currentNodeId && <p className="route-note">这条路线已无法前往，可查看节点资料。</p>}
-      </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看收获、沿途补给与精英、首领资料，再决定下一步。</p><p>衡量精英的风险与收益，为休息、锻造或精简牌组留出路线。</p></div>}
+      </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看收获、沿途补给与首领资料，再决定下一步。</p><p>衡量精英的风险与收益，为休息、锻造或精简牌组留出路线。</p></div>}
     </div>
     <div className="route-panel-actions">
       {selected && canEnter && !preview && <button className="btn primary" onClick={() => travel(selected.id)}>确认前往 · {nodeTypeName(selected.type)}</button>}
@@ -202,7 +202,7 @@ function MapSvg(props: {
         const isCur = n.id === currentId;
         const isVisited = visited.has(n.id);
         const dead = !isAvail && !isCur && !isVisited && !reachable.has(n.id);
-        const encounter = n.type !== 'combat' ? plannedEncounter(run, n) : undefined;
+        const encounter = n.type === 'boss' ? plannedEncounter(run, n) : undefined;
         const r = n.type === 'boss' ? 30 : 18;
         return (
           <g

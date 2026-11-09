@@ -1,7 +1,7 @@
 {
   "name": "ember-traveler",
   "private": true,
-  "version": "0.1.15",
+  "version": "0.1.16",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,8 @@
     "audit:relics": "vite-node scripts/audit-relics.ts",
     "audit:final-enemies": "vite-node scripts/audit-final-enemies.ts",
     "audit:builds": "vite-node scripts/audit-builds.ts",
-    "audit:strategy": "vite-node scripts/audit-strategy.ts"
+    "audit:strategy": "vite-node scripts/audit-strategy.ts",
+    "audit:card-rarity": "vite-node scripts/audit-card-rarity.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -95,10 +95,10 @@ describe('基础与通用卡牌的不同用途', () => {
     expect(result.player.ember).toBe(0);
     expect(result.player.energy).toBe(1);
     expect(result.player.block).toBe(0);
-    expect(result.player.statuses.metallicize).toBe(up ? 8 : 6);
+    expect(result.player.statuses.metallicize).toBe(up ? 11 : 8);
     expect(result.player.statuses.regen).toBe(up ? 3 : 2);
     const ended = endPlayerTurn(result).state;
-    expect(ended.player.block).toBe(up ? 8 : 6);
+    expect(ended.player.block).toBe(up ? 11 : 8);
     expect(ended.player.hp).toBe(30 + (up ? 3 : 2));
     expect(result.player.discard).toHaveLength(0);
   });

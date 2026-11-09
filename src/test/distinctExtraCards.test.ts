@@ -83,7 +83,7 @@ describe('专属卡牌的不同用途', () => {
     cs.enemies[3].hp = 0;
     cs.enemies[3].flags.deadHandled = 1;
     const result = play(cs, 'flashover', 'e0');
-    const layers = up ? 12 : 11;
+    const layers = up ? 16 : 14;
     expect(result.enemies.map(e => e.statuses.burn ?? 0)).toEqual([layers, layers + 2, layers, 0]);
     expect(result.enemies.map(e => e.hp)).toEqual([1000, 1000, 1000, 0]);
     expect(result.player.ember).toBe(7);
@@ -101,9 +101,9 @@ describe('专属卡牌的不同用途', () => {
       expect(result.enemies[0].statuses.burn ?? 0).toBe(0);
       expect(result.enemies[1].statuses.burn).toBe(4);
       expect(result.enemies.map(e => e.hp)).toEqual([1000, 1000]);
-      expect(result.player.ember).toBe(1 + Math.min(layers, 5));
+      expect(result.player.ember).toBe(1 + Math.min(layers, up ? 14 : 10));
       expect(result.player.hand).toHaveLength(up ? 3 : 2);
-      expect(result.player.energy).toBe(2);
+      expect(result.player.energy).toBe(3);
       expect(result.player.exhaust.map(c => c.defId)).toEqual(['white_hot']);
     }
   });
@@ -113,7 +113,8 @@ describe('专属卡牌的不同用途', () => {
     cs.player.statuses.echo = 1;
     cs.enemies[0].statuses.burn = 9;
     const result = play(cs, 'white_hot', 'e0');
-    expect(result.player.ember).toBe(5);
+    expect(result.player.ember).toBe(9);
+    expect(result.player.energy).toBe(4);
     expect(result.player.hand).toHaveLength(4);
     expect(result.enemies[0].hp).toBe(1000);
     expect(result.enemies[0].statuses.burn ?? 0).toBe(0);

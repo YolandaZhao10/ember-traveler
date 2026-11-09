@@ -193,7 +193,8 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       const twoStrikes = control.enemies[0].hp - attacked.enemies[0].hp;
       expect(savedHp).toBeGreaterThan(0);
       expect(damage + savedHp).toBeGreaterThanOrEqual(twoStrikes);
-      expect(damage + savedHp).toBeLessThanOrEqual(twoStrikes + 5);
+      // 已先花一费准备格挡；稀有牌按双倍格挡转伤，增益仍受这一份准备资源约束。
+      expect(damage + savedHp).toBeLessThanOrEqual(twoStrikes + before.player.block + 5);
     }
   });
 

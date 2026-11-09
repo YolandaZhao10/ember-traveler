@@ -7,9 +7,9 @@ import { closeOverlay } from '../store';
 import { Card } from './Card';
 import { Modal } from './Common';
 
-type Group = CharacterId | 'all' | 'shared';
+type Group = CharacterId | 'all' | 'shared' | 'curse';
 const instance = (id: string, upgraded = false): CardInstance => ({ uid: `catalog-${id}`, defId: id, upgraded });
-const ownerName = (card: CardDef) => card.owner ? CHARACTERS[card.owner].name : card.type === 'curse' ? '通用诅咒' : '四角色通用';
+const ownerName = (card: CardDef) => card.owner ? CHARACTERS[card.owner].name : card.type === 'curse' ? '诅咒牌' : '四角色通用';
 
 export function CardCatalog({ initialCharacter }: { initialCharacter?: CharacterId }) {
   const [group, setGroup] = useState<Group>(initialCharacter ?? 'all');
@@ -31,8 +31,12 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
     return () => window.removeEventListener('keydown', onKey, true);
   }, [selected]);
 
-  const pool = CARD_LIST.filter((card) => group === 'all' || (group === 'shared' ? !card.owner : cardAvailableTo(card, group) && (includeShared || card.owner === group)))
-    .sort((a, b) => group === 'all' || group === 'shared' ? 0 : Number(!a.owner) - Number(!b.owner));
+  const pool = CARD_LIST.filter((card) => {
+    if (group === 'curse') return card.type === 'curse';
+    if (card.type === 'curse') return false;
+    if (group === 'all') return true;
+    return group === 'shared' ? !card.owner : cardAvailableTo(card, group) && (includeShared || card.owner === group);
+  }).sort((a, b) => group === 'all' || group === 'shared' || group === 'curse' ? 0 : Number(!a.owner) - Number(!b.owner));
   const routes = [...new Set(pool.map((card) => card.archetype))];
   const cards = pool.filter((card) => (archetype === 'all' || card.archetype === archetype)
     && (rarity === 'all' || card.rarity === rarity)
@@ -54,29 +58,31 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
         </div>
       ) : (
         <>
-          <div className="catalog-tabs" aria-label="按角色筛选">
-            {([{ id: 'all', name: '全部角色' }, ...CHARACTER_LIST, { id: 'shared', name: '通用牌' }] as { id: Group; name: string }[]).map((item) => (
+          <div className="catalog-tabs" aria-label="卡牌分类">
+            {([{ id: 'all', name: '全部角色' }, ...CHARACTER_LIST, { id: 'shared', name: '通用牌' }, { id: 'curse', name: '诅咒牌' }] as { id: Group; name: string }[]).map((item) => (
               <button key={item.id} className={`iconbtn ${group === item.id ? 'active' : ''}`} aria-pressed={group === item.id}
-                onClick={() => { setGroup(item.id); setArchetype('all'); }}>{item.name}</button>
+                onClick={() => { setGroup(item.id); setArchetype('all'); setType('all'); setRarity('all'); setQuery(''); }}>{item.name}</button>
             ))}
           </div>
           <div className="catalog-filters">
             <input aria-label="搜索卡牌" placeholder="搜索牌名、效果或流派" value={query} onChange={(e) => setQuery(e.target.value)} />
-            <select aria-label="流派筛选" value={archetype} onChange={(e) => setArchetype(e.target.value as Archetype | 'all')}>
-              <option value="all">全部流派</option>
-              {routes.map((route) => <option key={route} value={route}>{archetypeName(route)}</option>)}
-            </select>
-            <select aria-label="类型筛选" value={type} onChange={(e) => setType(e.target.value as CardType | 'all')}>
-              <option value="all">全部类型</option>
-              {(['attack', 'skill', 'power', 'curse'] as const).map((t) => <option key={t} value={t}>{cardTypeName(t)}</option>)}
-            </select>
-            <select aria-label="稀有度筛选" value={rarity} onChange={e => setRarity(e.target.value as Rarity | 'all')}>
-              <option value="all">全部稀有度</option><option value="common">普通</option><option value="uncommon">罕见</option><option value="rare">稀有</option><option value="starter">初始</option><option value="curse">诅咒</option>
-            </select>
-            {group !== 'all' && group !== 'shared' && <button className={`iconbtn ${includeShared ? 'active' : ''}`} aria-pressed={includeShared} onClick={() => setIncludeShared(!includeShared)}>包含通用牌</button>}
-            <button className={`iconbtn ${upgraded ? 'active' : ''}`} aria-pressed={upgraded} onClick={() => setUpgraded(!upgraded)}>查看{upgraded ? '基础版' : '升级版'}</button>
+            {group !== 'curse' && <>
+              <select aria-label="流派筛选" value={archetype} onChange={(e) => setArchetype(e.target.value as Archetype | 'all')}>
+                <option value="all">全部流派</option>
+                {routes.map((route) => <option key={route} value={route}>{archetypeName(route)}</option>)}
+              </select>
+              <select aria-label="类型筛选" value={type} onChange={(e) => setType(e.target.value as CardType | 'all')}>
+                <option value="all">全部类型</option>
+                {(['attack', 'skill', 'power'] as const).map((t) => <option key={t} value={t}>{cardTypeName(t)}</option>)}
+              </select>
+              <select aria-label="稀有度筛选" value={rarity} onChange={e => setRarity(e.target.value as Rarity | 'all')}>
+                <option value="all">全部稀有度</option><option value="common">普通</option><option value="uncommon">罕见</option><option value="rare">稀有</option><option value="starter">初始</option>
+              </select>
+              {group !== 'all' && group !== 'shared' && <button className={`iconbtn ${includeShared ? 'active' : ''}`} aria-pressed={includeShared} onClick={() => setIncludeShared(!includeShared)}>包含通用牌</button>}
+              <button className={`iconbtn ${upgraded ? 'active' : ''}`} aria-pressed={upgraded} onClick={() => setUpgraded(!upgraded)}>查看{upgraded ? '基础版' : '升级版'}</button>
+            </>}
           </div>
-          <p className="subtitle catalog-summary" aria-live="polite">共 {cards.length} 张 · {upgraded ? '升级版（诅咒不升级）' : '基础版'} · {group === 'all' || group === 'shared' ? '点击卡牌对比升级效果' : includeShared ? '专属牌与通用牌' : '仅该角色专属牌'}</p>
+          <p className="subtitle catalog-summary" aria-live="polite">共 {cards.length} 张 · {group === 'curse' ? '诅咒牌 · 无法打出或升级，点击查看效果' : <>{upgraded ? '升级版' : '基础版'} · {group === 'all' || group === 'shared' ? '点击卡牌对比升级效果' : includeShared ? '专属牌与通用牌' : '仅该角色专属牌'}</>}</p>
           <div className="cardgrid catalog-grid">
             {cards.map((card) => (
               <button className="catalog-entry" key={card.id} onClick={() => setSelected(card.id)} aria-label={`查看${card.name}`}>
