@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CARD_LIST } from '../data/cards';
-import { cardDesign } from './cardDesign';
+import { cardDesign, cardMechanics } from './cardDesign';
 import { viewDef } from '../engine/cards';
 import type { Effect } from '../engine/types';
 
@@ -9,7 +9,8 @@ describe('卡牌近似设计回归审查', () => {
     function needsTarget(e: Effect): boolean {
       switch (e.kind) {
         case 'damage': case 'damageByBlock': case 'damagePerBurn': return !e.aoe;
-        case 'damagePerHpLost': case 'damagePerAttack': case 'damagePerEmber': case 'consumeBurn': return true;
+        case 'damagePerHpLost': case 'damagePerAttack': case 'damagePerEmber': case 'consumeBurn':
+        case 'removeBlock': case 'spreadBurn': case 'blockPerBurn': case 'burnToEmber': return true;
         case 'emberBurst': return !!e.damagePer && !e.aoe;
         case 'exhaustHand': return !!e.damagePerCard;
         case 'doubleStatus': return e.target !== 'self';
@@ -35,5 +36,14 @@ describe('卡牌近似设计回归审查', () => {
       if (a.id < b.id && (!a.owner || !b.owner || a.owner === b.owner)) conflicts.add(`${a.name} / ${b.name}`);
     }
     expect([...conflicts], '同卡池出现只改表面参数的设计，请调整真实条件、资源代价或机制').toEqual([]);
+  });
+  it('通用奖励不能与角色非基础初始牌完全等效，包含无关效果换序和基础升级交叉比较', () => {
+    const starters = CARD_LIST.filter(c => c.rarity === 'starter' && c.archetype !== 'basic');
+    const shared = CARD_LIST.filter(c => !c.owner && ['common', 'uncommon', 'rare'].includes(c.rarity));
+    const conflicts = new Set<string>();
+    for (const a of starters) for (const b of shared) for (const aUp of [false, true]) for (const bUp of [false, true]) {
+      if (cardMechanics(a.id, aUp) === cardMechanics(b.id, bUp)) conflicts.add(`${a.name}${aUp ? '+' : ''} / ${b.name}${bUp ? '+' : ''}`);
+    }
+    expect([...conflicts], '角色特色初始牌与通用奖励不能仅以换序、费用或稀有度区分').toEqual([]);
   });
 });

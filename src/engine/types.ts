@@ -69,22 +69,28 @@ export type Effect =
   | { kind: 'loseHp'; amount: number }
   | { kind: 'tempStrength'; amount: number }
   | { kind: 'doubleEmber' }
-  | { kind: 'discardRandom'; count: number }
+  | { kind: 'discardRandom'; count: number | 'all' }
+  | { kind: 'clearDebuffs' }
+  | { kind: 'removeBlock' }
   | { kind: 'damageByBlock'; bonus?: number; aoe?: boolean; mult?: number; consume?: boolean }
   | { kind: 'damagePerAttack'; amount: number }
   | { kind: 'damagePerEmber'; amount: number; per?: number }
   | { kind: 'block'; amount: number }
+  | { kind: 'blockPerBurn'; amount: number; max: number }
   | { kind: 'draw'; amount: number }
+  | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number }
   | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean }
   | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
   | { kind: 'heal'; amount: number }
-  | { kind: 'exhaustHand'; count: number | 'all'; damagePerCard?: number; energyPerCard?: number }
+  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number }
   | { kind: 'damagePerBurn'; amount: number; aoe?: boolean }
+  | { kind: 'spreadBurn' }
+  | { kind: 'burnToEmber'; amount: number; max: number }
   | { kind: 'consumeBurn'; damagePer: number }
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
-  | { kind: 'returnExhausted'; count: number }
+  | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
   | { kind: 'conditional'; cond: Condition; then: Effect[] };
 
 export interface CardDef {

@@ -752,12 +752,29 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         gainEmber(cs, p.ember, ev, false);
         log(cs, ev, `余烬翻倍为 ${p.ember}`);
         break;
-      case 'discardRandom':
-        for (let i = 0; i < e.count && p.hand.length; i++) {
-          const idx = nextInt(cs.rng, 0, p.hand.length - 1);
+      case 'discardRandom': {
+        const n = e.count === 'all' ? p.hand.length : e.count;
+        for (let i = 0; i < n && p.hand.length; i++) {
+          const idx = e.count === 'all' ? 0 : nextInt(cs.rng, 0, p.hand.length - 1);
           const [c] = p.hand.splice(idx, 1);
           p.discard.push(c);
           log(cs, ev, `弃置「${viewCard(c).name}」`);
+        }
+        break;
+      }
+      case 'clearDebuffs':
+        // 力竭是临时力量的归还标记，不能通过净化将临时力量变为永久力量。
+        for (const status of ['weak', 'vulnerable', 'frail', 'burn'] as const) {
+          const amount = p.statuses[status] ?? 0;
+          if (amount) ev.push({ type: 'status', targetId: p.id, status, amount: -amount });
+          delete p.statuses[status];
+        }
+        log(cs, ev, '清除了自身的虚弱、易伤、脆弱与燃烧');
+        break;
+      case 'removeBlock':
+        for (const t of targets(false)) {
+          log(cs, ev, `移除 ${t.name} 的全部 ${t.block} 点格挡`);
+          t.block = 0;
         }
         break;
       case 'damageByBlock': {
@@ -799,8 +816,23 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         log(cs, ev, `获得 ${b} 点格挡`);
         break;
       }
+      case 'blockPerBurn':
+        for (const t of targets(false)) {
+          const b = calcBlock(Math.min((t.statuses.burn ?? 0) * e.amount, e.max), p.statuses);
+          gainBlock(p, b, ev, cs);
+          log(cs, ev, `借助 ${t.name} 的燃烧获得 ${b} 点格挡`);
+        }
+        break;
       case 'draw':
         drawCards(cs, e.amount, ev);
+        break;
+      case 'chargeHand':
+        for (const card of p.hand) {
+          const charged = viewCard(card);
+          if (!charged.charge) continue;
+          card.bonus = (card.bonus ?? 0) + e.amount;
+          log(cs, ev, `「${charged.name}」立即蓄力 ${e.amount} 回合（累计 ${card.bonus}）`);
+        }
         break;
       case 'energy':
         p.energy += e.amount;
@@ -841,11 +873,20 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       }
       case 'exhaustHand': {
-        const n = e.count === 'all' ? p.hand.length : Math.min(e.count, p.hand.length);
+        // 有筛选时固定本次效果开始时的候选，消耗触发的抽牌不能被顺带消耗。
+        const candidates = e.filter === 'curse' ? p.hand.filter(c => viewCard(c).type === 'curse') : null;
+        const available = candidates?.length ?? p.hand.length;
+        const n = e.count === 'all' ? available : Math.min(e.count, available);
         let exhausted = 0;
         for (let i = 0; i < n; i++) {
           if (!p.hand.length) break;
-          const idx = e.count === 'all' ? 0 : Math.floor(nextInt(cs.rng, 0, p.hand.length - 1));
+          let idx: number;
+          if (candidates) {
+            const selected = e.count === 'all' ? 0 : nextInt(cs.rng, 0, candidates.length - 1);
+            const [candidate] = candidates.splice(selected, 1);
+            idx = p.hand.findIndex(c => c.uid === candidate.uid);
+            if (idx < 0) continue;
+          } else idx = e.count === 'all' ? 0 : nextInt(cs.rng, 0, p.hand.length - 1);
           const [c] = p.hand.splice(idx, 1);
           exhaustCard(cs, c, ev);
           exhausted++;
@@ -870,6 +911,28 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         }
         break;
       }
+      case 'spreadBurn':
+        for (const source of targets(false)) {
+          const layers = source.statuses.burn ?? 0;
+          if (layers <= 0) break;
+          for (const t of aliveEnemies(cs)) {
+            if (t.id === source.id) continue;
+            addStatus(t, 'burn', layers, ev);
+            log(cs, ev, `将 ${source.name} 的 ${layers} 层燃烧传播给 ${t.name}`);
+          }
+        }
+        break;
+      case 'burnToEmber':
+        for (const t of targets(false)) {
+          const layers = t.statuses.burn ?? 0;
+          if (layers <= 0) continue;
+          delete t.statuses.burn;
+          ev.push({ type: 'status', targetId: t.id, status: 'burn', amount: -layers });
+          const before = p.ember;
+          gainEmber(cs, Math.min(layers * e.amount, e.max), ev, true);
+          log(cs, ev, `消耗 ${t.name} 的 ${layers} 层燃烧，获得 ${p.ember - before} 点余烬`);
+        }
+        break;
       case 'consumeBurn': {
         for (const t of targets(false)) {
           const layers = t.statuses.burn ?? 0;
@@ -898,7 +961,12 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       case 'returnExhausted': {
         for (let i = 0; i < e.count; i++) {
           if (!p.exhaust.length || p.hand.length >= HAND_MAX) break;
-          const idx = nextInt(cs.rng, 0, p.exhaust.length - 1);
+          let idx = 0;
+          if (e.selection === 'highestCost') {
+            for (let j = 1; j < p.exhaust.length; j++) {
+              if (viewCard(p.exhaust[j]).cost > viewCard(p.exhaust[idx]).cost) idx = j;
+            }
+          } else idx = nextInt(cs.rng, 0, p.exhaust.length - 1);
           const [c] = p.exhaust.splice(idx, 1);
           p.hand.push(c);
           log(cs, ev, `「${viewCard(c).name}」从消耗区回到手牌`);

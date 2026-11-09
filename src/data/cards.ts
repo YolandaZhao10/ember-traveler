@@ -71,12 +71,12 @@ def({
   exhaust: true,
   effects: [
     { kind: 'draw', amount: 1 },
-    { kind: 'gainEmber', amount: 1 },
+    { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'gainEmber', amount: 2 }] },
   ],
   upgrade: {
     effects: [
       { kind: 'draw', amount: 2 },
-      { kind: 'gainEmber', amount: 1 },
+      { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'gainEmber', amount: 2 }] },
     ],
   },
   flavor: '踏过灰烬，不留脚印。',
@@ -118,12 +118,12 @@ def({
   target: 'enemy',
   effects: [
     { kind: 'damage', amount: 6 },
-    { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'draw', amount: 1 }] },
+    { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'tempStrength', amount: 2 }] },
   ],
   upgrade: {
     effects: [
       { kind: 'damage', amount: 8 },
-      { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'draw', amount: 1 }] },
+      { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'tempStrength', amount: 3 }] },
     ],
   },
 });
@@ -881,8 +881,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'returnExhausted', count: 1 }],
-  upgrade: { effects: [{ kind: 'returnExhausted', count: 2 }] },
+  effects: [{ kind: 'returnExhausted', count: 1, selection: 'highestCost' }],
+  upgrade: { effects: [{ kind: 'returnExhausted', count: 2, selection: 'highestCost' }] },
 });
 def({
   id: 'dust_to_dust',
@@ -894,13 +894,13 @@ def({
   cost: 1,
   target: 'self',
   effects: [
-    { kind: 'exhaustHand', count: 1 },
-    { kind: 'block', amount: 7 },
+    { kind: 'exhaustHand', count: 'all', filter: 'curse' },
+    { kind: 'block', amount: 6 },
   ],
   upgrade: {
     effects: [
-      { kind: 'exhaustHand', count: 1 },
-      { kind: 'block', amount: 10 },
+      { kind: 'exhaustHand', count: 'all', filter: 'curse' },
+      { kind: 'block', amount: 9 },
     ],
   },
 });
@@ -1173,13 +1173,13 @@ def({
   cost: 2,
   target: 'enemy',
   effects: [
-    { kind: 'damage', amount: 10 },
-    { kind: 'status', status: 'vulnerable', amount: 2, target: 'target' },
+    { kind: 'removeBlock' },
+    { kind: 'damage', amount: 14 },
   ],
   upgrade: {
     effects: [
-      { kind: 'damage', amount: 13 },
-      { kind: 'status', status: 'vulnerable', amount: 2, target: 'target' },
+      { kind: 'removeBlock' },
+      { kind: 'damage', amount: 18 },
     ],
   },
 });
@@ -1404,9 +1404,10 @@ def({
   cost: 1,
   target: 'self',
   retain: true,
+  exhaust: true,
   charge: { block: 4 },
-  effects: [{ kind: 'block', amount: 6 }],
-  upgrade: { effects: [{ kind: 'block', amount: 8 }] },
+  effects: [{ kind: 'block', amount: 6 }, { kind: 'status', status: 'metallicize', amount: 2, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'metallicize', amount: 3, target: 'self' }] },
 });
 def({
   id: 'charged_blade',

@@ -11,12 +11,13 @@ export function resourcePairs(): [CardInstance, CardInstance][] {
   return pool.flatMap(a => pool.filter(b => !CARDS[a.defId].owner || !CARDS[b.defId].owner || CARDS[a.defId].owner === CARDS[b.defId].owner).map(b => [a, b] as [CardInstance, CardInstance]));
 }
 
-/** 极薄牌组，无遗物/能力；预先满足连击门槛，检查是否能靠一对牌永久维持资源。 */
+/** 极薄牌组，无遗物/能力；满足连击、格挡、燃烧与本回合失血门槛，检查双牌资源循环。 */
 export function probePair(a: CardInstance, b: CardInstance, limit = 80) {
   let cs = createCombat('audit', ['tomb_puppet'], 'normal', [], 100, 100, [], makeRng('LOOP', 'c'), 100).state;
   cs.enemies[0].hp = cs.enemies[0].maxHp = 1000000;
   cs.player.hand = [{ ...a, uid: 'probe-0' }, { ...b, uid: 'probe-1' }];
-  cs.player.ember = 10; cs.player.cardsPlayedThisTurn = 2; cs.player.attacksPlayedThisTurn = 2;
+  cs.player.ember = 10; cs.player.cardsPlayedThisTurn = 10; cs.player.attacksPlayedThisTurn = 10;
+  cs.player.block = 10; cs.player.hpLostThisTurn = 10; cs.enemies[0].statuses.burn = 10;
   let actions = 0;
   while (actions < limit) {
     const card = cs.player.hand.find(c => canPlayCard(cs, c).ok);

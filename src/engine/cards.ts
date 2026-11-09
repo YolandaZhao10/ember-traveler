@@ -137,7 +137,11 @@ function emberSpendAmount(ctx: DescribeContext | null): number | null {
 
 export function describeEffects(effects: Effect[], ctx: DescribeContext | null, view?: CardView): string {
   // 同一张牌先增力量再攻击时，后续数字要使用增长后的力量；预览不能修改战斗。
-  if (ctx) ctx = { ...ctx, player: { ...ctx.player, statuses: { ...ctx.player.statuses }, turnFlags: { ...ctx.player.turnFlags } } };
+  if (ctx) ctx = {
+    ...ctx,
+    player: { ...ctx.player, statuses: { ...ctx.player.statuses }, turnFlags: { ...ctx.player.turnFlags } },
+    target: ctx.target ? { ...ctx.target, statuses: { ...ctx.target.statuses } } : null,
+  };
   const previewStrength = (amount: number) => {
     if (!ctx || amount <= 0) return;
     if (ctx.relics.includes('war_horn') && !ctx.player.turnFlags.warHorn) {
@@ -184,7 +188,14 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`余烬翻倍${ctx ? `（${ctx.player.ember} → ${Math.min(10, ctx.player.ember * 2)}）` : ''}`);
         break;
       case 'discardRandom':
-        parts.push(`随机弃置 ${e.count} 张手牌`);
+        parts.push(e.count === 'all' ? '弃置所有手牌' : `随机弃置 ${e.count} 张手牌`);
+        break;
+      case 'clearDebuffs':
+        parts.push('清除自身的虚弱、易伤、脆弱与燃烧');
+        if (ctx) for (const status of ['weak', 'vulnerable', 'frail', 'burn'] as const) delete ctx.player.statuses[status];
+        break;
+      case 'removeBlock':
+        parts.push('移除目标全部格挡');
         break;
       case 'damageByBlock': {
         const t = e.aoe ? '对所有敌人' : '';
@@ -217,8 +228,16 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'block':
         parts.push(`获得 ${blockText(e.amount + chargeBlk, ctx)} 点格挡`);
         break;
+      case 'blockPerBurn': {
+        const current = ctx?.target ? (ctx.target.hp > 0 ? blockText(Math.min((ctx.target.statuses.burn ?? 0) * e.amount, e.max), ctx) : '0') : null;
+        parts.push(`获得等于目标燃烧层数 × ${e.amount} 的基础格挡（基础上限 ${e.max}）${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
+        break;
+      }
       case 'draw':
         parts.push(`抽 ${e.amount} 张牌`);
+        break;
+      case 'chargeHand':
+        parts.push(`手中所有蓄力牌立即蓄力 ${e.amount} 回合`);
         break;
       case 'energy':
         parts.push(`获得 ${e.amount} 点能量`);
@@ -255,14 +274,21 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
           parts.push(`${tgt}施加 ${e.amount} 层${name}`);
         }
         if (e.target === 'self' && e.status === 'strength') previewStrength(e.amount);
+        if (ctx?.target && e.target !== 'self' && e.status === 'burn') {
+          ctx.target.statuses.burn = Math.max(0, (ctx.target.statuses.burn ?? 0) + e.amount);
+        }
         break;
       }
       case 'heal':
         parts.push(`回复 ${e.amount} 点生命`);
         break;
       case 'exhaustHand': {
-        const what = e.count === 'all' ? '手牌中的所有牌' : `手牌中随机 ${e.count} 张牌`;
-        const n = ctx ? (e.count === 'all' ? Math.max(0, ctx.player.hand.length - 1) : null) : null;
+        const what = e.filter === 'curse'
+          ? (e.count === 'all' ? '手牌中的所有诅咒牌' : `手牌中随机 ${e.count} 张诅咒牌`)
+          : (e.count === 'all' ? '手牌中的所有牌' : `手牌中随机 ${e.count} 张牌`);
+        const n = ctx && e.count === 'all'
+          ? (e.filter === 'curse' ? ctx.player.hand.filter(c => viewCard(c).type === 'curse').length : Math.max(0, ctx.player.hand.length - 1))
+          : null;
         const segs: string[] = [`消耗${what}`];
         if (e.damagePerCard) segs.push(`每消耗一张造成 ${dmgText(e.damagePerCard, ctx)} 点伤害${n !== null ? `（当前 ${n} 张）` : ''}`);
         if (e.energyPerCard) segs.push(`每消耗一张获得 ${e.energyPerCard} 点能量`);
@@ -275,17 +301,38 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`${t}造成等于其燃烧层数 × ${e.amount} 的伤害${cur}`);
         break;
       }
+      case 'spreadBurn':
+        parts.push('将目标当前的燃烧层数施加给其他所有存活敌人（不移除目标燃烧）');
+        break;
+      case 'burnToEmber': {
+        let current: number | null = null;
+        if (ctx?.target) {
+          const layers = ctx.target.hp > 0 ? (ctx.target.statuses.burn ?? 0) : 0;
+          const base = Math.min(layers * e.amount, e.max);
+          current = layers > 0 && base > 0
+            ? Math.max(0, Math.min(10 - ctx.player.ember, base + (ctx.relics.includes('ash_hourglass') ? 1 : 0)))
+            : 0;
+          if (layers > 0) delete ctx.target.statuses.burn;
+          ctx.player.ember += current;
+        }
+        parts.push(`消耗目标所有燃烧：每层获得 ${e.amount} 点余烬（基础上限 ${e.max} 点）${current !== null ? `（当前获得 ${current} 点余烬）` : ''}`);
+        break;
+      }
       case 'consumeBurn': {
         const cur = ctx?.target ? `（当前 ${dmgText((ctx.target.statuses.burn ?? 0) * e.damagePer, ctx)}）` : '';
         parts.push(`移除目标所有燃烧，每层造成 ${e.damagePer} 点伤害${cur}`);
+        if (ctx?.target) delete ctx.target.statuses.burn;
         break;
       }
       case 'doubleStatus':
         parts.push(`使${e.target === 'self' ? '自身' : '目标'}的${STATUSES[e.status].name}层数翻倍`);
         if (e.target === 'self' && e.status === 'strength') previewStrength(ctx?.player.statuses.strength ?? 0);
+        if (ctx?.target && e.target !== 'self' && e.status === 'burn') ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
         break;
       case 'returnExhausted':
-        parts.push(`从消耗区随机取回 ${e.count} 张牌到手牌`);
+        parts.push(e.selection === 'highestCost'
+          ? `从消耗区按费用从高到低取回 ${e.count} 张牌到手牌（同费按消耗顺序）`
+          : `从消耗区随机取回 ${e.count} 张牌到手牌`);
         break;
       case 'conditional':
         // 分号明确结束条件范围，后面的无条件效果不能被误读为也需要条件。
