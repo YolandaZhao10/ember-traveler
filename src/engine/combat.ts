@@ -6,7 +6,7 @@ import { RELIC_TUNING as T } from '../data/relicBalance';
 import { calcBlock, calcDamage, checkCondition, viewCard, type CardView } from './cards';
 import { scaleEnemyValue } from './difficulty';
 import { ensurePowerInstances } from './powers';
-import { EMBER_MAX } from './constants';
+import { BLOCK_MAX, EMBER_MAX } from './constants';
 import { nextInt, pick, shuffle, type RngState } from './rng';
 import type {
   CardInstance,
@@ -27,6 +27,7 @@ import type {
 } from './types';
 
 export { EMBER_MAX } from './constants';
+export { BLOCK_MAX } from './constants';
 export const HAND_MAX = 10;
 
 function relicProc(cs: CombatState, relicId: string, ev: CombatEvent[]) {
@@ -112,6 +113,8 @@ function dealDamage(
 }
 
 function gainBlock(entity: Entity, amount: number, ev: CombatEvent[], cs?: CombatState) {
+  if (amount <= 0) return;
+  amount = Math.min(amount, Math.max(0, BLOCK_MAX - entity.block));
   if (amount <= 0) return;
   entity.block += amount;
   ev.push({ type: 'block', targetId: entity.id, amount });
@@ -331,9 +334,11 @@ export function enemyIntent(cs: CombatState, e: EnemyState): Intent | null {
   if (atk && atk.kind === 'attack') {
     const amount = calcDamage(scaleEnemyValue(atk.amount, cs.difficulty?.attackMultiplier), e.statuses, cs.player.statuses);
     const kind = move.intent === 'attack_debuff' || move.intent === 'special' ? 'attack_debuff' : 'attack';
-    return { kind, amount, times: atk.times ?? 1 };
+    return { kind, amount, times: atk.times ?? 1, ...(atk.piercing ? { piercing: true } : {}) };
   }
   switch (move.intent) {
+    case 'escape':
+      return { kind: 'escape' };
     case 'defend':
       return { kind: 'defend' };
     case 'buff':
@@ -608,19 +613,83 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   ev.push({ type: 'cardPlayed', uid, name: v.name });
   log(cs, ev, `打出「${v.name}」${target ? ` → ${target.name}` : ''}`);
 
-  const isFirstAttack = v.type === 'attack' && p.attacksPlayedThisTurn === 0;
-  let extraDamage = 0;
-  if (v.type === 'attack') {
-    if (isFirstAttack && cs.relics.includes('flint')) {
-      extraDamage += T.flintDamage;
-      ev.push({ type: 'relic', relicId: 'flint' });
+  // 每次实际重放都独立结算一次出牌计数与触发；费用和实体卡去向仍只处理一次。
+  const finishPlay = () => {
+    // 计数
+    p.cardsPlayedThisTurn += 1;
+    if (v.type === 'attack') p.attacksPlayedThisTurn += 1;
+    if (cs.outcome === 'ongoing' && p.hp > 0) {
+      if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && p.statuses.comboFlow) {
+        p.energy += p.statuses.comboFlow;
+        log(cs, ev, `续势：获得 ${p.statuses.comboFlow} 点能量`);
+      }
+      if (releaseCharge && !p.turnFlags.chargeMaster) {
+        p.turnFlags.chargeMaster = 1;
+        p.energy += 1;
+        log(cs, ev, '凝神：返还 1 点能量');
+      }
     }
-    if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
-  }
+    if (v.type === 'skill') p.skillsPlayedThisTurn += 1;
+    triggerRelics(cs, 'cardPlayed', ev);
+    if (v.type === 'attack') triggerRelics(cs, 'attackPlayed', ev);
+    if (v.type === 'skill') triggerRelics(cs, 'skillPlayed', ev);
+    if (v.type === 'power') triggerRelics(cs, 'powerPlayed', ev);
+    if (v.type === 'skill' && p.skillsPlayedThisTurn === 1 && cs.relics.includes('ink_well')) {
+      gainBlock(p, 3, ev, cs); relicProc(cs, 'ink_well', ev);
+    }
+    if (v.type === 'attack' && p.attacksPlayedThisTurn === 2 && cs.relics.includes('trail_boots')) {
+      gainBlock(p, 3, ev, cs); relicProc(cs, 'trail_boots', ev);
+    }
 
-  resolveEffects(cs, v.effects, target, ev, extraDamage, v);
+    // 敌人激怒
+    if (v.type === 'skill') {
+      for (const e of aliveEnemies(cs)) {
+        if (e.statuses.enrage) {
+          addStatus(e, 'strength', e.statuses.enrage, ev);
+          log(cs, ev, `${e.name} 被激怒，获得 ${e.statuses.enrage} 点力量`);
+        }
+      }
+    }
 
-  // 回响和每张镜像分别贡献一次重放；重放不算再次打牌。
+    // 节奏类触发
+    if (p.cardsPlayedThisTurn === 3) {
+      if (cs.relics.includes('duelist_clasp')) { gainEmber(cs, 2, ev, false); relicProc(cs, 'duelist_clasp', ev); }
+      if (cs.relics.includes('metronome')) {
+        drawCards(cs, 1, ev);
+        ev.push({ type: 'relic', relicId: 'metronome' });
+        log(cs, ev, '节拍怀表：抽 1 张牌');
+      }
+    }
+    if (p.hp > 0 && cs.outcome === 'ongoing') for (const power of activeTempos) {
+      power.progress++;
+      if (power.progress === 3) {
+        power.progress = 0;
+        log(cs, ev, `余音：累计打出 3 张牌，抽 ${power.amount} 张牌`);
+        drawCards(cs, power.amount, ev);
+      }
+    }
+    if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && cs.relics.includes('drummer_heart')) {
+      p.energy += 1;
+      ev.push({ type: 'relic', relicId: 'drummer_heart' });
+      log(cs, ev, '鼓手之心：获得 1 点能量');
+    }
+  };
+  const resolvePlay = () => {
+    let extraDamage = 0;
+    if (v.type === 'attack') {
+      if (p.attacksPlayedThisTurn === 0 && cs.relics.includes('flint')) {
+        extraDamage += T.flintDamage;
+        ev.push({ type: 'relic', relicId: 'flint' });
+      }
+      if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
+    }
+    resolveEffects(cs, v.effects, target, ev, extraDamage, v);
+    finishPlay();
+    handleEnemyDeaths(cs, ev);
+  };
+  resolvePlay();
+
+  // 只读取本次手动出牌之前的回响。重放获得的新回响留给下一张牌，不能递归复制。
   if (v.type !== 'power' && cs.outcome === 'ongoing') {
     const repeats: string[] = [];
     if (hadEcho) {
@@ -633,7 +702,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     }
     for (const source of repeats) {
       if (cs.outcome !== 'ongoing' || p.hp <= 0) break;
-      log(cs, ev, `${source}：效果再次触发`);
+      ev.push({ type: 'cardPlayed', uid, name: v.name });
+      log(cs, ev, `${source}：再次打出「${v.name}」`);
       if (cs.relics.includes('crystal_chime') && !p.turnFlags.chime) {
         p.turnFlags.chime = 1; gainBlock(p, 5, ev, cs); relicProc(cs, 'crystal_chime', ev);
       }
@@ -642,67 +712,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
         ev.push({ type: 'relic', relicId: 'tuning_fork' });
       }
       triggerRelics(cs, 'echo', ev);
-      resolveEffects(cs, v.effects, target, ev, extraDamage, v);
+      resolvePlay();
     }
-  }
-
-  // 计数
-  p.cardsPlayedThisTurn += 1;
-  if (v.type === 'attack') p.attacksPlayedThisTurn += 1;
-  if (cs.outcome === 'ongoing' && p.hp > 0) {
-    if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && p.statuses.comboFlow) {
-      p.energy += p.statuses.comboFlow;
-      log(cs, ev, `续势：获得 ${p.statuses.comboFlow} 点能量`);
-    }
-    if (releaseCharge) {
-      p.turnFlags.chargeMaster = 1;
-      p.energy += 1;
-      log(cs, ev, '凝神：返还 1 点能量');
-    }
-  }
-  if (v.type === 'skill') p.skillsPlayedThisTurn += 1;
-  triggerRelics(cs, 'cardPlayed', ev);
-  if (v.type === 'attack') triggerRelics(cs, 'attackPlayed', ev);
-  if (v.type === 'skill') triggerRelics(cs, 'skillPlayed', ev);
-  if (v.type === 'power') triggerRelics(cs, 'powerPlayed', ev);
-  if (v.type === 'skill' && p.skillsPlayedThisTurn === 1 && cs.relics.includes('ink_well')) {
-    gainBlock(p, 3, ev, cs); relicProc(cs, 'ink_well', ev);
-  }
-  if (v.type === 'attack' && p.attacksPlayedThisTurn === 2 && cs.relics.includes('trail_boots')) {
-    gainBlock(p, 3, ev, cs); relicProc(cs, 'trail_boots', ev);
-  }
-
-  // 敌人激怒
-  if (v.type === 'skill') {
-    for (const e of aliveEnemies(cs)) {
-      if (e.statuses.enrage) {
-        addStatus(e, 'strength', e.statuses.enrage, ev);
-        log(cs, ev, `${e.name} 被激怒，获得 ${e.statuses.enrage} 点力量`);
-      }
-    }
-  }
-
-  // 节奏类触发
-  if (p.cardsPlayedThisTurn === 3) {
-    if (cs.relics.includes('duelist_clasp')) { gainEmber(cs, 2, ev, false); relicProc(cs, 'duelist_clasp', ev); }
-    if (cs.relics.includes('metronome')) {
-      drawCards(cs, 1, ev);
-      ev.push({ type: 'relic', relicId: 'metronome' });
-      log(cs, ev, '节拍怀表：抽 1 张牌');
-    }
-  }
-  if (p.hp > 0 && cs.outcome === 'ongoing') for (const power of activeTempos) {
-    power.progress++;
-    if (power.progress === 3) {
-      power.progress = 0;
-      log(cs, ev, `余音：累计打出 3 张牌，抽 ${power.amount} 张牌`);
-      drawCards(cs, power.amount, ev);
-    }
-  }
-  if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && cs.relics.includes('drummer_heart')) {
-    p.energy += 1;
-    ev.push({ type: 'relic', relicId: 'drummer_heart' });
-    log(cs, ev, '鼓手之心：获得 1 点能量');
   }
 
   // 卡牌去向
@@ -1099,7 +1110,7 @@ function handleEnemyDeaths(cs: CombatState, ev: CombatEvent[]) {
   if (aliveEnemies(cs).length === 0 && cs.outcome === 'ongoing') {
     cs.outcome = 'won';
     cs.phase = 'ended';
-    log(cs, ev, '战斗胜利！');
+    log(cs, ev, cs.enemies.every(e => e.flags.escaped) ? '敌人全部逃离，未获得战利品。' : '战斗胜利！');
   }
 }
 
@@ -1255,8 +1266,8 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       for (let i = 0; i < times; i++) {
         if (!alive(e) || p.hp <= 0) break;
         const dmg = calcDamage(scaleEnemyValue(a.amount, cs.difficulty?.attackMultiplier), e.statuses, p.statuses);
-        const lost = dealDamage(cs, p, dmg, ev, 'enemy');
-        log(cs, ev, `${e.name} 攻击：${dmg} 点伤害（${lost} 点生命，${dmg - lost} 点被格挡）`);
+        const lost = dealDamage(cs, p, dmg, ev, 'enemy', a.piercing);
+        log(cs, ev, `${e.name} ${a.piercing ? '穿透攻击' : '攻击'}：${dmg} 点伤害（${lost} 点生命${a.piercing ? '，无视格挡' : `，${dmg - lost} 点被格挡`}）`);
         if (p.statuses.thorns) {
           const reflected = dealDamage(cs, e, p.statuses.thorns, ev, 'thorns');
           log(cs, ev, `荆棘：${e.name} 失去 ${reflected} 点生命`);
@@ -1278,7 +1289,7 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       const targets: Entity[] = a.target === 'player' ? [p] : a.target === 'self' ? [e] : aliveEnemies(cs);
       for (const t of targets) {
         addStatus(t, a.status, a.amount, ev);
-        log(cs, ev, `${t.name} 获得 ${a.amount} 层${STATUSES[a.status].name}`);
+        log(cs, ev, `${t.name} ${a.amount < 0 ? '减少' : '获得'} ${Math.abs(a.amount)} 层${STATUSES[a.status].name}`);
       }
       break;
     }
@@ -1286,6 +1297,27 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       e.hp = Math.min(e.maxHp, e.hp + a.amount);
       ev.push({ type: 'heal', targetId: e.id, amount: a.amount });
       break;
+    case 'healWeakest': {
+      const target = aliveEnemies(cs).reduce<EnemyState | null>((lowest, ally) =>
+        !lowest || ally.hp / ally.maxHp < lowest.hp / lowest.maxHp ? ally : lowest, null);
+      if (!target) break;
+      const amount = Math.min(a.amount, target.maxHp - target.hp);
+      target.hp += amount;
+      ev.push({ type: 'heal', targetId: target.id, amount });
+      log(cs, ev, `${e.name} 为${target.name}回复 ${amount} 点生命`);
+      break;
+    }
+    case 'escape': {
+      const taken = e.flags.stolenGold ?? 0;
+      e.flags.escaped = 1;
+      e.flags.escapedGold = taken;
+      e.flags.stolenGold = 0;
+      // 离场复用零生命的不可选中状态，但绝不进入死亡钩子或返还金币。
+      e.flags.deadHandled = 1;
+      e.hp = 0; e.block = 0; e.statuses = {}; e.moveId = null;
+      log(cs, ev, `${e.name} 逃跑了${taken > 0 ? `，带走 ${taken} 金币` : ''}。`);
+      break;
+    }
     case 'loseHp': {
       const lost = dealDamage(cs, e, Math.min(a.amount, Math.max(0, e.hp - 1)), ev, 'enemy', true);
       log(cs, ev, `${e.name} 失去 ${lost} 点生命`);

@@ -70,7 +70,7 @@ describe('诅咒结算与获得途径', () => {
     for (const curse of EXTRA_CURSES) {
       const source = sources.find(s => s.id === curse.id)!; expect(source).toBeTruthy();
       let run = R.newRun('CURSE-EVENT'); run.chapter = source.event.chapter ?? 1;
-      const id = run.map.startIds[0]; run.map.nodes[id].type = 'event'; run = R.travelTo(run, id);
+      const id = run.map.startIds[0]; run.map.nodes[id].type = 'event'; run.map.nodes[id].mysteryType = 'event'; run = R.travelTo(run, id);
       run.event!.eventId = source.event.id; run.checkpoint = null;
       const snapshot = structuredClone(run); run.checkpoint = snapshot;
       const changed = R.eventChoose(run, source.choice.id);

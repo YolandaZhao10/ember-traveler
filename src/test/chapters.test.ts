@@ -114,7 +114,7 @@ describe('前三章连续旅程', () => {
       for (const tier of ['normal', 'elite', 'boss'] as const) {
         const pool = ENCOUNTERS.filter(e => (e.chapter ?? 1) === chapter && e.tier === tier && floor >= (e.minFloor ?? 0) && floor <= (e.maxFloor ?? 19));
         expect(pool.length).toBeGreaterThan(0);
-        if (chapter === 2) expect(pool.every(e => e.enemies.every(id => CHAPTER_TWO_ENEMIES.some(enemy => enemy.id === id)))).toBe(true);
+        if (chapter === 2) expect(pool.every(e => e.enemies.every(id => [...CHAPTER_TWO_ENEMIES.map(enemy => enemy.id), 'pressure_boiler', 'quench_smith', 'slag_saw'].includes(id)))).toBe(true);
       }
     }
   });
@@ -125,6 +125,7 @@ describe('前三章连续旅程', () => {
       const base = copy(entry);
       base.gold = 500;
       base.map.nodes[base.map.startIds[0]].type = type;
+      if (type === 'event') base.map.nodes[base.map.startIds[0]].mysteryType = 'event';
       const start = R.travelTo(base, base.map.startIds[0]);
       let changed = start;
       if (type === 'event') {

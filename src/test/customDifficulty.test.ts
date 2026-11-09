@@ -75,7 +75,9 @@ describe('新旅程自定义难度', () => {
       let rare = 0;
       for (let i = 0; i < 120; i++) for (const type of ['shop', 'event'] as const) {
         let run = R.newRun(`RELIC-BIAS-${i}`, 'traveler', { ...STANDARD_DIFFICULTY, relicRarity: level });
-        const id = run.map.startIds[0]; run.map.nodes[id].type = type; run = R.travelTo(run, id);
+        const id = run.map.startIds[0]; run.map.nodes[id].type = type;
+        if (type === 'event') run.map.nodes[id].mysteryType = 'event';
+        run = R.travelTo(run, id);
         if (type === 'shop') {
           expect(new Set(run.shop!.relics.map(r => r.relicId)).size).toBe(6);
           rare += run.shop!.relics.filter(r => RELICS[r.relicId].rarity === 'rare').length;

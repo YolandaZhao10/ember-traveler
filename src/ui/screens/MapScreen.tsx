@@ -76,7 +76,7 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
           <b>{ICONS.elite}</b><span title="比普通战斗更强，胜利后额外掉落遗物">精英</span>
         </span>
         <span>
-          <b>{ICONS.event}</b>事件
+          <b>{ICONS.event}</b><span title="可能遇到事件、普通战斗或商店，进入后揭晓">问号</span>
         </span>
         <span>
           <b>{ICONS.shop}</b>商店
@@ -109,7 +109,7 @@ const NODE_REWARDS: Record<MapNode['type'], string> = {
   combat: '胜利后获得金币，并从卡牌奖励中选一张；也可以跳过选牌。',
   elite: '胜利后获得金币、随机遗物，并从卡牌奖励中选一张。',
   boss: '胜利后获得金币、本角色稀有卡牌三选一，以及章节遗物三选一。',
-  event: '进入后揭示事件选项，可能交换生命、金币、卡牌或获得问号专属遗物。',
+  event: '可能遇到事件、普通战斗或商店，进入后揭晓。事件可能交换生命、金币、卡牌或获得问号专属遗物。',
   shop: '用金币购买卡牌、遗物或移除一张牌，商品进入商店后揭示。',
   rest: '休息、锻造、精简三选一。精简每章一次，会占用本次营火行动。',
 };
@@ -137,7 +137,7 @@ export function RoutePanel({ run, selected, preview, canEnter, reachable, onSele
         <section className="route-reward"><h4>{selected.type === 'rest' || selected.type === 'shop' ? '可以做什么' : '收获'}</h4><p>{selected.type === 'boss' && run.chapter === 4 ? '击败无昼之主，完成本局旅程。终战后直接结算。' : NODE_REWARDS[selected.type]}</p></section>
         {route && <section className="route-outlook"><h4>沿此分支直到本章首领</h4><dl>
           <div><dt>营火</dt><dd>{distance(route.nearestRest)}</dd></div>
-          <div><dt>商店</dt><dd>{distance(route.nearestShop)}</dd></div>
+          <div><dt>已知商店</dt><dd>{distance(route.nearestShop)}</dd></div>
           <div><dt>精英</dt><dd>{route.elites.min === route.elites.max ? route.elites.min : `${route.elites.min}–${route.elites.max}`} 场</dd></div>
         </dl><p className="route-note">包含所选节点；亮线为可达后路。“最快”取最近支路，精英数量随分叉选择变化。</p></section>}
         {!reachable && selected.id !== run.currentNodeId && <p className="route-note">这条路线已无法前往，可查看节点资料。</p>}

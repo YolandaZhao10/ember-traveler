@@ -5,7 +5,7 @@ import type { EncounterDef, MapNode, RunState } from './types';
 type EncounterPlanRun = Pick<RunState, 'seed' | 'chapter' | 'map' | 'visited' | 'currentNodeId' | 'combat'>;
 
 function encounterTier(node: MapNode): EncounterDef['tier'] | undefined {
-  if (node.type === 'combat') return 'normal';
+  if (node.type === 'combat' || (node.type === 'event' && node.mysteryType === 'combat')) return 'normal';
   if (node.type === 'elite' || node.type === 'boss') return node.type;
   return undefined;
 }

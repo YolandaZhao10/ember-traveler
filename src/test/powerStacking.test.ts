@@ -31,19 +31,20 @@ describe('能力牌独立叠加', () => {
     step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
     expect(step.state.player.energy).toBe(93); // 7张1费牌，没有旧版余音的隐含能量。
   });
-  it('普通/升级余音分别抽1/2张，回响重放不额外计牌，跨回合保留进度', () => {
+  it('普通/升级余音分别抽1/2张，回响重放额外计牌，跨回合保留进度', () => {
     let cs = play(play(setup(), 'tempo').state, 'tempo', true).state;
     cs.player.statuses.echo = 1; cs = play(cs, 'defend').state;
-    expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([2, 1]);
+    expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([0, 2]);
     cs = startPlayerTurn(endPlayerTurn(cs).state).state;
-    expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([2, 1]); cs.player.energy = 100; cs.player.hand = [];
-    let step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
-    step = play(step.state, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 2 }]);
+    expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([0, 2]); cs.player.energy = 100; cs.player.hand = [];
+    let step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 2 }]);
+    step = play(step.state, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toHaveLength(0);
+    step = play(step.state, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
     expect(describeCard(card('tempo'), null)).toContain('抽 1 张牌'); expect(describeCard(card('tempo', true), null)).toContain('抽 2 张牌');
   });
   it('两张镜像和回响分别重放，之后本回合不再重复，新打出的镜像仍可触发', () => {
     let cs = play(play(setup(), 'mirror').state, 'mirror').state; cs.player.statuses.echo = 1;
-    let step = play(cs, 'strike'); expect(step.state.enemies[0].hp).toBe(9976); expect(step.state.player.attacksPlayedThisTurn).toBe(1);
+    let step = play(cs, 'strike'); expect(step.state.enemies[0].hp).toBe(9976); expect(step.state.player.attacksPlayedThisTurn).toBe(4);
     expect(step.events.filter(e => e.type === 'damage' && e.source === 'player')).toHaveLength(4);
     step = play(step.state, 'strike'); expect(step.state.enemies[0].hp).toBe(9970);
     cs = play(step.state, 'mirror').state; step = play(cs, 'strike'); expect(step.state.enemies[0].hp).toBe(9958);

@@ -164,19 +164,22 @@ export interface Entity {
 
 // ---------- 敌人 ----------
 export type Intent =
-  | { kind: 'attack'; amount: number; times: number }
-  | { kind: 'attack_debuff'; amount: number; times: number }
+  | { kind: 'attack'; amount: number; times: number; piercing?: boolean }
+  | { kind: 'attack_debuff'; amount: number; times: number; piercing?: boolean }
   | { kind: 'defend' }
   | { kind: 'buff' }
   | { kind: 'debuff' }
   | { kind: 'special' }
+  | { kind: 'escape' }
   | { kind: 'defend_buff' };
 
 export type EnemyAction =
-  | { kind: 'attack'; amount: number; times?: number }
+  | { kind: 'attack'; amount: number; times?: number; piercing?: boolean }
   | { kind: 'block'; amount: number }
   | { kind: 'status'; status: StatusId; amount: number; target: 'player' | 'self' | 'allies' }
   | { kind: 'heal'; amount: number }
+  | { kind: 'healWeakest'; amount: number }
+  | { kind: 'escape' }
   | { kind: 'loseHp'; amount: number }
   | { kind: 'stealGold'; amount: number }
   | { kind: 'addCardToDiscard'; cardId: string; count: number }
@@ -381,6 +384,7 @@ export interface CombatState {
 
 // ---------- 地图 ----------
 export type NodeType = 'combat' | 'elite' | 'event' | 'shop' | 'rest' | 'boss';
+export type MysteryType = 'event' | 'combat' | 'shop';
 export interface MapNode {
   id: string;
   row: number;
@@ -389,6 +393,8 @@ export interface MapNode {
   next: string[];
   /** 开章时固定，地图预览与实际进入使用同一个敌组。 */
   encounterId?: string;
+  /** 问号进入后揭示并固定；未访问节点不提前显示内容。 */
+  mysteryType?: MysteryType;
 }
 export interface GameMap {
   rows: number;

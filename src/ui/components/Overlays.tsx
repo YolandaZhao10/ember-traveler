@@ -237,13 +237,17 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
 function describeAction(a: import('../../engine/types').EnemyAction, self: import('../../engine/types').Statuses, player: import('../../engine/types').Statuses, difficulty?: CombatDifficulty): string {
   switch (a.kind) {
     case 'attack':
-      return `攻击：${calcDamage(scaleEnemyValue(a.amount, difficulty?.attackMultiplier), self, player)} 点伤害${a.times && a.times > 1 ? ` × ${a.times}` : ''}`;
+      return `${a.piercing ? '穿透攻击（无视格挡）' : '攻击'}：${calcDamage(scaleEnemyValue(a.amount, difficulty?.attackMultiplier), self, player)} 点伤害${a.times && a.times > 1 ? ` × ${a.times}` : ''}`;
     case 'block':
       return `获得 ${calcBlock(scaleEnemyValue(a.amount, difficulty?.blockMultiplier), self)} 点格挡`;
     case 'status':
-      return `${a.target === 'player' ? '对你' : a.target === 'self' ? '自身' : '全体同伴'}施加 ${a.amount} 层${STATUSES[a.status].name}`;
+      return `${a.target === 'player' ? '对你' : a.target === 'self' ? '自身' : '全体同伴'}${a.amount < 0 ? '移除' : '施加'} ${Math.abs(a.amount)} 层${STATUSES[a.status].name}`;
     case 'heal':
       return `回复 ${a.amount} 点生命`;
+    case 'healWeakest':
+      return `为当前生命比例最低的存活敌人回复 ${a.amount} 点生命（包括自身）`;
+    case 'escape':
+      return '行动时逃离并带走偷到的金币；在它行动前击败才能追回。逃离不算击杀，不触发击杀奖励。';
     case 'loseHp':
       return `失去 ${a.amount} 点生命`;
     case 'stealGold':

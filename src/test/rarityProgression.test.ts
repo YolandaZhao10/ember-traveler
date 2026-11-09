@@ -46,6 +46,7 @@ describe('随楼层上升的卡牌稀有度', () => {
       let rare = 0;
       for (let i = 0; i < 300; i++) {
         let run = R.newRun(`EVENT-RARITY-${i}`); run.map.nodes[run.map.startIds[0]].type = 'event';
+        run.map.nodes[run.map.startIds[0]].mysteryType = 'event';
         run = R.travelTo(run, run.map.startIds[0]); run.floor = floor; run.event!.eventId = eventId;
         const next = R.eventChoose(run, choice); if (CARDS[next.deck[next.deck.length - 1].defId].rarity === 'rare') rare++;
       }

@@ -12,13 +12,14 @@ import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type 
 import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
 import { ensureEncounterPlan, plannedEncounter } from './encounters';
+import { resolveMystery } from './mystery';
 import { distinctRewardPool } from './cardChoices';
 import { describeCard } from './cards';
 import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 16;
+export const SAVE_VERSION = 17;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -115,7 +116,8 @@ export function travelTo(input: RunState, nodeId: string): RunState {
   run.currentNodeId = nodeId;
   run.visited.push(nodeId);
   run.floor = CHAPTERS[run.chapter].startFloor + node.row;
-  switch (node.type) {
+  const type = node.type === 'event' ? resolveMystery(run, node) : node.type;
+  switch (type) {
     case 'combat':
       startEncounter(run, 'normal');
       break;
@@ -201,7 +203,7 @@ export function combatPlayCard(run: RunState, cardUid: string, targetId: string 
   const step = playCard(run.combat, cardUid, targetId);
   const out = applyCombatStep(run, step);
   if (out.events.length) {
-    out.run.stats.cardsPlayed += 1;
+    out.run.stats.cardsPlayed += step.events.filter(e => e.type === 'cardPlayed').length;
     out.run.stats.damageDealt += step.events.filter((e) => e.type === 'damage' && e.source === 'player').reduce((s, e) => s + (e.type === 'damage' ? e.amount : 0), 0);
   }
   return out;
@@ -243,9 +245,15 @@ export function finishCombat(input: RunState): RunState {
     run.combat = null;
     return run;
   }
-  run.stats.enemiesKilled += cs.enemies.length;
-  if (cs.tier === 'elite') run.stats.elitesKilled += 1;
+  const defeated = cs.enemies.filter(e => !e.flags.escaped);
+  run.stats.enemiesKilled += defeated.length;
+  if (cs.tier === 'elite' && defeated.some(e => ENEMIES[e.defId].tier === 'elite')) run.stats.elitesKilled += 1;
   run.stats.floorsCleared += 1;
+  if (!defeated.length) {
+    // 全部逃离没有击败奖励或战后遗物收益，仍可从地图 SL 重打本节点。
+    run.combat = null; run.reward = null; run.screen = 'map';
+    return run;
+  }
   // 战斗中新增的牌（如诅咒）不会进入牌组——仅战斗内有效
   if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + T.canteenHeal);
   if (run.relics.includes('red_vial') && cs.player.selfHpLost > 0) run.hp = Math.min(run.maxHp, run.hp + Math.floor(cs.player.selfHpLost / 2));
@@ -260,7 +268,7 @@ export function finishCombat(input: RunState): RunState {
     goldTaken: false,
     cards: generateCardChoices(run, cs.tier === 'elite' ? 'elite' : 'normal', 3),
     cardTaken: false,
-    relic: cs.tier === 'elite' ? pickRelic(run) : null,
+    relic: cs.tier === 'elite' && defeated.some(e => ENEMIES[e.defId].tier === 'elite') ? pickRelic(run) : null,
     relicTaken: false,
   };
   run.combat = null;

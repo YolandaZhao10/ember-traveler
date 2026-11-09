@@ -363,6 +363,7 @@ async function afterStep() {
     const next = R.finishCombat(state.run!);
     set({ busy: false, selectedCard: null });
     setRun(next);
+    if (next.screen === 'map') toast('敌人已逃离，未获得战利品；被带走的金币无法追回。');
     return;
   }
   set({ busy: false });

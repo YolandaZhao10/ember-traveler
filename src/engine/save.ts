@@ -7,6 +7,7 @@ import { recordJourney } from './history';
 import { ensurePowerInstances } from './powers';
 import { ENEMIES } from '../data/enemies';
 import { ensureEncounterPlan } from './encounters';
+import { BLOCK_MAX } from './constants';
 
 type Snapshot = NonNullable<RunState['checkpoint']>;
 
@@ -64,6 +65,13 @@ function migrateLayout(input: Snapshot): Snapshot {
     run.campRefined = run.campRefined === true;
     ensureEncounterPlan(run);
   }
+  if (input.version < 17) {
+    // 旧问号只会触发事件：保留历史与当前事件，不重抽，也不改未访问节点。
+    for (const id of new Set([...run.visited, ...(run.currentNodeId ? [run.currentNodeId] : [])])) {
+      const node = map.nodes[id];
+      if (node?.type === 'event') node.mysteryType = 'event';
+    }
+  }
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';
@@ -108,6 +116,10 @@ export function loadRun(): RunState | null {
     const raw = s.getItem(KEY);
     if (!raw) return null;
     const run = JSON.parse(raw) as RunState;
+    for (const snapshot of [run, run.checkpoint]) {
+      if (!snapshot?.combat) continue;
+      for (const entity of [snapshot.combat.player, ...snapshot.combat.enemies]) entity.block = Math.min(BLOCK_MAX, Math.max(0, entity.block));
+    }
     // 旧版只有第一章；快照也升级，避免 SL 后退回旧结构。
     if (run.version >= 4 && run.version < SAVE_VERSION) {
       const singleChapter = run.version < 6;

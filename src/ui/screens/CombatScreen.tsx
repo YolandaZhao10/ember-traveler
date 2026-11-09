@@ -226,6 +226,7 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
   const intent = cs ? enemyIntent(cs, e) : null;
   const it = intentText(intent);
   const dead = e.hp <= 0;
+  const escaped = !!e.flags.escaped;
   const guard = enemyDamageGuard(e);
   return (
     <div data-entity-id={e.id} className={`entity ${targetable ? 'targetable' : ''} ${aimed ? 'aimed' : ''} ${dead ? 'dead' : ''} ${acting ? 'acting' : ''}`} onClick={(ev) => { ev.stopPropagation(); onClick(); }} role="button" aria-disabled={dead || undefined} aria-label={`${e.name}，生命 ${e.hp}/${e.maxHp}`}>
@@ -240,8 +241,8 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
       <CombatFigure impacts={impacts} attacking={acting} defeated={dead}>
         <EnemyArt kind={def.sprite} className="sprite" />
       </CombatFigure>
-      <div className="ename">{e.name}</div>
-      <HpBar hp={e.hp} maxHp={e.maxHp} block={e.block} />
+      <div className="ename">{e.name}{escaped ? ' · 已逃跑' : ''}</div>
+      {!escaped && <HpBar hp={e.hp} maxHp={e.maxHp} block={e.block} />}
       {!dead && guard && (
         <button type="button" className={`damage-guard ${guard.remaining === 0 ? 'full' : ''}`}
           title={`本回合最多失去 ${guard.limit} 点生命，已失去 ${guard.lost} 点。每个玩家回合开始刷新。点击查看详情。`}

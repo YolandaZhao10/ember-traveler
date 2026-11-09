@@ -112,6 +112,7 @@ describe('当前节点快速 SL', () => {
     const base = R.newRun('EVENT-SL');
     base.usedEvents = EVENT_LIST.filter((event) => event.id !== 'ember_sprite').map((event) => event.id);
     base.map.nodes[base.map.startIds[0]].type = 'event';
+    base.map.nodes[base.map.startIds[0]].mysteryType = 'event';
     const original = R.travelTo(base, base.map.startIds[0]);
     const choice = R.eventChoose(original, 'absorb');
     const restored = R.resetCurrentNode(choice);

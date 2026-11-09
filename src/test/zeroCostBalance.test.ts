@@ -60,8 +60,8 @@ describe('零费资源牌的真实消耗边界', () => {
     expect(after.player.block).toBe(6);
     expect(after.player.exhaust.map(c => c.uid).sort()).toEqual(['burn_pages', 'fuel-a', 'fuel-b']);
     expect(after.player.turnFlags.exhausted).toBe(3);
-    expect(events.filter(e => e.type === 'cardPlayed')).toHaveLength(1);
-    expect(after.player.cardsPlayedThisTurn).toBe(1);
+    expect(events.filter(e => e.type === 'cardPlayed')).toHaveLength(2);
+    expect(after.player.cardsPlayedThisTurn).toBe(2);
     const alone = use(battle('burn_pages'), 'burn_pages').state;
     expect(alone.player.energy).toBe(0);
     expect(alone.player.exhaust).toHaveLength(1);
@@ -76,7 +76,7 @@ describe('零费资源牌的真实消耗边界', () => {
     expect(after.player.hand).toHaveLength(upgraded ? 6 : 4);
     expect(after.player.block).toBe(2);
     expect(after.player.exhaust.map(c => c.uid)).toEqual(['blood_rite']);
-    expect(after.player.cardsPlayedThisTurn).toBe(1);
+    expect(after.player.cardsPlayedThisTurn).toBe(2);
   });
 
   it('折页护符仍可保留蓄力，回响后仅消耗一次；只有结算时拥有回响才储能', () => {
@@ -129,7 +129,7 @@ describe('可重复零费牌的收益预算', () => {
     const cs = battle(id, upgraded);
     cs.player.cardsPlayedThisTurn = 2; cs.player.attacksPlayedThisTurn = 2;
     cs.enemies[0].statuses.burn = 1;
-    // 回响只在低语针场景启用，额外伤害计两次，额外出牌计数不翻倍。
+    // 回响只在低语针场景启用，伤害与出牌次数各计两次。
     if (id === 'whisper_needle') cs.player.statuses.echo = 1;
     const after = use(cs, id).state;
     const budget = repeatBudgets[id], up = Number(upgraded);
@@ -143,7 +143,7 @@ describe('可重复零费牌的收益预算', () => {
     expect(after.player.hand).toHaveLength(0);
     expect(after.player.discard.filter(c => c.uid === id)).toHaveLength(1);
     expect(after.player.exhaust).toHaveLength(0);
-    expect(after.player.cardsPlayedThisTurn).toBe(3);
+    expect(after.player.cardsPlayedThisTurn).toBe(id === 'whisper_needle' ? 4 : 3);
     if (['crimson_step', 'ember_pulse'].includes(id)) expect(after.player.hp).toBe(98);
     if (id === 'flex') expect(nextTurn(after).player.statuses.strength ?? 0).toBe(0);
   });

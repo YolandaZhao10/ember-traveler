@@ -108,7 +108,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     expect(cs.player.statuses.energyNext ?? 0).toBe(0);
   });
 
-  it('旧书与黑日叠加镜像时能力不被回响复制，五次伤害仍只算一张牌，门钥每轮只返一次能量', () => {
+  it('旧书与黑日叠加镜像时能力不被回响复制，五次重放计五次出牌，门钥每轮只返一次能量', () => {
     let cs = battle('scholar', ['old_tome', 'black_sun', 'echo_key', 'clocktower_gear'],
       [mirror, mirror, mirror, 'whisper_needle', 'whisper_needle'],
       ['whisper_needle', mirror, ...copies('whisper_needle', 8)]);
@@ -124,13 +124,13 @@ describe('有限牌组的遗物组合资源上限', () => {
 
     cs = use(cs, first, 'whisper_needle');
     expect(cs.enemies[0].hp).toBe(990); // 本体 + 回响 + 三张独立镜像，每次 2 点伤害。
-    expect(cs.player.cardsPlayedThisTurn).toBe(4);
-    expect(cs.player.attacksPlayedThisTurn).toBe(1);
+    expect(cs.player.cardsPlayedThisTurn).toBe(8);
+    expect(cs.player.attacksPlayedThisTurn).toBe(5);
     expect(cs.player.energy).toBe(5);
     expect(cs.player.block).toBe(18);
     expect(cs.player.statuses.echo).toBe(1);
     cs = emptyHand(cs, first);
-    expect(cs.player.cardsPlayedThisTurn).toBe(6);
+    expect(cs.player.cardsPlayedThisTurn).toBe(11);
     expect(cs.player.energy).toBe(5);
     expect(cs.player.statuses.echo ?? 0).toBe(0);
     for (const relic of cs.relics) expect(procs(first, relic)).toBe(1);
@@ -144,10 +144,10 @@ describe('有限牌组的遗物组合资源上限', () => {
     const enemyHp = cs.enemies[0].hp;
     cs = use(cs, second, 'whisper_needle');
     expect(enemyHp - cs.enemies[0].hp).toBe(12);
-    expect(cs.player.cardsPlayedThisTurn).toBe(2);
-    expect(cs.player.attacksPlayedThisTurn).toBe(1);
-    expect(cs.player.energy).toBe(4);
-    expect(cs.player.block).toBe(4);
+    expect(cs.player.cardsPlayedThisTurn).toBe(7);
+    expect(cs.player.attacksPlayedThisTurn).toBe(6);
+    expect(cs.player.energy).toBe(5);
+    expect(cs.player.block).toBe(10);
     cs = emptyHand(cs, second);
     expect(cs.player.energy).toBe(5);
     expect(procs(second, 'old_tome')).toBe(1);
@@ -156,7 +156,7 @@ describe('有限牌组的遗物组合资源上限', () => {
     expect(procs(second, 'clocktower_gear')).toBe(1);
   });
 
-  it('回响消耗牌可以结算两次卡面收益，却只消耗一次且不会重复触发能力、消耗或三技能返利', () => {
+  it('回响消耗牌可以结算两次卡面收益，却只消耗一次且能力和消耗只触发一次，三技能返利计重放', () => {
     let cs = battle('scholar', ['old_tome', 'foundry_core', 'echo_key', 'unwritten_page'],
       [mirror, 'traveling_supplies', 'traveling_supplies', 'shutter_lamp', 'shutter_lamp'], copies('shutter_lamp', 8));
     const events: CombatEvent[] = [];
@@ -164,8 +164,8 @@ describe('有限牌组的遗物组合资源上限', () => {
     cs = use(cs, events, 'traveling_supplies');
     expect(cs.player.hp).toBe(58);
     expect(cs.player.exhaust).toHaveLength(1);
-    expect(cs.player.cardsPlayedThisTurn).toBe(2);
-    expect(cs.player.skillsPlayedThisTurn).toBe(1);
+    expect(cs.player.cardsPlayedThisTurn).toBe(3);
+    expect(cs.player.skillsPlayedThisTurn).toBe(2);
     expect(cs.player.energy).toBe(5);
     expect(cs.player.statuses.echo ?? 0).toBe(0);
     expect(draws(events)).toBe(3); // 药包自身抽两次，动力核只抽一次。
@@ -173,8 +173,8 @@ describe('有限牌组的遗物组合资源上限', () => {
 
     cs = emptyHand(cs, events);
     expect(cs.player.hp).toBe(62);
-    expect(cs.player.cardsPlayedThisTurn).toBe(10);
-    expect(cs.player.skillsPlayedThisTurn).toBe(9);
+    expect(cs.player.cardsPlayedThisTurn).toBe(11);
+    expect(cs.player.skillsPlayedThisTurn).toBe(10);
     expect(cs.player.exhaust).toHaveLength(9); // 两张药包和七张掩灯，各只消耗一次
     expect(cs.player.energy).toBe(5);
     expect(cs.player.statuses.energyNext).toBe(1);

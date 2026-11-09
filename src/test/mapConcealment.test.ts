@@ -42,3 +42,14 @@ it('首领选中详情继续显示敌方资料',()=>{
  expect(html).toContain('敌方阵容');
  for(const id of plannedEncounter(run,selected)!.enemies)expect(html).toContain(ENEMIES[id].name);
 });
+it('问号预览只说明三种可能，不提前揭示类型、阵容或商店库存，也不改随机状态',()=>{
+ const run=newRun('HIDDEN-MYSTERY'),selected=Object.values(run.map.nodes).find(n=>n.type==='event')!;
+ const before=structuredClone(run);
+ for(const preview of [false,true]) {
+  const html=renderToStaticMarkup(React.createElement(RoutePanel,{run,selected,preview,canEnter:true,reachable:true,onSelect:()=>{}}));
+  expect(html).toContain('可能遇到事件、普通战斗或商店');
+  expect(html).toContain('已知商店');
+  expect(html).not.toMatch(/敌方阵容|名敌人|遭遇敌人/);
+ }
+ expect(run).toEqual(before);
+});

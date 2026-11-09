@@ -3,6 +3,8 @@
  * 所有图形为简单几何拼接，使用统一配色。
  */
 
+import { extraEnemyBody } from './ExtraEnemySprites';
+
 const INK = '#1a1411';
 const PARCH = '#e8d9b5';
 const EMBER = '#ff7a2a';
@@ -164,6 +166,8 @@ function Eyes({ x1, x2, y, color = EMBER2, r = 4 }: { x1: number; x2: number; y:
 }
 
 export function EnemySprite({ kind, className }: { kind: string; className?: string }) {
+  const extra = extraEnemyBody(kind);
+  if (extra) return <svg viewBox="0 0 160 160" className={className} aria-hidden="true"><Shadow />{extra}</svg>;
   const stroke = { stroke: INK, strokeWidth: 3 };
   let body: JSX.Element;
   switch (kind) {

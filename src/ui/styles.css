@@ -760,8 +760,10 @@ h3 {
   border-radius: 9px;
   background: #1a1411;
   border: 1px solid #5a4a36;
-  overflow: hidden;
+  overflow: visible;
 }
+.hpbar-track { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
+.hpbar.has-block .txt { padding-left: 38px; }
 .hpbar .fill {
   height: 100%;
   background: linear-gradient(180deg, #d4574a, #8a2b22);
@@ -818,8 +820,12 @@ h3 {
   position: absolute;
   left: -8px;
   top: -10px;
-  width: 30px;
-  height: 32px;
+  width: max-content;
+  min-width: 34px;
+  height: 36px;
+  padding: 0 8px 7px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -2314,3 +2320,4 @@ h3 {
 .choice .event-relic-preview > span { color: #574630; font-size: 13px; }
 .event-curse-preview { border-left-color: #8b4555; background: #8b455510; }
 .choice .event-curse-preview strong { color: #7b3346; }
+.intent.escape { color: #ffe59b; border-color: #d1a84b; background: #51401d; font-weight: 800; }

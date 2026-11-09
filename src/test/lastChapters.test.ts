@@ -32,6 +32,7 @@ function claim(run: RunState) { return R.rewardLeave(R.rewardTakeRelic(R.rewardT
 function event(id: string) {
   const run = R.newRun('PREVIEW'); run.chapter = 3; run.gold = 500; run.hp = 50;
   run.usedEvents = EVENT_LIST.filter(e => e.id !== id).map(e => e.id); run.map.nodes[run.map.startIds[0]].type = 'event';
+  run.map.nodes[run.map.startIds[0]].mysteryType = 'event';
   return R.travelTo(run, run.map.startIds[0]);
 }
 
@@ -90,7 +91,7 @@ describe('第三章与五站终章', () => {
     expect(R.resetCurrentNode(loaded).reward!.chapterComplete).toBe(2);
   });
   it('第三章所有层有独立遭遇，终章只用独立精英与首领，每章独有9件奖励', () => {
-    const ids = CHAPTER_THREE_ENEMIES.map(e => e.id); expect(ids).toHaveLength(10);
+    const ids = [...CHAPTER_THREE_ENEMIES.map(e => e.id), 'sealed_archivist', 'phase_lancer', 'orbit_gambler']; expect(ids).toHaveLength(13);
     for (let floor = 0; floor < 20; floor++) for (const tier of ['normal','elite','boss'] as const) {
       const pool = ENCOUNTERS.filter(e => e.chapter === 3 && e.tier === tier && floor >= (e.minFloor ?? 0) && floor <= (e.maxFloor ?? 19));
       expect(pool.length).toBeGreaterThan(0); expect(pool.every(e => e.enemies.every(id => ids.includes(id)))).toBe(true);

@@ -2,7 +2,7 @@ import type { StatusDef, StatusId } from '../engine/types';
 
 export const STATUSES: Record<StatusId, StatusDef> = {
   spentEmberDraw: { id: 'spentEmberDraw', name: '长明', kind: 'power', description: n => `每回合首次因打出卡牌实际消耗余烬时，获得 ${n * 6} 点格挡并抽 ${n} 张牌。` },
-  comboFlow: { id: 'comboFlow', name: '续势', kind: 'power', description: n => `每回合打出第 3 张攻击牌后，获得 ${n} 点能量。重放不计数。` },
+  comboFlow: { id: 'comboFlow', name: '续势', kind: 'power', description: n => `每回合打出第 3 张攻击牌后，获得 ${n} 点能量。回响与镜像重放也计数。` },
   guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
   ashInsight: { id: 'ashInsight', name: '灰中启示', kind: 'power', description: n => `每回合生效后的前 2 次消耗，每次抽 ${n} 张牌。` },
   bloodDraw: { id: 'bloodDraw', name: '血之筹码', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，抽 ${n} 张牌。` },
@@ -176,7 +176,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     id: 'echo',
     name: '回响',
     kind: 'buff',
-    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次。`,
+    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次，每次分别计入出牌次数，只支付一次能量。`,
   },
   resonance: {
     id: 'resonance',
@@ -188,7 +188,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     id: 'mirror',
     name: '镜像',
     kind: 'power',
-    description: (n) => `每回合生效后的第一张攻击牌额外触发 ${n} 次。每张独立触发，可与回响叠加。`,
+    description: (n) => `每回合生效后的第一张攻击牌额外触发 ${n} 次。每张独立触发，可与回响叠加；每次重放计入出牌和攻击次数，不额外支付能量。`,
   },
   energyNext: {
     id: 'energyNext',

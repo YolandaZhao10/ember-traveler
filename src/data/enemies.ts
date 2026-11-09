@@ -3,6 +3,7 @@ import { chance, pick } from '../engine/rng';
 import { CHAPTER_TWO_ENCOUNTERS, CHAPTER_TWO_ENEMIES } from './enemies2';
 import { CHAPTER_THREE_ENCOUNTERS, CHAPTER_THREE_ENEMIES } from './enemies3';
 import { CHAPTER_FOUR_ENCOUNTERS, CHAPTER_FOUR_ENEMIES } from './enemies4';
+import { EXTRA_ENEMIES, EXTRA_ENCOUNTERS } from './extraEnemies';
 
 export const ENEMIES: Record<string, EnemyDef> = {};
 function def(e: EnemyDef) {
@@ -131,13 +132,15 @@ def({
   tier: 'normal',
   hp: [26, 30],
   sprite: 'looter',
-  description: '灰烬城里也有人在讨生活，只是方式不太体面。',
+  description: '第二回合偷窃。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；在它行动前击败可追回金币，否则带钱离场。',
   moves: [
     { id: 'lunge', name: '突刺', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     { id: 'flurry', name: '连刺', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 3 }] },
     { id: 'steal', name: '偷窃', intent: 'special', actions: [{ kind: 'attack', amount: 5 }, { kind: 'stealGold', amount: 12 }] },
+    { id: 'escape', name: '携财逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
   chooseMove: (ctx) => {
+    if (ctx.enemy.turn >= 5 && chance(ctx.rng, 0.2)) return 'escape';
     if (ctx.enemy.turn === 1) return 'steal';
     return last(ctx) === 'flurry' ? 'lunge' : chance(ctx.rng, 0.5) ? 'flurry' : 'lunge';
   },
@@ -386,13 +389,14 @@ def({
   tier: 'elite',
   hp: [78, 78],
   sprite: 'taxman',
-  description: '连死人也要收税。它会抢走你的金币，并定期清除身上的负面状态。',
+  description: '抢走金币并定期净化。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
   moves: [
     { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }] },
     { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
     { id: 'ledger', name: '账本壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'escape', name: '携账逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
-  chooseMove: (ctx) => cycle(ctx, ['levy', 'verdict', 'ledger']),
+  chooseMove: (ctx) => ctx.enemy.turn >= 5 && chance(ctx.rng, 0.2) ? 'escape' : cycle(ctx, ['levy', 'verdict', 'ledger']),
 });
 
 def({
@@ -453,9 +457,10 @@ def({
 });
 
 // ---------- 遭遇 ----------
-[...CHAPTER_TWO_ENEMIES, ...CHAPTER_THREE_ENEMIES, ...CHAPTER_FOUR_ENEMIES].forEach(def);
+[...CHAPTER_TWO_ENEMIES, ...CHAPTER_THREE_ENEMIES, ...CHAPTER_FOUR_ENEMIES, ...EXTRA_ENEMIES].forEach(def);
 export const ENCOUNTERS: EncounterDef[] = [
   ...CHAPTER_TWO_ENCOUNTERS, ...CHAPTER_THREE_ENCOUNTERS, ...CHAPTER_FOUR_ENCOUNTERS,
+  ...EXTRA_ENCOUNTERS,
   { id: 'rats3', enemies: ['ash_rat', 'ash_rat', 'ash_rat'], tier: 'normal', maxFloor: 4 },
   { id: 'crows2', enemies: ['shade_crow', 'shade_crow'], tier: 'normal', maxFloor: 5 },
   { id: 'ember1', enemies: ['stray_ember'], tier: 'normal', maxFloor: 3 },

@@ -117,8 +117,8 @@ function assignTypes(grid: (MapNode | null)[][], rng: RngState, camps: Set<strin
       else if (camps.has(n.id)) type = 'rest';
       else {
         const weights: { item: NodeType; weight: number }[] = [
-          { item: 'combat', weight: 42 },
-          { item: 'event', weight: 22 },
+          { item: 'combat', weight: 37 },
+          { item: 'event', weight: 27 },
           { item: 'elite', weight: r >= 4 ? 18 : 0 },
           { item: 'rest', weight: r >= 3 && r <= lastRow - 2 && !n.next.some(id => camps.has(id)) ? 10 : 0 },
           { item: 'shop', weight: r >= 2 ? 8 : 0 },
@@ -202,7 +202,7 @@ function weightedNodeType(rng: RngState, items: { item: NodeType; weight: number
 }
 
 export function nodeTypeName(t: NodeType): string {
-  return { combat: '战斗', elite: '精英', event: '事件', shop: '商店', rest: '营火', boss: '首领' }[t];
+  return { combat: '战斗', elite: '精英', event: '问号', shop: '商店', rest: '营火', boss: '首领' }[t];
 }
 
 /** 当前可前往的节点 */

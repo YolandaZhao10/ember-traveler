@@ -1,0 +1,73 @@
+{
+  "note": "随机完整路径与地图结构统计，不模拟战斗胜率；每种子三路径不预知问号结果。",
+  "seedsPerChapter": 500,
+  "before": {
+    "maps": 1500,
+    "routes": 4500,
+    "nodeCounts": {
+      "combat": 76510,
+      "event": 28860,
+      "shop": 5623,
+      "elite": 11702,
+      "rest": 20904,
+      "boss": 1500
+    },
+    "mysteryCounts": {
+      "event": 16671,
+      "combat": 0,
+      "shop": 0
+    },
+    "routeCounts": {
+      "combat": 44093,
+      "event": 16671,
+      "shop": 3271,
+      "elite": 6573,
+      "rest": 14892,
+      "boss": 4500
+    },
+    "questionNodePercent": 19.889868296818033,
+    "averagePerRoute": {
+      "combat": 9.798444444444444,
+      "event": 3.7046666666666668,
+      "shop": 0.7268888888888889,
+      "elite": 1.4606666666666666,
+      "rest": 3.3093333333333335,
+      "boss": 1
+    }
+  },
+  "after": {
+    "maps": 1500,
+    "routes": 4500,
+    "nodeCounts": {
+      "combat": 69994,
+      "event": 35376,
+      "shop": 5623,
+      "elite": 11702,
+      "rest": 20904,
+      "boss": 1500
+    },
+    "mysteryCounts": {
+      "event": 15346,
+      "combat": 3305,
+      "shop": 1820
+    },
+    "routeCounts": {
+      "combat": 43599,
+      "event": 15346,
+      "shop": 5090,
+      "elite": 6573,
+      "rest": 14892,
+      "boss": 4500
+    },
+    "questionNodePercent": 24.380595317679653,
+    "averagePerRoute": {
+      "combat": 9.688666666666666,
+      "event": 3.410222222222222,
+      "shop": 1.1311111111111112,
+      "elite": 1.4606666666666666,
+      "rest": 3.3093333333333335,
+      "boss": 1
+    }
+  },
+  "failures": []
+}

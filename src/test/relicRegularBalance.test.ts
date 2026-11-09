@@ -45,10 +45,10 @@ describe('常规与角色专属遗物的强度边界和差异', () => {
     expect(cs.player.hand.find(c => c.uid === 'held')!.bonus).toBe(before);
     cs = play(cs, 'quick_stab', 'second');
     expect(cs.player.hand.find(c => c.uid === 'held')!.bonus).toBe(before + 1);
-    expect(cs.player.ember).toBe(2);
+    expect(cs.player.ember).toBe(4); // 无尽笔2余烬，加第二张疾刺及其回响各1余烬。
     cs = play(cs, 'strike', 'third');
     expect(cs.player.hand.find(c => c.uid === 'held')!.bonus).toBe(before + 1);
-    expect(cs.player.ember).toBe(2);
+    expect(cs.player.ember).toBe(4); // 无尽笔2余烬，加第二张疾刺及其回响各1余烬。
   });
 
   it('守锋令不会在防守和连击条件下每回合同时叠力量与额外能量', () => {

@@ -1,0 +1,2527 @@
+{
+  "note": "固定构筑、同章同层普通遭遇对照；不代表真人或整局胜率。新敌组允许有强弱差异，逐章逐路线检查胜率下降不超过15个百分点、平均生命损失比例不额外增加超过0.15。",
+  "seeds": 8,
+  "rows": [
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.015625,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.001736111111111111,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.003205128205128205,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02564102564102564,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.00641025641025641,
+        "turns": 1.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.00641025641025641,
+        "turns": 1.25
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.125
+      }
+    },
+    {
+      "id": "alley_crossbow",
+      "reference": "snail1",
+      "floor": 3,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.875
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05902777777777778,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0798611111111111,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008680555555555556,
+        "turns": 4
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.046875,
+        "turns": 4.625
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0625,
+        "turns": 2.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.043560606060606064,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022727272727272728,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0321969696969697,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01442307692307692,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03044871794871795,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05608974358974359,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03685897435897436,
+        "turns": 1.375
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.028846153846153848,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "alley_duel",
+      "reference": "hollow1",
+      "floor": 6,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.004807692307692308,
+        "turns": 2.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04807692307692308,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.026041666666666668,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.052083333333333336,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 4.125
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.00946969696969697,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03598484848484848,
+        "turns": 2
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.003787878787878788,
+        "turns": 1.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01893939393939394,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008012820512820512,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01282051282051282,
+        "turns": 2.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03365384615384615,
+        "turns": 2.125
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.002403846153846154,
+        "turns": 3
+      }
+    },
+    {
+      "id": "lamp_and_rat",
+      "reference": "puppet_rat",
+      "floor": 4,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08159722222222224,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.1527777777777778,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0625,
+        "turns": 4.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03125,
+        "turns": 4.875
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03409090909090909,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.056818181818181816,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022727272727272728,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.043560606060606064,
+        "turns": 2
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022435897435897436,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01282051282051282,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01923076923076923,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08012820512820512,
+        "turns": 2.125
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007211538461538462,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01201923076923077,
+        "turns": 4.125
+      }
+    },
+    {
+      "id": "crossbow_ambush",
+      "reference": "looter_crow",
+      "floor": 9,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007211538461538462,
+        "turns": 3.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.019230769230769232,
+        "turns": 3
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.171875,
+        "turns": 4.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.2152777777777778,
+        "turns": 7.125
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.019097222222222224,
+        "turns": 8
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02951388888888889,
+        "turns": 9
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.07196969696969696,
+        "turns": 3.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.10037878787878787,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.10037878787878787,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.06818181818181818,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.046474358974358976,
+        "turns": 4.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08974358974358974,
+        "turns": 6.375
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.1362179487179487,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.1330128205128205,
+        "turns": 3.5
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01682692307692308,
+        "turns": 6.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04086538461538462,
+        "turns": 9
+      }
+    },
+    {
+      "id": "lamplit_patrol",
+      "reference": "snail_hollow",
+      "floor": 12,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.028846153846153844,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.052884615384615384,
+        "turns": 4.75
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.005208333333333333,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.010416666666666666,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.015625,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02884615384615385,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014423076923076924,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": -0.008012820512820512,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008012820512820512,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04326923076923077,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "deep_pressure",
+      "reference": "deep_drone",
+      "floor": 23,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007211538461538462,
+        "turns": 3.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.25
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.017361111111111112,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.001736111111111111,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.005208333333333333,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022727272727272728,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.001893939393939394,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04006410256410256,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03685897435897436,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.046474358974358976,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.016025641025641028,
+        "turns": 2
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.038461538461538464,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.004807692307692308,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "deep_quenching",
+      "reference": "deep_guard",
+      "floor": 22,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014423076923076924,
+        "turns": 3.625
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.006944444444444444,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.010416666666666666,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.25
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.016025641025641028,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.017628205128205128,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0657051282051282,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03365384615384615,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014423076923076924,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.021634615384615384,
+        "turns": 1.875
+      }
+    },
+    {
+      "id": "deep_saw_track",
+      "reference": "deep_hound",
+      "floor": 23,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.25
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.13368055555555555,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02430555555555556,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04513888888888889,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.019097222222222224,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03598484848484849,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.011363636363636364,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.005681818181818182,
+        "turns": 1.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007575757575757576,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.1266025641025641,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.024038461538461536,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.16666666666666669,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.059294871794871785,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.11538461538461538,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.019230769230769232,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "deep_smith_ticks",
+      "reference": "deep_stoker_tick",
+      "floor": 27,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05288461538461539,
+        "turns": 4.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.036057692307692304,
+        "turns": 4.125
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08333333333333334,
+        "turns": 3.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022569444444444448,
+        "turns": 2.875
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04861111111111112,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.020833333333333336,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022727272727272728,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.011363636363636364,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.043560606060606064,
+        "turns": 2.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007575757575757576,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08974358974358974,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01282051282051282,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.11698717948717949,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05128205128205127,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08653846153846154,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.024038461538461536,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "deep_saw_ticks",
+      "reference": "deep_seer",
+      "floor": 30,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04807692307692309,
+        "turns": 5.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05528846153846154,
+        "turns": 5.125
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.004261363636363636,
+        "turns": 1.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008522727272727272,
+        "turns": 1.875
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.011904761904761904,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.025297619047619048,
+        "turns": 3.5
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.006756756756756757,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.001893939393939394,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014627659574468084,
+        "turns": 2.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0678191489361702,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": -0.005319148936170213,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02526595744680852,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.020833333333333332,
+        "turns": 2.25
+      }
+    },
+    {
+      "id": "sky_sealed_archive",
+      "reference": "sky_pilgrim",
+      "floor": 43,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014583333333333334,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.028409090909090908,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.06547619047619048,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0033783783783783786,
+        "turns": 1.5
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.125
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.017287234042553192,
+        "turns": 2.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.022606382978723406,
+        "turns": 2.375
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": -0.003989361702127659,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.12898936170212766,
+        "turns": 2
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05625,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "sky_phase_lance",
+      "reference": "sky_hound",
+      "floor": 43,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.13541666666666669,
+        "turns": 2.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.002840909090909091,
+        "turns": 1.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0014204545454545455,
+        "turns": 1.875
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03571428571428571,
+        "turns": 3.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02827380952380952,
+        "turns": 3.75
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0033783783783783786,
+        "turns": 1.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0033783783783783786,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.625
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04122340425531915,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04388297872340426,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.02393617021276596,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.03324468085106383,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008333333333333333,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "sky_starboard",
+      "reference": "sky_sentinel",
+      "floor": 44,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 3.375
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.015625,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.21306818181818182,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.12797619047619047,
+        "turns": 2.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.01636904761904762,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.007575757575757576,
+        "turns": 2
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.08143939393939394,
+        "turns": 2.5
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.05585106382978724,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.1196808510638298,
+        "turns": 3.625
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.025265957446808505,
+        "turns": 2.5
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.2021276595744681,
+        "turns": 3
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.06041666666666667,
+        "turns": 2.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.11458333333333333,
+        "turns": 3.25
+      }
+    },
+    {
+      "id": "sky_lancer_mirror",
+      "reference": "sky_hound_mirror",
+      "floor": 49,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.17500000000000002,
+        "turns": 4.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.010416666666666666,
+        "turns": 5.125
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "combo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.07244318181818182,
+        "turns": 2.875
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.017045454545454544,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "bulwark",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.017857142857142856,
+        "turns": 3.125
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.00744047619047619,
+        "turns": 3.125
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "cinder",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.125
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "ash",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.75
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 1.625
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "blood",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.0651595744680851,
+        "turns": 3.375
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.014627659574468085,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "might",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.09840425531914894,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": -0.0013297872340425532,
+        "turns": 2.75
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "echo",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.04375,
+        "turns": 3
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 2.625
+      }
+    },
+    {
+      "id": "sky_archive_moth",
+      "reference": "sky_scribe_moth",
+      "floor": 52,
+      "route": "focus",
+      "seeds": 8,
+      "candidate": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0.008333333333333333,
+        "turns": 6.25
+      },
+      "control": {
+        "wins": 8,
+        "stalled": 0,
+        "invalid": 0,
+        "hpLoss": 0,
+        "turns": 4.75
+      }
+    }
+  ],
+  "failures": []
+}

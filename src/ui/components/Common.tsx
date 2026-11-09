@@ -40,9 +40,9 @@ export function intentText(intent: Intent | null): { icon: string; text: string;
   if (!intent) return { icon: '…', text: '', cls: 'special' };
   switch (intent.kind) {
     case 'attack':
-      return { icon: '⚔', text: intent.times > 1 ? `${intent.amount} × ${intent.times}` : `${intent.amount}`, cls: 'attack' };
+      return { icon: '⚔', text: `${intent.piercing ? '穿透 ' : ''}${intent.times > 1 ? `${intent.amount} × ${intent.times}` : `${intent.amount}`}`, cls: 'attack' };
     case 'attack_debuff':
-      return { icon: '⚔✦', text: intent.times > 1 ? `${intent.amount} × ${intent.times}` : `${intent.amount}`, cls: 'attack' };
+      return { icon: '⚔✦', text: `${intent.piercing ? '穿透 ' : ''}${intent.times > 1 ? `${intent.amount} × ${intent.times}` : `${intent.amount}`}`, cls: 'attack' };
     case 'defend':
       return { icon: '🛡', text: '防御', cls: 'defend' };
     case 'buff':
@@ -53,6 +53,8 @@ export function intentText(intent: Intent | null): { icon: string; text: string;
       return { icon: '🛡▲', text: '防御+强化', cls: 'defend' };
     case 'special':
       return { icon: '✦', text: '特殊', cls: 'special' };
+    case 'escape':
+      return { icon: '➜', text: '逃跑', cls: 'escape' };
   }
 }
 
@@ -74,12 +76,12 @@ export function RelicBar({ relics }: { relics: string[] }) {
 
 export function HpBar({ hp, maxHp, block }: { hp: number; maxHp: number; block: number }) {
   return (
-    <div className="hpbar">
-      <div className="fill" style={{ width: `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%` }} />
+    <div className={`hpbar ${block > 0 ? 'has-block' : ''}`}>
+      <div className="hpbar-track"><div className="fill" style={{ width: `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%` }} /></div>
       <div className="txt">
         {hp} / {maxHp}
       </div>
-      {block > 0 && <div className="blockbadge">{block}</div>}
+      {block > 0 && <div className="blockbadge" title={`格挡 ${block}，上限 9999`} aria-label={`格挡 ${block}`}>{block}</div>}
     </div>
   );
 }

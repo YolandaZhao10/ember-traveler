@@ -12,7 +12,7 @@ function outcomes(list: EventOutcome[]): EventOutcome[] {
 }
 function enter(run: RunState): RunState {
   run.screen = 'map'; run.currentNodeId = null;
-  const id = run.map.startIds[0]; run.map.nodes[id].type = 'event';
+  const id = run.map.startIds[0]; run.map.nodes[id].type = 'event'; run.map.nodes[id].mysteryType = 'event';
   return R.travelTo(run, id);
 }
 function event(id: string, seed = 'NEW-EVENT'): RunState {

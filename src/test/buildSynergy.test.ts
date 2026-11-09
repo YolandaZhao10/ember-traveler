@@ -13,12 +13,12 @@ function battle(ids:string[]){
 function use(cs:CombatState,id:string){const c=cs.player.hand.find(c=>c.defId===id)!;expect(c).toBeDefined();const next=playCard(cs,c.uid,viewCard(c).target==='enemy'?'e0':null).state;expect(next).not.toBe(cs);return next;}
 function round(cs:CombatState){cs=endPlayerTurn(cs).state;cs=enemyAct(cs,'e0').state;return startPlayerTurn(cs).state;}
 describe('流派按动作运转，不依靠无条件数值',()=>{
- it('连击先布战鼓、接三次攻击续费；多段、回响均不算额外出牌',()=>{
+ it('连击先布战鼓、接三次攻击续费；多段只算一次，回响另算一次',()=>{
   let cs=battle(['war_drum','quick_stab','twin_blades','quick_stab','thousand_cuts']);
   cs=use(cs,'war_drum');cs=use(cs,'quick_stab');cs.player.statuses.echo=1;
-  cs=use(cs,'twin_blades');expect(cs.player.attacksPlayedThisTurn).toBe(2);expect(cs.player.energy).toBe(1);
+  cs=use(cs,'twin_blades');expect(cs.player.attacksPlayedThisTurn).toBe(3);expect(cs.player.energy).toBe(2);
   cs=use(cs,'quick_stab');expect(cs.player.energy).toBe(2);
-  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(36);expect(cs.player.energy).toBe(0);
+  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(50);expect(cs.player.energy).toBe(0);
  });
  it('续势不在第六次攻击重复返能，叠加两张只提高第三次返能',()=>{
   let cs=battle(['war_drum','war_drum',...Array(6).fill('quick_stab')]);cs=use(use(cs,'war_drum'),'war_drum');
@@ -75,7 +75,7 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
  it('回响先给下一张防护或爆发准备复制，能力部署不消耗回响',()=>{
   let cs=battle(['echo_card','mirror','echo_blade']);cs=use(cs,'echo_card');expect(cs.player.block).toBe(5);
   cs=use(cs,'mirror');expect(cs.player.statuses.echo).toBe(1);const hp=cs.enemies[0].hp;cs=use(cs,'echo_blade');
-  expect(hp-cs.enemies[0].hp).toBe(24);expect(cs.player.cardsPlayedThisTurn).toBe(3);expect(cs.player.attacksPlayedThisTurn).toBe(1);
+  expect(hp-cs.enemies[0].hp).toBe(24);expect(cs.player.cardsPlayedThisTurn).toBe(5);expect(cs.player.attacksPlayedThisTurn).toBe(3);
  });
  it('专注立即充能，凝神奖励跨回合保留；释放返能每回合只有一次',()=>{
   let cs=battle(['ward_rune','focus','charged_blade','charged_blade']);cs=use(use(cs,'ward_rune'),'focus');

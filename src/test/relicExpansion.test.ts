@@ -22,13 +22,13 @@ describe('新增21个遗物的真实触发', () => {
     cs = next(cs); expect(cs.player.statuses.strength).toBe(1); expect(cs.player.block).toBe(0); expect(cs.player.energy).toBe(5); expect(cs.player.ember).toBe(2);
     cs = next(cs); expect(cs.player.energy).toBe(3); expect(cs.player.ember).toBe(2);
   });
-  it('踏灰靴、墨井、决斗扣环按出牌次数触发，回响不会伪造额外出牌数', () => {
+  it('踏灰靴、墨井、决斗扣环按出牌次数触发，回响另计一次但首次和第N次奖励不重复', () => {
     let cs = battle(['trail_boots', 'ink_well', 'duelist_clasp'], ['quick_stab', 'quick_stab', 'defend', 'defend']);
     cs.player.statuses.echo = 1;
-    cs = play(cs, 'quick_stab'); expect(cs.player.block).toBe(0);
     cs = play(cs, 'quick_stab'); expect(cs.player.block).toBe(3);
-    cs = play(cs, 'defend'); expect(cs.player.block).toBe(11); expect(cs.player.ember).toBe(2);
-    cs = play(cs, 'defend'); expect(cs.player.block).toBe(16); expect(cs.player.ember).toBe(2);
+    cs = play(cs, 'quick_stab'); expect(cs.player.block).toBe(3);
+    cs = play(cs, 'defend'); expect(cs.player.block).toBe(11); expect(cs.player.ember).toBe(3);
+    cs = play(cs, 'defend'); expect(cs.player.block).toBe(16); expect(cs.player.ember).toBe(3);
   });
   it('炭灰袋与灵种每回合仅第一次消耗触发，窑芯需要至少两张', () => {
     let cs = battle(['coal_pouch', 'phoenix_ash', 'kiln_spark'], ['pick_up', 'bone_ash']);

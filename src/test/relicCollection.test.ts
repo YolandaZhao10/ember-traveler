@@ -212,7 +212,7 @@ describe('章节遗物的触发频率', () => {
 });
 
 describe('遗物组合、死亡与存档边界', () => {
-  it('首次与第N次触发不会因回响增加出牌次数，下一回合重新计数', () => {
+  it('回响增加出牌次数但首次与第N次触发仍各触发一次，下一回合重新计数', () => {
     let cs = battle('traveler'); cs.relics = ['brass_knuckle', 'roadward_pin']; cs.player.statuses.echo = 2; cs.player.block = 5;
     for (let i = 0; i < 3; i++) { cs.player.hand.push(card('strike', `q${i}`)); cs = playCard(cs, `q${i}`, 'e0').state; }
     expect(cs.player.ember).toBe(1); expect(cs.player.block).toBe(5); expect(cs.enemies[0].statuses.vulnerable).toBe(1);
