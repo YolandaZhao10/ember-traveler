@@ -142,6 +142,11 @@ export function CombatScreen() {
           <button className="pilebtn" onClick={() => openOverlay({ kind: 'pile', pile: 'draw' })} aria-label="抽牌堆">
             <b>{p.draw.length}</b>抽牌堆
           </button>
+          <div className="hand-shortcuts" aria-label="出牌快捷键提示">
+            <span><kbd>1–9</kbd> / <kbd>0</kbd> 选牌</span>
+            <span>有目标：点敌人<br />无目标：点打出</span>
+            <span><kbd>Esc</kbd> 取消选牌</span>
+          </div>
         </div>
         <Hand
           hand={p.hand}
@@ -157,8 +162,9 @@ export function CombatScreen() {
           onDetail={(c) => openOverlay({ kind: 'card', card: c, inCombat: true })}
         />
         <div className="pilecol">
-          <button className="btn primary endturn" onClick={() => void endTurn()} disabled={busy || cs.phase !== 'player'} title="快捷键 E / Enter">
-            {busy ? '…' : '结束回合'}
+          <button className="btn primary endturn" onClick={() => void endTurn()} disabled={busy || cs.phase !== 'player'} aria-label={busy ? '处理中' : '结束回合'} title="E 结束回合；Enter 未聚焦其他按钮时也可结束回合">
+            <span>{busy ? '…' : '结束回合'}</span>
+            <kbd className="endturn-shortcut" aria-hidden="true">E</kbd>
           </button>
           <button className="pilebtn" onClick={() => openOverlay({ kind: 'pile', pile: 'discard' })} aria-label="弃牌堆">
             <b>{p.discard.length}</b>弃牌堆
@@ -281,7 +287,7 @@ function Hand(props: {
   const longPress = useRef<ReturnType<typeof setTimeout> | null>(null);
   return (
     <div className="hand">
-      {hand.map((c) => {
+      {hand.map((c, index) => {
         const ok = cs ? canPlayCard(cs, c).ok : false;
         return (
           <div
@@ -299,6 +305,7 @@ function Hand(props: {
             onTouchEnd={() => longPress.current && clearTimeout(longPress.current)}
             onTouchMove={() => longPress.current && clearTimeout(longPress.current)}
           >
+            <kbd className="hand-shortcut-key" aria-hidden="true">{(index + 1) % 10}</kbd>
             <Card card={c} ctx={ctxFor(c)} energy={energy} unplayable={!ok || busy} onClick={() => onCardClick(c)} />
           </div>
         );

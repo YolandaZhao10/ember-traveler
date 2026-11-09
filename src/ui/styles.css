@@ -1027,7 +1027,7 @@ h3 {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.7));
   border-top: 1px solid rgba(201, 162, 74, 0.3);
   display: grid;
-  grid-template-columns: 90px 1fr 110px;
+  grid-template-columns: 90px minmax(0, 1fr) 110px;
   align-items: center;
   padding: 8px 10px 10px;
   gap: 8px;
@@ -1060,8 +1060,40 @@ h3 {
   gap: 8px;
   align-items: center;
 }
+.hand-shortcuts {
+  display: grid;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}
+.handarea kbd {
+  display: inline-block;
+  min-width: 19px;
+  padding: 0 4px;
+  border: 1px solid #8a7653;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #241e18;
+  color: #efe4c8;
+  font: 600 11px/17px var(--font-body);
+  text-align: center;
+}
+.hand-shortcut-key {
+  position: absolute;
+  top: -23px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.hand .cardwrap.selected .hand-shortcut-key {
+  border-color: var(--ember-2);
+  color: var(--ember-2);
+}
 .hand {
   position: relative;
+  min-width: 0;
   height: 100%;
   display: flex;
   align-items: flex-end;
@@ -1072,12 +1104,16 @@ h3 {
   scrollbar-width: thin;
 }
 .hand .cardwrap {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
   margin: 0 -14px;
   transition: transform 0.18s ease, margin 0.18s ease;
   transform-origin: bottom center;
   position: relative;
 }
+.hand .cardwrap > .card { flex-shrink: 0; }
 .hand .cardwrap:hover,
 .hand .cardwrap.selected {
   z-index: 10;
@@ -1133,6 +1169,14 @@ h3 {
 }
 .endturn {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .hand-shortcuts, .handarea .hand-shortcut-key, .handarea .endturn-shortcut { display: none; }
 }
 
 /* ---------- 卡牌 ---------- */
@@ -1801,6 +1845,7 @@ h3 {
     padding: 20px 8px 4px;
   }
   .hand .cardwrap {
+    flex: 0 0 auto;
     margin: 0 -6px;
   }
   .hand .cardwrap:hover {
