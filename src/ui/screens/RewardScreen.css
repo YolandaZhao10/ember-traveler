@@ -1,0 +1,19 @@
+.reward-deck-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 9px 14px;
+  max-width: min(720px, 100%);
+  color: var(--text-dim);
+  font-size: 13px;
+}
+.reward-deck-summary strong { color: var(--text); }
+.reward-deck-summary .btn { padding: 4px 9px; }
+.reward-card-owned {
+  margin: 8px 0 0;
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: center;
+}

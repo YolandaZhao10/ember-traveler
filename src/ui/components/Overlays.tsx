@@ -174,6 +174,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
                   <Card card={c} size="sm" onClick={() => {
                     if (!ok) return;
                     if (overlay.previewUpgrade) openOverlay({ kind: 'upgrade', card: c, onConfirm: () => overlay.onPick(c.uid), onBack: () => openOverlay(overlay) });
+                    else if (overlay.previewRemove) openOverlay({ kind: 'remove', card: c, onConfirm: () => overlay.onPick(c.uid), onBack: () => openOverlay(overlay) });
                     else overlay.onPick(c.uid);
                   }} />
                 </div>
@@ -195,6 +196,19 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
           <button className="btn ghost" onClick={closeOverlay}>取消</button>
           <button className="btn" onClick={overlay.onBack}>重新选择</button>
           <button className="btn primary" onClick={overlay.onConfirm}>确认升级</button>
+        </div>
+      </Modal>;
+    case 'remove':
+      return <Modal title="确认精简牌组" onClose={closeOverlay}>
+        <div className="camp-refine-preview">
+          <Card card={overlay.card} presentation />
+          <p>永久移除这张牌。牌组将从 <b>{run.deck.length}</b> 张变为 <b>{Math.max(0, run.deck.length - 1)}</b> 张。</p>
+          <p className="subtitle">这会用掉本章唯一一次精简机会；本次营火无法再休息或锻造。确认前可以取消或重新选择。</p>
+        </div>
+        <div className="camp-refine-actions">
+          <button className="btn ghost" onClick={closeOverlay}>取消</button>
+          <button className="btn" onClick={overlay.onBack}>重新选择</button>
+          <button className="btn danger" onClick={overlay.onConfirm}>确认精简</button>
         </div>
       </Modal>;
     case 'confirm':

@@ -376,6 +376,8 @@ export interface MapNode {
   col: number;
   type: NodeType;
   next: string[];
+  /** 开章时固定，地图预览与实际进入使用同一个敌组。 */
+  encounterId?: string;
 }
 export interface GameMap {
   rows: number;
@@ -484,6 +486,8 @@ export interface RunState {
   shop: ShopState | null;
   event: EventState | null;
   rest: RestState | null;
+  /** 每章可用一次营火精简；与休息、锻造共用本次营火行动。 */
+  campRefined?: boolean;
   usedEvents: string[];
   seenEncounters: string[];
   stats: RunStats;

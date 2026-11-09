@@ -2,7 +2,9 @@ import { Backdrop } from '../components/Art';
 import { CHAPTERS, FINAL_CHAPTER, nextChapter } from '../../data/chapters';
 import { RELICS } from '../../data/relics';
 import { Card } from '../components/Card';
+import { rewardDeckSummary } from '../rewardDeckSummary';
 import { openOverlay, rewardLeave, rewardSkipCard, rewardTakeCard, rewardTakeGold, rewardTakeRelic, useGame } from '../store';
+import './RewardScreen.css';
 
 export function RewardScreen() {
   const { run } = useGame();
@@ -11,6 +13,7 @@ export function RewardScreen() {
   const relic = r.relic ? RELICS[r.relic] : null;
   const chapterEnd = r.chapterComplete ?? (run.currentNodeId && run.map.nodes[run.currentNodeId].type === 'boss' ? run.chapter : null);
   const choices = r.relicChoices ?? [];
+  const deck = rewardDeckSummary(run.deck);
   return (
     <div className="screen center-screen grain scroll">
       <Backdrop id={CHAPTERS[run.chapter].battleArt} dim={0.62} />
@@ -58,6 +61,12 @@ export function RewardScreen() {
       {!r.cardTaken ? (
         <>
           <p className="subtitle">{chapterEnd ? '本角色稀有卡牌 · 三选一（右键 / 长按查看详情）' : '选择一张卡牌加入牌组（右键 / 长按查看详情）：'}</p>
+          <div className="panel reward-deck-summary" aria-label="当前牌组概览">
+            <strong>牌组 {deck.count} 张</strong>
+            <span>攻击 {deck.types.attack} · 技能 {deck.types.skill} · 能力 {deck.types.power}{deck.types.curse ? ` · 诅咒 ${deck.types.curse}` : ''}</span>
+            <span title="按升级后的费用计算，诅咒不参与平均">平均费用 {deck.averageCost === null ? '—' : deck.averageCost.toFixed(1)}</span>
+            <button className="btn ghost small" onClick={() => openOverlay({ kind: 'pile', pile: 'deck' })}>查看牌组</button>
+          </div>
           <div className="cardchoice">
             {r.cards.map((c) => (
               <div
@@ -69,6 +78,7 @@ export function RewardScreen() {
                 }}
               >
                 <Card card={c} showFlavor onClick={() => rewardTakeCard(c.uid)} />
+                <p className="reward-card-owned">已持有 {deck.copies[c.defId] ?? 0} 张</p>
               </div>
             ))}
           </div>

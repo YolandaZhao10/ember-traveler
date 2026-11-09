@@ -6,6 +6,7 @@ import { expandLegacyRoutes } from './map';
 import { recordJourney } from './history';
 import { ensurePowerInstances } from './powers';
 import { ENEMIES } from '../data/enemies';
+import { ensureEncounterPlan } from './encounters';
 
 type Snapshot = NonNullable<RunState['checkpoint']>;
 
@@ -59,6 +60,10 @@ function migrateLayout(input: Snapshot): Snapshot {
     run.gold = run.combat.gold = available;
   }
   if (input.version < 12 && run.chapter !== 4) expandLegacyRoutes(map, run.visited);
+  if (input.version < 16) {
+    run.campRefined = run.campRefined === true;
+    ensureEncounterPlan(run);
+  }
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';

@@ -11,10 +11,12 @@ import { EVENT_RELICS, SHOP_RELICS } from '../data/specialRelics';
 import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type StepResult } from './combat';
 import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
+import { ensureEncounterPlan, plannedEncounter } from './encounters';
+import { distinctRewardPool } from './cardChoices';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick } from './rng';
 import type { CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -83,6 +85,7 @@ export function newRun(seed: string, character: CharacterId = 'traveler', diffic
     shop: null,
     event: null,
     rest: null,
+    campRefined: false,
     usedEvents: [],
     seenEncounters: [],
     stats: { floorsCleared: 0, enemiesKilled: 0, cardsPlayed: 0, damageDealt: 0, elitesKilled: 0 },
@@ -93,6 +96,7 @@ export function newRun(seed: string, character: CharacterId = 'traveler', diffic
   let guard = 0;
   while (!validateMap(map) && guard++ < 20) map = generateMap(run.rng.map);
   run.map = map;
+  ensureEncounterPlan(run);
   run.deck = ch.starterDeck.map((id) => makeCard(run, id));
   return run;
 }
@@ -168,7 +172,9 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
     (e) => (e.chapter ?? 1) === run.chapter && e.tier === tier && (e.minFloor === undefined || localFloor >= e.minFloor) && (e.maxFloor === undefined || localFloor <= e.maxFloor),
   );
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
-  const enc = pick(run.rng.combat, fresh.length ? fresh : pool);
+  const node = run.currentNodeId ? run.map.nodes[run.currentNodeId] : undefined;
+  const enc = (node && plannedEncounter(run, node)) ?? pick(run.rng.combat, fresh.length ? fresh : pool);
+  if (node) node.encounterId = enc.id;
   run.seenEncounters.push(enc.id);
   const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty), run.gold);
   run.rng.combat.s = res.state.rng.s;
@@ -315,8 +321,10 @@ export function enterNextChapter(input: RunState): RunState {
   run.shop = null;
   run.event = null;
   run.rest = null;
+  run.campRefined = false;
   run.endMessage = null;
   run.screen = 'map';
+  ensureEncounterPlan(run);
   // 新章独立回退点，不能通过 SL 反复领取过章恢复或返回上一章。
   return recordCheckpoint(run);
 }
@@ -363,7 +371,8 @@ export function generateCardChoices(run: RunState, tier: CardRewardTier, n: numb
     const r = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map((k) => ({ item: k, weight: weights[k] })));
     const pool = CARD_LIST.filter((c) => c.rarity === r && !chosen.includes(c.id) && (tier === 'boss' ? c.owner === run.character : cardAvailableTo(c, run.character)));
     if (!pool.length) continue;
-    chosen.push(pick(run.rng.reward, pool).id);
+    const choices = n === 3 && tier !== 'shop' ? distinctRewardPool(pool, chosen.map(id => CARDS[id])) : pool;
+    chosen.push(pick(run.rng.reward, choices).id);
   }
   return chosen.map((id) => makeCard(run, id));
 }
@@ -569,6 +578,18 @@ export function restLeave(input: RunState): RunState {
   const run = clone(input);
   run.rest = null;
   run.screen = 'map';
+  return run;
+}
+
+/** 精简只消耗营火行动，不触发描述为商店付费移除的遗物。 */
+export function restRefine(input: RunState, cardUid: string): RunState {
+  if (input.screen !== 'rest' || !input.rest || input.rest.used || input.campRefined || input.deck.length <= 1) return input;
+  if (!input.deck.some(card => card.uid === cardUid)) return input;
+  const run = clone(input);
+  run.deck = run.deck.filter(card => card.uid !== cardUid);
+  run.rest!.used = true;
+  run.rest!.picking = false;
+  run.campRefined = true;
   return run;
 }
 

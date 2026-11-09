@@ -49,7 +49,12 @@ describe('对局计时与旧终章结算', () => {
     const values=storage();const run=R.newRun('FINAL-START');run.chapter=4;run.floor=60;run.map=generateMap(run.rng.map,4);run.version=12;
     const {checkpoint,...snapshot}=run;run.checkpoint=structuredClone(snapshot);
     values.set('ember-traveler:save',JSON.stringify(run));const loaded=loadRun()!;
-    expect(loaded.floor).toBe(60);expect(loaded.checkpoint!.floor).toBe(60);expect(loaded.map).toEqual(run.map);
+    expect(loaded.floor).toBe(60);expect(loaded.checkpoint!.floor).toBe(60);
+    // 地形与连接保持原样；v16 会为尚未进入的精英、首领补齐固定敌组。
+    expect(loaded.map).toMatchObject(run.map);
+    expect(loaded.checkpoint!.map).toEqual(loaded.map);
+    expect(loaded.map.nodes['final-1'].encounterId).toBe('final_elite_warden');
+    expect(loaded.map.nodes[loaded.map.bossId].encounterId).toBe('final_boss_lord');
   });
   it.each([false,true])('旧终章奖励迁移直接结算，金币已领取=%s时均不重复发奖', goldTaken => {
     const values = storage(); let run = R.newRun('OLD-FINAL'); run.chapter = 4; run.floor = 64;

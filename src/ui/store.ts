@@ -31,8 +31,9 @@ export type Overlay =
   | { kind: 'log' }
   | { kind: 'map' }
   | { kind: 'enemy'; enemyId: string }
-  | { kind: 'pick'; title: string; filter: (c: CardInstance) => boolean; onPick: (uid: string) => void; onCancel?: () => void; previewUpgrade?: boolean }
+  | { kind: 'pick'; title: string; filter: (c: CardInstance) => boolean; onPick: (uid: string) => void; onCancel?: () => void; previewUpgrade?: boolean; previewRemove?: boolean }
   | { kind: 'upgrade'; card: CardInstance; onConfirm: () => void; onBack: () => void }
+  | { kind: 'remove'; card: CardInstance; onConfirm: () => void; onBack: () => void }
   | { kind: 'confirm'; title: string; text: string; onYes: () => void }
   | { kind: 'menu'; character?: CharacterId };
 
@@ -483,6 +484,17 @@ export function restUpgrade(uid: string) {
   const next = R.restUpgrade(state.run, uid);
   if (next !== state.run) sfx('ember');
   setRun(next);
+  closeOverlay();
+}
+
+export function restRefine(uid: string) {
+  if (!state.run || state.busy) return;
+  const next = R.restRefine(state.run, uid);
+  if (next === state.run) toast('本次无法精简牌组');
+  else {
+    sfx('death');
+    setRun(next);
+  }
   closeOverlay();
 }
 

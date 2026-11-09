@@ -2,7 +2,7 @@ import { Backdrop } from '../components/Art';
 import { CHAPTERS } from '../../data/chapters';
 import { canUpgrade, relicJourneyBonus, restHealAmount, restUpgradeHealAmount } from '../../engine/run';
 import { Campfire } from '../sprites/Sprites';
-import { openOverlay, restHeal, restLeave, restUpgrade, useGame } from '../store';
+import { openOverlay, restHeal, restLeave, restRefine, restUpgrade, useGame } from '../store';
 
 export function RestScreen() {
   const { run } = useGame();
@@ -17,7 +17,7 @@ export function RestScreen() {
   };
   const upgradeHeal = restUpgradeHealAmount(run);
   return (
-    <div className="screen center-screen grain scroll">
+    <div className="screen center-screen grain scroll rest-screen">
       <Backdrop id={CHAPTERS[run.chapter].restArt} dim={0.62} />
       <Campfire className="campfire" />
       <h2>营火</h2>
@@ -44,6 +44,22 @@ export function RestScreen() {
           <span className="big">⚒️</span>
           <b>锻造</b>
           <span>升级一张牌{upgradeHeal ? `，回复 ${upgradeHeal} 点生命` : ''}{extras('upgrade')}</span>
+        </button>
+        <button
+          className="restopt"
+          disabled={r.used || run.campRefined || run.deck.length <= 1}
+          onClick={() => openOverlay({
+            kind: 'pick',
+            title: '选择要永久移除的牌',
+            filter: () => true,
+            onPick: restRefine,
+            previewRemove: true,
+          })}
+        >
+          <span className="big" aria-hidden="true">✂</span>
+          <b>精简</b>
+          <span>免费永久移除一张牌，让余下的牌更容易抽到。</span>
+          <span className="camp-refine-quota">{run.campRefined ? '本章精简机会已用完' : run.deck.length <= 1 ? '至少保留一张牌' : '每章一次 · 占用本次营火行动'}</span>
         </button>
       </div>
       {r.used && <p className="subtitle">你已经利用了这团火。</p>}

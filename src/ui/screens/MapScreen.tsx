@@ -1,7 +1,10 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { availableNodes, MAP_ROWS, nodeTypeName } from '../../engine/map';
+import { plannedEncounter } from '../../engine/encounters';
+import { previewRoute } from '../../engine/routePreview';
 import { CHAPTERS } from '../../data/chapters';
-import type { GameMap, MapNode } from '../../engine/types';
+import { ENEMIES } from '../../data/enemies';
+import type { GameMap, MapNode, RunState } from '../../engine/types';
 import { Backdrop } from '../components/Art';
 import { travel, useGame } from '../store';
 
@@ -20,6 +23,8 @@ const BOTTOM_SPACE = 48;
 export function MapScreen({ preview = false }: { preview?: boolean }) {
   const { run } = useGame();
   const wrap = useRef<HTMLDivElement>(null);
+  const [selectedId, selectNode] = useState<string | null>(null);
+  useEffect(() => selectNode(null), [run?.chapter, run?.currentNodeId]);
   const curRow = run?.currentNodeId ? run.map.nodes[run.currentNodeId].row : -1;
   const rows = run?.map.rows ?? MAP_ROWS;
   const H = TOP_SPACE + (rows - 1) * ROW_HEIGHT + BOTTOM_SPACE;
@@ -49,6 +54,8 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
   const pos = (n: MapNode) => ({ x: colW * (n.col + 1), y: rowY(n.row) });
   const nodes = Object.values(map.nodes);
   const visited = new Set(run.visited);
+  const selected = selectedId ? map.nodes[selectedId] : undefined;
+  const branch = selected ? previewRoute(map, selected.id) : null;
   // 已经无法到达的节点（在当前层以下或不在可达分支）
   const reachable = new Set<string>();
   const stack = run.currentNodeId ? [...map.nodes[run.currentNodeId].next] : [...map.startIds];
@@ -82,17 +89,66 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
         </span>
         <span style={{ marginLeft: 'auto' }}>种子 {run.seed}</span>
       </div>
-      <div className="map-stage">
-        <Backdrop id={chapter.mapArt} dim={0.68} />
-        <div className="map-wrap grain" ref={wrap}>
-          <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} preview={preview} floorOffset={chapter.startFloor} />
+      <div className="map-route-layout">
+        <div className="map-stage">
+          <Backdrop id={chapter.mapArt} dim={0.68} />
+          <div className="map-wrap grain" ref={wrap}>
+            <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} floorOffset={chapter.startFloor} selectedId={selectedId} branch={branch?.reachable} onSelect={selectNode} run={run} />
+          </div>
         </div>
+        <RoutePanel run={run} selected={selected} preview={preview} canEnter={!!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
       </div>
       <p className="subtitle" style={{ textAlign: 'center', margin: 0 }}>
-        {preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 仅查看路线，关闭后继续当前进度。` : run.currentNodeId ? '选择下一个发光的节点前进。' : '选择一个起点开始旅程。'}
+        {preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较敌人与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
       </p>
     </div>
   );
+}
+
+const NODE_REWARDS: Record<MapNode['type'], string> = {
+  combat: '胜利后获得金币，并从卡牌奖励中选一张；也可以跳过选牌。',
+  elite: '胜利后获得金币、随机遗物，并从卡牌奖励中选一张。',
+  boss: '胜利后获得金币、本角色稀有卡牌三选一，以及章节遗物三选一。',
+  event: '进入后揭示事件选项，可能交换生命、金币、卡牌或获得问号专属遗物。',
+  shop: '用金币购买卡牌、遗物或移除一张牌，商品进入商店后揭示。',
+  rest: '休息、锻造、精简三选一。精简每章一次，会占用本次营火行动。',
+};
+
+function RoutePanel({ run, selected, preview, canEnter, reachable, onSelect }: {
+  run: RunState;
+  selected: MapNode | undefined;
+  preview: boolean;
+  canEnter: boolean;
+  reachable: boolean;
+  onSelect: (id: string) => void;
+}) {
+  const encounter = selected ? plannedEncounter(run, selected) : undefined;
+  const route = selected ? previewRoute(run.map, selected.id) : null;
+  const enemies = encounter ? [...new Set(encounter.enemies)].map((id) => ({ enemy: ENEMIES[id], count: encounter.enemies.filter((enemyId) => enemyId === id).length })) : [];
+  const distance = (value: number | null) => value === null ? '后路没有' : value === 0 ? '本站' : `最快 ${value} 层后`;
+  return <aside className="route-panel" aria-label="节点与后路预览">
+    <div className="route-panel-content">
+      {selected ? <>
+        <div className="route-panel-heading"><span>第 {CHAPTERS[run.chapter].startFloor + selected.row + 1} 层</span><h3>{ICONS[selected.type]} {nodeTypeName(selected.type)}</h3></div>
+        {enemies.length > 0 && <section className="route-enemies" aria-label="遭遇敌人">
+          <h4>敌方阵容 · 共 {encounter!.enemies.length} 名</h4>
+          {enemies.map(({ enemy, count }) => <div className="route-enemy" key={enemy.id}><b>{enemy.name}{count > 1 ? ` ×${count}` : ''}</b><p>{enemy.description}</p></div>)}
+        </section>}
+        <section className="route-reward"><h4>{selected.type === 'rest' || selected.type === 'shop' ? '可以做什么' : '收获'}</h4><p>{selected.type === 'boss' && run.chapter === 4 ? '击败无昼之主，完成本局旅程。终战后直接结算。' : NODE_REWARDS[selected.type]}</p></section>
+        {route && <section className="route-outlook"><h4>沿此分支直到本章首领</h4><dl>
+          <div><dt>营火</dt><dd>{distance(route.nearestRest)}</dd></div>
+          <div><dt>商店</dt><dd>{distance(route.nearestShop)}</dd></div>
+          <div><dt>精英</dt><dd>{route.elites.min === route.elites.max ? route.elites.min : `${route.elites.min}–${route.elites.max}`} 场</dd></div>
+        </dl><p className="route-note">包含所选节点；亮线为可达后路。“最快”取最近支路，精英数量随分叉选择变化。</p></section>}
+        {!reachable && selected.id !== run.currentNodeId && <p className="route-note">这条路线已无法前往，可查看节点资料。</p>}
+      </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看敌人、收获和沿途补给，再决定下一步。</p><p>已有群攻、擅长持久战，或急需精简牌组，都可以成为选择路线的理由。</p></div>}
+    </div>
+    <div className="route-panel-actions">
+      {selected && canEnter && !preview && <button className="btn primary" onClick={() => travel(selected.id)}>确认前往 · {nodeTypeName(selected.type)}</button>}
+      {selected && (!canEnter || preview) && <span className="route-note">{preview ? '查看模式 · 关闭地图继续当前进度' : selected.id === run.currentNodeId ? '当前位置' : reachable ? '前方节点预览，请先选择相邻节点' : '节点资料'}</span>}
+      {selected?.id !== run.map.bossId && <button className="btn small ghost" onClick={() => onSelect(run.map.bossId)}>查看本章首领</button>}
+    </div>
+  </aside>;
 }
 
 function MapSvg(props: {
@@ -105,11 +161,22 @@ function MapSvg(props: {
   reachable: Set<string>;
   avail: string[];
   currentId: string | null;
-  preview: boolean;
   floorOffset: number;
+  selectedId: string | null;
+  branch: Set<string> | undefined;
+  onSelect: (id: string) => void;
+  run: RunState;
 }) {
-  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, preview, floorOffset } = props;
+  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, floorOffset, selectedId, branch, onSelect, run } = props;
   const glow = useId().replace(/:/g, '');
+  const nodeRefs = useRef(new Map<string, SVGGElement>());
+  const focusId = selectedId ?? avail[0] ?? currentId ?? nodes[0]?.id;
+  const moveFocus = (node: MapNode, key: string) => {
+    const row = key === 'ArrowUp' ? node.row + 1 : key === 'ArrowDown' ? node.row - 1 : node.row;
+    const choices = nodes.filter((candidate) => candidate.row === row && (key === 'ArrowLeft' ? candidate.col < node.col : key === 'ArrowRight' ? candidate.col > node.col : true));
+    const target = choices.sort((a, b) => Math.abs(a.col - node.col) - Math.abs(b.col - node.col) || a.col - b.col)[0];
+    if (target) { onSelect(target.id); nodeRefs.current.get(target.id)?.focus(); }
+  };
   return (
     <svg className="map-svg" viewBox={`0 0 ${W} ${H}`}>
       <defs>
@@ -124,8 +191,9 @@ function MapSvg(props: {
           const b = pos(map.nodes[nx]);
           const lit = visited.has(n.id) && visited.has(nx);
           const next = n.id === currentId && avail.includes(nx);
+          const inBranch = branch?.has(n.id) && branch.has(nx);
           const my = (a.y + b.y) / 2;
-          return <path key={`${n.id}-${nx}`} className={`map-edge ${lit ? 'lit' : ''} ${next ? 'next' : ''}`} d={`M${a.x} ${a.y} C${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y}`} />;
+          return <path key={`${n.id}-${nx}`} className={`map-edge ${lit ? 'lit' : ''} ${next ? 'next' : ''} ${inBranch ? 'branch' : ''} ${branch && !inBranch && !lit ? 'outside-branch' : ''}`} d={`M${a.x} ${a.y} C${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y}`} />;
         }),
       )}
       {nodes.map((n) => {
@@ -134,15 +202,23 @@ function MapSvg(props: {
         const isCur = n.id === currentId;
         const isVisited = visited.has(n.id);
         const dead = !isAvail && !isCur && !isVisited && !reachable.has(n.id);
+        const encounter = plannedEncounter(run, n);
         const r = n.type === 'boss' ? 30 : 18;
         return (
           <g
             key={n.id}
-            className={`map-node ${isAvail ? 'available' : ''} ${isCur ? 'current' : ''} ${isVisited ? 'visited' : ''} ${dead ? 'dead' : ''}`}
+            ref={(element) => { if (element) nodeRefs.current.set(n.id, element); else nodeRefs.current.delete(n.id); }}
+            className={`map-node ${isAvail ? 'available' : ''} ${isCur ? 'current' : ''} ${isVisited ? 'visited' : ''} ${dead ? 'dead' : ''} ${selectedId === n.id ? 'selected' : ''} ${branch?.has(n.id) ? 'branch' : ''}`}
             transform={`translate(${p.x} ${p.y})`}
-            onClick={preview ? undefined : () => isAvail && travel(n.id)}
-            role={isAvail && !preview ? 'button' : undefined}
-            aria-label={`${nodeTypeName(n.type)} 第 ${floorOffset + n.row + 1} 层${isCur ? ' · 当前位置' : ''}`}
+            onClick={() => onSelect(n.id)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onSelect(n.id); }
+              if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); moveFocus(n, event.key); }
+            }}
+            role="button"
+            tabIndex={n.id === focusId ? 0 : -1}
+            aria-pressed={selectedId === n.id}
+            aria-label={`${nodeTypeName(n.type)} 第 ${floorOffset + n.row + 1} 层${isCur ? ' · 当前位置' : isAvail ? ' · 可前往' : ''}${encounter ? ` · ${encounter.enemies.map((id) => ENEMIES[id].name).join('、')}` : ''} · 查看详情`}
           >
             {n.type === 'boss' && <circle r="60" fill={`url(#${glow})`} />}
             <circle className="node-ring" r={r} />
@@ -154,6 +230,7 @@ function MapSvg(props: {
                 {isCur ? '当前位置' : nodeTypeName(n.type)}
               </text>
             )}
+            {isAvail && encounter && <text y={r + 12} textAnchor="middle" fontSize="9" fill="#dbcba8">{encounter.enemies.length} 名敌人</text>}
           </g>
         );
       })}
