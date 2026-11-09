@@ -13,6 +13,7 @@ import type { CardInstance, CombatDifficulty } from '../../engine/types';
 import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
 import { DiscardReplay } from './DiscardReplay';
+import { PileCardChoice } from './PileCardChoice';
 import { CardCatalog } from './CardCatalog';
 import { RelicCatalog } from './RelicCatalog';
 import { GameMenu } from './GameMenu';
@@ -42,6 +43,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
   const { run } = useGame();
   if (!run) return null;
   switch (overlay.kind) {
+    case 'cardTransfer': return <PileCardChoice cardUid={overlay.cardUid} />;
     case 'replay': return <DiscardReplay cardUid={overlay.cardUid} />;
     case 'history': return null;
     case 'help': return null;

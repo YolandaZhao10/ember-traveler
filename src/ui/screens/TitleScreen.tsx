@@ -17,6 +17,7 @@ export function TitleScreen() {
   const [character, setCharacter] = useState<CharacterId>('traveler');
   const [difficulty, setDifficulty] = useState<RunDifficulty>({ ...STANDARD_DIFFICULTY });
   const [showDifficulty, setShowDifficulty] = useState(false);
+  const settled = savedRun?.screen === 'victory' || savedRun?.screen === 'gameover';
   return (
     <>
     <div className="screen title-screen grain scroll">
@@ -59,7 +60,7 @@ export function TitleScreen() {
         <div className="title-primary-actions">
         {hasSave && (
           <button className="btn primary" onClick={continueGame}>
-            继续旅程{savedRun ? ` · 第 ${savedRun.chapter} 章 · 第 ${savedRun.floor + 1} 层` : ''}
+            {settled ? '查看本局结算' : '继续旅程'}{savedRun ? ` · 第 ${savedRun.chapter} 章 · 第 ${savedRun.floor + 1} 层` : ''}
           </button>
         )}
         <div className="new-run-actions">{hasSave && !confirmNew ? (
@@ -67,8 +68,8 @@ export function TitleScreen() {
             新的旅程（从第 1 层开始）
           </button>
         ) : (
-          <button className={`btn ${hasSave ? 'danger' : 'primary'}`} onClick={() => newGame(seed, character, difficulty)}>
-            {hasSave ? '放弃存档，开始新旅程' : '开始旅程'}
+          <button className={`btn ${hasSave && !settled ? 'danger' : 'primary'}`} onClick={() => newGame(seed, character, difficulty)}>
+            {hasSave ? settled ? '结束本局，开始新旅程' : '放弃存档，开始新旅程' : '开始旅程'}
           </button>
         )}<button className="btn" onClick={() => setShowDifficulty(true)}>难度设置 · {difficultyName(difficulty)}</button></div>
         </div>

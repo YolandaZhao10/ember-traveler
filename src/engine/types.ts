@@ -93,6 +93,8 @@ export type Effect =
   | { kind: 'blockPerHand'; amount: number; max: number }
   | { kind: 'consumeVulnerable'; damagePer: number; aoe?: boolean }
   | { kind: 'draw'; amount: number }
+  | { kind: 'moveCard'; from: 'draw' | 'discard' | 'exhaust'; to: 'hand' | 'draw' | 'discard'; filter?: 'attack' | 'skill' | 'action' | 'exhaust'; sample?: number }
+  | { kind: 'retainHand' }
   | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge'; per: number; max: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
@@ -349,6 +351,7 @@ export interface PlayerCombat extends Entity {
 
 export type CombatEvent =
   | { type: 'cardPlayed'; uid: string; name: string }
+  | { type: 'cardRemoved'; card: CardInstance; destination: 'exhaust' | 'discard'; random: boolean }
   | { type: 'damage'; targetId: string; amount: number; blocked: number; prevented?: number; source: 'player' | 'enemy' | 'thorns' | 'burn' | 'aura' }
   | { type: 'block'; targetId: string; amount: number }
   | { type: 'status'; targetId: string; status: StatusId; amount: number }

@@ -4,7 +4,7 @@ import { CHAPTERS } from '../../data/chapters';
 import { sortedDeck } from '../../engine/run';
 import { Card } from '../components/Card';
 import { FlameIcon } from '../sprites/Sprites';
-import { toTitle, newGame, useGame } from '../store';
+import { toTitle, newGame, confirmFinishRun, useGame } from '../store';
 
 export function EndScreen({ victory }: { victory: boolean }) {
   const { run } = useGame();
@@ -58,7 +58,8 @@ export function EndScreen({ victory }: { victory: boolean }) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button className="btn primary" onClick={() => newGame(undefined, run.character)}>
+        <button className="btn primary" onClick={confirmFinishRun}>结束旅程</button>
+        <button className="btn" onClick={() => newGame(undefined, run.character)}>
           再来一局
         </button>
         <button className="btn" onClick={() => newGame(run.seed, run.character)}>

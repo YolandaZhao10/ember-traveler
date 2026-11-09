@@ -2,6 +2,7 @@ import { CARD_LIST, CARDS } from '../data/cards';
 import { describeCard, viewCard } from '../engine/cards';
 import { canPlayCard, createCombat, playCard } from '../engine/combat';
 import { makeRng } from '../engine/rng';
+import { cardTransferChoices, cardTransferEffect } from '../engine/cardTransfer';
 import type { CombatState } from '../engine/types';
 
 /** 可复现的效果边界探针，不把预置资源当作免费获得，也不用于推算真人胜率。 */
@@ -30,12 +31,15 @@ export function rarityFixture(id: string, upgraded = false, context: RarityConte
     state.player.statuses.weak = 1; state.player.statuses.frail = 1; state.player.statuses.burn = 3;
     state.enemies.forEach(e => { e.block = 10; e.statuses.vulnerable = 1; });
   }
+  const transfer = cardTransferEffect(candidate);
+  if (transfer?.from === 'discard') state.player.discard = [card('strike', false, 'discard-target'), card('defend', false, 'discard-skill'), card('blood_rite', false, 'discard-exhaust')];
+  if (transfer?.from === 'exhaust' && !state.player.exhaust.length) state.player.exhaust = [card('defend', false, 'ex-target')];
   return state;
 }
 export function rarityProbe(id: string, upgraded: boolean, context: RarityContext) {
   const before = rarityFixture(id, upgraded, context), candidate = before.player.hand[0];
   const view = viewCard(candidate), allowed = canPlayCard(before, candidate).ok;
-  const result = playCard(before, candidate.uid, view.target === 'enemy' || id === 'oath_reenactment' ? 'e0' : null, 'discard-target');
+  const result = playCard(before, candidate.uid, view.target === 'enemy' || id === 'oath_reenactment' ? 'e0' : null, cardTransferChoices(before, candidate)[0]?.uid ?? 'discard-target');
   const after = result.state;
   return {
     id, upgraded, context, allowed, played: after !== before,

@@ -2,6 +2,7 @@ import type { CardDef, CharacterId } from '../engine/types';
 import { EXTRA_CHARACTER_CARDS } from './extraCards';
 import { EXTRA_SHARED_CARDS } from './sharedCards';
 import { EXTRA_CURSES } from './curses';
+import { CYCLE_CARDS } from './cycleCards';
 
 /**
  * 所有卡牌定义。描述文本由效果数据自动生成（见 engine/describe.ts），
@@ -1383,6 +1384,7 @@ def({
 EXTRA_CHARACTER_CARDS.forEach(def);
 EXTRA_SHARED_CARDS.forEach(def);
 EXTRA_CURSES.forEach(def);
+CYCLE_CARDS.forEach(def);
 export const CARD_LIST: CardDef[] = Object.values(CARDS);
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {

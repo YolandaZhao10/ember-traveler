@@ -1,0 +1,1208 @@
+{
+  "note": "4角色合法13张构筑；基础/升级×单体/群体/精英×8种子，新卡组与同数旧功能牌对照。固定真实费用、初始遗物，3步束搜索；检查选牌实体守恒、每回合100次出牌上限、战斗结束与严重退化。机器人仅看已知手牌和显示的候选；样本胜率不等于真人或整局胜率。",
+  "fights": 384,
+  "summary": [
+    {
+      "owner": "traveler",
+      "fightsPerBuild": 48,
+      "candidateWins": 46,
+      "controlWins": 48,
+      "maxTurnPlays": 13
+    },
+    {
+      "owner": "picker",
+      "fightsPerBuild": 48,
+      "candidateWins": 48,
+      "controlWins": 48,
+      "maxTurnPlays": 9
+    },
+    {
+      "owner": "oathbound",
+      "fightsPerBuild": 48,
+      "candidateWins": 27,
+      "controlWins": 20,
+      "maxTurnPlays": 12
+    },
+    {
+      "owner": "scholar",
+      "fightsPerBuild": 48,
+      "candidateWins": 48,
+      "controlWins": 48,
+      "maxTurnPlays": 11
+    }
+  ],
+  "failures": [],
+  "rows": [
+    {
+      "owner": "traveler",
+      "up": false,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 1,
+        "turns": 5.125,
+        "maxTurnPlays": 9,
+        "plays": {
+          "raise_shield": 14,
+          "vanguard_oath": 8,
+          "spin_kick": 39,
+          "haste": 15,
+          "strike": 28,
+          "shield_rotation": 20,
+          "ember_retrieval": 8,
+          "unburden_armor": 6,
+          "blade_recall": 10,
+          "trail_supply": 9,
+          "rhythm": 6,
+          "defend": 10
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.75,
+        "turns": 6.75,
+        "maxTurnPlays": 8,
+        "plays": {
+          "measured_step": 22,
+          "vanguard_oath": 6,
+          "haste": 8,
+          "rhythm": 8,
+          "defend": 7,
+          "brace_line": 27,
+          "sunward_step": 8,
+          "raise_shield": 10,
+          "spin_kick": 41,
+          "strike": 32,
+          "unburden_armor": 7,
+          "trail_supply": 8
+        }
+      }
+    },
+    {
+      "owner": "traveler",
+      "up": false,
+      "stage": "group",
+      "candidate": {
+        "wins": 6,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 37.75,
+        "turns": 13,
+        "maxTurnPlays": 9,
+        "plays": {
+          "rhythm": 7,
+          "vanguard_oath": 5,
+          "haste": 15,
+          "unburden_armor": 2,
+          "ember_retrieval": 8,
+          "strike": 38,
+          "trail_supply": 8,
+          "raise_shield": 75,
+          "spin_kick": 73,
+          "shield_rotation": 48,
+          "blade_recall": 32,
+          "defend": 55
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 21.375,
+        "turns": 13.875,
+        "maxTurnPlays": 6,
+        "plays": {
+          "rhythm": 7,
+          "vanguard_oath": 6,
+          "haste": 8,
+          "sunward_step": 8,
+          "raise_shield": 47,
+          "brace_line": 57,
+          "spin_kick": 76,
+          "measured_step": 57,
+          "trail_supply": 8,
+          "unburden_armor": 6,
+          "strike": 45,
+          "defend": 26
+        }
+      }
+    },
+    {
+      "owner": "traveler",
+      "up": false,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 23.625,
+        "turns": 11.5,
+        "maxTurnPlays": 9,
+        "plays": {
+          "raise_shield": 54,
+          "vanguard_oath": 8,
+          "spin_kick": 84,
+          "haste": 16,
+          "strike": 49,
+          "shield_rotation": 59,
+          "ember_retrieval": 8,
+          "unburden_armor": 8,
+          "blade_recall": 25,
+          "trail_supply": 8,
+          "rhythm": 8,
+          "defend": 46
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 15,
+        "turns": 15.25,
+        "maxTurnPlays": 6,
+        "plays": {
+          "raise_shield": 40,
+          "measured_step": 84,
+          "haste": 8,
+          "vanguard_oath": 8,
+          "spin_kick": 93,
+          "strike": 44,
+          "sunward_step": 8,
+          "defend": 15,
+          "trail_supply": 8,
+          "rhythm": 8,
+          "brace_line": 65,
+          "unburden_armor": 8
+        }
+      }
+    },
+    {
+      "owner": "traveler",
+      "up": true,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.375,
+        "turns": 4.375,
+        "maxTurnPlays": 11,
+        "plays": {
+          "raise_shield": 14,
+          "vanguard_oath": 8,
+          "spin_kick": 32,
+          "haste": 15,
+          "strike": 23,
+          "blade_recall": 9,
+          "unburden_armor": 6,
+          "shield_rotation": 19,
+          "trail_supply": 8,
+          "ember_retrieval": 8,
+          "rhythm": 4,
+          "defend": 8
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 4.625,
+        "maxTurnPlays": 10,
+        "plays": {
+          "measured_step": 17,
+          "vanguard_oath": 8,
+          "haste": 8,
+          "strike": 22,
+          "unburden_armor": 8,
+          "spin_kick": 32,
+          "trail_supply": 8,
+          "brace_line": 15,
+          "sunward_step": 6,
+          "raise_shield": 6,
+          "rhythm": 8,
+          "defend": 4
+        }
+      }
+    },
+    {
+      "owner": "traveler",
+      "up": true,
+      "stage": "group",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 2.875,
+        "turns": 6.625,
+        "maxTurnPlays": 13,
+        "plays": {
+          "rhythm": 10,
+          "vanguard_oath": 8,
+          "haste": 14,
+          "strike": 32,
+          "ember_retrieval": 8,
+          "spin_kick": 60,
+          "unburden_armor": 8,
+          "trail_supply": 8,
+          "raise_shield": 29,
+          "shield_rotation": 14,
+          "blade_recall": 23,
+          "defend": 3
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.375,
+        "turns": 7.625,
+        "maxTurnPlays": 9,
+        "plays": {
+          "rhythm": 8,
+          "vanguard_oath": 8,
+          "haste": 8,
+          "strike": 41,
+          "trail_supply": 8,
+          "raise_shield": 13,
+          "spin_kick": 56,
+          "brace_line": 22,
+          "unburden_armor": 8,
+          "sunward_step": 8,
+          "measured_step": 30,
+          "defend": 1
+        }
+      }
+    },
+    {
+      "owner": "traveler",
+      "up": true,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 1.75,
+        "turns": 8.875,
+        "maxTurnPlays": 13,
+        "plays": {
+          "raise_shield": 37,
+          "vanguard_oath": 8,
+          "spin_kick": 73,
+          "haste": 15,
+          "strike": 41,
+          "blade_recall": 30,
+          "unburden_armor": 8,
+          "shield_rotation": 33,
+          "trail_supply": 8,
+          "ember_retrieval": 8,
+          "rhythm": 8,
+          "defend": 14
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 1,
+        "turns": 10.375,
+        "maxTurnPlays": 10,
+        "plays": {
+          "raise_shield": 13,
+          "measured_step": 55,
+          "haste": 8,
+          "vanguard_oath": 8,
+          "sunward_step": 8,
+          "spin_kick": 74,
+          "strike": 34,
+          "defend": 7,
+          "trail_supply": 8,
+          "unburden_armor": 8,
+          "brace_line": 47,
+          "rhythm": 8
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": false,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 3.875,
+        "turns": 4.125,
+        "maxTurnPlays": 8,
+        "plays": {
+          "sheltering_ash": 8,
+          "wildfire": 19,
+          "ash_sifting": 7,
+          "tinder_bundle": 12,
+          "burn_pages": 7,
+          "ash_index": 9,
+          "light_up": 14,
+          "strike": 9,
+          "ember_retrieval": 7,
+          "defend": 14,
+          "borrow_flame": 2,
+          "cinder_salvage": 2
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.125,
+        "turns": 4.375,
+        "maxTurnPlays": 7,
+        "plays": {
+          "sheltering_ash": 8,
+          "sift_ash": 7,
+          "wildfire": 14,
+          "tinder_bundle": 8,
+          "ash_index": 6,
+          "borrow_flame": 2,
+          "light_up": 18,
+          "strike": 8,
+          "sunward_step": 7,
+          "smoke_cover": 10,
+          "defend": 6,
+          "burn_pages": 1
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": false,
+      "stage": "group",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 16,
+        "turns": 5.375,
+        "maxTurnPlays": 9,
+        "plays": {
+          "wildfire": 20,
+          "tinder_bundle": 8,
+          "ash_index": 6,
+          "sheltering_ash": 8,
+          "defend": 31,
+          "ember_retrieval": 8,
+          "burn_pages": 12,
+          "light_up": 23,
+          "ash_sifting": 10,
+          "cinder_salvage": 6,
+          "borrow_flame": 6,
+          "strike": 10
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 3.875,
+        "turns": 5.25,
+        "maxTurnPlays": 6,
+        "plays": {
+          "wildfire": 17,
+          "tinder_bundle": 7,
+          "ash_index": 7,
+          "sheltering_ash": 8,
+          "sunward_step": 8,
+          "light_up": 24,
+          "sift_ash": 11,
+          "burn_pages": 6,
+          "strike": 16,
+          "smoke_cover": 17,
+          "defend": 6
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": false,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 28.25,
+        "turns": 6.375,
+        "maxTurnPlays": 8,
+        "plays": {
+          "sheltering_ash": 8,
+          "burn_pages": 8,
+          "ash_index": 9,
+          "tinder_bundle": 13,
+          "borrow_flame": 6,
+          "wildfire": 25,
+          "light_up": 31,
+          "strike": 12,
+          "ember_retrieval": 8,
+          "defend": 34,
+          "ash_sifting": 7,
+          "cinder_salvage": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 15.75,
+        "turns": 8.625,
+        "maxTurnPlays": 7,
+        "plays": {
+          "sheltering_ash": 8,
+          "burn_pages": 5,
+          "ash_index": 7,
+          "tinder_bundle": 8,
+          "borrow_flame": 3,
+          "wildfire": 16,
+          "light_up": 32,
+          "strike": 10,
+          "sunward_step": 6,
+          "smoke_cover": 24,
+          "defend": 35,
+          "sift_ash": 25
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": true,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 3.125,
+        "turns": 3.25,
+        "maxTurnPlays": 9,
+        "plays": {
+          "sheltering_ash": 7,
+          "wildfire": 15,
+          "burn_pages": 9,
+          "ash_sifting": 6,
+          "strike": 6,
+          "tinder_bundle": 12,
+          "light_up": 14,
+          "ember_retrieval": 6,
+          "defend": 12,
+          "ash_index": 4,
+          "borrow_flame": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 3.25,
+        "maxTurnPlays": 8,
+        "plays": {
+          "sheltering_ash": 8,
+          "sift_ash": 6,
+          "wildfire": 15,
+          "tinder_bundle": 8,
+          "ash_index": 4,
+          "borrow_flame": 4,
+          "light_up": 15,
+          "strike": 11,
+          "defend": 2,
+          "sunward_step": 7,
+          "smoke_cover": 8,
+          "burn_pages": 6
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": true,
+      "stage": "group",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 5.25,
+        "turns": 3.625,
+        "maxTurnPlays": 9,
+        "plays": {
+          "wildfire": 21,
+          "tinder_bundle": 10,
+          "ash_index": 9,
+          "sheltering_ash": 7,
+          "defend": 12,
+          "ember_retrieval": 8,
+          "strike": 10,
+          "light_up": 17,
+          "burn_pages": 10,
+          "ash_sifting": 10,
+          "borrow_flame": 4,
+          "cinder_salvage": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.5,
+        "turns": 3.875,
+        "maxTurnPlays": 6,
+        "plays": {
+          "wildfire": 18,
+          "tinder_bundle": 8,
+          "ash_index": 7,
+          "sheltering_ash": 7,
+          "sunward_step": 7,
+          "light_up": 20,
+          "strike": 11,
+          "burn_pages": 6,
+          "sift_ash": 12,
+          "defend": 5,
+          "borrow_flame": 3,
+          "smoke_cover": 5
+        }
+      }
+    },
+    {
+      "owner": "picker",
+      "up": true,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 19.5,
+        "turns": 5,
+        "maxTurnPlays": 9,
+        "plays": {
+          "sheltering_ash": 8,
+          "burn_pages": 10,
+          "borrow_flame": 6,
+          "wildfire": 22,
+          "ash_index": 8,
+          "light_up": 25,
+          "strike": 13,
+          "tinder_bundle": 11,
+          "ember_retrieval": 8,
+          "ash_sifting": 8,
+          "defend": 25
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 5.25,
+        "turns": 6,
+        "maxTurnPlays": 8,
+        "plays": {
+          "sheltering_ash": 8,
+          "burn_pages": 6,
+          "borrow_flame": 4,
+          "wildfire": 24,
+          "ash_index": 6,
+          "light_up": 18,
+          "strike": 12,
+          "tinder_bundle": 8,
+          "smoke_cover": 21,
+          "sunward_step": 7,
+          "sift_ash": 14,
+          "defend": 10
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": false,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 11.5,
+        "turns": 9.5,
+        "maxTurnPlays": 7,
+        "plays": {
+          "blood_watch": 8,
+          "crimson_covenant": 8,
+          "blood_rite": 10,
+          "vein_cutter": 13,
+          "strike": 41,
+          "scar_hold": 27,
+          "defend": 52,
+          "ember_retrieval": 8,
+          "flex": 19,
+          "blood_tether": 8,
+          "pulse_memory": 4,
+          "borrow_fury": 2
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 14,
+        "turns": 12.875,
+        "maxTurnPlays": 8,
+        "plays": {
+          "bind_wounds": 40,
+          "crimson_covenant": 8,
+          "blood_watch": 8,
+          "vein_cutter": 8,
+          "strike": 45,
+          "defend": 77,
+          "pulse_memory": 5,
+          "flex": 22,
+          "sunward_step": 8,
+          "gather_fury": 8,
+          "blood_rite": 7,
+          "borrow_fury": 1
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": false,
+      "stage": "group",
+      "candidate": {
+        "wins": 0,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 78,
+        "turns": 12.25,
+        "maxTurnPlays": 8,
+        "plays": {
+          "crimson_covenant": 8,
+          "defend": 122,
+          "flex": 22,
+          "strike": 38,
+          "vein_cutter": 13,
+          "blood_watch": 8,
+          "scar_hold": 65,
+          "blood_tether": 9,
+          "blood_rite": 10,
+          "ember_retrieval": 8,
+          "pulse_memory": 6,
+          "borrow_fury": 3
+        }
+      },
+      "control": {
+        "wins": 0,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 78,
+        "turns": 11.125,
+        "maxTurnPlays": 8,
+        "plays": {
+          "crimson_covenant": 8,
+          "defend": 96,
+          "sunward_step": 8,
+          "bind_wounds": 55,
+          "gather_fury": 8,
+          "flex": 16,
+          "strike": 39,
+          "vein_cutter": 8,
+          "pulse_memory": 2,
+          "blood_rite": 8,
+          "blood_watch": 8,
+          "borrow_fury": 2
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": false,
+      "stage": "elite",
+      "candidate": {
+        "wins": 0,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 78,
+        "turns": 15.25,
+        "maxTurnPlays": 11,
+        "plays": {
+          "blood_watch": 8,
+          "crimson_covenant": 8,
+          "vein_cutter": 13,
+          "strike": 53,
+          "scar_hold": 66,
+          "defend": 113,
+          "ember_retrieval": 8,
+          "blood_rite": 10,
+          "blood_tether": 9,
+          "flex": 48,
+          "pulse_memory": 6,
+          "borrow_fury": 2
+        }
+      },
+      "control": {
+        "wins": 0,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 78,
+        "turns": 15,
+        "maxTurnPlays": 8,
+        "plays": {
+          "bind_wounds": 56,
+          "crimson_covenant": 8,
+          "blood_watch": 8,
+          "vein_cutter": 8,
+          "strike": 48,
+          "defend": 108,
+          "pulse_memory": 5,
+          "flex": 29,
+          "sunward_step": 8,
+          "gather_fury": 8,
+          "blood_rite": 8,
+          "borrow_fury": 1
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": true,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.125,
+        "turns": 4.625,
+        "maxTurnPlays": 12,
+        "plays": {
+          "blood_watch": 8,
+          "crimson_covenant": 8,
+          "blood_rite": 9,
+          "vein_cutter": 15,
+          "strike": 27,
+          "scar_hold": 13,
+          "defend": 16,
+          "flex": 20,
+          "ember_retrieval": 8,
+          "blood_tether": 8,
+          "pulse_memory": 7,
+          "borrow_fury": 3
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 4.5,
+        "turns": 9,
+        "maxTurnPlays": 9,
+        "plays": {
+          "bind_wounds": 31,
+          "crimson_covenant": 8,
+          "blood_watch": 8,
+          "vein_cutter": 8,
+          "strike": 38,
+          "defend": 32,
+          "flex": 25,
+          "sunward_step": 8,
+          "gather_fury": 8,
+          "blood_rite": 7,
+          "pulse_memory": 5,
+          "borrow_fury": 5
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": true,
+      "stage": "group",
+      "candidate": {
+        "wins": 5,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 48.875,
+        "turns": 14.875,
+        "maxTurnPlays": 12,
+        "plays": {
+          "crimson_covenant": 8,
+          "defend": 110,
+          "flex": 52,
+          "strike": 82,
+          "vein_cutter": 12,
+          "blood_watch": 8,
+          "scar_hold": 95,
+          "blood_rite": 9,
+          "blood_tether": 11,
+          "ember_retrieval": 8,
+          "borrow_fury": 8,
+          "pulse_memory": 6
+        }
+      },
+      "control": {
+        "wins": 2,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 66.125,
+        "turns": 14.25,
+        "maxTurnPlays": 9,
+        "plays": {
+          "crimson_covenant": 8,
+          "sunward_step": 8,
+          "vein_cutter": 8,
+          "defend": 125,
+          "bind_wounds": 82,
+          "blood_watch": 8,
+          "gather_fury": 8,
+          "flex": 35,
+          "strike": 58,
+          "blood_rite": 8,
+          "borrow_fury": 4,
+          "pulse_memory": 3
+        }
+      }
+    },
+    {
+      "owner": "oathbound",
+      "up": true,
+      "stage": "elite",
+      "candidate": {
+        "wins": 6,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 63.875,
+        "turns": 19.25,
+        "maxTurnPlays": 12,
+        "plays": {
+          "blood_watch": 8,
+          "crimson_covenant": 8,
+          "flex": 62,
+          "blood_tether": 8,
+          "vein_cutter": 13,
+          "strike": 72,
+          "scar_hold": 93,
+          "blood_rite": 11,
+          "ember_retrieval": 8,
+          "pulse_memory": 7,
+          "defend": 147,
+          "borrow_fury": 8
+        }
+      },
+      "control": {
+        "wins": 2,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 74.625,
+        "turns": 18.375,
+        "maxTurnPlays": 9,
+        "plays": {
+          "bind_wounds": 78,
+          "crimson_covenant": 8,
+          "blood_watch": 8,
+          "vein_cutter": 8,
+          "strike": 58,
+          "defend": 142,
+          "flex": 46,
+          "sunward_step": 8,
+          "gather_fury": 8,
+          "blood_rite": 8,
+          "pulse_memory": 4,
+          "borrow_fury": 4
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": false,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 2.5,
+        "maxTurnPlays": 8,
+        "plays": {
+          "star_page_search": 8,
+          "defend": 6,
+          "future_memory": 7,
+          "charged_blade": 16,
+          "release_charge": 2,
+          "echo_footnotes": 4,
+          "double_chant": 6,
+          "strike": 3,
+          "palimpsest": 3,
+          "rune_shield": 3,
+          "patient_study": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.375,
+        "turns": 2.75,
+        "maxTurnPlays": 8,
+        "plays": {
+          "future_memory": 9,
+          "woven_words": 7,
+          "double_chant": 10,
+          "charged_blade": 17,
+          "strike": 8,
+          "rune_cache": 6,
+          "echo_footnotes": 7,
+          "sunward_step": 2,
+          "release_charge": 3,
+          "defend": 3,
+          "patient_study": 1,
+          "rune_shield": 1
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": false,
+      "stage": "group",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 3.75,
+        "turns": 4.625,
+        "maxTurnPlays": 9,
+        "plays": {
+          "double_chant": 8,
+          "defend": 16,
+          "strike": 14,
+          "future_memory": 9,
+          "rune_shield": 13,
+          "star_page_search": 19,
+          "charged_blade": 25,
+          "echo_footnotes": 7,
+          "release_charge": 5,
+          "palimpsest": 2,
+          "patient_study": 2,
+          "ember_retrieval": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.5,
+        "turns": 5.125,
+        "maxTurnPlays": 10,
+        "plays": {
+          "double_chant": 9,
+          "rune_cache": 6,
+          "strike": 26,
+          "sunward_step": 6,
+          "woven_words": 22,
+          "charged_blade": 39,
+          "future_memory": 11,
+          "release_charge": 7,
+          "echo_footnotes": 6,
+          "rune_shield": 7,
+          "patient_study": 1,
+          "defend": 4
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": false,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 7.375,
+        "turns": 4.5,
+        "maxTurnPlays": 8,
+        "plays": {
+          "star_page_search": 19,
+          "future_memory": 8,
+          "charged_blade": 28,
+          "rune_shield": 13,
+          "echo_footnotes": 7,
+          "double_chant": 9,
+          "strike": 11,
+          "patient_study": 2,
+          "defend": 17,
+          "release_charge": 3,
+          "palimpsest": 3,
+          "ember_retrieval": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 4.5,
+        "turns": 4.75,
+        "maxTurnPlays": 8,
+        "plays": {
+          "woven_words": 18,
+          "future_memory": 12,
+          "double_chant": 11,
+          "charged_blade": 31,
+          "release_charge": 6,
+          "strike": 21,
+          "echo_footnotes": 5,
+          "rune_cache": 8,
+          "defend": 16,
+          "rune_shield": 6,
+          "sunward_step": 5,
+          "patient_study": 5
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": true,
+      "stage": "single",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 1.5,
+        "maxTurnPlays": 10,
+        "plays": {
+          "star_page_search": 3,
+          "defend": 6,
+          "future_memory": 10,
+          "double_chant": 7,
+          "charged_blade": 11,
+          "release_charge": 3,
+          "strike": 3,
+          "rune_shield": 2,
+          "patient_study": 2,
+          "echo_footnotes": 3,
+          "ember_retrieval": 3,
+          "palimpsest": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 1.875,
+        "maxTurnPlays": 7,
+        "plays": {
+          "woven_words": 4,
+          "double_chant": 8,
+          "future_memory": 6,
+          "charged_blade": 12,
+          "strike": 6,
+          "sunward_step": 2,
+          "echo_footnotes": 4,
+          "defend": 3,
+          "release_charge": 2,
+          "rune_cache": 5,
+          "rune_shield": 1
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": true,
+      "stage": "group",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.125,
+        "turns": 3.375,
+        "maxTurnPlays": 10,
+        "plays": {
+          "double_chant": 14,
+          "rune_shield": 7,
+          "strike": 13,
+          "ember_retrieval": 8,
+          "star_page_search": 15,
+          "future_memory": 9,
+          "charged_blade": 20,
+          "release_charge": 6,
+          "palimpsest": 5,
+          "echo_footnotes": 4,
+          "defend": 7,
+          "patient_study": 1
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0,
+        "turns": 2.75,
+        "maxTurnPlays": 14,
+        "plays": {
+          "double_chant": 11,
+          "rune_cache": 7,
+          "strike": 14,
+          "sunward_step": 4,
+          "future_memory": 10,
+          "charged_blade": 27,
+          "defend": 5,
+          "woven_words": 13,
+          "release_charge": 6,
+          "rune_shield": 2,
+          "echo_footnotes": 4,
+          "patient_study": 2
+        }
+      }
+    },
+    {
+      "owner": "scholar",
+      "up": true,
+      "stage": "elite",
+      "candidate": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 2.125,
+        "turns": 2.5,
+        "maxTurnPlays": 11,
+        "plays": {
+          "rune_shield": 8,
+          "star_page_search": 9,
+          "future_memory": 8,
+          "double_chant": 14,
+          "charged_blade": 20,
+          "ember_retrieval": 7,
+          "echo_footnotes": 7,
+          "release_charge": 6,
+          "palimpsest": 4,
+          "defend": 5,
+          "patient_study": 2,
+          "strike": 6
+        }
+      },
+      "control": {
+        "wins": 8,
+        "invalid": 0,
+        "stalled": 0,
+        "hpLoss": 0.625,
+        "turns": 2.25,
+        "maxTurnPlays": 9,
+        "plays": {
+          "woven_words": 7,
+          "double_chant": 11,
+          "future_memory": 10,
+          "charged_blade": 22,
+          "rune_cache": 8,
+          "release_charge": 8,
+          "strike": 10,
+          "rune_shield": 3,
+          "sunward_step": 4,
+          "echo_footnotes": 7,
+          "defend": 2,
+          "patient_study": 1
+        }
+      }
+    }
+  ]
+}

@@ -375,7 +375,17 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (ctx?.target && e.target !== 'self' && e.status === 'burn') ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
         break;
       case 'replayDiscard':
-        parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放牌；其他代价照付，原牌结算后弃置或消耗）');
+        parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放或牌堆选牌效果的牌；其他代价照付，原牌结算后弃置或消耗）');
+        break;
+      case 'moveCard': {
+        const source = e.from === 'draw' ? '抽牌堆' : e.from === 'exhaust' ? '消耗区' : '弃牌堆';
+        const filter = e.filter === 'action' ? '攻击或技能' : e.filter === 'attack' ? '攻击牌' : e.filter === 'skill' ? '技能牌' : e.filter === 'exhaust' ? '带消耗的牌' : '牌';
+        const destination = e.to === 'hand' ? '手牌' : e.to === 'draw' ? '抽牌堆顶' : '弃牌堆';
+        parts.push(`${e.sample ? `从${source}随机查看最多 ${e.sample} 张${filter}，` : `从${source}`}选择 1 张${e.sample ? '' : filter}移入${destination}（${e.from === 'exhaust' ? '不能选择带消耗区回收效果的牌；' : ''}回响不重复移动）`);
+        break;
+      }
+      case 'retainHand':
+        parts.push('本回合结束时保留当前手牌（之后新抽到的牌不保留）');
         break;
       case 'returnExhausted':
         parts.push(e.selection === 'highestCost'

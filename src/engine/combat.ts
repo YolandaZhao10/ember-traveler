@@ -1,4 +1,5 @@
 import { convertResource, conversionText } from './resourceConversion';
+import { cardTransferChoices, cardTransferEffect, type CardTransfer } from './cardTransfer';
 import { CARDS } from '../data/cards';
 import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
@@ -292,9 +293,10 @@ function newUid(cs: CombatState): string {
 
 // ---------- 消耗 ----------
 /** 将一张牌放入消耗区并触发"消耗时"效果 */
-function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[]) {
+function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[], random = false) {
   const p = cs.player;
   p.exhaust.push(card);
+  ev.push({ type: 'cardRemoved', card: { ...card }, destination: 'exhaust', random });
   p.turnFlags.exhausted = (p.turnFlags.exhausted ?? 0) + 1;
   log(cs, ev, `「${viewCard(card).name}」被消耗`);
   if (p.hp > 0 && cs.outcome === 'ongoing' && p.statuses.ashInsight && (p.turnFlags.ashInsight ?? 0) < 2) {
@@ -618,7 +620,7 @@ export function needsDiscardReplay(card: CardInstance): boolean {
 export function discardReplayChoices(cs: CombatState): CardInstance[] {
   return cs.player.discard.filter(card => {
     const v = viewCard(card);
-    return (v.type === 'attack' || v.type === 'skill') && !needsDiscardReplay(card)
+    return (v.type === 'attack' || v.type === 'skill') && !needsDiscardReplay(card) && !cardTransferEffect(card)
       && v.requireEmber <= cs.player.ember && (v.target !== 'enemy' || aliveEnemies(cs).length > 0);
   });
 }
@@ -631,6 +633,7 @@ export function canPlayCard(cs: CombatState, card: CardInstance): { ok: boolean;
   if (v.requireEmber > cs.player.ember) return { ok: false, reason: `需要 ${v.requireEmber} 点余烬` };
   if (v.target === 'enemy' && aliveEnemies(cs).length === 0) return { ok: false, reason: '没有目标' };
   if (needsDiscardReplay(card) && !discardReplayChoices(cs).length) return { ok: false, reason: '弃牌堆没有可重放的攻击或技能' };
+  if (cardTransferEffect(card) && !cardTransferChoices(cs, card).length) return { ok: false, reason: '牌堆中没有符合条件的牌' };
   return { ok: true };
 }
 
@@ -652,6 +655,12 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   if (needsDiscardReplay(card) && !replayChoice) return { state: input, events: [] };
   // 固定确认时的卡牌版本；本次重放的抽牌、洗牌不会复制实体或改变选择。
   const replay = replayChoice ? { ...replayChoice } : undefined;
+  const transferEffect = cardTransferEffect(card);
+  const transferCard = transferEffect ? cardTransferChoices(cs, card, cs.rng).find(c => c.uid === replayUid) : undefined;
+  if (transferEffect && !transferCard) return { state: input, events: [] };
+  const transfer: CardMoveResolution | undefined = transferEffect && transferCard ? {
+    effect: transferEffect, card: transferCard, index: p[transferEffect.from].findIndex(c => c.uid === transferCard.uid), resolved: false,
+  } : undefined;
   let target: EnemyState | null = null;
   if (v.target === 'enemy' || (replay && viewCard(replay).target === 'enemy')) {
     target = cs.enemies.find((e) => e.id === targetId && alive(e)) ?? null;
@@ -659,6 +668,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   }
   p.energy -= v.cost;
   p.hand.splice(idx, 1);
+  // 选择的实体暂时离开来源牌堆，失血触发的抽牌/洗牌不能把它提前移动或复制。
+  if (transfer) p[transfer.effect.from].splice(transfer.index, 1);
   // 结算中的实体离开牌堆，不能被自己的抽牌洗回或作为消耗素材。
   if (replay) p.discard.splice(p.discard.findIndex(c => c.uid === replay.uid), 1);
   let replayed = false;
@@ -759,7 +770,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       }
       if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
     }
-    resolveEffects(cs, v.effects, target, ev, extraDamage, v);
+    resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer);
     finishPlay(v, releaseCharge);
     handleEnemyDeaths(cs, ev);
   };
@@ -821,6 +832,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     if (replayed && viewCard(replay).exhaust) exhaustCard(cs, replay, ev);
     else p.discard.push(replay);
   }
+  if (transfer && !transfer.resolved) p[transfer.effect.from].splice(Math.min(transfer.index, p[transfer.effect.from].length), 0, transfer.card);
 
   // 卡牌去向
   if (v.type === 'power') {
@@ -835,7 +847,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   return { state: cs, events: ev };
 }
 
-function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView) {
+type CardMoveResolution = { effect: CardTransfer; card: CardInstance; index: number; resolved: boolean };
+function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution) {
   const p = cs.player;
   const onEmberSpent = (amount: number) => {
     if (amount <= 0 || !view || view.type === 'curse' || p.hp <= 0 || cs.outcome !== 'ongoing') return;
@@ -934,6 +947,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           const idx = e.count === 'all' ? 0 : nextInt(cs.rng, 0, p.hand.length - 1);
           const [c] = p.hand.splice(idx, 1);
           p.discard.push(c);
+          ev.push({ type: 'cardRemoved', card: { ...c }, destination: 'discard', random: e.count !== 'all' });
           log(cs, ev, `弃置「${viewCard(c).name}」`);
         }
         break;
@@ -1029,6 +1043,23 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       case 'draw':
         drawCards(cs, e.amount, ev);
         break;
+      case 'moveCard': {
+        if (!transfer || transfer.resolved) break;
+        transfer.resolved = true;
+        const card = transfer.card;
+        if (e.to === 'hand' && p.hand.length >= HAND_MAX) {
+          p[e.from].splice(Math.min(transfer.index, p[e.from].length), 0, card);
+          log(cs, ev, `手牌已满，「${viewCard(card).name}」留在原牌堆`);
+        } else {
+          p[e.to].push(card); // 抽牌堆末端即堆顶。
+          log(cs, ev, `将「${viewCard(card).name}」移入${e.to === 'hand' ? '手牌' : e.to === 'draw' ? '抽牌堆顶' : '弃牌堆'}`);
+        }
+        break;
+      }
+      case 'retainHand':
+        for (const card of p.hand) p.turnFlags[`retain:${card.uid}`] = 1;
+        log(cs, ev, `本回合结束时保留当前 ${p.hand.length} 张手牌`);
+        break;
       case 'chargeHand':
         for (const card of p.hand) {
           const charged = viewCard(card);
@@ -1092,7 +1123,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
             if (idx < 0) continue;
           } else idx = e.count === 'all' ? 0 : nextInt(cs.rng, 0, p.hand.length - 1);
           const [c] = p.hand.splice(idx, 1);
-          exhaustCard(cs, c, ev);
+          exhaustCard(cs, c, ev, e.count !== 'all');
           exhausted++;
         }
         if (e.energyPerCard && exhausted) p.energy += e.energyPerCard * exhausted;
@@ -1181,7 +1212,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       }
       case 'conditional':
-        if (checkCondition(e.cond, p, target, view?.bonus ?? 0)) resolveEffects(cs, e.then, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined);
+        if (checkCondition(e.cond, p, target, view?.bonus ?? 0)) resolveEffects(cs, e.then, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined, transfer);
         break;
     }
   }
@@ -1341,7 +1372,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
   const kept: CardInstance[] = [];
   for (const c of p.hand) {
     const cv = viewCard(c);
-    if (cv.retain) {
+    if (cv.retain || p.turnFlags[`retain:${c.uid}`]) {
       if (cv.charge) c.bonus = (c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0);
       kept.push(c);
     } else p.discard.push(c);

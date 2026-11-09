@@ -73,12 +73,13 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
   return (
     <div className={`screen map-screen ${preview ? 'map-preview' : ''} ${compact ? 'compact-map' : ''}`}
       onKeyDownCapture={event => {
-        if (ink.drawing && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); ink.stop(); }
+        if (ink.editing && event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); ink.stop(); }
       }}>
       <div className="map-heading-row">
         <div className="chapter-map-heading"><b>{chapter.label} · {chapter.name}</b><span>第 {chapter.startFloor + 1}–{chapter.startFloor + map.rows} 层</span></div>
         <div className="map-note-tools" role="group" aria-label="个人路线标注">
-          <button className={`btn small map-pen ${ink.drawing ? 'active' : ''}`} aria-pressed={ink.drawing} onClick={ink.toggle} title="自由绘制绿色计划路线，仅作个人参考，不改变实际路线">{ink.drawing ? '完成标注' : '绿色标注'}</button>
+          <button className={`btn small map-pen ${ink.drawing ? 'active' : ''}`} aria-pressed={ink.drawing} onClick={() => ink.selectTool('pen')} title="自由绘制绿色计划路线，仅作个人参考，不改变实际路线">{ink.drawing ? '完成标注' : '绿色标注'}</button>
+          <button className={`btn small map-eraser ${ink.erasing ? 'active' : ''}`} aria-pressed={ink.erasing} onClick={() => ink.selectTool('eraser')} title="擦去绿色笔迹中碰到的部分，保留其余线段">{ink.erasing ? '完成擦除' : '橡皮擦'}</button>
           <button className="btn small ghost" disabled={!notes.length || !!ink.draft.length} onClick={() => noteScope && writeMapNotes(noteScope, notes.slice(0, -1))}>撤销一笔</button>
           <button className="btn small ghost" disabled={!notes.length || !!ink.draft.length} onClick={() => noteScope && writeMapNotes(noteScope, [])}>清空标注</button>
         </div>
@@ -114,7 +115,7 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
         <RoutePanel run={run} selected={selected} preview={preview} canEnter={!!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
       </div>
       <p className="subtitle" style={{ textAlign: 'center', margin: 0 }}>
-        {ink.drawing ? notes.length >= MAX_MAP_STROKES ? '标注已满，请撤销或清空后继续。右键或 Esc 结束标注。' : '拖动绘制绿色计划路线 · 滚轮查看地图 · 右键或 Esc 结束标注。绿线仅作参考。' : preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
+        {ink.erasing ? '点击或划过绿线，只擦掉碰到的部分 · 右键或 Esc 结束擦除。' : ink.drawing ? notes.length >= MAX_MAP_STROKES ? '标注已满，请使用橡皮擦、撤销或清空后继续。右键或 Esc 结束标注。' : '拖动绘制绿色计划路线 · 滚轮查看地图 · 右键或 Esc 结束标注。绿线仅作参考。' : preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
       </p>
     </div>
   );
@@ -195,9 +196,9 @@ function MapSvg(props: {
     if (target) { onSelect(target.id); nodeRefs.current.get(target.id)?.focus(); }
   };
   return (
-    <svg className={`map-svg ${ink.drawing ? 'drawing' : ''}`} viewBox={`0 0 ${W} ${H}`} {...ink.handlers}
-      onClickCapture={event => { if (ink.drawing) { event.preventDefault(); event.stopPropagation(); } }}
-      onContextMenu={event => { if (ink.drawing) { event.preventDefault(); event.stopPropagation(); ink.stop(); } }}>
+    <svg className={`map-svg ${ink.editing ? 'editing' : ''} ${ink.drawing ? 'drawing' : ''} ${ink.erasing ? 'erasing' : ''}`} viewBox={`0 0 ${W} ${H}`} {...ink.handlers}
+      onClickCapture={event => { if (ink.editing) { event.preventDefault(); event.stopPropagation(); } }}
+      onContextMenu={event => { if (ink.editing) { event.preventDefault(); event.stopPropagation(); ink.stop(); } }}>
       <defs>
         <radialGradient id={glow}>
           <stop offset="0%" stopColor="#ff7a2a" stopOpacity="0.5" />

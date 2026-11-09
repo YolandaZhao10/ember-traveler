@@ -51,6 +51,12 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
       case 'draw':
         util += e.amount * 2;
         break;
+      case 'moveCard':
+        util += e.to === 'hand' ? 5 : e.to === 'draw' ? 3 : 1;
+        break;
+      case 'retainHand':
+        util += Math.min(5, p.hand.length);
+        break;
       case 'energy':
         util += e.amount * 3;
         break;

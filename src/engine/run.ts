@@ -479,8 +479,38 @@ export function cardShopPriceRange(run: RunState, rarity: Rarity): [number, numb
 function priceMul(run: RunState) {
   return run.relics.includes('merchant_scale') ? 0.75 : 1;
 }
+
+/** 两排五张：攻击、攻击、技能、技能、能力；通用、通用、随机、随机、随机。 */
+export function generateShopCards(run: RunState): CardInstance[] {
+  const tiers = ['common', 'uncommon', 'rare'] as const;
+  const weights = cardRarityWeights(run.floor, 'shop', run.difficulty.cardRarity);
+  const pool = CARD_LIST.filter(c => cardAvailableTo(c, run.character) && tiers.some(r => r === c.rarity));
+  const rarities = Array.from({ length: 10 }, () => weightedPick(run.rng.reward, tiers.map(item => ({ item, weight: weights[item] }))));
+  const powerTiers = tiers.filter(r => pool.some(c => c.type === 'power' && c.rarity === r));
+  if (!powerTiers.includes(rarities[4])) {
+    // 先交换已有稀有度位置，保持整店的随机稀有度配比；不把普通牌直接升级。
+    const swaps = rarities.flatMap((r, i) => i !== 4 && powerTiers.includes(r) ? [i] : []);
+    if (swaps.length) {
+      const index = pick(run.rng.reward, swaps);
+      [rarities[4], rarities[index]] = [rarities[index], rarities[4]];
+    } else {
+      // 极端全普通货架且该角色没有普通能力牌时，只为必需的能力位抽取可用档位。
+      rarities[4] = weightedPick(run.rng.reward, powerTiers.map(item => ({ item, weight: weights[item] })));
+    }
+  }
+  const types = ['attack', 'attack', 'skill', 'skill', 'power'] as const;
+  const chosen: string[] = [];
+  return rarities.map((rarity, i) => {
+    const choices = pool.filter(c => c.rarity === rarity && !chosen.includes(c.id)
+      && (i >= 5 || c.type === types[i]) && (i !== 5 && i !== 6 || !c.owner));
+    const card = pick(run.rng.reward, choices);
+    chosen.push(card.id);
+    return makeCard(run, card.id);
+  });
+}
+
 function generateShop(run: RunState): ShopState {
-  const cards = generateCardChoices(run, 'shop', 10);
+  const cards = generateShopCards(run);
   const special = SHOP_RELICS.filter(r => !run.relics.includes(r.id));
   const relicIds: string[] = special.length ? [pick(run.rng.shop, special).id] : [];
   for (let i = relicIds.length; i < 6; i++) {

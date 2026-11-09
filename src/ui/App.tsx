@@ -1,4 +1,5 @@
 import { formatJourneyTime } from './journeyClock';
+import { useEffect } from 'react';
 import { nodeTypeName } from '../engine/map';
 import { CHAPTERS } from '../data/chapters';
 import { ChapterScreen } from './screens/ChapterScreen';
@@ -12,11 +13,23 @@ import { RestScreen } from './screens/RestScreen';
 import { RewardScreen } from './screens/RewardScreen';
 import { ShopScreen } from './screens/ShopScreen';
 import { TitleScreen } from './screens/TitleScreen';
-import { openOverlay, toggleSound, useGame } from './store';
+import { getState, openOverlay, quickReset, toggleSound, useGame } from './store';
 
 export function App() {
   const { run, showTitle, toast, settings, busy } = useGame();
   const screen = showTitle || !run ? 'title' : run.screen;
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== 'r' || event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const current = getState();
+      if (current.showTitle || current.busy || !current.run?.checkpoint) return;
+      event.preventDefault();
+      quickReset();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   return (
     <div className={`app chapter-${screen === 'title' ? 1 : run?.chapter ?? 1}`}>
       {screen !== 'title' && run && (

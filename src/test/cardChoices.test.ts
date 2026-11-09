@@ -93,7 +93,7 @@ describe('卡牌奖励功能分工', () => {
     expect(changedOffers).toBeGreaterThan(0);
   });
 
-  it('商店十张牌沿用原抽取结果，单张奖励也不强加功能限制', () => {
+  it('通用抽取函数的商店档与单张奖励不强加三选一的功能限制', () => {
     for (const [tier, n] of [['shop', 10], ['normal', 1]] as const) {
       const run = R.newRun(`ROLE-UNAFFECTED-${tier}`, 'scholar');
       const control = structuredClone(run);

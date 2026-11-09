@@ -8,8 +8,10 @@ import type { CardInstance, CharacterId, CombatEvent, RunDifficulty, RunState, S
 import { setSoundEnabled, sfx } from './sound';
 import { STATUSES } from '../data/statuses';
 import { canPlayCard, needsDiscardReplay } from '../engine/combat';
+import { cardTransferEffect } from '../engine/cardTransfer';
 import { viewCard } from '../engine/cards';
 import { impactCues, type ImpactItem } from './combatFx';
+import { cardExitCues, type CardExitItem } from './cardExitFx';
 import { ensureRecordId, recordJourney } from '../engine/history';
 
 export interface FxItem {
@@ -21,6 +23,7 @@ export interface FxItem {
 }
 
 export type Overlay =
+  | { kind: 'cardTransfer'; cardUid: string }
   | { kind: 'replay'; cardUid: string }
   | { kind: 'history' }
   | { kind: 'help' }
@@ -48,6 +51,7 @@ export interface UIState {
   selectedCard: string | null;
   fx: FxItem[];
   impacts: ImpactItem[];
+  cardExits: CardExitItem[];
   playing: string | null;
   attacking: string | null;
   overlay: Overlay | null;
@@ -65,6 +69,7 @@ let state: UIState = {
   selectedCard: null,
   fx: [],
   impacts: [],
+  cardExits: [],
   playing: null,
   attacking: null,
   overlay: null,
@@ -151,7 +156,7 @@ export function newGame(seed?: string, character: CharacterId = 'traveler', diff
   const run = R.newRun(s, character, difficulty);
   ensureRecordId(run);
   clearSave();
-  set({ showTitle: false, selectedCard: null, overlay: null, hasSave: true, impacts: [], fx: [] });
+  set({ showTitle: false, selectedCard: null, overlay: null, hasSave: true, impacts: [], cardExits: [], fx: [] });
   setRun(run);
   sfx('click');
 }
@@ -161,7 +166,7 @@ export function continueGame() {
   if (!run) return;
   ensureRecordId(run, JSON.stringify(run));
   recordJourney(run);
-  set({ showTitle: false, selectedCard: null, overlay: null, impacts: [], fx: [] });
+  set({ showTitle: false, selectedCard: null, overlay: null, impacts: [], cardExits: [], fx: [] });
   setRun(run, false);
   // 战斗已结束但未结算（例如在结算动画期间刷新）
   if (run.combat && run.combat.outcome !== 'ongoing') {
@@ -181,6 +186,19 @@ export function abandonRun() {
   recordJourney(state.run, true);
   clearSave();
   set({ run: null, showTitle: true, hasSave: false, overlay: null });
+}
+
+/** 已结算的旅程正式结束，保留胜负记录与最终牌组，不计为放弃。 */
+export function finishRun() {
+  if (!state.run || state.busy || !['victory', 'gameover'].includes(state.run.screen)) return;
+  recordJourney(state.run);
+  clearSave();
+  set({ run: null, showTitle: true, hasSave: false, overlay: null, selectedCard: null });
+}
+
+export function confirmFinishRun() {
+  if (!state.run || !['victory', 'gameover'].includes(state.run.screen)) return;
+  openOverlay({ kind: 'confirm', title: '结束旅程', text: `${state.run.screen === 'victory' ? '通关' : '本局结算'}记录、用时和最终牌组将保留在旅程记录中。结束后返回首页，清除本局存档与回退点。`, onYes: finishRun });
 }
 
 export function toggleSound() {
@@ -229,7 +247,7 @@ export function travel(nodeId: string) {
   if (!R.canTravelTo(state.run, nodeId)) return;
   sfx('click');
   const next = R.travelTo(state.run, nodeId);
-  set({ impacts: [], fx: [] });
+  set({ impacts: [], cardExits: [], fx: [] });
   setRun(next);
   if (next.combat) banner(next.combat.tier === 'boss' ? '首领战' : next.combat.tier === 'elite' ? '精英战' : '遭遇战');
 }
@@ -240,7 +258,7 @@ export function quickReset() {
   if (next === state.run) return;
   if (bannerTimer) clearTimeout(bannerTimer);
   if (toastTimer) clearTimeout(toastTimer);
-  set({ selectedCard: null, overlay: null, fx: [], impacts: [], playing: null, attacking: null, lastEvents: [], banner: null, toast: null });
+  set({ selectedCard: null, overlay: null, fx: [], impacts: [], cardExits: [], playing: null, attacking: null, lastEvents: [], banner: null, toast: null });
   setRun(next);
   sfx('click');
   toast(next.currentNodeId === null ? `已回到第 ${next.chapter} 章地图起点` : `已回到第 ${next.floor + 1} 层${next.screen === 'reward' ? '奖励选择' : '节点开始'}`);
@@ -261,6 +279,8 @@ function showEvents(events: CombatEvent[]) {
   const fx: Omit<FxItem, 'id'>[] = [];
   const cues = impactCues(events);
   const impacts = cues.map((cue) => ({ ...cue, id: ++fxId, delayMs: cue.delayMs * (state.settings.fastAnim ? 0.45 : 1) }));
+  const cardExits = cardExitCues(events, state.settings.fastAnim).map(cue => ({ ...cue, id: ++fxId }));
+  const cardExitTime = Math.max(0, ...cardExits.map(cue => cue.delayMs + cue.durationMs));
   let hit = false;
   let blk = false;
   let ember = false;
@@ -305,7 +325,11 @@ function showEvents(events: CombatEvent[]) {
     }
   }
   pushFx(fx);
-  set({ impacts, lastEvents: events });
+  set({ impacts, cardExits, lastEvents: events });
+  if (cardExits.length) {
+    const ids = new Set(cardExits.map(cue => cue.id));
+    setTimeout(() => set({ cardExits: state.cardExits.filter(cue => !ids.has(cue.id)) }), cardExitTime);
+  }
   if (impacts.length) {
     const ids = new Set(impacts.map((cue) => cue.id));
     setTimeout(() => set({ impacts: state.impacts.filter((cue) => !ids.has(cue.id)) }), 650 + Math.max(...impacts.map((cue) => cue.delayMs)));
@@ -315,7 +339,7 @@ function showEvents(events: CombatEvent[]) {
   if (ember) sfx('ember');
   if (heal) sfx('heal');
   if (death) sfx('death');
-  return 420 + Math.max(0, ...cues.map((cue) => cue.delayMs));
+  return Math.max(420 + Math.max(0, ...cues.map(cue => cue.delayMs)), cardExitTime / (state.settings.fastAnim ? 0.45 : 1));
 }
 
 function statusLabel(id: StatusId) {
@@ -341,10 +365,10 @@ export async function playSelected(targetId: string | null, replayUid?: string) 
   if (!uid || !run || !run.combat || state.busy) return;
   const card = run.combat.player.hand.find((c) => c.uid === uid);
   if (!card) return;
-  if (needsDiscardReplay(card) && !replayUid) {
+  if ((needsDiscardReplay(card) || cardTransferEffect(card)) && !replayUid) {
     const check = canPlayCard(run.combat, card);
     if (!check.ok) { toast(check.reason ?? '无法打出'); return; }
-    openOverlay({ kind: 'replay', cardUid: uid });
+    openOverlay({ kind: needsDiscardReplay(card) ? 'replay' : 'cardTransfer', cardUid: uid });
     return;
   }
   const res = R.combatPlayCard(run, uid, targetId, replayUid);
@@ -352,7 +376,7 @@ export async function playSelected(targetId: string | null, replayUid?: string) 
     toast('无法打出');
     return;
   }
-  const replay = run.combat.player.discard.find(c => c.uid === replayUid);
+  const replay = needsDiscardReplay(card) ? run.combat.player.discard.find(c => c.uid === replayUid) : undefined;
   const attacks = viewCard(card).type === 'attack' || (replay && viewCard(replay).type === 'attack');
   set({ busy: true, overlay: null, selectedCard: null, playing: uid, attacking: attacks ? 'player' : null, impacts: [] });
   // 先保存结算结果，前摇期间刷新也不会回滚出牌或重复结算。
@@ -395,9 +419,9 @@ export async function endTurn() {
   sfx('click');
   const res = R.combatEndTurn(run);
   setRun(res.run);
-  showEvents(res.events);
+  const recovery = showEvents(res.events);
   if (res.run.combat?.outcome === 'ongoing') banner('敌人回合');
-  await delay(350);
+  await delay(Math.max(350, recovery));
   await runEnemyPhase();
 }
 

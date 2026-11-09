@@ -1,4 +1,5 @@
 import { playOptions } from './playOptions';
+import { cardTransferEffect } from '../engine/cardTransfer';
 import { CARDS } from '../data/cards';
 import { CHARACTERS } from '../data/characters';
 import { viewCard } from '../engine/cards';
@@ -128,6 +129,8 @@ export function planMove(cs: CombatState, options = { depth: 5, width: 6, engine
           // 已打出或离手的牌不再已知；即使搜索内洗回原 UID，也只能在真实抽到后重新规划。
           const handUids = new Set(result.player.hand.map(c => c.uid));
           const known = new Set([...plan.known].filter(uid => uid !== card.uid && handUids.has(uid)));
+          // 玩家自己选回手中的牌是已知牌，可以继续规划；普通未知抽牌仍隐藏。
+          if (cardTransferEffect(card)?.to === 'hand' && replayUid && handUids.has(replayUid)) known.add(replayUid);
           const state = hideUnknown(result, known);
           const score = turnValue(state, known, options.engines);
           const first = plan.first ?? { uid: card.uid, target, replayUid };

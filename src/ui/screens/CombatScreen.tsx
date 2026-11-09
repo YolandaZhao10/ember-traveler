@@ -9,13 +9,14 @@ import { Card } from '../components/Card';
 import { HpBar, StatusChips, intentText } from '../components/Common';
 import { Backdrop, EnemyArt, PlayerArt } from '../components/Art';
 import { ImpactEffects, SwingArc } from '../components/CombatEffects';
+import { CardExitEffects } from '../components/CardExitEffects';
 import { TargetingArrow } from '../components/TargetingArrow';
 import { useCardAim } from '../useCardAim';
 import type { ImpactItem } from '../combatFx';
-import { closeOverlay, endTurn, openOverlay, playSelected, selectCard, selectCardByIndex, useGame, type FxItem } from '../store';
+import { closeOverlay, endTurn, openOverlay, playSelected, selectCard, selectCardByIndex, toast, useGame, type FxItem } from '../store';
 
 export function CombatScreen() {
-  const { run, busy, selectedCard, fx, impacts, playing, attacking, banner: bannerText, overlay, settings } = useGame();
+  const { run, busy, selectedCard, fx, impacts, cardExits, playing, attacking, banner: bannerText, overlay, settings } = useGame();
   const cs = run?.combat;
   const root = useRef<HTMLDivElement>(null);
   const { aim, dragging, onCardPointerDown, onClickCapture, onContextMenuCapture } = useCardAim(root);
@@ -35,13 +36,24 @@ export function CombatScreen() {
   }, [impacts, settings.fastAnim]);
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
-      if (ev.target instanceof HTMLInputElement) return;
+      if (ev.isComposing || ev.ctrlKey || ev.metaKey || ev.altKey || ev.repeat) return;
+      if (ev.target instanceof Element && ev.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (ev.key === 'Escape') {
         if (overlay) closeOverlay();
         else selectCard(null);
         return;
       }
       if (overlay) return;
+      if (ev.code === 'Space' || ev.key === ' ') {
+        const card = cs?.player.hand.find(c => c.uid === selectedCard);
+        if (!card) return;
+        ev.preventDefault();
+        if (busy || cs?.phase !== 'player' || dragging) return;
+        if (!needsTarget(card)) void playSelected(null);
+        else if (aim?.ready && aim.targetId) void playSelected(aim.targetId);
+        else toast('将指针移到目标敌人上，再按 Space 打出');
+        return;
+      }
       // 聚焦按钮时 Enter 交给按钮自身，避免快速 SL / 图鉴同时触发结束回合。
       if (ev.key === 'Enter' && ev.target instanceof Element && ev.target.closest('button, [role="button"]')) return;
       if (ev.key === 'e' || ev.key === 'E' || ev.key === 'Enter') {
@@ -53,7 +65,7 @@ export function CombatScreen() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [overlay]);
+  }, [overlay, cs, selectedCard, busy, dragging, aim]);
   if (!run || !cs) return null;
   const p = cs.player;
   const selected = selectedCard ? p.hand.find((c) => c.uid === selectedCard) ?? null : null;
@@ -144,7 +156,7 @@ export function CombatScreen() {
           </button>
           <div className="hand-shortcuts" aria-label="出牌快捷键提示">
             <span><kbd>1–9</kbd> / <kbd>0</kbd> 选牌</span>
-            <span>有目标：点敌人<br />无目标：点打出</span>
+            <span><kbd>Space</kbd> 打出<br />单体牌先指向敌人</span>
             <span><kbd>Esc</kbd> 取消选牌</span>
           </div>
         </div>
@@ -177,17 +189,18 @@ export function CombatScreen() {
         </div>
       </div>
       {aim && <TargetingArrow aim={aim} />}
+      <CardExitEffects items={cardExits} />
       {selected && !targeting && !dragging && !overlay && (
         <div className="toast" style={{ top: 'auto', bottom: 'calc(var(--hand-h) + 8px)', pointerEvents: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
           <span>{viewCard(selected).name}</span>
-          <button className="btn small primary" onClick={() => void playSelected(null)}>
-            打出
+          <button className="btn small primary" aria-label="打出" aria-keyshortcuts="Space" title="Space 打出所选卡牌" onClick={() => void playSelected(null)}>
+            打出 <kbd className="card-action-shortcut">Space</kbd>
           </button>
           <button className="btn small ghost" onClick={() => openOverlay({ kind: 'card', card: selected, inCombat: true })}>
             详情
           </button>
-          <button className="btn small ghost" onClick={() => selectCard(null)}>
-            取消
+          <button className="btn small ghost" aria-label="取消" aria-keyshortcuts="Escape" title="Esc 取消选牌或瞄准" onClick={() => selectCard(null)}>
+            取消 <kbd className="card-action-shortcut">Esc</kbd>
           </button>
         </div>
       )}

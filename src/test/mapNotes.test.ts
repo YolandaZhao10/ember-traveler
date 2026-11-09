@@ -64,7 +64,7 @@ it('四章分别保留，修改一章不清空其他章，新局不继承旧笔�
   expect(readMapNotes({ ...scope, page: '1' })).toEqual([]);
 });
 
-it.each(['{', 'null', '{"version":2,"journey":"journey-a","pages":{}}'])('损坏或未知版本标注安全忽略：%s', async raw => {
+it.each(['{', 'null', '{"version":99,"journey":"journey-a","pages":{}}'])('损坏或未知版本标注安全忽略：%s', async raw => {
   data.set(key, raw);
   const { readMapNotes, writeMapNotes } = await import('../ui/mapNotes');
   expect(readMapNotes(scope)).toEqual([]);
@@ -74,7 +74,7 @@ it.each(['{', 'null', '{"version":2,"journey":"journey-a","pages":{}}'])('损坏
 
 it('无效坐标和过量笔迹不会导致无限渲染或破坏其他有效笔迹', async () => {
   data.set(key, JSON.stringify({ version: 1, journey: scope.journey, pages: {
-    [scope.page]: [stroke, [{ x: -1, y: .2 }, { x: 0, y: 0 }], [{ x: null, y: .2 }, { x: 0, y: 0 }], Array(513).fill(stroke[0])],
+    [scope.page]: [stroke, [{ x: -1, y: .2 }, { x: 0, y: 0 }], [{ x: null, y: .2 }, { x: 0, y: 0 }], Array(4097).fill(stroke[0])],
   } }));
   const { readMapNotes, writeMapNotes, MAX_MAP_STROKES } = await import('../ui/mapNotes');
   expect(readMapNotes(scope)).toEqual([stroke]);
@@ -116,4 +116,71 @@ it('快速连续落笔逐笔追加，点状标记与中断前的短笔画也会�
   expect(readMapNotes(scope)).toEqual(expected);
   vi.resetModules();
   expect((await import('../ui/mapNotes')).readMapNotes(scope)).toEqual(expected);
+});
+
+it('橡皮擦只裁掉接触部分，两端和其他笔迹不变，反复擦空白不重新连线', async () => {
+  const { eraseMapStrokes } = await import('../ui/mapNotes');
+  const lines = [.2, .5, .8].map(x => [{ x, y: .1 }, { x, y: .9 }]);
+  const point = { x: .5, y: .5 }, size = { x: 1000, y: 1000 };
+  const remaining = eraseMapStrokes(lines, point, point, size);
+  expect(remaining).toHaveLength(3);
+  expect(remaining[0]).toBe(lines[0]); expect(remaining[2]).toBe(lines[2]);
+  expect(remaining[1][0]).toEqual(lines[1][0]); expect(remaining[1][3]).toEqual(lines[1][1]);
+  expect(remaining[1][1].y).toBeCloseTo(.492); expect(remaining[1][2].y).toBeCloseTo(.508);
+  expect(remaining[1][2].breakBefore).toBe(true);
+  expect(eraseMapStrokes(remaining, point, point, size)).toBe(remaining);
+  expect(lines[1]).toHaveLength(2);
+});
+
+it('拖动擦出一段空隙，快速跨过两条线也不会漏擦；不波及远处标注', async () => {
+  const { eraseMapStrokes } = await import('../ui/mapNotes');
+  const lines = [.2, .5, .8].map(x => [{ x, y: .1 }, { x, y: .9 }]);
+  const remaining = eraseMapStrokes(lines, { x: .1, y: .5 }, { x: .6, y: .5 }, { x: 1000, y: 1000 });
+  expect(remaining).toHaveLength(3);
+  expect(remaining.slice(0, 2).every(s => s.some(p => p.breakBefore))).toBe(true);
+  expect(remaining[2]).toBe(lines[2]);
+  const along = eraseMapStrokes([lines[1]], { x: .5, y: .3 }, { x: .5, y: .7 }, { x: 1000, y: 1000 })[0];
+  expect(along[1].y).toBeCloseTo(.292); expect(along[2].y).toBeCloseTo(.708);
+  expect(along[2].breakBefore).toBe(true);
+});
+
+it('同一笔多次局部擦除只增加断点，不新增笔数或删除其余部分', async () => {
+  const { eraseMapStrokes } = await import('../ui/mapNotes');
+  let notes: MapNotes = [[{ x: .1, y: .5 }, { x: .9, y: .5 }]];
+  for (const x of [.3, .5, .7]) notes = eraseMapStrokes(notes, { x, y: .5 }, { x, y: .5 }, { x: 1000, y: 1000 });
+  expect(notes).toHaveLength(1);
+  expect(notes[0].filter(p => p.breakBefore)).toHaveLength(3);
+  expect(notes[0][0]).toEqual({ x: .1, y: .5 });
+  expect(notes[0][notes[0].length - 1]).toEqual({ x: .9, y: .5 });
+});
+
+it('主地图与缩小预览均按屏幕像素命中，整笔都被覆盖时才完全删除', async () => {
+  const { eraseMapStrokes } = await import('../ui/mapNotes');
+  const dot = [{ x: .5, y: .5 }];
+  for (const size of [{ x: 720, y: 1260 }, { x: 320, y: 560 }]) {
+    const hit = { x: .5 + 7 / size.x, y: .5 };
+    const miss = { x: .5 + 10 / size.x, y: .5 };
+    expect(eraseMapStrokes([dot], hit, hit, size)).toEqual([]);
+    expect(eraseMapStrokes([dot], miss, miss, size)).toEqual([dot]);
+  }
+  expect(eraseMapStrokes([[{ x: .499, y: .5 }, { x: .501, y: .5 }]], dot[0], dot[0], { x: 1000, y: 1000 })).toEqual([]);
+});
+
+it('旧笔迹可继续局部擦除，断点刷新后保留，不影响其他章和对局存档', async () => {
+  data.set(key, JSON.stringify({ version: 1, journey: scope.journey, pages: { [scope.page]: [stroke] } }));
+  const notes = await import('../ui/mapNotes');
+  const run = newRun('ERASER'); saveRun(run);
+  const saved = data.get('ember-traveler:save');
+  const other = { ...scope, page: '2:another-map' };
+  expect(notes.readMapNotes(scope)).toEqual([stroke]);
+  notes.writeMapNotes(other, [stroke]);
+  notes.eraseMapNotes(scope, stroke[1], stroke[1], { x: 720, y: 1260 });
+  const result = notes.readMapNotes(scope);
+  expect(result[0].some(p => p.breakBefore)).toBe(true);
+  expect(JSON.parse(data.get(key)!).version).toBe(2);
+  vi.resetModules();
+  const restored = await import('../ui/mapNotes');
+  expect(restored.readMapNotes(scope)).toEqual(result);
+  expect(restored.readMapNotes(other)).toEqual([stroke]);
+  expect(data.get('ember-traveler:save')).toBe(saved);
 });

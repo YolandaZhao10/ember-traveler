@@ -22,10 +22,10 @@ describe('全卡表基础/升级效果审查', () => {
    if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}
   }
  });
- it('每角色增加两张罕见资源牌，血誓者另有重放牌、通用池另增两张普通转换牌',()=>{
+ it('角色配额包含资源、循环与重放牌，通用池含两张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([owner === undefined ? 22 : 20,owner === undefined ? 18 : owner === 'oathbound' ? 21 : 20,15]);
+   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([owner === undefined ? 22 : 20,owner === undefined ? 18 : owner === 'oathbound' ? 23 : 22,owner === undefined ? 16 : 15]);
   }
  });
 });

@@ -414,9 +414,11 @@ h3 {
 .map-note-tools .btn { padding: 4px 9px; font-size: 12px; }
 .map-note-tools .map-pen { color: #8ce6b0; border-color: #549d70; }
 .map-note-tools .map-pen.active { background: #254b35; box-shadow: inset 0 0 0 1px #8ce6b0; }
-.map-ink polyline { fill: none; stroke: #6fe59b; stroke-width: 5; stroke-opacity: .75; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.map-note-tools .map-eraser.active { color: #ffcfb2; background: #563b31; border-color: #db9c77; }
+.map-ink path { fill: none; stroke: #6fe59b; stroke-width: 5; stroke-opacity: .75; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .map-svg.drawing, .map-svg.drawing .map-node { cursor: crosshair; }
-.map-svg.drawing { touch-action: none; user-select: none; }
+.map-svg.erasing, .map-svg.erasing .map-node { cursor: cell; }
+.map-svg.editing { touch-action: none; user-select: none; }
 .map-route-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(270px, 26vw, 330px); gap: 10px; }
 .map-stage {
   position: relative;
@@ -555,6 +557,39 @@ h3 {
   grid-template-rows: 1fr auto;
   min-height: 0;
 }
+.card-exit-layer { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.card-exit { position: absolute; left: calc(50% + var(--exit-slot) * 152px); bottom: calc(var(--hand-h) + 22px); width: 140px; margin-left: -70px; display: flex; align-items: center; flex-direction: column; gap: 8px; opacity: 0; animation-fill-mode: forwards; animation-timing-function: ease-in; }
+.card-exit-label { padding: 6px 8px; border-radius: 6px; background: #18130ff2; border: 1px solid #e19a4b; color: #ffe0a2; box-shadow: 0 2px 15px #0009; text-align: center; white-space: nowrap; font-size: 12px; font-weight: 700; }
+.card-exit-face { position: relative; filter: drop-shadow(0 0 12px #ff8c3355); }
+.card-exit-face .card { margin: 0; }
+.card-exit.exhaust { animation-name: card-consumed; }
+.card-exit.discard { animation-name: card-discarded; }
+.card-exit.discard .card-exit-label { color: #cbe9ef; border-color: #88bac8; }
+.card-exit.discard .card-exit-face { filter: drop-shadow(0 0 12px #8fd3e555); }
+.card-exit-trail { position: absolute; inset: 25% 12% 0; border-radius: 35%; background: radial-gradient(ellipse at 50% 100%, #ffd27988, #e1572522 45%, transparent 72%); mix-blend-mode: screen; }
+.card-exit.discard .card-exit-trail { background: linear-gradient(100deg, transparent 35%, #add9e644, transparent 75%); }
+@keyframes card-consumed {
+  0% { opacity: 1; transform: translateY(20px) scale(.9); }
+  14%, 65% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+  82% { opacity: .9; transform: translateY(-18px) scale(.96); filter: brightness(1.6) sepia(.8); }
+  100% { opacity: 0; transform: translateY(-65px) scale(.7); filter: brightness(2) sepia(1) blur(4px); }
+}
+@keyframes card-discarded {
+  0% { opacity: 1; transform: translateY(20px) scale(.9); }
+  14%, 65% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(38vw, 150px) rotate(18deg) scale(.25); }
+}
+@media (max-width: 600px) {
+  .card-exit { left: calc(50% + var(--exit-slot) * 84px); width: 80px; margin-left: -40px; bottom: calc(var(--hand-h) + 10px); }
+  .card-exit-face .card { width: 76px; height: 115px; }
+  .card-exit-face .cdesc, .card-exit-face .ctype { display: none; }
+  .card-exit-label { white-space: normal; padding: 4px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-exit.exhaust, .card-exit.discard { animation-name: card-exit-fade; }
+  .card-exit-trail { display: none; }
+}
+@keyframes card-exit-fade { 0%, 90% { opacity: 1; } 100% { opacity: 0; } }
 .battlefield {
   --attack-duration: 480ms;
   --impact-duration: 380ms;
@@ -1156,7 +1191,7 @@ h3 {
   line-height: 1.6;
   text-align: center;
 }
-.handarea kbd {
+.handarea kbd, .card-action-shortcut {
   display: inline-block;
   min-width: 19px;
   padding: 0 4px;
@@ -1264,7 +1299,7 @@ h3 {
 }
 
 @media (max-width: 760px), (pointer: coarse) {
-  .hand-shortcuts, .handarea .hand-shortcut-key, .handarea .endturn-shortcut { display: none; }
+  .hand-shortcuts, .handarea .hand-shortcut-key, .handarea .endturn-shortcut, .card-action-shortcut { display: none; }
 }
 
 /* ---------- 卡牌 ---------- */
