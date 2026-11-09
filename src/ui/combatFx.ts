@@ -13,7 +13,7 @@ export interface ImpactCue {
 export function impactCues(events: CombatEvent[]): ImpactCue[] {
   const hits = new Map<string, number>();
   return events.flatMap((event, eventIndex) => {
-    if (event.type !== 'damage' || event.amount + event.blocked <= 0) return [];
+    if (event.type !== 'damage' || event.amount + event.blocked + (event.prevented ?? 0) <= 0) return [];
     const count = hits.get(event.targetId) ?? 0;
     hits.set(event.targetId, count + 1);
     return [{

@@ -5,6 +5,7 @@ import { normalizeDifficulty } from '../data/difficulty';
 import { expandLegacyRoutes } from './map';
 import { recordJourney } from './history';
 import { ensurePowerInstances } from './powers';
+import { ENEMIES } from '../data/enemies';
 
 type Snapshot = NonNullable<RunState['checkpoint']>;
 
@@ -34,6 +35,16 @@ function migrateLayout(input: Snapshot): Snapshot {
   run.elapsedMs = Number.isFinite(run.elapsedMs) ? Math.max(0, run.elapsedMs) : 0;
   run.difficulty = normalizeDifficulty(run.difficulty);
   if (run.combat) ensurePowerInstances(run.combat.player);
+  if (input.version < 15 && run.combat) {
+    for (const enemy of run.combat.enemies) {
+      const ratio = ENEMIES[enemy.defId]?.maxHpLossPerTurn;
+      if (!ratio || enemy.damageGuard) continue;
+      const limit = Math.max(1, Math.ceil(enemy.maxHp * ratio));
+      // 旧档没有逐回合损血账本：保守计入已损失生命，新回合正常刷新。
+      // 不重算已开始战斗的生命，也不消耗随机流；回退点采用相同迁移。
+      enemy.damageGuard = { limit, lost: Math.min(limit, Math.max(0, enemy.maxHp - enemy.hp)) };
+    }
+  }
   if (input.version < 14 && run.combat) {
     // 旧版偷窃只记账、战后才扣钱。仅把存活敌人尚未归还的账目转成实际扣款。
     // 旧日志可能已截断，按敌人顺序限额分配，确保绝不凭空生成返还金币。

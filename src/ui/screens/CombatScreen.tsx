@@ -3,7 +3,7 @@ import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { ENEMIES } from '../../data/enemies';
 import { viewCard, type DescribeContext } from '../../engine/cards';
-import { aliveEnemies, canPlayCard, enemyIntent, needsTarget } from '../../engine/combat';
+import { aliveEnemies, canPlayCard, enemyDamageGuard, enemyIntent, needsTarget } from '../../engine/combat';
 import type { CardInstance, CombatState, EnemyState } from '../../engine/types';
 import { Card } from '../components/Card';
 import { HpBar, StatusChips, intentText } from '../components/Common';
@@ -226,6 +226,7 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
   const intent = cs ? enemyIntent(cs, e) : null;
   const it = intentText(intent);
   const dead = e.hp <= 0;
+  const guard = enemyDamageGuard(e);
   return (
     <div data-entity-id={e.id} className={`entity ${targetable ? 'targetable' : ''} ${aimed ? 'aimed' : ''} ${dead ? 'dead' : ''} ${acting ? 'acting' : ''}`} onClick={(ev) => { ev.stopPropagation(); onClick(); }} role="button" aria-disabled={dead || undefined} aria-label={`${e.name}，生命 ${e.hp}/${e.maxHp}`}>
       <FxLayer fx={fx} targetId={e.id} />
@@ -241,6 +242,15 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
       </CombatFigure>
       <div className="ename">{e.name}</div>
       <HpBar hp={e.hp} maxHp={e.maxHp} block={e.block} />
+      {!dead && guard && (
+        <button type="button" className={`damage-guard ${guard.remaining === 0 ? 'full' : ''}`}
+          title={`本回合最多失去 ${guard.limit} 点生命，已失去 ${guard.lost} 点。每个玩家回合开始刷新。点击查看详情。`}
+          aria-label={`${e.name}本回合剩余承伤 ${guard.remaining}，上限 ${guard.limit}，查看详情`}
+          onClick={(event) => { event.stopPropagation(); openOverlay({ kind: 'enemy', enemyId: e.id }); }}>
+          <span>{guard.remaining === 0 ? '本回合承伤已满' : '本回合剩余承伤'}</span>
+          <b>{guard.remaining} / {guard.limit}</b>
+        </button>
+      )}
       <StatusChips statuses={e.statuses} ownerName={e.name} />
     </div>
   );

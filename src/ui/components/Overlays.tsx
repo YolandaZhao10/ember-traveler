@@ -5,7 +5,7 @@ import { RELICS } from '../../data/relics';
 import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
-import { enemyIntent, enemyMoveName } from '../../engine/combat';
+import { enemyDamageGuard, enemyIntent, enemyMoveName } from '../../engine/combat';
 import { calcBlock, calcDamage, describeCard } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { sortedDeck } from '../../engine/run';
@@ -135,9 +135,16 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
       const intent = enemyIntent(cs, e);
       const it = intentText(intent);
       const move = def.moves.find((m) => m.id === e.moveId);
+      const guard = enemyDamageGuard(e);
       return (
         <Modal title={e.name} onClose={closeOverlay}>
           <p>{def.description}</p>
+          {guard && (
+            <div className="damage-guard-detail">
+              <p><b>每回合承伤上限：{guard.limit}</b>{def.maxHpLossPerTurn && <>（最大生命的 {def.maxHpLossPerTurn * 100}%，向上取整）</>}<br />本回合已失去 {guard.lost} 点生命，还能受到 {guard.remaining} 点生命伤害。</p>
+              <p>每个玩家回合开始时刷新。单次攻击、多段攻击、回响、燃烧、荆棘及遗物伤害共用此上限；只累计实际失去的生命，格挡吸收的伤害不计入。达到上限后，本回合不再失去生命。回复生命与切换阶段均不会重置额度。</p>
+            </div>
+          )}
           {(e.flags.stolenGold ?? 0) > 0 && <p>已偷走 <b>{e.flags.stolenGold}</b> 金币，击败它后全额返还。</p>}
           {cs.difficulty && <p className="subtitle">第 {cs.difficulty.floor} 层 · {cs.tier === 'elite' ? '精英额外强化' : cs.tier === 'boss' ? '首领强化' : '逐层强化'}<br />生命 ×{cs.difficulty.healthMultiplier.toFixed(2)} · 攻击 ×{cs.difficulty.attackMultiplier.toFixed(2)} · 格挡 ×{cs.difficulty.blockMultiplier.toFixed(2)}</p>}
           <p>

@@ -209,7 +209,7 @@ describe('偷钱与击杀返还', () => {
     legacy.checkpoint.combat.enemies[1].hp = 0;
     values.set('ember-traveler:save', JSON.stringify(legacy));
     const migrated = loadRun()!;
-    expect(migrated.version).toBe(14);
+    expect(migrated.version).toBe(R.SAVE_VERSION);
     expect(migrated.gold).toBe(0);
     expect(migrated.combat!.gold).toBe(0);
     expect(migrated.combat!.enemies.map(e => e.flags.stolenGold ?? 0)).toEqual([20, 5, 0]);

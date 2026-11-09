@@ -2,21 +2,22 @@ import type { EnemyDef, EncounterDef } from '../engine/types';
 
 export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
   {
-    id: 'last_warden', name: '终庭执卫', tier: 'elite', hp: [150, 150], sprite: 'last_warden',
-    description: '最后一道守卫。先举盾施加易伤，随后重斩与双击；收剑时获得 1 力量并塞入 1 张疑惧，考验输出与解牌节奏。',
+    id: 'last_warden', name: '终庭执卫', tier: 'elite', hp: [180, 180], sprite: 'last_warden',
+    description: '最后一道守卫。先举盾施加易伤，随后重斩与双击；收剑时追加一次轻斩、获得 2 力量并塞入 1 张疑惧。每四轮只有封庭敕令停止攻击。',
     moves: [
       { id: 'seal', name: '封庭敕令', intent: 'special', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'verdict', name: '断路重斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
       { id: 'twins', name: '守门双击', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }] },
-      { id: 'sheathe', name: '收剑封志', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
+      { id: 'sheathe', name: '收剑封志', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
     ], chooseMove: c => ['seal', 'verdict', 'twins', 'sheathe'][c.enemy.turn % 4],
   },
   {
-    id: 'nightless_lord', name: '无昼之主', tier: 'boss', hp: [320, 320], sprite: 'nightless_lord',
-    description: '封存黎明的最终首领。半血时吞没天光，清除负面状态、获得 30 格挡与 3 力量。二阶段的长夜重击后有一次蓄盾回合，下一次将发动四连击。',
+    id: 'nightless_lord', name: '无昼之主', tier: 'boss', hp: [400, 400], sprite: 'nightless_lord',
+    description: '封存黎明的最终首领。永夜屏障限制每回合的生命损失，熄光敕令也会造成伤害。半血时清除负面状态、获得 30 点基础格挡与 3 力量。常规循环中每四轮只有终夜壁垒停止攻击，二阶段蓄盾后发动四连击。',
+    maxHpLossPerTurn: 0.25,
     moves: [
       { id: 'sweep', name: '永夜横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 21 }] },
-      { id: 'edict', name: '熄光敕令', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'edict', name: '熄光敕令', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'pulse', name: '暗日三鸣', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
       { id: 'wall', name: '终夜壁垒', intent: 'defend', actions: [{ kind: 'block', amount: 24 }] },
       { id: 'awaken', name: '吞没天光', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 30 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },

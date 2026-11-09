@@ -257,12 +257,12 @@ function showEvents(events: CombatEvent[]) {
   for (const [eventIndex, e] of events.entries()) {
     switch (e.type) {
       case 'damage':
-        if (e.amount > 0 || e.blocked > 0) {
-          fx.push({ targetId: e.targetId, text: e.amount > 0 ? `-${e.amount}` : `挡下 ${e.blocked}`, kind: e.amount > 0 ? 'damage' : 'miss', delayMs: impacts.find((cue) => cue.eventIndex === eventIndex)?.delayMs });
+        if (e.amount > 0 || e.blocked > 0 || (e.prevented ?? 0) > 0) {
+          fx.push({ targetId: e.targetId, text: e.amount > 0 ? `-${e.amount}` : e.prevented ? '屏障抵消' : `挡下 ${e.blocked}`, kind: e.amount > 0 ? 'damage' : 'miss', delayMs: impacts.find((cue) => cue.eventIndex === eventIndex)?.delayMs });
           if (e.amount > 0) {
             hit = true;
           }
-          if (e.blocked > 0) blk = true;
+          if (e.blocked > 0 || (e.prevented ?? 0) > 0) blk = true;
         }
         break;
       case 'block':

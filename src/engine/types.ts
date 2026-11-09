@@ -185,6 +185,8 @@ export interface EnemyState extends Entity {
   turn: number;
   phase: number;
   flags: Record<string, number>;
+  /** 从本次玩家回合开始到下次开始，所有来源共用的实际生命损失额度。 */
+  damageGuard?: { limit: number; lost: number };
 }
 
 export interface EnemyAiContext {
@@ -200,6 +202,8 @@ export interface EnemyDef {
   hp: [number, number];
   tier: 'normal' | 'elite' | 'boss';
   sprite: string;
+  /** 每回合最多失去最大生命的比例；战斗创建时向上取整并固定额度。 */
+  maxHpLossPerTurn?: number;
   moves: EnemyMove[];
   /** 选择下一步行动 */
   chooseMove: (ctx: EnemyAiContext) => string;
@@ -325,7 +329,7 @@ export interface PlayerCombat extends Entity {
 
 export type CombatEvent =
   | { type: 'cardPlayed'; uid: string; name: string }
-  | { type: 'damage'; targetId: string; amount: number; blocked: number; source: 'player' | 'enemy' | 'thorns' | 'burn' | 'aura' }
+  | { type: 'damage'; targetId: string; amount: number; blocked: number; prevented?: number; source: 'player' | 'enemy' | 'thorns' | 'burn' | 'aura' }
   | { type: 'block'; targetId: string; amount: number }
   | { type: 'status'; targetId: string; status: StatusId; amount: number }
   | { type: 'heal'; targetId: string; amount: number }

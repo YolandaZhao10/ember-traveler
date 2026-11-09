@@ -74,9 +74,15 @@ export function aliveEnemies(cs: CombatState): EnemyState[] {
   return cs.enemies.filter(alive);
 }
 
+/** 同一份持久化额度用于结算、血条和敌人详情。 */
+export function enemyDamageGuard(enemy: EnemyState) {
+  const guard = enemy.damageGuard;
+  return guard ? { ...guard, remaining: Math.max(0, guard.limit - guard.lost) } : null;
+}
+
 /** 对实体造成伤害（经过格挡）。返回实际损失生命。 */
 function dealDamage(
-  _cs: CombatState,
+  cs: CombatState,
   target: Entity,
   amount: number,
   ev: CombatEvent[],
@@ -84,16 +90,23 @@ function dealDamage(
   ignoreBlock = false,
 ): number {
   let blocked = 0;
-  let remaining = amount;
+  let remaining = Math.max(0, amount);
   if (!ignoreBlock && target.block > 0) {
     blocked = Math.min(target.block, remaining);
     target.block -= blocked;
     remaining -= blocked;
   }
+  const guard = 'defId' in target ? (target as EnemyState).damageGuard : undefined;
+  // 超过剩余生命的部分不算屏障减伤，避免正常击杀也提示承伤已满。
+  remaining = Math.min(target.hp, remaining);
+  const prevented = guard ? Math.max(0, remaining - Math.max(0, guard.limit - guard.lost)) : 0;
+  remaining -= prevented;
   const before = target.hp;
   target.hp = Math.max(0, target.hp - remaining);
   const lost = before - target.hp;
-  ev.push({ type: 'damage', targetId: target.id, amount: lost, blocked, source });
+  if (guard) guard.lost += lost;
+  ev.push({ type: 'damage', targetId: target.id, amount: lost, blocked, source, ...(prevented > 0 ? { prevented } : {}) });
+  if (prevented > 0) log(cs, ev, `${target.name} 的永夜屏障抵消 ${prevented} 点伤害，本回合承伤已达上限`);
   if (target.hp === 0) ev.push({ type: 'death', targetId: target.id });
   return lost;
 }
@@ -259,8 +272,8 @@ function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[]) {
     if (targets.length) {
       const t = pick(cs.rng, targets);
       const dmg = calcDamage(p.statuses.kindling, {}, t.statuses);
-      dealDamage(cs, t, dmg, ev, 'player');
-      log(cs, ev, `火种传递：对 ${t.name} 造成 ${dmg} 点伤害`);
+      const lost = dealDamage(cs, t, dmg, ev, 'player');
+      log(cs, ev, `火种传递：${t.name} 失去 ${lost} 点生命`);
     }
   }
   if (cs.relics.includes('bone_urn') && p.turnFlags.exhausted === 1) {
@@ -405,6 +418,7 @@ export function createCombat(
       turn: 0,
       phase: 1,
       flags: {},
+      ...(def.maxHpLossPerTurn ? { damageGuard: { limit: Math.max(1, Math.ceil(hpv * def.maxHpLossPerTurn)), lost: 0 } } : {}),
     });
   });
   cs.player.draw = shuffle(cs.rng, deck.map((c) => ({ ...c, bonus: 0 })));
@@ -468,6 +482,8 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
   const p = cs.player;
   cs.turn += 1;
   cs.phase = 'player';
+  // 必须在焰柱与回合开始遗物造成伤害之前刷新；敌方回合仍沿用上一轮额度。
+  for (const e of cs.enemies) if (e.damageGuard) e.damageGuard.lost = 0;
   log(cs, ev, `—— 第 ${cs.turn} 回合 ——`);
   p.turnFlags = {};
   for (const power of ensurePowerInstances(p)) if (power.status === 'mirror') power.progress = 0;
@@ -491,8 +507,10 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
   for (const power of ensurePowerInstances(p).filter(power => power.status === 'flameAura')) {
     const dmg = p.ember + power.amount - 1;
     if (dmg > 0) {
-      for (const e of aliveEnemies(cs)) dealDamage(cs, e, dmg, ev, 'aura');
-      log(cs, ev, `焰柱：对所有敌人造成 ${dmg} 点伤害`);
+      for (const e of aliveEnemies(cs)) {
+        const lost = dealDamage(cs, e, dmg, ev, 'aura');
+        log(cs, ev, `焰柱：${e.name} 失去 ${lost} 点生命`);
+      }
       handleEnemyDeaths(cs, ev);
       if (cs.outcome === 'won') return;
     }
@@ -694,7 +712,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       log(cs, ev, `${tgt.name} 的荆棘：你受到 ${tgt.statuses.thorns} 点伤害`);
       if (p.hp <= 0) finishLost(cs, ev);
     }
-    return { dmg, lost };
+    return { lost };
   };
   const spendEmber = (): number => {
     let e = p.ember;
@@ -716,7 +734,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           if (ts.length === 0) break;
           for (const t of ts) {
             const r = hit(e.amount, t, extra);
-            log(cs, ev, `对 ${t.name} 造成 ${r.dmg} 点伤害`);
+            log(cs, ev, `对 ${t.name} 造成 ${r.lost} 点生命伤害`);
             if (e.lifesteal && r.lost > 0 && p.hp > 0) {
               const before = p.hp;
               p.hp = Math.min(p.maxHp, p.hp + Math.min(r.lost, e.lifestealCap ?? Infinity));
@@ -734,7 +752,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         if (bonus > 0) {
           for (const t of targets(false)) {
             const r = hit(bonus, t);
-            log(cs, ev, `以血还血：对 ${t.name} 额外造成 ${r.dmg} 点伤害`);
+            log(cs, ev, `以血还血：对 ${t.name} 额外造成 ${r.lost} 点生命伤害`);
           }
         }
         break;
@@ -785,7 +803,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         for (const t of targets(e.aoe)) {
           if (cs.outcome !== 'ongoing') break;
           const r = hit(base, t);
-          log(cs, ev, `以格挡对 ${t.name} 造成 ${r.dmg} 点伤害`);
+          log(cs, ev, `以格挡对 ${t.name} 造成 ${r.lost} 点生命伤害`);
         }
         break;
       }
@@ -795,7 +813,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           const ts = targets(false);
           if (ts.length === 0) break;
           const r = hit(e.amount, ts[0]);
-          log(cs, ev, `对 ${ts[0].name} 造成 ${r.dmg} 点伤害`);
+          log(cs, ev, `对 ${ts[0].name} 造成 ${r.lost} 点生命伤害`);
         }
         break;
       }
@@ -804,7 +822,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         if (bonus > 0) {
           for (const t of targets(false)) {
             const r = hit(bonus, t);
-            log(cs, ev, `余烬加成：对 ${t.name} 额外造成 ${r.dmg} 点伤害`);
+            log(cs, ev, `余烬加成：对 ${t.name} 额外造成 ${r.lost} 点生命伤害`);
           }
         }
         break;
@@ -845,7 +863,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         if (e.damagePer) {
           for (const t of targets(e.aoe)) {
             const r = hit(e.damagePer * n, t);
-            log(cs, ev, `余烬爆发：对 ${t.name} 造成 ${r.dmg} 点伤害`);
+            log(cs, ev, `余烬爆发：对 ${t.name} 造成 ${r.lost} 点生命伤害`);
           }
         }
         if (e.blockPer) {
@@ -896,7 +914,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
             const ts = targets(false);
             if (!ts.length) break;
             const r = hit(e.damagePerCard, ts[0]);
-            log(cs, ev, `焚尽：对 ${ts[0].name} 造成 ${r.dmg} 点伤害`);
+            log(cs, ev, `焚尽：对 ${ts[0].name} 造成 ${r.lost} 点生命伤害`);
           }
         }
         break;
@@ -906,7 +924,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           const base = (t.statuses.burn ?? 0) * e.amount;
           if (base <= 0) continue;
           const r = hit(base, t);
-          log(cs, ev, `热浪：对 ${t.name} 造成 ${r.dmg} 点伤害`);
+          log(cs, ev, `热浪：对 ${t.name} 造成 ${r.lost} 点生命伤害`);
         }
         break;
       }
@@ -942,7 +960,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           delete t.statuses.burn;
           ev.push({ type: 'status', targetId: t.id, status: 'burn', amount: -layers });
           const r = hit(layers * e.damagePer, t);
-          log(cs, ev, `引爆 ${layers} 层燃烧：对 ${t.name} 造成 ${r.dmg} 点伤害`);
+          log(cs, ev, `引爆 ${layers} 层燃烧：对 ${t.name} 造成 ${r.lost} 点生命伤害`);
         }
         break;
       }
@@ -1079,9 +1097,11 @@ export function endPlayerTurn(input: CombatState): StepResult {
     ev.push({ type: 'heal', targetId: 'player', amount: p.hp - before });
   }
   if (cs.relics.includes('anvil_shard') && p.block >= 10) {
-    for (const e of aliveEnemies(cs)) dealDamage(cs, e, 5, ev, 'player');
+    for (const e of aliveEnemies(cs)) {
+      const lost = dealDamage(cs, e, 5, ev, 'player');
+      log(cs, ev, `砧铁碎片：${e.name} 失去 ${lost} 点生命`);
+    }
     ev.push({ type: 'relic', relicId: 'anvil_shard' });
-    log(cs, ev, '砧铁碎片：对所有敌人造成 5 点伤害');
     handleEnemyDeaths(cs, ev);
   }
   if (p.statuses.arcaneWard && p.hand.length) {
@@ -1145,8 +1165,8 @@ export function enemyAct(input: CombatState, enemyId: string): StepResult {
   e.block = 0;
   if (e.statuses.burn) {
     const b = e.statuses.burn + (cs.relics.includes('tinderbox') ? 2 : 0);
-    dealDamage(cs, e, b, ev, 'burn', true);
-    log(cs, ev, `${e.name} 燃烧：受到 ${b} 点伤害`);
+    const lost = dealDamage(cs, e, b, ev, 'burn', true);
+    log(cs, ev, `${e.name} 燃烧：失去 ${lost} 点生命`);
     if (!cs.player.statuses.everburn) addStatus(e, 'burn', -1, ev);
     handleEnemyDeaths(cs, ev);
     if (!alive(e) || cs.outcome !== 'ongoing') return { state: cs, events: ev };
@@ -1186,8 +1206,8 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
         const lost = dealDamage(cs, p, dmg, ev, 'enemy');
         log(cs, ev, `${e.name} 攻击：${dmg} 点伤害（${lost} 点生命，${dmg - lost} 点被格挡）`);
         if (p.statuses.thorns) {
-          dealDamage(cs, e, p.statuses.thorns, ev, 'thorns');
-          log(cs, ev, `荆棘：对 ${e.name} 造成 ${p.statuses.thorns} 点伤害`);
+          const reflected = dealDamage(cs, e, p.statuses.thorns, ev, 'thorns');
+          log(cs, ev, `荆棘：${e.name} 失去 ${reflected} 点生命`);
         }
         if (p.hp <= 0) {
           finishLost(cs, ev);
@@ -1214,11 +1234,11 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       e.hp = Math.min(e.maxHp, e.hp + a.amount);
       ev.push({ type: 'heal', targetId: e.id, amount: a.amount });
       break;
-    case 'loseHp':
-      e.hp = Math.max(1, e.hp - a.amount);
-      ev.push({ type: 'damage', targetId: e.id, amount: a.amount, blocked: 0, source: 'enemy' });
-      log(cs, ev, `${e.name} 失去 ${a.amount} 点生命`);
+    case 'loseHp': {
+      const lost = dealDamage(cs, e, Math.min(a.amount, Math.max(0, e.hp - 1)), ev, 'enemy', true);
+      log(cs, ev, `${e.name} 失去 ${lost} 点生命`);
       break;
+    }
     case 'stealGold': {
       const amount = Math.min(cs.gold, a.amount);
       cs.gold -= amount;
@@ -1243,7 +1263,8 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
 export function startPlayerTurn(input: CombatState): StepResult {
   const cs = clone(input);
   const ev: CombatEvent[] = [];
-  if (cs.outcome !== 'ongoing') return { state: input, events: [] };
+  if (cs.outcome !== 'ongoing' || cs.phase !== 'enemy') return { state: input, events: [] };
+  if (cs.enemies.some(e => e.damageGuard) && aliveEnemies(cs).some(e => !e.flags.acted)) return { state: input, events: [] };
   startPlayerTurnInPlace(cs, ev);
   return { state: cs, events: ev };
 }
