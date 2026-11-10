@@ -56,7 +56,7 @@ add('uncommon', [
   A('spare_torch', '掷出火把', 1, [hit(9), ember(2), status('burn', 3, 'target')], [hit(14), ember(3), status('burn', 4, 'target')], { exhaust: true }),
   S('traveling_supplies', '随身药包', 0, [heal(4), draw(1)], [heal(6), draw(1)], { exhaust: true }),
   S('emergency_stash', '翻找行囊', 0, [draw(3), discard(2), status('energyNext', 1)], [draw(4), discard(2), status('energyNext', 1)], { exhaust: true }),
-  S('enduring_warmth', '余温未散', 1, [heal(5), block(10)], [heal(7), block(14)], { exhaust: true }),
+  S('enduring_warmth', '余温未散', 1, [heal(5), { kind: 'clearDebuffs' }], [heal(7), { kind: 'clearDebuffs' }], { exhaust: true }),
   A('sharpened_coal', '淬炭刃', 1, [hit(8), status('strength', 1)], [hit(12), status('strength', 1)], { exhaust: true }),
 ]);
 add('rare', [

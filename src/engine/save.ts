@@ -8,6 +8,7 @@ import { ensurePowerInstances } from './powers';
 import { ENEMIES } from '../data/enemies';
 import { ensureEncounterPlan } from './encounters';
 import { BLOCK_MAX, clampCharge } from './constants';
+import { appliedBurn } from './burnHistory';
 
 type Snapshot = NonNullable<RunState['checkpoint']>;
 
@@ -76,6 +77,10 @@ function migrateLayout(input: Snapshot): Snapshot {
   if (input.version < 18) run.shopRemovals = 0;
   // 不改变旧战斗已经展示的意图；下一场再采用新的难度规则。
   if (input.version < 19 && run.combat?.difficulty) run.combat.difficulty.complexIntents = false;
+  if (input.version < 20 && run.combat) {
+    // 旧档没有燃烧历史，按当前仍在的层数接续；回退点同样迁移，不重抽随机数。
+    for (const enemy of run.combat.enemies) enemy.burnApplied = appliedBurn(enemy);
+  }
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';

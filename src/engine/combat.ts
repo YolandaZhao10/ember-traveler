@@ -1,4 +1,5 @@
 import { convertResource, conversionText } from './resourceConversion';
+import { appliedBurn, recordBurn } from './burnHistory';
 import { cardTransferChoices, cardTransferEffect, type CardTransfer } from './cardTransfer';
 import { CARDS } from '../data/cards';
 import { ENEMIES } from '../data/enemies';
@@ -56,6 +57,7 @@ function log(cs: CombatState, ev: CombatEvent[], text: string) {
 
 function addStatus(entity: Entity, status: StatusId, amount: number, ev: CombatEvent[]) {
   if (amount === 0) return;
+  if (status === 'burn') recordBurn(entity, amount);
   if ('hand' in entity && amount > 0 && (status === 'tempo' || status === 'flameAura' || status === 'mirror')) {
     ensurePowerInstances(entity as PlayerCombat).push({ status, amount, progress: 0 });
   }
@@ -491,6 +493,7 @@ export function createCombat(
     cs.enemies.push({
       id: `e${i}`,
       defId: id,
+      burnApplied: 0,
       name: def.name + (enemyIds.filter((x) => x === id).length > 1 ? ` ${String.fromCharCode(65 + enemyIds.slice(0, i).filter((x) => x === id).length)}` : ''),
       hp: hpv,
       maxHp: hpv,
@@ -1182,6 +1185,13 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         }
         break;
       }
+      case 'reapplyBurn':
+        for (const t of targets(false)) {
+          const layers = appliedBurn(t);
+          addStatus(t, 'burn', layers, ev);
+          log(cs, ev, `旧火重燃：对 ${t.name} 再施加本场累计的 ${layers} 层燃烧`);
+        }
+        break;
       case 'spreadBurn':
         for (const source of targets(false)) {
           const layers = source.statuses.burn ?? 0;

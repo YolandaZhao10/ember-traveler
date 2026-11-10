@@ -26,6 +26,8 @@ const PALETTE: Record<Archetype, { bg1: string; bg2: string; fg: string; glow: s
 function Glyph({ id, type, fg }: { id: string; type: CardType; fg: string }) {
   const s = { fill: 'none', stroke: fg, strokeWidth: 3, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (id) {
+    case 'rekindle_history':
+      return <g {...s}><path d="M25 47 A29 29 0 1 1 27 72 M25 47 V27 M25 47 H43" /><path d="M51 27 C58 44 72 49 63 66 C56 80 36 70 38 57 C39 48 48 43 51 27 Z M50 55 Q42 68 53 70" /></g>;
     case 'dazed':
       return <path d="M66 51 C67 29 34 27 31 49 C27 76 73 82 80 50 C87 15 25 11 18 49 M43 51 C43 39 60 40 59 51 C58 61 45 61 43 54" {...s} />;
     case 'strike':

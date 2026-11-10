@@ -106,6 +106,7 @@ export type Effect =
   | { kind: 'heal'; amount: number }
   | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number }
   | { kind: 'damagePerBurn'; amount: number; aoe?: boolean }
+  | { kind: 'reapplyBurn' }
   | { kind: 'spreadBurn' }
   | { kind: 'burnToEmber'; amount: number; max: number }
   | { kind: 'consumeBurn'; damagePer: number }
@@ -210,6 +211,8 @@ export interface EnemyMove {
 
 export interface EnemyState extends Entity {
   defId: string;
+  /** 本场对该敌人实际施加过的燃烧总层数，消退/消耗不扣除。 */
+  burnApplied: number;
   moveId: string | null;
   moveHistory: string[];
   turn: number;

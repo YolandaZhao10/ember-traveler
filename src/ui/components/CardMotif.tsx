@@ -7,7 +7,7 @@ export function cardMotif(type: CardType, effects: Effect[]): Motif {
   if (all.some(e => e.kind === 'heal' || (e.kind === 'damage' && e.lifesteal))) return 'heart';
   if (all.some(e => e.kind === 'energy' || (e.kind === 'convertResource' && e.reward === 'energy'))) return 'crystal';
   if (all.some(e => e.kind === 'draw' || (e.kind === 'convertResource' && e.reward === 'draw'))) return 'pages';
-  if (all.some(e => e.kind === 'exhaustHand' || e.kind === 'emberBurst' || e.kind === 'gainEmber' || e.kind === 'consumeBurn')) return 'flame';
+  if (all.some(e => e.kind === 'exhaustHand' || e.kind === 'emberBurst' || e.kind === 'gainEmber' || e.kind === 'consumeBurn' || e.kind === 'reapplyBurn')) return 'flame';
   return type === 'attack' ? 'blade' : type === 'skill' ? 'shield' : 'seal';
 }
 

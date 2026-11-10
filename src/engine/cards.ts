@@ -1,4 +1,5 @@
 import { convertResource, conversionText } from './resourceConversion';
+import { appliedBurn, recordBurn } from './burnHistory';
 import { RELIC_TUNING as T } from '../data/relicBalance';
 import { EMBER_MAX, CHARGE_MAX, clampCharge } from './constants';
 import { CARDS } from '../data/cards';
@@ -172,7 +173,10 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
     }
     if (spent >= 3 && ctx.player.statuses.emberConduit && !ctx.player.turnFlags.emberConduit) {
       ctx.player.turnFlags.emberConduit = 1;
-      if (ctx.target) ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) + ctx.player.statuses.emberConduit;
+      if (ctx.target) {
+        recordBurn(ctx.target, ctx.player.statuses.emberConduit);
+        ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) + ctx.player.statuses.emberConduit;
+      }
     }
   };
   const parts: string[] = [];
@@ -322,6 +326,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         }
         if (e.target === 'self' && e.status === 'strength') previewStrength(e.amount);
         if (ctx?.target && e.target !== 'self' && e.status === 'burn') {
+          recordBurn(ctx.target, e.amount);
           ctx.target.statuses.burn = Math.max(0, (ctx.target.statuses.burn ?? 0) + e.amount);
         }
         break;
@@ -346,6 +351,15 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         const t = e.aoe ? '对所有敌人' : '';
         const cur = ctx?.target ? `（当前 ${dmgText((ctx.target.statuses.burn ?? 0) * e.amount, ctx)}）` : '';
         parts.push(`${t}造成等于其燃烧层数 × ${e.amount} 的伤害${cur}`);
+        break;
+      }
+      case 'reapplyBurn': {
+        const layers = ctx?.target ? appliedBurn(ctx.target) : null;
+        parts.push(`再次施加本场对目标累计施加过的燃烧（含已消退或移除）${layers !== null ? `（当前 ${layers} 层）` : ''}`);
+        if (ctx?.target && layers !== null) {
+          recordBurn(ctx.target, layers);
+          ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) + layers;
+        }
         break;
       }
       case 'spreadBurn':
@@ -374,7 +388,10 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'doubleStatus':
         parts.push(`使${e.target === 'self' ? '自身' : '目标'}的${STATUSES[e.status].name}层数翻倍`);
         if (e.target === 'self' && e.status === 'strength') previewStrength(ctx?.player.statuses.strength ?? 0);
-        if (ctx?.target && e.target !== 'self' && e.status === 'burn') ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
+        if (ctx?.target && e.target !== 'self' && e.status === 'burn') {
+          recordBurn(ctx.target, ctx.target.statuses.burn ?? 0);
+          ctx.target.statuses.burn = (ctx.target.statuses.burn ?? 0) * 2;
+        }
         break;
       case 'replayDiscard':
         parts.push('选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放或牌堆选牌效果的牌；其他代价照付，原牌结算后弃置或消耗）');

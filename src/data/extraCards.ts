@@ -90,6 +90,7 @@ add('picker', 'common', [
   A('buried_knife', '埋灰短刃', 'ash', 1, [hit(14), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], [hit(19), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], { exhaust: true }),
 ]);
 add('picker', 'uncommon', [
+  S('rekindle_history', '旧火重燃', 'cinder', 2, [{ kind: 'reapplyBurn' }], [{ kind: 'reapplyBurn' }], { target: 'enemy', exhaust: true, retain: true, upgradeCost: 1 }),
   S('smoke_cover', '烟幕护身', 'cinder', 1, [exhaust(1), block(7), status('weak', 1, 'all')], [exhaust(1), block(10), status('weak', 2, 'all')]),
   A('flashpoint', '燃点', 'cinder', 1, [hit(8), when(burning, status('vulnerable', 2, 'target'))], [hit(12), when(burning, status('vulnerable', 2, 'target'))]),
   A('coal_lance', '炭火长枪', 'cinder', 2, [{ kind: 'damagePerBurn', amount: 2 }, hit(14)], [{ kind: 'damagePerBurn', amount: 3 }, hit(18)]),
@@ -119,6 +120,7 @@ add('picker', 'rare', [
 
 // 血誓者：低费失血换节奏，回复与护甲托住风险，力量构筑拥有多段与群攻出口。
 add('oathbound', 'common', [
+  S('staunching_guard', '止血护势', 'blood', 1, [block(7), { kind: 'heal', amount: 2 }], [block(8), { kind: 'heal', amount: 3 }]),
   S('crimson_step', '猩红步', 'blood', 0, [lose(2), block(6)], [lose(2), block(8)]),
   A('scar_cut', '伤疤斩', 'blood', 1, [hit(8), when(wounded, ember(2))], [hit(11), when(wounded, ember(2))]),
   S('blood_insight', '痛中醒悟', 'blood', 1, [draw(2), when(wounded, block(4))], [draw(2), when(wounded, block(7))]),
@@ -126,7 +128,7 @@ add('oathbound', 'common', [
   S('bind_wounds', '裹伤', 'blood', 1, [block(9), when(wounded, draw(1))], [block(12), when(wounded, draw(1))]),
   A('blood_sip', '血滴', 'blood', 0, [lose(1), hit(5, { lifesteal: true })], [lose(1), hit(7, { lifesteal: true })], { exhaust: true }),
   S('ember_pulse', '烬血脉动', 'blood', 0, [lose(2), ember(2)], [lose(2), ember(3)]),
-  A('line_breaker', '破阵横扫', 'might', 2, [strength(2), hit(7, { aoe: true }), when(wounded, block(6))], [strength(3), hit(10, { aoe: true }), when(wounded, block(8))], { target: 'all_enemies' }),
+  A('line_breaker', '破阵横扫', 'might', 2, [status('strength', 2), hit(7, { aoe: true }), when(wounded, block(6))], [status('strength', 3), hit(10, { aoe: true }), when(wounded, block(8))], { target: 'all_enemies' }),
   A('double_punch', '双拳', 'might', 1, [hit(4, { times: 2 }), strength(1)], [hit(6, { times: 2 }), strength(1)]),
   S('battle_breath', '战息', 'might', 1, [block(7), strength(1)], [block(10), strength(2)]),
   A('iron_elbow', '铁肘', 'might', 1, [hit(6), block(4), when({ kind: 'strengthAtLeast', value: 3 }, block(6))], [hit(9), block(6), when({ kind: 'strengthAtLeast', value: 3 }, block(8))]),

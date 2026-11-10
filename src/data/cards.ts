@@ -949,7 +949,7 @@ def({
   id: 'sanguine',
   name: '饮血',
   type: 'power',
-  rarity: 'uncommon',
+  rarity: 'common',
   archetype: 'blood',
   owner: 'oathbound',
   cost: 1,

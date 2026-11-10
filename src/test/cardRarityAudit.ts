@@ -25,7 +25,7 @@ export function rarityFixture(id: string, upgraded = false, context: RarityConte
     state.player.hpLostThisTurn = 4; state.player.turnFlags.exhausted = 1;
     state.player.statuses = { strength: 3, echo: 1 };
     state.player.exhaust = [card('bone_ash', false, 'ex-1'), card('defend', false, 'ex-2'), card('strike', false, 'ex-3')];
-    state.enemies.forEach(e => { e.statuses.burn = 6; });
+    state.enemies.forEach(e => { e.statuses.burn = 6; e.burnApplied = 10; });
   }
   if (context === 'debuffed') {
     state.player.statuses.weak = 1; state.player.statuses.frail = 1; state.player.statuses.burn = 3;

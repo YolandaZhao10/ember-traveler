@@ -10,6 +10,7 @@ function effectRole(effect: Effect): CardRole | null {
     case 'damagePerAttack':
     case 'damagePerEmber':
     case 'damagePerBurn':
+    case 'reapplyBurn':
     case 'consumeBurn':
     case 'consumeVulnerable':
     case 'spreadBurn':

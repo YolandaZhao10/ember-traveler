@@ -1,4 +1,5 @@
 import { RELIC_TUNING as T } from '../data/relicBalance';
+import { appliedBurn } from '../engine/burnHistory';
 import { CARDS } from '../data/cards';
 import { calcBlock, calcDamage, viewCard } from '../engine/cards';
 import { aliveEnemies, enemyIntent, discardReplayChoices } from '../engine/combat';
@@ -88,6 +89,11 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         const b = target?.statuses.burn ?? 0;
         dmg += b * e.damagePer;
         if (b < 4) util -= 6;
+        break;
+      }
+      case 'reapplyBurn': {
+        const layers = target ? appliedBurn(target) : 0;
+        util += layers >= 3 ? layers * 1.5 : -4;
         break;
       }
       case 'doubleStatus': {

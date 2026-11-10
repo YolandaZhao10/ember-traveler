@@ -19,7 +19,7 @@ import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick, type RngState } from './rng';
 import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 19;
+export const SAVE_VERSION = 20;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
