@@ -1,5 +1,8 @@
+import { useId } from 'react';
+import { CARDS } from '../../data/cards';
+import { CardMotif, cardMotif } from './CardMotif';
 import type { Archetype, CardType } from '../../engine/types';
-import { useArt } from '../art';
+import { useArt, useCardStyle } from '../art';
 
 /**
  * 卡面插画：按卡牌 id 选择符号，按流派配色并叠加手绘底图。
@@ -16,12 +19,15 @@ const PALETTE: Record<Archetype, { bg1: string; bg2: string; fg: string; glow: s
   might: { bg1: '#5a3a10', bg2: '#1f1304', fg: '#ffcf6b', glow: '#e08a1f' },
   echo: { bg1: '#1f3a5a', bg2: '#08101f', fg: '#8fd3ff', glow: '#3f8fd1' },
   focus: { bg1: '#2a4a3a', bg2: '#08140f', fg: '#9fe3b8', glow: '#3fb37a' },
+  status: { bg1: '#514460', bg2: '#151321', fg: '#c9b9e0', glow: '#9480cf' },
   curse: { bg1: '#222', bg2: '#050505', fg: '#777', glow: '#333' },
 };
 
 function Glyph({ id, type, fg }: { id: string; type: CardType; fg: string }) {
   const s = { fill: 'none', stroke: fg, strokeWidth: 3, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (id) {
+    case 'dazed':
+      return <path d="M66 51 C67 29 34 27 31 49 C27 76 73 82 80 50 C87 15 25 11 18 49 M43 51 C43 39 60 40 59 51 C58 61 45 61 43 54" {...s} />;
     case 'strike':
     case 'quick_stab':
       return <path d="M30 70 L70 30 M62 30 H70 V38 M30 62 L38 70" {...s} />;
@@ -200,12 +206,14 @@ function Glyph({ id, type, fg }: { id: string; type: CardType; fg: string }) {
 
 export function CardArt({ id, archetype, type }: { id: string; archetype: Archetype; type: CardType }) {
   const p = PALETTE[archetype];
-  const gid = `g-${id}`;
-  const art = useArt();
+  const gid = `art-${useId().replace(/:/g, '')}`;
+  const art = useArt('cards');
+  const style = useCardStyle();
   const bg = art[`art_${archetype}`];
   return (
-    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {bg && <image href={bg} x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid slice" />}
+    <svg viewBox={style === 'ornate' ? '0 0 160 100' : '0 0 100 100'} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g transform={style === 'ornate' ? 'translate(30 0)' : undefined}>
+      {bg && <image href={bg} x={style === 'ornate' ? -30 : 0} y="0" width={style === 'ornate' ? 160 : 100} height="100" preserveAspectRatio="xMidYMid slice" />}
       <defs>
         <radialGradient id={gid} cx="50%" cy="55%" r="65%">
           <stop offset="0%" stopColor={p.bg1} />
@@ -215,7 +223,11 @@ export function CardArt({ id, archetype, type }: { id: string; archetype: Archet
           <feGaussianBlur stdDeviation="3" />
         </filter>
       </defs>
-      <rect width="100" height="100" fill={`url(#${gid})`} opacity={bg ? 0.35 : 1} />
+      <rect x={style === 'ornate' ? -30 : 0} width={style === 'ornate' ? 160 : 100} height="100" fill={`url(#${gid})`} opacity={bg ? 0.35 : 1} />
+      {style === 'ornate' && <g fill="none" stroke={p.fg} opacity=".48" strokeWidth=".65">
+        <circle cx="50" cy="50" r="39" /><circle cx="50" cy="50" r="34" strokeDasharray="1 4" />
+        <path d="M50 7L54 14L50 21L46 14Z M50 79L54 86L50 93L46 86Z M7 50L14 46L21 50L14 54Z M79 50L86 46L93 50L86 54Z M17 17L28 20L20 28Z M83 17L80 28L72 20Z M17 83L20 72L28 80Z M83 83L72 80L80 72Z" />
+      </g>}
       <circle cx="50" cy="52" r="26" fill={p.glow} opacity="0.22" filter={`url(#${gid}-glow)`} />
       <g opacity="0.25" stroke={p.fg} strokeWidth="0.8" fill="none">
         <path d="M0 90 Q25 70 50 90 T100 90" />
@@ -224,7 +236,11 @@ export function CardArt({ id, archetype, type }: { id: string; archetype: Archet
       <g filter={`url(#${gid}-glow)`} opacity="0.7">
         <Glyph id={id} type={type} fg={p.glow} />
       </g>
-      <Glyph id={id} type={type} fg={p.fg} />
+      {style === 'ornate' ? <>
+        <CardMotif motif={cardMotif(type, CARDS[id]?.effects ?? [])} fg={p.fg} glow={p.glow} dark={p.bg2} />
+        <g transform="translate(71 71) scale(.24)"><circle cx="50" cy="50" r="46" fill={p.bg2} stroke={p.fg} strokeWidth="4" /><Glyph id={id} type={type} fg={p.fg} /></g>
+      </> : <Glyph id={id} type={type} fg={p.fg} />}
+      </g>
     </svg>
   );
 }

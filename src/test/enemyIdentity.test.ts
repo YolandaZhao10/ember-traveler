@@ -9,7 +9,7 @@ import * as R from '../engine/run';
 const polluters = [
   ['tomb_puppet','dust','ashes'],['rust_snail','acid','ashes'],
   ['furnace_drone','shell','cold_ash'],['cinder_stoker','coal','cold_ash'],
-  ['star_moth','dust','frailty'],['star_pilgrim','repair','exposure'],['last_warden','sheathe','doubt'],
+  ['star_pilgrim','repair','exposure'],['last_warden','sheathe','doubt'],
 ];
 describe('章节敌人特色与精英比例', () => {
   it.each(polluters)('%s的%s实际塞入%s：不重复行动、不污染永久牌组且日志正确', (id,move,curse) => {

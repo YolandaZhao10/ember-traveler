@@ -23,10 +23,10 @@ const stable = (x: unknown): string => JSON.stringify(x, (_key, value) => value 
 describe('卡牌效果身份与升级边界', () => {
   it('不同卡牌的基础版/升级版不得完全同效，费用、名称、稀有度和角色不作为差异', () => {
     const mechanical = new Map<string, string>(); const descriptions = new Map<string, string>();
-    for (const c of CARD_LIST) for (const up of c.type === 'curse' ? [false] : [false, true]) {
+    for (const c of CARD_LIST) for (const up of c.cost < 0 ? [false] : [false, true]) {
       const v = viewDef(c.id, up);
       // 保留、蓄力、消耗、余烬门槛与回合末效果会改变真实行为，属于牌的效果。
-      const key = stable([v.effects, v.handEndEffects, v.target, v.exhaust, v.retain, v.charge ?? null, v.requireEmber]);
+      const key = stable([v.effects, v.handEndEffects, v.target, v.exhaust, v.ethereal, v.retain, v.charge ?? null, v.requireEmber]);
       const description = describeCard(card(c.id, up), null);
       for (const [map, signature] of [[mechanical, key], [descriptions, description]] as const) {
         const previous = map.get(signature);

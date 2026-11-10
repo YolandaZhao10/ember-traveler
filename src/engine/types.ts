@@ -1,9 +1,9 @@
 import type { RngState } from './rng';
 
 // ---------- 卡牌 ----------
-export type CardType = 'attack' | 'skill' | 'power' | 'curse';
-export type Rarity = 'starter' | 'common' | 'uncommon' | 'rare' | 'curse';
-export type Archetype = 'basic' | 'combo' | 'bulwark' | 'ember' | 'cinder' | 'ash' | 'blood' | 'might' | 'echo' | 'focus' | 'curse';
+export type CardType = 'attack' | 'skill' | 'power' | 'curse' | 'status';
+export type Rarity = 'starter' | 'common' | 'uncommon' | 'rare' | 'curse' | 'status';
+export type Archetype = 'basic' | 'combo' | 'bulwark' | 'ember' | 'cinder' | 'ash' | 'blood' | 'might' | 'echo' | 'focus' | 'curse' | 'status';
 export type CharacterId = 'traveler' | 'picker' | 'oathbound' | 'scholar';
 export type ChapterId = 1 | 2 | 3 | 4;
 /** 百分比；字符串只用于兼容旧存档/规则调用。新界面与存档统一使用 50–200。 */
@@ -126,6 +126,8 @@ export interface CardDef {
   /** 回合结束时仍在手中的诅咒，在减益递减后触发。 */
   handEndEffects?: Effect[];
   exhaust?: boolean;
+  /** 回合结束时仍在手中则自动消耗，优先于保留。 */
+  ethereal?: boolean;
   /** 回合结束时保留在手牌 */
   retain?: boolean;
   /** 每保留一回合，伤害 / 格挡增加 */
@@ -191,6 +193,7 @@ export type EnemyAction =
   | { kind: 'loseHp'; amount: number }
   | { kind: 'stealGold'; amount: number }
   | { kind: 'addCardToDiscard'; cardId: string; count: number }
+  | { kind: 'addCardToDraw'; cardId: string; count: number }
   | { kind: 'clearDebuffs' };
 
 export interface EnemyMove {
@@ -198,6 +201,8 @@ export interface EnemyMove {
   name: string;
   intent: Intent['kind'];
   actions: EnemyAction[];
+  /** 高难度的完整替代行动，固定出招顺序不变。 */
+  hardActions?: EnemyAction[];
 }
 
 export interface EnemyState extends Entity {
@@ -366,6 +371,7 @@ export type CombatEvent =
   | { type: 'log'; text: string };
 
 export interface CombatDifficulty {
+  complexIntents?: boolean;
   floor: number;
   healthMultiplier: number;
   attackMultiplier: number;

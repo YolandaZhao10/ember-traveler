@@ -78,10 +78,10 @@ describe('扩展卡池与遗物配额', () => {
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
   });
-  it('卡牌302张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(302); expect(EXTRA_CHARACTER_CARDS).toHaveLength(152); expect(EXTRA_SHARED_CARDS).toHaveLength(41);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(302);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(302);
+  it('卡牌303张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(303); expect(EXTRA_CHARACTER_CARDS).toHaveLength(152); expect(EXTRA_SHARED_CARDS).toHaveLength(41);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(303);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(303);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);
@@ -100,12 +100,12 @@ describe('扩展卡池与遗物配额', () => {
       expect(new Set(reward.map(c => c.defId)).size).toBe(reward.length);
       for (const c of reward) {
         expect(cardAvailableTo(CARDS[c.defId], character)).toBe(true);
-        expect(['starter', 'curse']).not.toContain(CARDS[c.defId].rarity);
+        expect(['starter', 'curse', 'status']).not.toContain(CARDS[c.defId].rarity);
         if (tier === 'boss') { expect(CARDS[c.defId].rarity).toBe('rare'); expect(CARDS[c.defId].owner).toBe(character); }
         seen.add(c.defId);
       }
     }
-    for (const c of CARD_LIST.filter(c => cardAvailableTo(c, character) && !['starter', 'curse'].includes(c.rarity))) expect(seen.has(c.id), c.id).toBe(true);
+    for (const c of CARD_LIST.filter(c => cardAvailableTo(c, character) && !['starter', 'curse', 'status'].includes(c.rarity))) expect(seen.has(c.id), c.id).toBe(true);
   });
   it('全部新增牌的基础版与升级版可实际出牌，描述完整，结算数值有效', () => {
     for (const def of [...EXTRA_CHARACTER_CARDS, ...EXTRA_SHARED_CARDS]) for (const up of [false, true]) {

@@ -7,9 +7,9 @@ import { closeOverlay } from '../store';
 import { Card } from './Card';
 import { Modal } from './Common';
 
-type Group = CharacterId | 'all' | 'shared' | 'curse';
+type Group = CharacterId | 'all' | 'shared' | 'curse' | 'status';
 const instance = (id: string, upgraded = false): CardInstance => ({ uid: `catalog-${id}`, defId: id, upgraded });
-const ownerName = (card: CardDef) => card.owner ? CHARACTERS[card.owner].name : card.type === 'curse' ? '诅咒牌' : '四角色通用';
+const ownerName = (card: CardDef) => card.owner ? CHARACTERS[card.owner].name : card.type === 'status' ? '状态牌' : card.type === 'curse' ? '诅咒牌' : '四角色通用';
 
 export function CardCatalog({ initialCharacter }: { initialCharacter?: CharacterId }) {
   const [group, setGroup] = useState<Group>(initialCharacter ?? 'all');
@@ -44,8 +44,8 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
   }, [selected]);
 
   const pool = CARD_LIST.filter((card) => {
-    if (group === 'curse') return card.type === 'curse';
-    if (card.type === 'curse') return false;
+    if (group === 'curse' || group === 'status') return card.type === group;
+    if (card.cost < 0) return false;
     if (group === 'all') return true;
     return group === 'shared' ? !card.owner : cardAvailableTo(card, group) && (includeShared || card.owner === group);
   }).sort((a, b) => group === 'all' || group === 'shared' || group === 'curse' ? 0 : Number(!a.owner) - Number(!b.owner));
@@ -53,7 +53,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
   const cards = pool.filter((card) => (archetype === 'all' || card.archetype === archetype)
     && (rarity === 'all' || card.rarity === rarity)
     && (type === 'all' || card.type === type)
-    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && card.type !== 'curse'), null)}`.includes(query.trim()));
+    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && card.cost >= 0), null)}`.includes(query.trim()));
   const detail = selected ? CARDS[selected] : null;
 
   return (
@@ -64,21 +64,21 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
           <p className="subtitle">{ownerName(detail)} · {archetypeName(detail.archetype)} · {detail.name}</p>
           <div className="catalog-comparison">
             <div><h4>基础版</h4><Card card={instance(detail.id)} size="lg" showFlavor presentation /></div>
-            {detail.type !== 'curse' && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation /></div>}
+            {detail.cost >= 0 && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation /></div>}
           </div>
-          {detail.type === 'curse' && <p className="subtitle">诅咒无法升级，不会作为普通奖励出现。</p>}
+          {detail.cost < 0 && <p className="subtitle">{detail.type === 'status' ? '状态牌仅存在于本场战斗' : '诅咒牌'}，无法升级，不会作为普通奖励出现。</p>}
         </div>
       ) : (
         <>
           <div className="catalog-tabs" aria-label="卡牌分类">
-            {([{ id: 'all', name: '全部角色' }, ...CHARACTER_LIST, { id: 'shared', name: '通用牌' }, { id: 'curse', name: '诅咒牌' }] as { id: Group; name: string }[]).map((item) => (
+            {([{ id: 'all', name: '全部角色' }, ...CHARACTER_LIST, { id: 'shared', name: '通用牌' }, { id: 'curse', name: '诅咒牌' }, { id: 'status', name: '状态牌' }] as { id: Group; name: string }[]).map((item) => (
               <button key={item.id} className={`iconbtn ${group === item.id ? 'active' : ''}`} aria-pressed={group === item.id}
                 onClick={() => { setGroup(item.id); setArchetype('all'); setType('all'); setRarity('all'); setQuery(''); }}>{item.name}</button>
             ))}
           </div>
           <div className="catalog-filters">
             <input aria-label="搜索卡牌" placeholder="搜索牌名、效果或流派" value={query} onChange={(e) => setQuery(e.target.value)} />
-            {group !== 'curse' && <>
+            {group !== 'curse' && group !== 'status' && <>
               <select aria-label="流派筛选" value={archetype} onChange={(e) => setArchetype(e.target.value as Archetype | 'all')}>
                 <option value="all">全部流派</option>
                 {routes.map((route) => <option key={route} value={route}>{archetypeName(route)}</option>)}
@@ -94,12 +94,12 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
               <button className={`iconbtn ${upgraded ? 'active' : ''}`} aria-pressed={upgraded} onClick={() => setUpgraded(!upgraded)}>查看{upgraded ? '基础版' : '升级版'}</button>
             </>}
           </div>
-          <p className="subtitle catalog-summary" aria-live="polite">共 {cards.length} 张 · {group === 'curse' ? '诅咒牌 · 无法打出或升级，点击查看效果' : <>{upgraded ? '升级版' : '基础版'} · {group === 'all' || group === 'shared' ? '点击卡牌对比升级效果' : includeShared ? '专属牌与通用牌' : '仅该角色专属牌'}</>}</p>
+          <p className="subtitle catalog-summary" aria-live="polite">共 {cards.length} 张 · {group === 'curse' || group === 'status' ? `${group === 'status' ? '状态牌' : '诅咒牌'} · 无法打出或升级，点击查看效果` : <>{upgraded ? '升级版' : '基础版'} · {group === 'all' || group === 'shared' ? '点击卡牌对比升级效果' : includeShared ? '专属牌与通用牌' : '仅该角色专属牌'}</>}</p>
           <div className="cardgrid catalog-grid" ref={gridRef}>
             {cards.map((card) => (
               <button className="catalog-entry" key={card.id} data-card-id={card.id} onClick={() => showDetail(card.id)} aria-label={`查看${card.name}`}>
                 <span className="catalog-owner">{ownerName(card)}</span>
-                <Card card={instance(card.id, upgraded && card.type !== 'curse')} size="sm" presentation />
+                <Card card={instance(card.id, upgraded && card.cost >= 0)} size="sm" presentation />
               </button>
             ))}
             {!cards.length && <p className="subtitle">没有匹配的卡牌，试试其他关键词或筛选。</p>}

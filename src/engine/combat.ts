@@ -18,6 +18,7 @@ import type {
   CombatState,
   Effect,
   EnemyAction,
+  EnemyMove,
   EnemyState,
   Entity,
   Intent,
@@ -360,15 +361,32 @@ export function drawCards(cs: CombatState, n: number, ev: CombatEvent[]) {
 }
 
 // ---------- 意图计算 ----------
+export function enemyMoveActions(cs: CombatState, move: EnemyMove): EnemyAction[] {
+  return cs.difficulty?.complexIntents && move.hardActions ? move.hardActions : move.actions;
+}
+
+/** 复合行动的附加效果直接显示在意图旁，详细数值仍来自同一组规则。 */
+export function enemyIntentExtras(cs: CombatState, e: EnemyState): string[] {
+  const move = ENEMIES[e.defId].moves.find(m => m.id === e.moveId);
+  if (!move || !cs.difficulty?.complexIntents || !move.hardActions) return [];
+  return enemyMoveActions(cs, move).flatMap(a => {
+    if (a.kind === 'block') return [`格挡 ${calcBlock(scaleEnemyValue(a.amount, cs.difficulty?.blockMultiplier), e.statuses)}`];
+    if (a.kind === 'status') return [`${a.target === 'player' ? '施加' : a.target === 'allies' ? '全体' : ''}${STATUSES[a.status].name} ${a.amount}`];
+    if (a.kind === 'addCardToDraw' || a.kind === 'addCardToDiscard') return [`${CARDS[a.cardId].name} ×${a.count} → ${a.kind === 'addCardToDraw' ? '抽牌堆' : '弃牌堆'}`];
+    return [];
+  });
+}
+
 export function enemyIntent(cs: CombatState, e: EnemyState): Intent | null {
   if (!e.moveId) return null;
   const def = ENEMIES[e.defId];
   const move = def.moves.find((m) => m.id === e.moveId);
   if (!move) return null;
-  const atk = move.actions.find((a) => a.kind === 'attack');
+  const actions = enemyMoveActions(cs, move);
+  const atk = actions.find((a) => a.kind === 'attack');
   if (atk && atk.kind === 'attack') {
     const amount = calcDamage(scaleEnemyValue(atk.amount, cs.difficulty?.attackMultiplier), e.statuses, cs.player.statuses);
-    const kind = move.intent === 'attack_debuff' || move.intent === 'special' ? 'attack_debuff' : 'attack';
+    const kind = move.intent === 'attack_debuff' || move.intent === 'special' || (cs.difficulty?.complexIntents && move.hardActions && actions.some(a => a.kind !== 'attack')) ? 'attack_debuff' : 'attack';
     return { kind, amount, times: atk.times ?? 1, ...(atk.piercing ? { piercing: true } : {}) };
   }
   switch (move.intent) {
@@ -628,7 +646,7 @@ export function discardReplayChoices(cs: CombatState): CardInstance[] {
 export function canPlayCard(cs: CombatState, card: CardInstance): { ok: boolean; reason?: string } {
   const v = viewCard(card);
   if (cs.phase !== 'player' || cs.outcome !== 'ongoing') return { ok: false, reason: '现在不能出牌' };
-  if (v.type === 'curse') return { ok: false, reason: '诅咒牌无法打出' };
+  if (v.cost < 0) return { ok: false, reason: v.type === 'status' ? '状态牌无法打出' : '诅咒牌无法打出' };
   if (v.cost > cs.player.energy) return { ok: false, reason: '能量不足' };
   if (v.requireEmber > cs.player.ember) return { ok: false, reason: `需要 ${v.requireEmber} 点余烬` };
   if (v.target === 'enemy' && aliveEnemies(cs).length === 0) return { ok: false, reason: '没有目标' };
@@ -1198,13 +1216,14 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       case 'returnExhausted': {
         for (let i = 0; i < e.count; i++) {
-          if (!p.exhaust.length || p.hand.length >= HAND_MAX) break;
-          let idx = 0;
+          const eligible = p.exhaust.map((c, index) => ({ c, index })).filter(({ c }) => !p.turnFlags[`endExhaust:${c.uid}`]);
+          if (!eligible.length || p.hand.length >= HAND_MAX) break;
+          let idx = eligible[0].index;
           if (e.selection === 'highestCost') {
-            for (let j = 1; j < p.exhaust.length; j++) {
-              if (viewCard(p.exhaust[j]).cost > viewCard(p.exhaust[idx]).cost) idx = j;
+            for (const { c, index } of eligible) {
+              if (viewCard(c).cost > viewCard(p.exhaust[idx]).cost) idx = index;
             }
-          } else idx = nextInt(cs.rng, 0, p.exhaust.length - 1);
+          } else idx = eligible[nextInt(cs.rng, 0, eligible.length - 1)].index;
           const [c] = p.exhaust.splice(idx, 1);
           p.hand.push(c);
           log(cs, ev, `「${viewCard(c).name}」从消耗区回到手牌`);
@@ -1368,6 +1387,18 @@ export function endPlayerTurn(input: CombatState): StepResult {
     }
   }
   if (p.hp <= 0) return { state: cs, events: ev };
+  // 自动消耗优先于保留；消耗联动新抽入的状态牌也处理。
+  // 本轮清理过的牌暂不可被自动取回，避免灰烬储备把同一实体反复消耗。
+  while (cs.outcome === 'ongoing') {
+    const index = p.hand.findIndex(c => viewCard(c).ethereal);
+    if (index < 0) break;
+    const [c] = p.hand.splice(index, 1);
+    p.turnFlags[`endExhaust:${c.uid}`] = 1;
+    exhaustCard(cs, c, ev);
+    handleEnemyDeaths(cs, ev);
+  }
+  for (const key of Object.keys(p.turnFlags)) if (key.startsWith('endExhaust:')) delete p.turnFlags[key];
+  if (cs.outcome !== 'ongoing') return { state: cs, events: ev };
   // 弃手牌（保留牌留在手上并蓄力）
   const kept: CardInstance[] = [];
   for (const c of p.hand) {
@@ -1412,7 +1443,7 @@ export function enemyAct(input: CombatState, enemyId: string): StepResult {
   if (move) {
     ev.push({ type: 'enemyMove', enemyId: e.id, moveName: move.name });
     log(cs, ev, `${e.name} 使用「${move.name}」`);
-    for (const a of move.actions) {
+    for (const a of enemyMoveActions(cs, move)) {
       if (cs.outcome !== 'ongoing' || !alive(e)) break;
       applyEnemyAction(cs, e, a, ev);
     }
@@ -1504,8 +1535,13 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       break;
     }
     case 'addCardToDiscard':
-      for (let i = 0; i < a.count; i++) p.discard.push({ uid: newUid(cs), defId: a.cardId, upgraded: false });
-      log(cs, ev, `${a.count} 张「${CARDS[a.cardId].name}」被塞进你的弃牌堆（仅本场战斗）`);
+    case 'addCardToDraw':
+      for (let i = 0; i < a.count; i++) {
+        const card = { uid: newUid(cs), defId: a.cardId, upgraded: false };
+        if (a.kind === 'addCardToDraw') p.draw.splice(nextInt(cs.rng, 0, p.draw.length), 0, card);
+        else p.discard.push(card);
+      }
+      log(cs, ev, `${a.count} 张「${CARDS[a.cardId].name}」被塞进你的${a.kind === 'addCardToDraw' ? '抽牌堆随机位置' : '弃牌堆'}（仅本场战斗）`);
       break;
     case 'clearDebuffs':
       for (const k of Object.keys(e.statuses) as StatusId[]) {

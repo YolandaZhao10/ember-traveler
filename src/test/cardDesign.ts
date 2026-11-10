@@ -117,6 +117,6 @@ export function cardMechanics(id: string, upgraded: boolean): string {
   const v = viewDef(id, upgraded);
   return JSON.stringify([
     v.type, normalizeEffects(v.effects, 'exact'), normalizeEffects(v.handEndEffects, 'exact'),
-    v.target, v.exhaust, v.retain, chargeShape(v.charge, 'exact'), v.requireEmber,
+    v.target, v.exhaust, v.ethereal, v.retain, chargeShape(v.charge, 'exact'), v.requireEmber,
   ]);
 }

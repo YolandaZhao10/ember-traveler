@@ -40,8 +40,8 @@ def({
   sprite: 'puppet',
   description: '重击后抖落墓灰，将 1 张灰烬塞入弃牌堆；随后支撑躯壳，留下两个不攻击的回合。',
   moves: [
-    { id: 'smash', name: '重击', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
-    { id: 'dust', name: '抖落墓灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
+    { id: 'smash', name: '重击', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }], hardActions: [{ kind: 'attack', amount: 9 }, { kind: 'block', amount: 3 }] },
+    { id: 'dust', name: '抖落墓灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
     { id: 'brace', name: '支撑', intent: 'defend', actions: [{ kind: 'block', amount: 6 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['smash', 'dust', 'brace']),
@@ -105,7 +105,7 @@ def({
   sprite: 'cultist',
   description: '向灰烬祈祷的狂信者。越拖越危险，速战速决。',
   moves: [
-    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 1, target: 'self' }] },
+    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'ritual', amount: 1, target: 'self' }] },
     { id: 'strike', name: '仪式刀', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }] },
   ],
   chooseMove: (ctx) => (ctx.enemy.turn === 0 ? 'chant' : 'strike'),

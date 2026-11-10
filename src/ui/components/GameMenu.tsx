@@ -1,5 +1,6 @@
 import type { CharacterId } from '../../engine/types';
-import { abandonRun, changeArtStyle, closeOverlay, confirmFinishRun, openOverlay, quickReset, toTitle, toggleFastAnim, toggleSound, useGame } from '../store';
+import { abandonRun, changeVisualStyle, closeOverlay, confirmFinishRun, openOverlay, quickReset, toTitle, toggleFastAnim, toggleSound, useGame } from '../store';
+import { visualPreferences } from '../../engine/save';
 import { Modal } from './Common';
 import { DifficultySummary } from './DifficultyPicker';
 
@@ -7,6 +8,7 @@ export function GameMenu({ character }: { character?: CharacterId }) {
   const { run, showTitle, busy, settings } = useGame();
   const active = !showTitle && run;
   const settled = run?.screen === 'victory' || run?.screen === 'gameover';
+  const visuals = visualPreferences(settings);
   return (
     <Modal title="菜单" onClose={closeOverlay}>
       {active && <p className="subtitle">进度自动保存 · 种子：{run.seed}</p>}
@@ -20,18 +22,21 @@ export function GameMenu({ character }: { character?: CharacterId }) {
         </>}
         <button className="btn" onClick={() => openOverlay({ kind: 'catalog', character: character ?? (active ? run.character : undefined) })}>卡牌图鉴</button>
         <button className="btn" onClick={() => openOverlay({ kind: 'relicCatalog' })}>遗物图鉴</button>
-        <fieldset className="art-style-picker">
-          <legend>画风</legend>
-          <label className={settings.artStyle === 'detailed' ? 'selected' : ''}>
-            <input type="radio" name="art-style" value="detailed" checked={settings.artStyle === 'detailed'} onChange={() => changeArtStyle('detailed')} />
-            精细画风
-          </label>
-          <label className={settings.artStyle === 'simple' ? 'selected' : ''}>
-            <input type="radio" name="art-style" value="simple" checked={settings.artStyle === 'simple'} onChange={() => changeArtStyle('simple')} />
-            简易画风
-          </label>
-          <p>角色、怪物、卡面与背景同时切换，自动记住选择。</p>
-        </fieldset>
+        <div className="visual-settings">
+          <h4>画面风格</h4>
+          {([['characters', '人物'], ['enemies', '怪物'], ['backgrounds', '场景背景']] as const).map(([key, label]) => <fieldset className="visual-style-row" key={key}>
+            <legend>{label}</legend>
+            {([['detailed', '现有'], ['simple', '简易']] as const).map(([value, text]) => <label className={visuals[key] === value ? 'selected' : ''} key={value}>
+              <input type="radio" name={`visual-${key}`} checked={visuals[key] === value} onChange={() => changeVisualStyle(key, value)} />{text}
+            </label>)}
+          </fieldset>)}
+          <fieldset className="visual-style-row"><legend>卡牌</legend>
+            {([['normal', '正常'], ['simple', '简单'], ['ornate', '繁复']] as const).map(([value, text]) => <label className={visuals.cards === value ? 'selected' : ''} key={value}>
+              <input type="radio" name="visual-cards" checked={visuals.cards === value} onChange={() => changeVisualStyle('cards', value)} />{text}
+            </label>)}
+          </fieldset>
+          <p className="subtitle">分别选择，立即生效并自动保存。繁复卡牌增加纹饰、流派纹章与效果标记。</p>
+        </div>
         <button className={`btn ${settings.sound ? '' : 'ghost'}`} onClick={toggleSound}>音效：{settings.sound ? '开' : '关'}</button>
         <button className={`btn ${settings.fastAnim ? '' : 'ghost'}`} onClick={toggleFastAnim}>快速动画：{settings.fastAnim ? '开' : '关'}</button>
         {active && <>

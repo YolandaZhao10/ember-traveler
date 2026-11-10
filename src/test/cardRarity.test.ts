@@ -13,10 +13,10 @@ const hit = (cs: CombatState) => cs.enemies[0].hp - use(cs).enemies[0].hp;
 describe('全卡表基础/升级效果审查', () => {
  it.each(CARD_LIST.map(c=>c.id))('%s：四种资源情景下可合法结算，诅咒仍不能打出，状态不变成负数或小数',id=>{
   const def=CARD_LIST.find(c=>c.id===id)!;
-  for(const up of def.type==='curse'?[false]:[false,true])for(const context of RARITY_CONTEXTS){
+  for(const up of def.cost < 0?[false]:[false,true])for(const context of RARITY_CONTEXTS){
    const before=rarityFixture(id,up,context),saved=JSON.stringify(before);
    const probe=rarityProbe(id,up,context);
-   expect(probe.allowed).toBe(def.type!=='curse');
+   expect(probe.allowed).toBe(def.cost >= 0);
    expect(probe.played).toBe(probe.allowed);expect(probe.invalid).toBe(false);
    use(before);expect(JSON.stringify(before)).toBe(saved);
    if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}

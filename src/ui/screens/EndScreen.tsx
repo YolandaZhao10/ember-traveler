@@ -1,3 +1,5 @@
+import { scoreJourney } from '../../engine/score';
+import { JourneyScore } from '../components/JourneyScore';
 import { formatJourneyTime } from '../journeyClock';
 import { RELICS } from '../../data/relics';
 import { CHAPTERS } from '../../data/chapters';
@@ -10,6 +12,7 @@ export function EndScreen({ victory }: { victory: boolean }) {
   const { run } = useGame();
   if (!run) return null;
   const st = run.stats;
+  const score = victory ? scoreJourney(run) : null;
   return (
     <div className="screen center-screen grain scroll">
       <FlameIcon className="flame" />
@@ -18,6 +21,7 @@ export function EndScreen({ victory }: { victory: boolean }) {
         {CHAPTERS[run.chapter].label} · {CHAPTERS[run.chapter].name} — {run.endMessage}
       </p>
       <p className="subtitle">本局用时 {formatJourneyTime(run.elapsedMs)}</p>
+      {score && <JourneyScore score={score} />}
       <div className="endstats">
         <div className="panel">
           <b>{run.floor + 1}</b>

@@ -1381,6 +1381,12 @@ def({
   flavor: '无法打出。占据手牌。',
 });
 
+def({
+  id: 'dazed', name: '眩晕', type: 'status', rarity: 'status', archetype: 'status',
+  cost: -1, target: 'none', effects: [], ethereal: true, upgrade: {},
+  flavor: '星光残影遮住视线，静息之后便会散去。仅存在于本场战斗。',
+});
+
 EXTRA_CHARACTER_CARDS.forEach(def);
 EXTRA_SHARED_CARDS.forEach(def);
 EXTRA_CURSES.forEach(def);

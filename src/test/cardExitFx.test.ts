@@ -23,6 +23,12 @@ describe('卡牌离手动画对应真实实体', () => {
     result.state.player.exhaust[0].upgraded = !result.state.player.exhaust[0].upgraded;
     expect(cues[0].card).toEqual(cs.player.hand.find(c => c.uid === cues[0].card.uid));
   });
+  it('手动打出消耗牌只短暂反馈，随机烧掉的牌仍留足读牌时间', () => {
+    const result = playCard(scene('burn_pages'), 'burn_pages', null);
+    const cues = cardExitCues(result.events, true);
+    expect(cues.find(c => c.card.uid === 'burn_pages')?.durationMs).toBe(360);
+    expect(cues.filter(c => c.random).every(c => c.durationMs === 1100)).toBe(true);
+  });
   it('随机弃牌即使随后洗回手牌，也保留当时被弃置的卡牌快照', () => {
     const cs = scene('truce_smoke'); cs.player.statuses.echo = 1;
     const result = playCard(cs, 'truce_smoke', null), cues = cardExitCues(result.events);
@@ -42,11 +48,12 @@ describe('卡牌离手动画对应真实实体', () => {
     expect(cardExitCues(playCard(scene('defend'), 'defend', null).events)).toEqual([]);
     expect(cardExitCues(endPlayerTurn(scene('strike')).events)).toEqual([]);
   });
-  it('快动画仍给每张牌至少700毫秒，结束时间覆盖最后一批', () => {
+  it('效果移走的牌快速1100毫秒、普通1400毫秒，自身消耗缩短，批次不重叠', () => {
     const events = playCard(scene('empty_the_satchel'), 'empty_the_satchel', null).events;
     const normal = cardExitCues(events), fast = cardExitCues(events, true);
     expect(fast.map(c => c.card)).toEqual(normal.map(c => c.card));
-    expect(fast.every(c => c.durationMs === 700)).toBe(true);
+    expect(fast.every(c => c.durationMs === (c.card.uid === 'empty_the_satchel' ? 360 : 1100))).toBe(true);
+    expect(normal.every(c => c.durationMs === (c.card.uid === 'empty_the_satchel' ? 600 : 1400))).toBe(true);
     expect(fast[fast.length - 1].delayMs + fast[fast.length - 1].durationMs).toBeLessThan(normal[normal.length - 1].delayMs + normal[normal.length - 1].durationMs);
   });
 });

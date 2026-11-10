@@ -19,7 +19,7 @@ import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick, type RngState } from './rng';
 import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
-export const SAVE_VERSION = 18;
+export const SAVE_VERSION = 19;
 
 /** 数据定义新增字段不写入存档；计数沿用已保存的 turnFlags。 */
 export function relicJourneyBonus(run: RunState, trigger: RelicJourneyRule['trigger'], kind: 'heal' | 'gold' | 'maxHp', tier?: RelicJourneyRule['tier']): number {
@@ -464,7 +464,7 @@ export function addRelic(run: RunState, relicId: string) {
 }
 
 // ---------- 商店 ----------
-const BASE_CARD_PRICES: Record<Rarity, [number, number]> = { common: [45, 55], uncommon: [70, 80], rare: [120, 150], starter: [30, 30], curse: [0, 0] };
+const BASE_CARD_PRICES: Record<Rarity, [number, number]> = { common: [45, 55], uncommon: [70, 80], rare: [120, 150], starter: [30, 30], curse: [0, 0], status: [0, 0] };
 const BASE_RELIC_PRICES: Record<RelicRarity, [number, number]> = { common: [150, 180], uncommon: [200, 250], rare: [280, 300], starter: [0, 0] };
 export function relicShopPriceRange(run: RunState, rarity: RelicRarity): [number, number] {
   const [low, high] = BASE_RELIC_PRICES[rarity];
@@ -614,7 +614,7 @@ export function restUpgrade(input: RunState, cardUid: string): RunState {
   if (!input.rest || input.rest.used) return input;
   const run = clone(input);
   const card = run.deck.find((c) => c.uid === cardUid);
-  if (!card || card.upgraded || CARDS[card.defId].type === 'curse') return input;
+  if (!card || card.upgraded || CARDS[card.defId].cost < 0) return input;
   card.upgraded = true;
   const heal = restUpgradeHealAmount(run);
   run.maxHp += relicJourneyBonus(run, 'upgrade', 'maxHp');
@@ -645,7 +645,7 @@ export function restRefine(input: RunState, cardUid: string): RunState {
 }
 
 export function canUpgrade(card: CardInstance): boolean {
-  return !card.upgraded && CARDS[card.defId].type !== 'curse';
+  return !card.upgraded && CARDS[card.defId].cost >= 0;
 }
 
 // ---------- 事件 ----------
@@ -888,7 +888,7 @@ export function eventLeave(input: RunState): RunState {
 
 // ---------- 工具 ----------
 export function sortedDeck(deck: CardInstance[]): CardInstance[] {
-  const order: Record<string, number> = { attack: 0, skill: 1, power: 2, curse: 3 };
+  const order: Record<string, number> = { attack: 0, skill: 1, power: 2, curse: 3, status: 4 };
   return deck.slice().sort((a, b) => {
       const da = CARDS[a.defId];
       const db = CARDS[b.defId];

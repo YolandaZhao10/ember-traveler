@@ -1,3 +1,4 @@
+import { JourneyScore } from './JourneyScore';
 import { formatJourneyTime } from '../journeyClock';
 import { useState } from 'react';
 import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
@@ -26,6 +27,7 @@ export function JourneyHistory() {
       <div className="history-detail-meta"><span>{new Date(selected.endedAt).toLocaleString('zh-CN')}</span><span>第 {selected.floor} 层 · 生命 {selected.hp}/{selected.maxHp}</span><span>种子 {selected.seed}</span><span>用时 {selected.elapsedMs == null ? '未记录' : formatJourneyTime(selected.elapsedMs)}</span></div>
       <div className="history-scroll">
         <DifficultySummary value={selected.difficulty} />
+        {selected.score ? <JourneyScore score={selected.score} /> : selected.outcome === 'won' && <p className="subtitle">此旧记录未保存评分。</p>}
         <h4>结束时的牌组 · {selected.deck.reduce((n,c) => n + c.count, 0)} 张</h4>
         <div className="cardgrid history-deck">{selected.deck.map((c, i) => <div className="history-card" key={`${c.defId}-${c.upgraded}`}>
           {CARDS[c.defId] ? <Card card={{ defId: c.defId, upgraded: c.upgraded, uid: `record-${i}` }} size="sm" presentation /> : <span>{c.defId}{c.upgraded ? '+' : ''}</span>}<b>× {c.count}</b>
@@ -49,7 +51,7 @@ export function JourneyHistory() {
           })}
         </tbody></table>
         <div className="history-list">{list.length ? list.map(r => <button className={`history-entry ${r.outcome}`} key={r.id} onClick={() => setSelected(r)}>
-          <b>{outcomes[r.outcome]} · {CHARACTERS[r.character].name}</b><span>{difficultyName(r.difficulty)} · 第 {r.floor} 层</span><small>{new Date(r.endedAt).toLocaleString('zh-CN')}</small><span>查看牌组 →</span>
+          <b>{outcomes[r.outcome]} · {CHARACTERS[r.character].name}</b><span>{difficultyName(r.difficulty)} · 第 {r.floor} 层</span><small>{new Date(r.endedAt).toLocaleString('zh-CN')}</small><span>{r.score ? `${r.score.total} 分 · ` : ''}查看牌组 →</span>
         </button>) : <p className="history-empty">暂无符合条件的记录。结束旅程后会自动保存，历史旧对局无法补录。</p>}</div>
       </div>
       <button className="btn" onClick={() => openOverlay({ kind: 'menu' })}>返回菜单</button>

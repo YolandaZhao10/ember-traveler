@@ -14,6 +14,7 @@ export function encounterDifficulty(floor: number, tier: CombatState['tier'], se
   const intent = difficultyPercent(boss ? 'bossIntent' : 'enemyIntent', boss ? settings.bossIntent : settings.enemyIntent) / 100;
   return {
     floor: depth + 1,
+    complexIntents: intent >= 1.25,
     healthMultiplier: (base.health + localDepth * FLOOR_STRENGTH_STEP.health) * (elite ? 1.18 : boss ? 1.10 : 1) * health,
     attackMultiplier: (base.attack + localDepth * FLOOR_STRENGTH_STEP.attack) * (elite ? 1.15 : boss ? 1.08 : 1) * intent,
     blockMultiplier: (base.block + localDepth * FLOOR_STRENGTH_STEP.block) * (elite ? 1.15 : boss ? 1.10 : 1) * intent,

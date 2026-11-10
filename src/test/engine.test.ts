@@ -35,7 +35,7 @@ describe('内容数量', () => {
   });
   it('每张非诅咒卡都有可区分的升级版本', () => {
     for (const c of CARD_LIST) {
-      if (c.type === 'curse') continue;
+      if (c.cost < 0) continue;
       const a = describeCard(card(c.id), null) + viewCard(card(c.id)).cost;
       const b = describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost;
       expect(b, c.id).not.toEqual(a);

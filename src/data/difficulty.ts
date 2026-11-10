@@ -22,8 +22,8 @@ export const DIFFICULTY_FIELDS: { key: keyof RunDifficulty; label: string; help:
   { key: 'gold', label: '金币掉落', help: '战斗金币奖励，不改变初始金币和事件固定金币。' },
   { key: 'relicRarity', label: '遗物稀有度倾向', help: '越高越容易获得稀有遗物；百分比表示倾向强度，并非掉落概率。' },
   { key: 'cardRarity', label: '卡牌稀有度倾向', help: '越高越容易获得稀有卡；首领和指定稀有度奖励不变。' },
-  { key: 'enemyIntent', label: '怪物攻击意图', help: '普通怪物与精英的伤害和格挡，保留出招顺序。' },
-  { key: 'bossIntent', label: 'Boss 攻击意图', help: '首领的伤害和格挡，保留阶段切换与出招顺序。' },
+  { key: 'enemyIntent', label: '怪物攻击意图', help: '普通怪物与精英的伤害和格挡；125%以上启用部分敌人的复合招式，出招顺序不变。' },
+  { key: 'bossIntent', label: 'Boss 攻击意图', help: '首领的伤害和格挡；125%以上启用部分首领的复合招式，阶段与出招顺序不变。' },
   { key: 'bossHealth', label: 'Boss 生命', help: '独立调整首领生命，叠加章节与楼层强化。' },
 ];
 

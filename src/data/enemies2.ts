@@ -29,8 +29,8 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     description: '空甲由锁链牵引。束缚施加 2 层易伤，下一击尤其危险；收链时可以反攻。',
     moves: [
       { id: 'bind', name: '束缚', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
-      { id: 'pull', name: '拖拽斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
-      { id: 'coil', name: '收链', intent: 'defend', actions: [{ kind: 'block', amount: 10 }] },
+      { id: 'pull', name: '拖拽斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }], hardActions: [{ kind: 'attack', amount: 12 }, { kind: 'block', amount: 4 }] },
+      { id: 'coil', name: '收链', intent: 'defend', actions: [{ kind: 'block', amount: 10 }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'block', amount: 10 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['bind', 'pull', 'coil']),
   },
@@ -39,7 +39,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张冷灰塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
-      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }], hardActions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),
@@ -48,7 +48,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'soot_seer', name: '烟尘先知', tier: 'normal', hp: [42, 46], sprite: 'soot_seer',
     description: '从黑烟中预言炉心的苏醒。烟幕混入一张疑惧，接着攻击并使你虚弱。',
     moves: [
-      { id: 'smoke', name: '烟幕', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
+      { id: 'smoke', name: '烟幕', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
       { id: 'gaze', name: '灼目', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 8 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
       { id: 'flare', name: '黑焰', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
     ],

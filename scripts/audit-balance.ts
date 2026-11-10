@@ -12,7 +12,7 @@ import { makeRng } from '../src/engine/rng';
 import { probePair, resourcePairs } from '../src/test/balanceProbe';
 
 const loops = [];
-for (const def of CARD_LIST.filter(c => c.type !== 'curse' && c.type !== 'power')) for (const upgraded of [false, true]) {
+for (const def of CARD_LIST.filter(c => c.cost >= 0 && c.type !== 'power')) for (const upgraded of [false, true]) {
   const card = { uid: '', defId: def.id, upgraded };
   if (probePair(card, card).actions === 80) loops.push(viewCard(card).name);
 }

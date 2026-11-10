@@ -8,7 +8,7 @@ describe('卡牌近似设计回归审查', () => {
   it('跨稀有度交叉审查基础/升级效果，不能依赖费用、保留、消耗或角色掩盖完全同效', () => {
     const seen = new Map<string, string>();
     const conflicts = new Set<string>();
-    for (const c of CARD_LIST.filter(c => !['starter', 'curse'].includes(c.rarity))) for (const up of [false, true]) {
+    for (const c of CARD_LIST.filter(c => !['starter', 'curse', 'status'].includes(c.rarity))) for (const up of [false, true]) {
       const v = viewDef(c.id, up);
       const key = effectDesign(v.effects, 'exact') + effectDesign(v.handEndEffects, 'exact');
       const previous = seen.get(key);
@@ -38,7 +38,7 @@ describe('卡牌近似设计回归审查', () => {
   });
   it('全角色与通用奖励牌，基础与升级版均不能只换数值、费用、段数、单体群体或保留消耗', () => {
     const groups = new Map<string, typeof CARD_LIST>();
-    for (const card of CARD_LIST.filter(c => !['starter','curse'].includes(c.rarity))) for (const upgraded of [false,true]) {
+    for (const card of CARD_LIST.filter(c => !['starter','curse','status'].includes(c.rarity))) for (const upgraded of [false,true]) {
       const key = cardDesign(card.id,upgraded); const group = groups.get(key) ?? [];
       if (!group.some(c => c.id === card.id)) group.push(card);
       groups.set(key,group);

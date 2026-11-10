@@ -8,7 +8,7 @@ import type { GameMap, MapNode, RunState } from '../../engine/types';
 import { Backdrop } from '../components/Art';
 import { MapInk, useMapInk } from '../components/MapInk';
 import { mapNoteScope, MAX_MAP_STROKES, useMapNotes, writeMapNotes, type MapNotes } from '../mapNotes';
-import { travel, useGame } from '../store';
+import { getState, travel, useGame } from '../store';
 
 const ICONS: Record<MapNode['type'], string> = {
   combat: '⚔',
@@ -109,13 +109,13 @@ export function MapScreen({ preview = false }: { preview?: boolean }) {
         <div className="map-stage">
           <Backdrop id={chapter.mapArt} dim={0.68} />
           <div className="map-wrap grain" ref={wrap}>
-            <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} floorOffset={chapter.startFloor} selectedId={selectedId} branch={branch?.reachable} onSelect={selectNode} run={run} notes={notes} ink={ink} />
+            <MapSvg map={map} W={W} H={H} pos={pos} nodes={nodes} visited={visited} reachable={reachable} avail={avail} currentId={run.currentNodeId} floorOffset={chapter.startFloor} selectedId={selectedId} branch={branch?.reachable} onSelect={selectNode} run={run} notes={notes} ink={ink} preview={preview} />
           </div>
         </div>
-        <RoutePanel run={run} selected={selected} preview={preview} canEnter={!!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
+        <RoutePanel run={run} selected={selected} preview={preview} canEnter={!ink.editing && !!selected && avail.includes(selected.id) && run.screen === 'map'} reachable={!!selected && reachable.has(selected.id)} onSelect={selectNode} />
       </div>
       <p className="subtitle" style={{ textAlign: 'center', margin: 0 }}>
-        {ink.erasing ? '点击或划过绿线，只擦掉碰到的部分 · 右键或 Esc 结束擦除。' : ink.drawing ? notes.length >= MAX_MAP_STROKES ? '标注已满，请使用橡皮擦、撤销或清空后继续。右键或 Esc 结束标注。' : '拖动绘制绿色计划路线 · 滚轮查看地图 · 右键或 Esc 结束标注。绿线仅作参考。' : preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · 点选节点查看，关闭地图后继续。` : '点选节点比较收获与后路，再确认前进。方向键切换节点，Tab 切换确认按钮。'}
+        {ink.erasing ? '点击或划过绿线，只擦掉碰到的部分 · 右键或 Esc 结束擦除。' : ink.drawing ? notes.length >= MAX_MAP_STROKES ? '标注已满，请使用橡皮擦、撤销或清空后继续。右键或 Esc 结束标注。' : '拖动绘制绿色计划路线 · 滚轮查看地图 · 右键或 Esc 结束标注。绿线仅作参考。' : preview ? `${run.currentNodeId ? `当前位置：第 ${run.floor + 1} 层` : '尚未出发'} · WASD / 方向键查看节点，预览不能进入。` : 'WASD / 方向键选择节点 · Enter 确认进入所选可前往节点 · Tab 切换按钮。'}
       </p>
     </div>
   );
@@ -160,7 +160,7 @@ export function RoutePanel({ run, selected, preview, canEnter, reachable, onSele
       </> : <div className="route-panel-empty"><h3>规划这段旅程</h3><p>点选地图节点，查看收获、沿途补给与首领资料，再决定下一步。</p><p>衡量精英的风险与收益，为休息、锻造或精简牌组留出路线。</p></div>}
     </div>
     <div className="route-panel-actions">
-      {selected && canEnter && !preview && <button className="btn primary" onClick={() => travel(selected.id)}>确认前往 · {nodeTypeName(selected.type)}</button>}
+      {selected && canEnter && !preview && <button className="btn primary" data-map-enter aria-keyshortcuts="Enter" onClick={() => travel(selected.id)}>确认前往 · {nodeTypeName(selected.type)} · Enter</button>}
       {selected && (!canEnter || preview) && <span className="route-note">{preview ? '查看模式 · 关闭地图继续当前进度' : selected.id === run.currentNodeId ? '当前位置' : reachable ? '前方节点预览，请先选择相邻节点' : '节点资料'}</span>}
       {selected?.id !== run.map.bossId && <button className="btn small ghost" onClick={() => onSelect(run.map.bossId)}>查看本章首领</button>}
     </div>
@@ -184,8 +184,9 @@ function MapSvg(props: {
   run: RunState;
   notes: MapNotes;
   ink: ReturnType<typeof useMapInk>;
+  preview: boolean;
 }) {
-  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, floorOffset, selectedId, branch, onSelect, run, notes, ink } = props;
+  const { map, W, H, pos, nodes, visited, reachable, avail, currentId, floorOffset, selectedId, branch, onSelect, run, notes, ink, preview } = props;
   const glow = useId().replace(/:/g, '');
   const nodeRefs = useRef(new Map<string, SVGGElement>());
   const focusId = selectedId ?? avail[0] ?? currentId ?? nodes[0]?.id;
@@ -193,8 +194,36 @@ function MapSvg(props: {
     const row = key === 'ArrowUp' ? node.row + 1 : key === 'ArrowDown' ? node.row - 1 : node.row;
     const choices = nodes.filter((candidate) => candidate.row === row && (key === 'ArrowLeft' ? candidate.col < node.col : key === 'ArrowRight' ? candidate.col > node.col : true));
     const target = choices.sort((a, b) => Math.abs(a.col - node.col) - Math.abs(b.col - node.col) || a.col - b.col)[0];
-    if (target) { onSelect(target.id); nodeRefs.current.get(target.id)?.focus(); }
+    if (target) focusNode(target.id);
   };
+  const focusNode = (id: string) => {
+    onSelect(id);
+    nodeRefs.current.get(id)?.focus({ preventScroll: true });
+    nodeRefs.current.get(id)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || ink.editing) return;
+      const current = getState();
+      if (current.busy || current.showTitle || (preview ? current.overlay?.kind !== 'map' : current.overlay || current.run?.screen !== 'map')) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('input, textarea, select, [contenteditable]')) return;
+      const direction = ({ w: 'ArrowUp', a: 'ArrowLeft', s: 'ArrowDown', d: 'ArrowRight' } as Record<string, string>)[event.key.toLowerCase()] ?? event.key;
+      const moving = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(direction);
+      if (!moving && event.key !== 'Enter') return;
+      if (!moving && target?.closest('button, a') && !target.closest('[data-map-enter]')) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      if (event.repeat) return;
+      const focused = [...nodeRefs.current.entries()].find(([, element]) => element === document.activeElement)?.[0];
+      const id = selectedId ?? focused ?? avail[0] ?? currentId;
+      if (!id) return;
+      if (!selectedId) { focusNode(id); return; }
+      if (moving) moveFocus(map.nodes[id], direction);
+      else if (!preview && avail.includes(id)) travel(id);
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [selectedId, avail, currentId, ink.editing, preview, map, nodes]);
   return (
     <svg className={`map-svg ${ink.editing ? 'editing' : ''} ${ink.drawing ? 'drawing' : ''} ${ink.erasing ? 'erasing' : ''}`} viewBox={`0 0 ${W} ${H}`} {...ink.handlers}
       onClickCapture={event => { if (ink.editing) { event.preventDefault(); event.stopPropagation(); } }}
@@ -233,8 +262,7 @@ function MapSvg(props: {
             transform={`translate(${p.x} ${p.y})`}
             onClick={() => onSelect(n.id)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onSelect(n.id); }
-              if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); moveFocus(n, event.key); }
+              if (event.key === ' ') { event.preventDefault(); onSelect(n.id); }
             }}
             role="button"
             tabIndex={n.id === focusId ? 0 : -1}

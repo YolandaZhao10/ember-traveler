@@ -74,6 +74,8 @@ function migrateLayout(input: Snapshot): Snapshot {
   }
   // 旧档没有可靠的历次付费删牌记录，从更新后开始计数，已生成货架保留原价。
   if (input.version < 18) run.shopRemovals = 0;
+  // 不改变旧战斗已经展示的意图；下一场再采用新的难度规则。
+  if (input.version < 19 && run.combat?.difficulty) run.combat.difficulty.complexIntents = false;
   // 已领取完第二章奖励的旧结局直接接入整备，不补发金币、卡牌或遗物。
   if (input.version < 12 && run.chapter === 2 && run.screen === 'victory') {
     run.screen = 'chapter';
@@ -87,11 +89,28 @@ const KEY = 'ember-traveler:save';
 const SETTINGS_KEY = 'ember-traveler:settings';
 
 export type ArtStyle = 'detailed' | 'simple';
+export type CardStyle = 'normal' | 'simple' | 'ornate';
+export interface VisualPreferences {
+  characters: ArtStyle;
+  enemies: ArtStyle;
+  backgrounds: ArtStyle;
+  cards: CardStyle;
+}
+export function visualPreferences(settings: { artStyle?: ArtStyle; visuals?: Partial<VisualPreferences> }): VisualPreferences {
+  const fallback = settings.artStyle === 'simple' ? 'simple' : 'detailed';
+  const scene = (value: unknown) => value === 'simple' || value === 'detailed' ? value : fallback;
+  const cards = settings.visuals?.cards;
+  return {
+    characters: scene(settings.visuals?.characters), enemies: scene(settings.visuals?.enemies), backgrounds: scene(settings.visuals?.backgrounds),
+    cards: cards === 'normal' || cards === 'simple' || cards === 'ornate' ? cards : fallback === 'simple' ? 'simple' : 'normal',
+  };
+}
 
 export interface Settings {
   sound: boolean;
   fastAnim: boolean;
   artStyle: ArtStyle;
+  visuals?: VisualPreferences;
 }
 
 function storage(): Storage | null {
@@ -161,12 +180,13 @@ export function loadSettings(): Settings {
         sound: typeof value?.sound === 'boolean' ? value.sound : true,
         fastAnim: typeof value?.fastAnim === 'boolean' ? value.fastAnim : false,
         artStyle: value?.artStyle === 'simple' ? 'simple' : 'detailed',
+        visuals: visualPreferences(value ?? {}),
       };
     }
   } catch {
     /* ignore */
   }
-  return { sound: true, fastAnim: false, artStyle: 'detailed' };
+  return { sound: true, fastAnim: false, artStyle: 'detailed', visuals: visualPreferences({}) };
 }
 
 export function saveSettings(st: Settings) {

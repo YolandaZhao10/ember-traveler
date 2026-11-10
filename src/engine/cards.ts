@@ -17,6 +17,7 @@ export interface CardView {
   effects: Effect[];
   handEndEffects: Effect[];
   exhaust: boolean;
+  ethereal: boolean;
   retain: boolean;
   charge?: { damage?: number; block?: number };
   requireEmber: number;
@@ -41,6 +42,7 @@ export function viewCard(card: CardInstance): CardView {
     effects: u.effects ?? d.effects,
     handEndEffects: d.handEndEffects ?? [],
     exhaust: u.exhaust ?? d.exhaust ?? false,
+    ethereal: d.ethereal ?? false,
     retain: d.retain ?? false,
     charge: d.charge,
     requireEmber: u.requireEmber ?? d.requireEmber ?? 0,
@@ -408,7 +410,8 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       tail.push(`每保留一回合${seg}${view.bonus ? `（已蓄力 ${view.bonus}）` : ''}`);
     }
     if (view.exhaust) tail.push('消耗');
-    if (view.type === 'curse') tail.push('无法打出');
+    if (view.cost < 0) tail.push('无法打出');
+    if (view.ethereal) tail.push('占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）');
     if (view.handEndEffects.length) tail.push(`回合结束时，若仍在手中：${describeEffects(view.handEndEffects, null).replace(/。$/, '')}`);
     if (tail.length) text = (text ? text + '。' : '') + tail.join('。');
   }
@@ -421,11 +424,11 @@ export function describeCard(card: CardInstance, ctx: DescribeContext | null): s
 }
 
 export function cardTypeName(t: CardDef['type']): string {
-  return { attack: '攻击', skill: '技能', power: '能力', curse: '诅咒' }[t];
+  return { attack: '攻击', skill: '技能', power: '能力', curse: '诅咒', status: '状态' }[t];
 }
 export function rarityName(r: CardDef['rarity']): string {
-  return { starter: '基础', common: '普通', uncommon: '罕见', rare: '稀有', curse: '诅咒' }[r];
+  return { starter: '基础', common: '普通', uncommon: '罕见', rare: '稀有', curse: '诅咒', status: '状态' }[r];
 }
 export function archetypeName(a: CardDef['archetype']): string {
-  return { basic: '基础', combo: '连击', bulwark: '壁垒', ember: '余烬', cinder: '焚烧', ash: '灰烬', blood: '血誓', might: '狂力', echo: '回响', focus: '专注', curse: '诅咒' }[a];
+  return { basic: '基础', combo: '连击', bulwark: '壁垒', ember: '余烬', cinder: '焚烧', ash: '灰烬', blood: '血誓', might: '狂力', echo: '回响', focus: '专注', curse: '诅咒', status: '干扰' }[a];
 }

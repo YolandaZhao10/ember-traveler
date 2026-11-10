@@ -3,7 +3,7 @@ import { setArtStylePreference } from './art';
 import { useSyncExternalStore } from 'react';
 import { randomSeedString } from '../engine/rng';
 import * as R from '../engine/run';
-import { clearSave, loadRun, loadSettings, saveRun, saveSettings, type ArtStyle, type Settings } from '../engine/save';
+import { clearSave, loadRun, loadSettings, saveRun, saveSettings, visualPreferences, type VisualPreferences, type Settings } from '../engine/save';
 import type { CardInstance, CharacterId, CombatEvent, RunDifficulty, RunState, StatusId } from '../engine/types';
 import { setSoundEnabled, sfx } from './sound';
 import { STATUSES } from '../data/statuses';
@@ -79,7 +79,7 @@ let state: UIState = {
   lastEvents: [],
 };
 setSoundEnabled(state.settings.sound);
-setArtStylePreference(state.settings.artStyle);
+setArtStylePreference(visualPreferences(state.settings));
 state.hasSave = loadRun() !== null;
 
 const listeners = new Set<() => void>();
@@ -214,10 +214,11 @@ export function toggleFastAnim() {
   set({ settings });
 }
 
-export function changeArtStyle(artStyle: ArtStyle) {
-  const settings = { ...state.settings, artStyle };
+export function changeVisualStyle<K extends keyof VisualPreferences>(category: K, value: VisualPreferences[K]) {
+  const visuals = { ...visualPreferences(state.settings), [category]: value };
+  const settings = { ...state.settings, visuals };
   saveSettings(settings);
-  setArtStylePreference(artStyle);
+  setArtStylePreference(visuals);
   set({ settings });
 }
 

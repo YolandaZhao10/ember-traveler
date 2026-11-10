@@ -3,7 +3,7 @@ import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { ENEMIES } from '../../data/enemies';
 import { viewCard, type DescribeContext } from '../../engine/cards';
-import { aliveEnemies, canPlayCard, enemyDamageGuard, enemyIntent, needsTarget } from '../../engine/combat';
+import { aliveEnemies, canPlayCard, enemyDamageGuard, enemyIntent, enemyIntentExtras, needsTarget } from '../../engine/combat';
 import type { CardInstance, CombatState, EnemyState } from '../../engine/types';
 import { Card } from '../components/Card';
 import { HpBar, StatusChips, intentText } from '../components/Common';
@@ -248,6 +248,7 @@ function EnemyView({ e, cs, targetable, aimed, acting, impacts, fx, onClick }: {
         <div className={`intent ${it.cls}`} title="点击查看敌人详情">
           <span>{it.icon}</span>
           <span>{it.text}</span>
+          {enemyIntentExtras(cs, e).map((text, i) => <span className="intent-extra" key={i}>{text}</span>)}
           {intent && (intent.kind === 'attack' || intent.kind === 'attack_debuff') && <span className="movename">{def.moves.find((m) => m.id === e.moveId)?.name}</span>}
         </div>
       )}

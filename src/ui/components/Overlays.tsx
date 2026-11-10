@@ -5,7 +5,7 @@ import { RELICS } from '../../data/relics';
 import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
-import { enemyDamageGuard, enemyIntent, enemyMoveName } from '../../engine/combat';
+import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName } from '../../engine/combat';
 import { calcBlock, calcDamage, describeCard } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { sortedDeck } from '../../engine/run';
@@ -142,7 +142,8 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
       const guard = enemyDamageGuard(e);
       return (
         <Modal title={e.name} onClose={closeOverlay}>
-          <p>{def.description}</p>
+          <p>{cs.difficulty?.complexIntents && def.moves.some(m => m.hardActions) && <b>常规难度行为：</b>}{def.description}</p>
+          {cs.difficulty?.complexIntents && def.moves.some(m => m.hardActions) && <p>当前启用困难复合招式：部分整备回合会追加攻击、格挡、强化或塞牌。以下「下一步」为本次实际行动。</p>}
           {guard && (
             <div className="damage-guard-detail">
               <p><b>每回合承伤上限：{guard.limit}</b>{def.maxHpLossPerTurn && <>（最大生命的 {def.maxHpLossPerTurn * 100}%，向上取整）</>}<br />本回合已失去 {guard.lost} 点生命，还能受到 {guard.remaining} 点生命伤害。</p>
@@ -157,7 +158,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
           </p>
           {move && (
             <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-dim)', fontSize: 13 }}>
-              {move.actions.map((a, i) => (
+              {enemyMoveActions(cs, move).map((a, i) => (
                 <li key={i}>{describeAction(a, e.statuses, cs.player.statuses, cs.difficulty)}</li>
               ))}
             </ul>
@@ -257,7 +258,8 @@ function describeAction(a: import('../../engine/types').EnemyAction, self: impor
     case 'stealGold':
       return `偷走最多 ${a.amount} 金币（击败它后返还）`;
     case 'addCardToDiscard':
-      return `向弃牌堆塞入 ${a.count} 张「${CARDS[a.cardId].name}」（仅本场战斗）：${describeCard({ uid: 'intent', defId: a.cardId, upgraded: false }, null)}`;
+    case 'addCardToDraw':
+      return `向${a.kind === 'addCardToDraw' ? '抽牌堆随机位置' : '弃牌堆'}塞入 ${a.count} 张「${CARDS[a.cardId].name}」（仅本场战斗）：${describeCard({ uid: 'intent', defId: a.cardId, upgraded: false }, null)}`;
     case 'clearDebuffs':
       return '清除自身所有负面状态';
   }

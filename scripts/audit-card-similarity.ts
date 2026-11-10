@@ -5,11 +5,11 @@ import { cardDesign, cardMechanics, containsPowerCore, effectDesign } from '../s
 import type { CardDef } from '../src/engine/types';
 const arg = (name: string) => { const i = process.argv.indexOf(name); return i < 0 ? undefined : process.argv[i + 1]; };
 if (arg('--cards')) for (const c of JSON.parse(readFileSync(arg('--cards')!, 'utf8')) as CardDef[]) CARDS[c.id] = c;
-const variants = CARD_LIST.flatMap(c => (c.type === 'curse' ? [false] : [false,true]).map(upgraded => ({id:c.id,upgraded})));
+const variants = CARD_LIST.flatMap(c => (c.cost < 0 ? [false] : [false,true]).map(upgraded => ({id:c.id,upgraded})));
 function collisions(signature: (id: string, up: boolean) => string, rewardsOnly = false) {
  const seen = new Map<string, typeof variants>(), pairs = new Map<string, string>();
  for (const v of variants) {
-  const c = CARDS[v.id]; if (rewardsOnly && ['starter','curse'].includes(c.rarity)) continue;
+  const c = CARDS[v.id]; if (rewardsOnly && ['starter','curse','status'].includes(c.rarity)) continue;
   const key = signature(v.id,v.upgraded), group = seen.get(key) ?? [];
   for (const other of group) if (other.id !== v.id) {
    const ids = [v.id,other.id].sort();

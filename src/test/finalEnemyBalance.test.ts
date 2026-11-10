@@ -42,7 +42,7 @@ describe('终章精英与首领攻防节奏', () => {
       moves.push(result.move!); hits.push(result.attacks);
     }
     expect(moves).toEqual(['seal', 'verdict', 'twins', 'sheathe', 'seal', 'verdict', 'twins', 'sheathe']);
-    expect(hits).toEqual([false, true, true, true, false, true, true, true]);
+    expect(hits).toEqual(cs.difficulty?.complexIntents ? Array(8).fill(true) : [false, true, true, true, false, true, true, true]);
     expect(cs.enemies[0].statuses.strength).toBe(4);
     expect([...cs.player.hand, ...cs.player.draw, ...cs.player.discard].filter(c => c.defId === 'doubt')).toHaveLength(2);
   });
@@ -76,7 +76,7 @@ describe('终章精英与首领攻防节奏', () => {
     }
     expect(moves).toEqual(['opening', 'edict', 'pulse', 'wall']);
     expect(hits).toEqual([true, true, true, false]);
-    expect(cs.enemies[0].statuses.strength ?? 0).toBe(0);
+    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 2 : 0);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
   });
 
