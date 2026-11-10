@@ -4,7 +4,7 @@ import { normalizeDifficulty } from '../data/difficulty';
 import type { RunState } from './types';
 
 export interface JourneyScore {
-  version: 1;
+  version: 1 | 2;
   total: number;
   multiplier: number;
   parts: { label: string; points: number; detail: string }[];
@@ -25,17 +25,20 @@ export function scoreJourney(run: RunState): JourneyScore | null {
     return [value + (c.upgraded ? 15 : 0)];
   }).sort((a, b) => b - a).slice(0, 20);
   const curses = run.deck.filter(c => CARDS[c.defId]?.type === 'curse').length;
+  const cardsPlayed = Math.floor(cap(run.stats.cardsPlayed, Number.MAX_SAFE_INTEGER));
+  const playPenalty = Math.min(500, Math.max(0, cardsPlayed - 1000));
   const parts = [
     { label: '终庭通关', points: 3000, detail: '击败无昼之主，完成四章旅程' },
     { label: '探索与精英', points: Math.round(cap(run.stats.floorsCleared, 65) * 20 + cap(run.stats.elitesKilled, 20) * 50), detail: `完成 ${run.stats.floorsCleared} 层 ×20，击败 ${run.stats.elitesKilled} 名精英 ×50（最多20名）` },
     { label: '遗物收藏', points: relicPoints, detail: `${new Set(run.relics).size} 件；初始10、普通25、罕见50、稀有/问号/商店75、章节100分，重复ID不累加` },
     { label: '金币储备', points: Math.floor(cap(run.gold, 1000)), detail: `剩余 ${run.gold} 金币，每枚1分，上限1000分` },
-    { label: '出牌积累', points: Math.floor(cap(run.stats.cardsPlayed, 250) * 2), detail: `累计打出 ${run.stats.cardsPlayed} 张，含回响和重放；每张2分，上限500分` },
-    { label: '构筑完成度', points: Math.max(0, deck.reduce((sum, n) => sum + n, 0) - curses * 40), detail: `取分值最高的20张：初始10、普通25、罕见40、稀有65，升级另加15；每张诅咒扣40。评价稀有度与升级投入，不等于实际战力或联动强度` },
+    { label: '出牌效率', points: playPenalty === 0 ? 0 : -playPenalty, detail: `累计打出 ${cardsPlayed} 次，含回响和重放；前1000次不加不扣，超过后每次扣1分，最多扣500分` },
+    { label: '负咒前行', points: curses * 40, detail: `通关时永久牌组中保留 ${curses} 张诅咒，每张加40分；同名牌逐张计算，战斗临时塞牌不计入` },
+    { label: '构筑完成度', points: deck.reduce((sum, n) => sum + n, 0), detail: `取分值最高的20张非诅咒、非状态牌：初始10、普通25、罕见40、稀有65，升级另加15。评价稀有度与升级投入，不等于实际战力或联动强度；诅咒另行加分` },
   ];
   const d = normalizeDifficulty(run.difficulty);
   const combat = (Number(d.enemyHealth) + Number(d.enemyIntent) + Number(d.bossHealth) + Number(d.bossIntent)) / 400;
   const reward = (Number(d.gold) + Number(d.cardRarity) + Number(d.relicRarity)) / 300;
   const multiplier = Math.round(Math.max(.25, Math.min(2, combat / Math.max(1, reward))) * 100) / 100;
-  return { version: 1, parts, multiplier, total: Math.round(parts.reduce((sum, p) => sum + p.points, 0) * multiplier) };
+  return { version: 2, parts, multiplier, total: Math.round(parts.reduce((sum, p) => sum + p.points, 0) * multiplier) };
 }

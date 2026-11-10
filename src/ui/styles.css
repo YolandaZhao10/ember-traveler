@@ -2425,6 +2425,7 @@ h3 {
 .journey-score summary { cursor: pointer; margin-top: 12px; color: var(--gold); }
 .journey-score dl > div { margin: 12px 0; }
 .journey-score dt { display: flex; justify-content: space-between; }
+.journey-score .score-penalty { color: #ed9385; }
 .journey-score dd { margin: 4px 0 0; color: var(--text-dim); font-size: 12px; line-height: 1.6; }
 .history-scroll .journey-score { margin: 12px 0; }
 
