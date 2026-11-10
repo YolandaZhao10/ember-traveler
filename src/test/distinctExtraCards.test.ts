@@ -127,9 +127,9 @@ describe('专属卡牌的不同用途', () => {
       cs.enemies[0].statuses.burn = initialBurn;
       const result = play(cs, 'firebreak', 'e0');
       expect(result.player.energy).toBe(2);
-      expect(result.enemies[0].statuses.burn).toBe(initialBurn + (up ? 3 : 2));
+      expect(result.enemies[0].statuses.burn).toBe(initialBurn + (up ? 4 : 3));
       expect(result.enemies[1].statuses.burn ?? 0).toBe(0);
-      expect(result.player.block).toBe(initialBurn === 1 ? (up ? 8 : 6) : (up ? 24 : 18));
+      expect(result.player.block).toBe(initialBurn === 1 ? (up ? 10 : 8) : (up ? 24 : 18));
     }
   });
 

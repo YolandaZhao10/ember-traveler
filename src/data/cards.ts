@@ -640,6 +640,7 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'enemy',
+  exhaust: true,
   effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 18 }],
   upgrade: { effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 24 }] },
 });

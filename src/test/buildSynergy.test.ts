@@ -45,6 +45,18 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   expect(cs.enemies[0].statuses.burn).toBe(6);expect(cs.player.block).toBe(12);
   const hp=cs.enemies[0].hp;cs=use(cs,'detonate');expect(hp-cs.enemies[0].hp).toBe(18);expect(cs.enemies[0].statuses.burn??0).toBe(0);
  });
+ it.each([false,true])('添油升级=%s：回响翻倍两次但实体只消耗一次，不能直接洗回',upgraded=>{
+  let cs=battle(['add_fuel']);cs.player.hand[0].upgraded=upgraded;
+  expect(describeCard(cs.player.hand[0],null)).toContain('消耗');
+  cs.enemies[0].statuses.burn=3;cs.player.statuses.echo=1;
+  cs=use(cs,'add_fuel');
+  expect(cs.enemies[0].statuses.burn).toBe(12);
+  expect(cs.player.block).toBe(upgraded?36:30);
+  expect(cs.player.energy).toBe(2);
+  expect(cs.player.exhaust.map(c=>c.defId)).toEqual(['add_fuel']);
+  cs=round(cs);
+  expect([...cs.player.hand,...cs.player.draw,...cs.player.discard].some(c=>c.defId==='add_fuel')).toBe(false);
+ });
  it('灰烬盛宴前两次消耗补牌，第三次只给格挡；下一回合重新可抽',()=>{
   let cs=use(battle(['ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast');cs.player.energy=5;
   for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(2);expect(cs.player.block).toBe(24);
