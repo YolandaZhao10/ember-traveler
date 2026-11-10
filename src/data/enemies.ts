@@ -220,10 +220,10 @@ def({
   tier: 'elite',
   hp: [40, 40],
   sprite: 'sentinel',
-  description: '一对石像守卫。其中一个倒下时，另一个会暴怒。',
+  description: '一对石像守卫，护卫时获得格挡并施加1回合脆弱。其中一个倒下时，另一个会暴怒。',
   moves: [
     { id: 'strike', name: '石拳', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
-    { id: 'guard', name: '护卫', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+    { id: 'guard', name: '护卫', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   chooseMove: (ctx) => {
     const idx = ctx.allies.findIndex((a) => a.id === ctx.enemy.id);
@@ -358,10 +358,10 @@ def({
   tier: 'normal',
   hp: [22, 26],
   sprite: 'grub',
-  description: '肚子里装满余火。死的时候会炸开，点燃你。',
+  description: '蠕动时获得格挡并施加1回合脆弱，随后喷火。死亡时爆开，点燃你。',
   moves: [
     { id: 'spit', name: '喷火', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'burn', amount: 2, target: 'player' }] },
-    { id: 'wriggle', name: '蠕动', intent: 'defend_buff', actions: [{ kind: 'block', amount: 5 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'wriggle', name: '蠕动', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   onDeath: [{ kind: 'status', status: 'burn', amount: 2, target: 'player' }],
   chooseMove: (ctx) => cycle(ctx, ['spit', 'wriggle']),
@@ -389,11 +389,11 @@ def({
   tier: 'elite',
   hp: [78, 78],
   sprite: 'taxman',
-  description: '抢走金币并定期净化。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
+  description: '抢走金币并定期净化，账本壁垒施加2回合脆弱。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
   moves: [
     { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }] },
     { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
-    { id: 'ledger', name: '账本壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'ledger', name: '账本壁垒', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
     { id: 'escape', name: '携账逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
   chooseMove: (ctx) => ctx.enemy.turn >= 5 && chance(ctx.rng, 0.2) ? 'escape' : cycle(ctx, ['levy', 'verdict', 'ledger']),

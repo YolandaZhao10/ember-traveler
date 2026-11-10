@@ -39,7 +39,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张冷灰塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
-      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }], hardActions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }], hardActions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),
@@ -87,10 +87,10 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [119, 129], sprite: 'slag_colossus',
-    description: '熔渣凝结成的重型躯壳。积蓄力量后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
+    description: '熔渣凝结成的重型躯壳。聚渣施加2回合易伤，给出一个玩家回合应对后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
     moves: [
-      { id: 'gather', name: '聚渣', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
-      { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 20 }] },
+      { id: 'gather', name: '聚渣', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
       { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['gather', 'crush', 'mend']),

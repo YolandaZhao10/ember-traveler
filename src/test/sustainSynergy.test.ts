@@ -65,24 +65,24 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  it('血色守望失血起甲，血色盟约累计失血换能量与治疗，回血再起甲',()=>{
   let cs=use(use(use(battle(),'blood_watch',up),'crimson_covenant',up),'crimson_mail',up);cs.player.block=0;
   const energy=cs.player.energy;
-  cs=use(cs,'ember_pulse');expect(cs.player.hp).toBe(18);expect(cs.player.block).toBe(up?4:3);
+  cs=use(cs,'ember_pulse');expect(cs.player.hp).toBe(18);expect(cs.player.block).toBe(up?9:6);
   cs=use(cs,'ember_pulse');expect(cs.player.hp).toBe(16+(up?3:2));expect(cs.player.energy).toBe(energy+1);
-  expect(cs.player.block).toBe((up?4:3)*2+(up?3:2));
+  expect(cs.player.block).toBe((up?9:6)*2+(up?3:2)*2);
   cs=use(cs,'ember_pulse');cs=use(cs,'ember_pulse');expect(cs.player.energy).toBe(energy+1);
   expect(cs.player.hp).toBe(12+(up?3:2));
  });
  it('血色守望受到敌人攻击失血也起甲，但完全格挡不触发',()=>{
   let cs=use(battle(),'blood_watch',up);cs.enemies[0].moveId='smash';
   cs=endPlayerTurn(cs).state;const hp=cs.player.hp;cs=enemyAct(cs,'e0').state;
-  expect(cs.player.hp).toBe(hp-9);expect(cs.player.block).toBe(up?4:3);
+  expect(cs.player.hp).toBe(hp-9);expect(cs.player.block).toBe(up?9:6);
   cs=use(battle(),'blood_watch',up);cs.player.block=20;cs=endPlayerTurn(cs).state;cs=enemyAct(cs,'e0').state;
   expect(cs.player.hp).toBe(20);expect(cs.player.block).toBe(11);
  });
  it('回生甲按实际治疗计算，每回合有上限，满血和致死失血无收益',()=>{
   let cs=use(battle(),'crimson_mail',up);cs.player.block=0;
-  cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(5);
+  cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(10);
   for(let i=0;i<6;i++)cs=use(cs,'ration_bite',true);
-  expect(cs.player.block).toBe(up?18:12);
+  expect(cs.player.block).toBe(up?30:20);
   cs=next(cs);cs.player.hp=cs.player.maxHp;cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(0);
   cs=use(cs,'crimson_covenant',up);cs.player.hp=2;cs=use(cs,'ember_pulse');expect(cs.player.hp).toBe(0);expect(cs.outcome).toBe('lost');
  });
@@ -93,11 +93,11 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  });
  it('战意化身仅临时力量起甲，永久力量不生效，每回合封顶',()=>{
   let cs=use(battle(),'war_avatar',up);cs=use(cs,'inflame');expect(cs.player.block).toBe(0);
-  for(let i=0;i<8;i++)cs=use(cs,'flex',true);expect(cs.player.block).toBe(up?18:12);
+  for(let i=0;i<8;i++)cs=use(cs,'flex',true);expect(cs.player.block).toBe(up?30:20);
  });
  it('先锋誓言需要攻守配对，每回合最多两对，回响同类不白送收益',()=>{
   let cs=use(battle(),'vanguard_oath',up);cs=use(cs,'strike');cs=use(cs,'strike');expect(cs.player.block).toBe(0);
-  cs=use(cs,'defend');expect(cs.player.block).toBe(5+(up?6:4));expect(cs.player.turnFlags.vanguardPairs).toBe(1);
+  cs=use(cs,'defend');expect(cs.player.block).toBe(5+(up?12:8));expect(cs.player.turnFlags.vanguardPairs).toBe(1);
   cs=use(cs,'strike');cs=use(cs,'defend');cs=use(cs,'strike');cs=use(cs,'defend');expect(cs.player.turnFlags.vanguardPairs).toBe(2);
  });
  it('漫长守望必须留下能量，耗尽能量则没有未来收益',()=>{

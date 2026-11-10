@@ -267,7 +267,7 @@ describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
     for (const up of upgrades) {
       const base = measure('strike', up);
       const echoed = measure('echo_blade', up);
-      expect(echoed.damage).toBe(base.damage + 2);
+      expect(echoed.damage).toBe(base.damage + 1);
       expect(echoed.after.player.hand).toHaveLength(echoed.before.player.hand.length);
       expect(echoed.cost).toBe(base.cost);
       const twin = measure('twin_blades', up, cs => { cs.player.statuses.strength = 1; });

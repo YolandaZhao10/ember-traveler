@@ -1,3 +1,4 @@
+import { conditionalDominations } from '../src/test/cardDominance';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { CARD_LIST, CARDS } from '../src/data/cards';
 import { describeCard, viewDef } from '../src/engine/cards';
@@ -21,6 +22,7 @@ function collisions(signature: (id: string, up: boolean) => string, rewardsOnly 
 }
 const report = {
  cards: CARD_LIST.length, variants: variants.length,
+ conditionalDominations: conditionalDominations(),
  exactMechanics: collisions(cardMechanics),
  rewardEffectIdentity: collisions((id,up)=>{const v=viewDef(id,up);return effectDesign(v.effects,'exact')+effectDesign(v.handEndEffects,'exact');},true),
  globalRewardDesign: collisions(cardDesign,true),
@@ -34,4 +36,4 @@ const report = {
 };
 if(arg('--output'))writeFileSync(arg('--output')!,JSON.stringify(report,null,2));
 console.log(JSON.stringify({...report,ledger:undefined},null,2));
-if(report.exactMechanics.length||report.rewardEffectIdentity.length||report.globalRewardDesign.length||report.powerCoverage.length)process.exitCode=1;
+if(report.conditionalDominations.length||report.exactMechanics.length||report.rewardEffectIdentity.length||report.globalRewardDesign.length||report.powerCoverage.length)process.exitCode=1;

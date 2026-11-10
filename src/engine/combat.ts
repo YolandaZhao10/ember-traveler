@@ -8,7 +8,7 @@ import { RELIC_TUNING as T } from '../data/relicBalance';
 import { calcBlock, calcDamage, checkCondition, viewCard, type CardView } from './cards';
 import { scaleEnemyValue } from './difficulty';
 import { ensurePowerInstances } from './powers';
-import { BLOCK_MAX, EMBER_MAX } from './constants';
+import { BLOCK_MAX, EMBER_MAX, clampCharge } from './constants';
 import { nextInt, pick, shuffle, type RngState } from './rng';
 import type {
   CardInstance,
@@ -127,7 +127,7 @@ function healPlayer(cs: CombatState, amount: number, ev: CombatEvent[]): number 
   p.hp += healed;
   p.turnFlags.actualHealing = (p.turnFlags.actualHealing ?? 0) + healed;
   if (healed) ev.push({ type: 'heal', targetId: p.id, amount: healed });
-  const armor = Math.min(healed, Math.max(0, (p.statuses.recoveryArmor ?? 0) - (p.turnFlags.recoveryArmor ?? 0)));
+  const armor = Math.min(healed * 2, Math.max(0, (p.statuses.recoveryArmor ?? 0) - (p.turnFlags.recoveryArmor ?? 0)));
   if (armor > 0) {
     p.turnFlags.recoveryArmor = (p.turnFlags.recoveryArmor ?? 0) + armor;
     gainBlock(p, armor, ev, cs);
@@ -279,7 +279,7 @@ function triggerRelics(cs: CombatState, trigger: RelicCombatTrigger, ev: CombatE
           }
           case 'cleanse': addStatus(p, effect.status, -Math.min(effect.amount, p.statuses[effect.status] ?? 0), ev); break;
           case 'charge':
-            for (const c of p.hand) if (viewCard(c).retain && viewCard(c).charge) c.bonus = (c.bonus ?? 0) + effect.amount;
+            for (const c of p.hand) if (viewCard(c).retain && viewCard(c).charge) c.bonus = clampCharge((c.bonus ?? 0) + effect.amount);
             break;
         }
       }
@@ -368,13 +368,26 @@ export function enemyMoveActions(cs: CombatState, move: EnemyMove): EnemyAction[
 /** 复合行动的附加效果直接显示在意图旁，详细数值仍来自同一组规则。 */
 export function enemyIntentExtras(cs: CombatState, e: EnemyState): string[] {
   const move = ENEMIES[e.defId].moves.find(m => m.id === e.moveId);
-  if (!move || !cs.difficulty?.complexIntents || !move.hardActions) return [];
+  if (!move) return [];
+  if (!cs.difficulty?.complexIntents || !move.hardActions) return move.actions.flatMap(a => {
+    if (a.kind === 'clearDebuffs' && a.keepBurnRatio) return ['清除其他负面，燃烧减半'];
+    if (a.kind === 'status' && a.target === 'player' && ['frail', 'vulnerable'].includes(a.status)) return [`施加${STATUSES[a.status].name} ${a.amount}`];
+    return [];
+  });
   return enemyMoveActions(cs, move).flatMap(a => {
+    if (a.kind === 'clearDebuffs') return [a.keepBurnRatio ? '清除其他负面，燃烧减半' : '清除负面状态'];
     if (a.kind === 'block') return [`格挡 ${calcBlock(scaleEnemyValue(a.amount, cs.difficulty?.blockMultiplier), e.statuses)}`];
     if (a.kind === 'status') return [`${a.target === 'player' ? '施加' : a.target === 'allies' ? '全体' : ''}${STATUSES[a.status].name} ${a.amount}`];
     if (a.kind === 'addCardToDraw' || a.kind === 'addCardToDiscard') return [`${CARDS[a.cardId].name} ×${a.count} → ${a.kind === 'addCardToDraw' ? '抽牌堆' : '弃牌堆'}`];
     return [];
   });
+}
+
+/** 意图与敌人详情共享预览；玩家最后一层易伤会在攻击前过期。 */
+export function previewEnemyAttack(cs: CombatState, enemy: EnemyState, base: number): number {
+  const targetStatuses = cs.phase === 'player' && cs.player.statuses.vulnerable === 1
+    ? { ...cs.player.statuses, vulnerable: 0 } : cs.player.statuses;
+  return calcDamage(scaleEnemyValue(base, cs.difficulty?.attackMultiplier), enemy.statuses, targetStatuses);
 }
 
 export function enemyIntent(cs: CombatState, e: EnemyState): Intent | null {
@@ -385,7 +398,7 @@ export function enemyIntent(cs: CombatState, e: EnemyState): Intent | null {
   const actions = enemyMoveActions(cs, move);
   const atk = actions.find((a) => a.kind === 'attack');
   if (atk && atk.kind === 'attack') {
-    const amount = calcDamage(scaleEnemyValue(atk.amount, cs.difficulty?.attackMultiplier), e.statuses, cs.player.statuses);
+    const amount = previewEnemyAttack(cs, e, atk.amount);
     const kind = move.intent === 'attack_debuff' || move.intent === 'special' || (cs.difficulty?.complexIntents && move.hardActions && actions.some(a => a.kind !== 'attack')) ? 'attack_debuff' : 'attack';
     return { kind, amount, times: atk.times ?? 1, ...(atk.piercing ? { piercing: true } : {}) };
   }
@@ -400,6 +413,8 @@ export function enemyIntent(cs: CombatState, e: EnemyState): Intent | null {
       return { kind: 'debuff' };
     case 'defend_buff':
       return { kind: 'defend_buff' };
+    case 'defend_debuff':
+      return { kind: 'defend_debuff' };
     default:
       return { kind: 'special' };
   }
@@ -555,7 +570,9 @@ function startPlayerTurnInPlace(cs: CombatState, ev: CombatEvent[]) {
   log(cs, ev, `—— 第 ${cs.turn} 回合 ——`);
   p.turnFlags = {};
   for (const power of ensurePowerInstances(p)) if (power.status === 'mirror') power.progress = 0;
-  if (!p.statuses.barricade) p.block = Math.min(p.block, p.statuses.guardReserve ?? 0);
+  if (!p.statuses.barricade) p.block = Math.min(p.block, (p.statuses.guardReserve ?? 0) + (p.statuses.guardOnce ?? 0));
+  if (p.statuses.guardOnce) addStatus(p, 'guardOnce', -p.statuses.guardOnce, ev);
+  if (p.statuses.tempThorns) addStatus(p, 'tempThorns', -p.statuses.tempThorns, ev);
   // 燃烧
   if (p.statuses.burn) {
     const b = p.statuses.burn;
@@ -707,7 +724,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     if (cs.outcome === 'ongoing' && p.hp > 0) {
       if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && p.statuses.comboFlow) {
         p.energy += p.statuses.comboFlow;
-        log(cs, ev, `续势：获得 ${p.statuses.comboFlow} 点能量`);
+        gainBlock(p, p.statuses.comboFlow * 8, ev, cs);
+        log(cs, ev, `续势：获得 ${p.statuses.comboFlow} 点能量和 ${p.statuses.comboFlow * 8} 点格挡`);
       }
       if (releaseCharge && !p.turnFlags.chargeMaster) {
         p.turnFlags.chargeMaster = 1;
@@ -949,7 +967,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         gainStrength(cs, e.amount, ev);
         addStatus(p, 'strengthDown', e.amount, ev);
         if (p.statuses.furyWard) {
-          const amount = Math.min(e.amount * 2, Math.max(0, p.statuses.furyWard - (p.turnFlags.furyWard ?? 0)));
+          const amount = Math.min(e.amount * 3, Math.max(0, p.statuses.furyWard - (p.turnFlags.furyWard ?? 0)));
           p.turnFlags.furyWard = (p.turnFlags.furyWard ?? 0) + amount;
           gainBlock(p, amount, ev, cs);
         }
@@ -1082,7 +1100,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         for (const card of p.hand) {
           const charged = viewCard(card);
           if (!charged.charge) continue;
-          card.bonus = (card.bonus ?? 0) + e.amount;
+          card.bonus = clampCharge((card.bonus ?? 0) + e.amount);
           log(cs, ev, `「${charged.name}」立即蓄力 ${e.amount} 回合（累计 ${card.bonus}）`);
         }
         break;
@@ -1347,7 +1365,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
   if (p.statuses.retainedWard) {
     const charged = p.hand.filter(c => !!viewCard(c).charge && (c.bonus ?? 0) > 0).sort((a, b) => a.bonus! - b.bonus!)[0];
     if (charged) {
-      charged.bonus!--; gainBlock(p, p.statuses.retainedWard, ev, cs); addStatus(p, 'thorns', 1, ev);
+      charged.bonus = clampCharge(charged.bonus ?? 0) - 1; gainBlock(p, p.statuses.retainedWard, ev, cs); addStatus(p, 'thorns', 1, ev);
       log(cs, ev, `星界护幕：消耗「${viewCard(charged).name}」1 点蓄力`);
     }
   }
@@ -1404,7 +1422,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
   for (const c of p.hand) {
     const cv = viewCard(c);
     if (cv.retain || p.turnFlags[`retain:${c.uid}`]) {
-      if (cv.charge) c.bonus = (c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0);
+      if (cv.charge) c.bonus = clampCharge((c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0));
       kept.push(c);
     } else p.discard.push(c);
   }
@@ -1472,8 +1490,9 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
         const dmg = calcDamage(scaleEnemyValue(a.amount, cs.difficulty?.attackMultiplier), e.statuses, p.statuses);
         const lost = dealDamage(cs, p, dmg, ev, 'enemy', a.piercing);
         log(cs, ev, `${e.name} ${a.piercing ? '穿透攻击' : '攻击'}：${dmg} 点伤害（${lost} 点生命${a.piercing ? '，无视格挡' : `，${dmg - lost} 点被格挡`}）`);
-        if (p.statuses.thorns) {
-          const reflected = dealDamage(cs, e, p.statuses.thorns, ev, 'thorns');
+        const thorns = (p.statuses.thorns ?? 0) + (p.statuses.tempThorns ?? 0);
+        if (thorns > 0) {
+          const reflected = dealDamage(cs, e, thorns, ev, 'thorns');
           log(cs, ev, `荆棘：${e.name} 失去 ${reflected} 点生命`);
         }
         if (p.hp <= 0) {
@@ -1545,9 +1564,12 @@ function applyEnemyAction(cs: CombatState, e: EnemyState, a: EnemyAction, ev: Co
       break;
     case 'clearDebuffs':
       for (const k of Object.keys(e.statuses) as StatusId[]) {
-        if (STATUSES[k].kind === 'debuff') delete e.statuses[k];
+        if (STATUSES[k].kind !== 'debuff') continue;
+        const keep = k === 'burn' ? Math.ceil((e.statuses[k] ?? 0) * Math.max(0, Math.min(1, a.keepBurnRatio ?? 0))) : 0;
+        if (keep > 0) e.statuses[k] = keep;
+        else delete e.statuses[k];
       }
-      log(cs, ev, `${e.name} 清除了所有负面状态`);
+      log(cs, ev, `${e.name} ${a.keepBurnRatio ? "清除其他负面状态，保留部分燃烧" : "清除了所有负面状态"}`);
       break;
   }
 }

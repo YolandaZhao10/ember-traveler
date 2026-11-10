@@ -166,6 +166,6 @@ describe('零费升级能力仍是一次部署，不伪装成消耗', () => {
     expect(after.player.statuses.echo).toBe(1);
     expect(events.some(e => e.type === 'relic' && cs.relics.includes(e.relicId))).toBe(false);
     const status = { forge: 'forge', everburning: 'everburn', blood_pact: 'bloodRage', mirror: 'mirror' } as const;
-    expect(after.player.statuses[status[id as keyof typeof status]]).toBe(1);
+    expect(after.player.statuses[status[id as keyof typeof status]]).toBe(id === 'blood_pact' ? 2 : 1);
   });
 });

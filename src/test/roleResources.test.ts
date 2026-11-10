@@ -89,9 +89,9 @@ describe.each([false, true])('角色资源转换（升级=%s）', up => {
   });
   it('释能演算从低蓄力起真实扣除，保留高蓄力输出的余数', () => {
     let cs = battle(); cs.player.hand = [{ ...card('charged_blade', false, 'high'), bonus: 4 }, { ...card('rune_shield', false, 'low'), bonus: 1 }];
-    cs = use(cs, 'release_charge', up); expect(cs.player.energy).toBe(5);
-    expect(cs.player.hand.map(c => c.bonus)).toEqual([1, 0]);
-    cs = use(cs, 'release_charge', up); expect(cs.player.energy).toBe(5);
+    cs = use(cs, 'release_charge', up); expect(cs.player.energy).toBe(4);
+    expect(cs.player.hand.map(c => c.bonus)).toEqual([2, 0]);
+    cs = use(cs, 'release_charge', up); expect(cs.player.energy).toBe(4);
   });
   it.each(ids)('%s缺少对应资源时收益为零，预览不修改任何状态', id => {
     const cs = battle(), c = card(id, up); cs.player.hand = [c];

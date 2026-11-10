@@ -49,6 +49,8 @@ export function intentText(intent: Intent | null): { icon: string; text: string;
       return { icon: '▲', text: '强化', cls: 'buff' };
     case 'debuff':
       return { icon: '▼', text: '削弱', cls: 'debuff' };
+    case 'defend_debuff':
+      return { icon: '🛡▼', text: '防御+削弱', cls: 'defend' };
     case 'defend_buff':
       return { icon: '🛡▲', text: '防御+强化', cls: 'defend' };
     case 'special':

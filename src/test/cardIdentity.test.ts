@@ -49,7 +49,7 @@ describe('卡牌效果身份与升级边界', () => {
     const fire = play('cremation', up); const armor = play('crimson_mail', up);
     expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 21 : 14, up ? 21 : 14]);
     expect(fire.player.statuses.burningRelay).toBe(up ? 6 : 4);
-    expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.recoveryArmor).toBe(up ? 18 : 12);
+    expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.recoveryArmor).toBe(up ? 30 : 20);
     expect(play('coal_heart', true).enemies[0].statuses.burn ?? 0).toBe(0);
     expect(play('blood_watch', true).player.block).toBe(0);
   });

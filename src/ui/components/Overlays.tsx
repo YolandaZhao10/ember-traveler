@@ -5,11 +5,11 @@ import { RELICS } from '../../data/relics';
 import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
-import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName } from '../../engine/combat';
-import { calcBlock, calcDamage, describeCard } from '../../engine/cards';
+import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName, previewEnemyAttack } from '../../engine/combat';
+import { calcBlock, describeCard } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { sortedDeck } from '../../engine/run';
-import type { CardInstance, CombatDifficulty } from '../../engine/types';
+import type { CardInstance, CombatState, EnemyState, EnemyAction } from '../../engine/types';
 import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
 import { DiscardReplay } from './DiscardReplay';
@@ -159,7 +159,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
           {move && (
             <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-dim)', fontSize: 13 }}>
               {enemyMoveActions(cs, move).map((a, i) => (
-                <li key={i}>{describeAction(a, e.statuses, cs.player.statuses, cs.difficulty)}</li>
+                <li key={i}>{describeAction(a, e, cs)}</li>
               ))}
             </ul>
           )}
@@ -239,10 +239,11 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
   }
 }
 
-function describeAction(a: import('../../engine/types').EnemyAction, self: import('../../engine/types').Statuses, player: import('../../engine/types').Statuses, difficulty?: CombatDifficulty): string {
+function describeAction(a: EnemyAction, enemy: EnemyState, cs: CombatState): string {
+  const self = enemy.statuses, difficulty = cs.difficulty;
   switch (a.kind) {
     case 'attack':
-      return `${a.piercing ? '穿透攻击（无视格挡）' : '攻击'}：${calcDamage(scaleEnemyValue(a.amount, difficulty?.attackMultiplier), self, player)} 点伤害${a.times && a.times > 1 ? ` × ${a.times}` : ''}`;
+      return `${a.piercing ? '穿透攻击（无视格挡）' : '攻击'}：${previewEnemyAttack(cs, enemy, a.amount)} 点伤害${a.times && a.times > 1 ? ` × ${a.times}` : ''}`;
     case 'block':
       return `获得 ${calcBlock(scaleEnemyValue(a.amount, difficulty?.blockMultiplier), self)} 点格挡`;
     case 'status':
@@ -261,6 +262,6 @@ function describeAction(a: import('../../engine/types').EnemyAction, self: impor
     case 'addCardToDraw':
       return `向${a.kind === 'addCardToDraw' ? '抽牌堆随机位置' : '弃牌堆'}塞入 ${a.count} 张「${CARDS[a.cardId].name}」（仅本场战斗）：${describeCard({ uid: 'intent', defId: a.cardId, upgraded: false }, null)}`;
     case 'clearDebuffs':
-      return '清除自身所有负面状态';
+      return a.keepBurnRatio ? `清除其他负面状态，保留 ${Math.round(a.keepBurnRatio * 100)}% 燃烧（向上取整）` : '清除自身所有负面状态';
   }
 }

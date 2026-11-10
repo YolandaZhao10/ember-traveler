@@ -168,10 +168,10 @@ describe('四角色资源牌实际联动', () => {
   });
   it('学者置顶释能演算并蓄力，抽到后可花蓄力换费，不能重复核销', () => {
     let cs = fixture('palimpsest', true);
-    cs.player.hand.push(card('charged_blade'), card('patient_study'));
+    cs.player.hand.push({ ...card('charged_blade'), bonus: 1 }, card('patient_study'));
     cs.player.discard = [card('release_charge')];
     cs = use(cs, 'palimpsest', 'release_charge');
-    expect(cs.player.hand.find(c => c.uid === 'charged_blade')?.bonus).toBe(2);
+    expect(cs.player.hand.find(c => c.uid === 'charged_blade')?.bonus).toBe(3);
     cs = use(cs, 'patient_study'); expect(cs.player.hand.some(c => c.uid === 'release_charge')).toBe(true);
     cs = use(cs, 'release_charge');
     expect(cs.player.energy).toBe(2); expect(cs.player.hand.find(c => c.uid === 'charged_blade')?.bonus).toBe(0);

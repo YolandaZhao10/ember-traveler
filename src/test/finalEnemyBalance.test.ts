@@ -76,7 +76,7 @@ describe('终章精英与首领攻防节奏', () => {
     }
     expect(moves).toEqual(['opening', 'edict', 'pulse', 'wall']);
     expect(hits).toEqual([true, true, true, false]);
-    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 2 : 0);
+    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 3 : 0);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
   });
 

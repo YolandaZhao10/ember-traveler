@@ -170,8 +170,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damagePerAttack', amount: 6 }],
-  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }] },
+  effects: [{ kind: 'damagePerAttack', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 16 }] }],
+  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 24 }] }] },
   flavor: '每一刀都为下一刀铺路。',
 });
 def({
@@ -259,6 +259,7 @@ def({
   owner: 'traveler',
   cost: 1,
   target: 'self',
+  exhaust: true,
   effects: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
   upgrade: { effects: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }] },
 });
@@ -271,8 +272,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'self',
-  effects: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 3, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }] },
 });
 def({
   id: 'riposte',
@@ -639,8 +640,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 1, max: 12 }],
-  upgrade: { effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 1, max: 18 }] },
+  effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 18 }],
+  upgrade: { effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 24 }] },
 });
 def({
   id: 'lingering_fire',
@@ -770,8 +771,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'ashFeast', amount: 4, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 6, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'ashFeast', amount: 8, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 12, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
 });
 def({
   id: 'pass_the_flame',
@@ -782,8 +783,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'kindling', amount: 8, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'kindling', amount: 12, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'kindling', amount: 12, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'kindling', amount: 18, target: 'self' }] },
 });
 def({
   id: 'burn_it_all',
@@ -807,8 +808,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'returnExhausted', count: 1, selection: 'highestCost' }, { kind: 'conditional', cond: { kind: 'exhaustedThisTurn' }, then: [{ kind: 'block', amount: 9 }] }],
-  upgrade: { effects: [{ kind: 'returnExhausted', count: 2, selection: 'highestCost' }, { kind: 'conditional', cond: { kind: 'exhaustedThisTurn' }, then: [{ kind: 'block', amount: 12 }] }] },
+  effects: [{ kind: 'returnExhausted', count: 1, selection: 'highestCost' }, { kind: 'conditional', cond: { kind: 'exhaustedThisTurn' }, then: [{ kind: 'block', amount: 12 }] }],
+  upgrade: { effects: [{ kind: 'returnExhausted', count: 2, selection: 'highestCost' }, { kind: 'conditional', cond: { kind: 'exhaustedThisTurn' }, then: [{ kind: 'block', amount: 18 }] }] },
 });
 def({
   id: 'dust_to_dust',
@@ -892,8 +893,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 7, lifesteal: true, lifestealCap: 6 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true, lifestealCap: 8 }] },
+  effects: [{ kind: 'damage', amount: 7, lifesteal: true, lifestealCap: 8 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true, lifestealCap: 16 }] },
 });
 def({
   id: 'blood_pact',
@@ -905,7 +906,7 @@ def({
   cost: 1,
   target: 'self',
   effects: [{ kind: 'status', status: 'bloodRage', amount: 1, target: 'self' }, { kind: 'status', status: 'bloodDraw', amount: 1, target: 'self' }],
-  upgrade: { cost: 0, effects: [{ kind: 'status', status: 'bloodRage', amount: 1, target: 'self' }, { kind: 'status', status: 'bloodDraw', amount: 2, target: 'self' }] },
+  upgrade: { cost: 0, effects: [{ kind: 'status', status: 'bloodRage', amount: 2, target: 'self' }, { kind: 'status', status: 'bloodDraw', amount: 2, target: 'self' }] },
 });
 def({
   id: 'martyr',
@@ -928,8 +929,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'block', amount: 8 }, { kind: 'conditional', cond: { kind: 'lostHpThisTurn' }, then: [{ kind: 'block', amount: 5 }] }],
-  upgrade: { effects: [{ kind: 'block', amount: 11 }, { kind: 'conditional', cond: { kind: 'lostHpThisTurn' }, then: [{ kind: 'block', amount: 6 }] }] },
+  effects: [{ kind: 'block', amount: 8 }, { kind: 'conditional', cond: { kind: 'lostHpThisTurn' }, then: [{ kind: 'block', amount: 8 }] }],
+  upgrade: { effects: [{ kind: 'block', amount: 11 }, { kind: 'conditional', cond: { kind: 'lostHpThisTurn' }, then: [{ kind: 'block', amount: 12 }] }] },
 });
 def({
   id: 'crimson_mail',
@@ -940,8 +941,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'recoveryArmor', amount: 12, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 17 }, { kind: 'status', status: 'recoveryArmor', amount: 18, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'recoveryArmor', amount: 20, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 17 }, { kind: 'status', status: 'recoveryArmor', amount: 30, target: 'self' }] },
 });
 def({
   id: 'sanguine',
@@ -1047,8 +1048,8 @@ def({
   owner: 'oathbound',
   cost: 2,
   target: 'self',
-  effects: [{ kind: 'status', status: 'demonHeart', amount: 2, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'demonHeart', amount: 3, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'demonHeart', amount: 3, target: 'self' }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 18 }, { kind: 'status', status: 'demonHeart', amount: 5, target: 'self' }, { kind: 'status', status: 'metallicize', amount: 8, target: 'self' }] },
 });
 def({
   id: 'heavy_blow',
@@ -1135,8 +1136,8 @@ def({
   owner: 'scholar',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 8 }, { kind: 'draw', amount: 1 }, { kind: 'conditional', cond: { kind: 'hasEcho' }, then: [{ kind: 'gainEmber', amount: 1 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 11 }, { kind: 'draw', amount: 1 }, { kind: 'conditional', cond: { kind: 'hasEcho' }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
+  effects: [{ kind: 'damage', amount: 7 }, { kind: 'draw', amount: 1 }, { kind: 'conditional', cond: { kind: 'hasEcho' }, then: [{ kind: 'gainEmber', amount: 1 }] }],
+  upgrade: { effects: [{ kind: 'damage', amount: 10 }, { kind: 'draw', amount: 1 }, { kind: 'conditional', cond: { kind: 'hasEcho' }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
 });
 def({
   id: 'resonance',
@@ -1281,8 +1282,8 @@ def({
   target: 'enemy',
   retain: true,
   charge: { damage: 4 },
-  effects: [{ kind: 'damage', amount: 10 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 14 }] },
+  effects: [{ kind: 'damage', amount: 9 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 13 }] },
 });
 def({
   id: 'meditate',

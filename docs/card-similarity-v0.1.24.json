@@ -1,0 +1,2436 @@
+{
+  "cards": 303,
+  "variants": 598,
+  "conditionalDominations": [],
+  "exactMechanics": [],
+  "rewardEffectIdentity": [],
+  "globalRewardDesign": [],
+  "powerCoverage": [],
+  "ledger": [
+    {
+      "id": "strike",
+      "name": "打击",
+      "owner": "shared",
+      "rarity": "starter",
+      "base": "造成 6 点伤害。",
+      "upgrade": "造成 9 点伤害。"
+    },
+    {
+      "id": "defend",
+      "name": "防御",
+      "owner": "shared",
+      "rarity": "starter",
+      "base": "获得 5 点格挡。",
+      "upgrade": "获得 8 点格挡。"
+    },
+    {
+      "id": "kindle",
+      "name": "引火",
+      "owner": "shared",
+      "rarity": "starter",
+      "base": "造成 5 点伤害，获得 2 点余烬。",
+      "upgrade": "造成 7 点伤害，获得 2 点余烬。"
+    },
+    {
+      "id": "ash_step",
+      "name": "灰烬步",
+      "owner": "traveler",
+      "rarity": "starter",
+      "base": "抽 1 张牌，若拥有格挡：获得 2 点余烬。消耗。",
+      "upgrade": "抽 2 张牌，若拥有格挡：获得 2 点余烬。消耗。"
+    },
+    {
+      "id": "quick_stab",
+      "name": "疾刺",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 3 点伤害，若本回合已打出 2 张以上攻击牌：获得 1 点余烬。",
+      "upgrade": "造成 5 点伤害，若本回合已打出 2 张以上攻击牌：获得 1 点余烬。"
+    },
+    {
+      "id": "twin_blades",
+      "name": "双刃",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 5 点伤害 × 2。",
+      "upgrade": "造成 7 点伤害 × 2。"
+    },
+    {
+      "id": "chain_slash",
+      "name": "连环斩",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 8 点伤害，若本回合已打出 1 张以上攻击牌：获得 2 点力量，回合结束时失去。",
+      "upgrade": "造成 11 点伤害，若本回合已打出 1 张以上攻击牌：获得 3 点力量，回合结束时失去。"
+    },
+    {
+      "id": "spin_kick",
+      "name": "回旋踢",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "造成 9 点伤害，抽 1 张牌。",
+      "upgrade": "造成 12 点伤害，抽 1 张牌。"
+    },
+    {
+      "id": "rhythm",
+      "name": "节奏",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "抽 2 张牌，若本回合已打出 2 张以上攻击牌：获得 1 点能量。消耗。",
+      "upgrade": "抽 3 张牌，若本回合已打出 2 张以上攻击牌：获得 1 点能量。消耗。"
+    },
+    {
+      "id": "haste",
+      "name": "急速",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 1 点能量，抽 1 张牌。消耗。",
+      "upgrade": "获得 1 点能量，抽 2 张牌。消耗。"
+    },
+    {
+      "id": "thousand_cuts",
+      "name": "千刃",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "造成 6 点伤害，次数等于本回合打出的攻击牌数（含本牌），若本回合已打出 2 张以上攻击牌：获得 16 点格挡。",
+      "upgrade": "造成 8 点伤害，次数等于本回合打出的攻击牌数（含本牌），若本回合已打出 2 张以上攻击牌：获得 24 点格挡。"
+    },
+    {
+      "id": "tempo",
+      "name": "余音",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "生效后每打出 3 张牌，抽 1 张牌。每张独立计数，进度跨回合保留。",
+      "upgrade": "生效后每打出 3 张牌，抽 2 张牌。每张独立计数，进度跨回合保留。"
+    },
+    {
+      "id": "war_drum",
+      "name": "战鼓",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "每打出一张攻击牌，本回合之后的攻击牌伤害 +1，每回合打出第 3 张攻击牌后，获得 1 点能量和 8 点格挡。回响与镜像重放也计数。",
+      "upgrade": "每打出一张攻击牌，本回合之后的攻击牌伤害 +2，每回合打出第 3 张攻击牌后，获得 1 点能量和 8 点格挡。回响与镜像重放也计数。"
+    },
+    {
+      "id": "trip",
+      "name": "绊倒",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "对目标施加 2 层易伤，抽 1 张牌。",
+      "upgrade": "对目标施加 3 层易伤，抽 1 张牌。"
+    },
+    {
+      "id": "raise_shield",
+      "name": "举盾",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "获得 9 点格挡。",
+      "upgrade": "获得 13 点格挡。"
+    },
+    {
+      "id": "shield_bash",
+      "name": "盾击",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成等于当前格挡的伤害。",
+      "upgrade": "获得 3 点格挡，造成等于当前格挡的伤害。"
+    },
+    {
+      "id": "thorn_mail",
+      "name": "荆棘甲",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 7 点格挡，获得 2 层荆棘。消耗。",
+      "upgrade": "获得 10 点格挡，获得 3 层荆棘。消耗。"
+    },
+    {
+      "id": "iron_wall",
+      "name": "铁壁",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 16 点格挡，每回合结束时获得 4 点格挡。",
+      "upgrade": "获得 22 点格挡，每回合结束时获得 5 点格挡。"
+    },
+    {
+      "id": "riposte",
+      "name": "反击",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 6 点伤害，若拥有格挡：造成 4 点伤害。",
+      "upgrade": "造成 9 点伤害，若拥有格挡：造成 5 点伤害。"
+    },
+    {
+      "id": "hold_fast",
+      "name": "固守",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "格挡不会在回合开始时消失。",
+      "upgrade": "格挡不会在回合开始时消失。"
+    },
+    {
+      "id": "iron_will",
+      "name": "钢铁意志",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "每回合结束时获得 4 点格挡，回合开始时，最多保留 6 点已有格挡。固守生效时保留全部。",
+      "upgrade": "每回合结束时获得 6 点格挡，回合开始时，最多保留 9 点已有格挡。固守生效时保留全部。"
+    },
+    {
+      "id": "shield_shatter",
+      "name": "碎盾",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "消耗所有格挡，对所有敌人造成等于当前格挡 × 2的伤害。",
+      "upgrade": "消耗所有格挡，对所有敌人造成等于当前格挡 × 3的伤害。"
+    },
+    {
+      "id": "vigil",
+      "name": "守望",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "获得 8 点格挡，对目标施加 1 层虚弱。",
+      "upgrade": "获得 11 点格挡，对目标施加 1 层虚弱。"
+    },
+    {
+      "id": "bulwark_counter",
+      "name": "盾墙反震",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 9 点格挡，对所有敌人施加 1 层易伤。",
+      "upgrade": "获得 13 点格挡，对所有敌人施加 2 层易伤。"
+    },
+    {
+      "id": "stoke",
+      "name": "添薪",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 6 点格挡，获得 3 点余烬。",
+      "upgrade": "获得 9 点格挡，获得 4 点余烬。"
+    },
+    {
+      "id": "ember_burst",
+      "name": "余烬爆发",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "消耗所有余烬：造成每点余烬 6 的伤害。",
+      "upgrade": "消耗所有余烬：造成每点余烬 8 的伤害。"
+    },
+    {
+      "id": "flame_breath",
+      "name": "烈焰吐息",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗所有余烬：对所有敌人造成每点余烬 2 的伤害，对所有敌人施加 3 层燃烧。",
+      "upgrade": "消耗所有余烬：对所有敌人造成每点余烬 3 的伤害，对所有敌人施加 4 层燃烧。"
+    },
+    {
+      "id": "ash_shield",
+      "name": "灰烬护盾",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗所有余烬：获得每点余烬 3 的格挡。",
+      "upgrade": "消耗所有余烬：获得每点余烬 4 的格挡。"
+    },
+    {
+      "id": "ember_heart",
+      "name": "火种之心",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "每回合结束时获得 1 点余烬。",
+      "upgrade": "每回合结束时获得 2 点余烬。"
+    },
+    {
+      "id": "ignite",
+      "name": "燃烧",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "对目标施加 3 层燃烧，获得 1 点余烬。",
+      "upgrade": "对目标施加 5 层燃烧，获得 1 点余烬。"
+    },
+    {
+      "id": "searing_strike",
+      "name": "灼热打击",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "造成 9 点伤害，若余烬 ≥ 5：造成 5 点伤害。",
+      "upgrade": "造成 12 点伤害，若余烬 ≥ 5：造成 6 点伤害。"
+    },
+    {
+      "id": "ember_dance",
+      "name": "余火之舞",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "造成 5 点伤害，每 1 点余烬额外 +1 伤害（不消耗）。",
+      "upgrade": "造成 7 点伤害，每 1 点余烬额外 +1 伤害（不消耗）。"
+    },
+    {
+      "id": "pillar_of_flame",
+      "name": "焰柱",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "每回合开始时，对所有敌人造成等于余烬数 的伤害（不消耗余烬）。每张独立触发。",
+      "upgrade": "每回合开始时，对所有敌人造成等于余烬数 +2 的伤害（不消耗余烬）。每张独立触发。"
+    },
+    {
+      "id": "torch",
+      "name": "火炬",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "抽 1 张牌，获得 2 点余烬，若余烬 ≥ 8：抽 1 张牌。",
+      "upgrade": "抽 2 张牌，获得 2 点余烬，若余烬 ≥ 8：抽 1 张牌。"
+    },
+    {
+      "id": "forge",
+      "name": "熔炉",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "每当你获得余烬时，每点余烬获得 1 点格挡。",
+      "upgrade": "每当你获得余烬时，每点余烬获得 1 点格挡。"
+    },
+    {
+      "id": "ember_blade",
+      "name": "灰烬之刃",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗 2 点余烬，造成 18 点伤害。需要 2 点余烬。",
+      "upgrade": "消耗 2 点余烬，造成 24 点伤害。需要 2 点余烬。"
+    },
+    {
+      "id": "ember_gust",
+      "name": "疾风余烬",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 1 点余烬，抽 1 张牌。消耗。",
+      "upgrade": "获得 2 点余烬，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "cinder_mend",
+      "name": "余烬疗愈",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "消耗 4 点余烬，回复 14 点生命，清除自身的虚弱、易伤、脆弱与燃烧。需要 4 点余烬。消耗。",
+      "upgrade": "消耗 4 点余烬，回复 18 点生命，清除自身的虚弱、易伤、脆弱与燃烧。需要 4 点余烬。消耗。"
+    },
+    {
+      "id": "light_up",
+      "name": "点燃",
+      "owner": "picker",
+      "rarity": "starter",
+      "base": "造成 7 点伤害，对目标施加 3 层燃烧。",
+      "upgrade": "造成 10 点伤害，对目标施加 4 层燃烧。"
+    },
+    {
+      "id": "wildfire",
+      "name": "燎原",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "对所有敌人施加 4 层燃烧。",
+      "upgrade": "对所有敌人施加 6 层燃烧。"
+    },
+    {
+      "id": "scorch_mark",
+      "name": "灼痕",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "造成 6 点伤害，若目标正在燃烧：造成 4 点伤害。",
+      "upgrade": "造成 9 点伤害，若目标正在燃烧：造成 5 点伤害。"
+    },
+    {
+      "id": "detonate",
+      "name": "引爆",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "移除目标所有燃烧，每层造成 3 点伤害。",
+      "upgrade": "移除目标所有燃烧，每层造成 4 点伤害。"
+    },
+    {
+      "id": "add_fuel",
+      "name": "添油",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "使目标的燃烧层数翻倍，获得等于目标燃烧层数 × 2 的基础格挡（基础上限 18）。",
+      "upgrade": "使目标的燃烧层数翻倍，获得等于目标燃烧层数 × 2 的基础格挡（基础上限 24）。"
+    },
+    {
+      "id": "lingering_fire",
+      "name": "余火",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "对目标施加 4 层燃烧，获得 7 点格挡。",
+      "upgrade": "对目标施加 6 层燃烧，获得 10 点格挡。"
+    },
+    {
+      "id": "heat_wave",
+      "name": "热浪",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成等于其燃烧层数 × 3 的伤害，对所有敌人施加 1 层虚弱。",
+      "upgrade": "对所有敌人造成等于其燃烧层数 × 4 的伤害，对所有敌人施加 2 层虚弱。"
+    },
+    {
+      "id": "cremation",
+      "name": "火葬",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "敌人死亡时，将其剩余燃烧（至少 4 层）施加给所有其他敌人。每名死者仅触发一次，对所有敌人施加 14 层燃烧。",
+      "upgrade": "敌人死亡时，将其剩余燃烧（至少 6 层）施加给所有其他敌人。每名死者仅触发一次，对所有敌人施加 21 层燃烧。"
+    },
+    {
+      "id": "everburning",
+      "name": "不灭之火",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "敌人的燃烧层数不再随回合减少。",
+      "upgrade": "敌人的燃烧层数不再随回合减少。"
+    },
+    {
+      "id": "ember_tongue",
+      "name": "烬舌",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "若目标正在燃烧：获得 1 点余烬；对目标施加 1 层燃烧，抽 1 张牌。消耗。",
+      "upgrade": "若目标正在燃烧：获得 1 点余烬；对目标施加 2 层燃烧，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "pick_up",
+      "name": "拾取",
+      "owner": "picker",
+      "rarity": "starter",
+      "base": "抽 1 张牌。消耗。",
+      "upgrade": "抽 2 张牌。消耗。"
+    },
+    {
+      "id": "burn_pages",
+      "name": "焚书",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "消耗手牌中随机 1 张牌，每消耗一张获得 1 点能量。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，每消耗一张获得 1 点能量，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "bone_ash",
+      "name": "骨灰",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "造成 18 点伤害，消耗区每张牌 +2（最多 +12）。消耗。",
+      "upgrade": "造成 25 点伤害，消耗区每张牌 +3（最多 +18）。消耗。"
+    },
+    {
+      "id": "ash_feast",
+      "name": "灰烬盛宴",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "每当你的一张牌被消耗时，获得 8 点格挡，每回合生效后的前 2 次消耗，每次抽 1 张牌。",
+      "upgrade": "每当你的一张牌被消耗时，获得 12 点格挡，每回合生效后的前 2 次消耗，每次抽 1 张牌。"
+    },
+    {
+      "id": "pass_the_flame",
+      "name": "火种传递",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "每当你的一张牌被消耗时，对随机敌人造成 12 点伤害。",
+      "upgrade": "每当你的一张牌被消耗时，对随机敌人造成 18 点伤害。"
+    },
+    {
+      "id": "burn_it_all",
+      "name": "焚尽",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗手牌中的所有牌，每消耗一张造成 9 点伤害。",
+      "upgrade": "消耗手牌中的所有牌，每消耗一张造成 12 点伤害。"
+    },
+    {
+      "id": "ash_return",
+      "name": "灰烬再临",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "从消耗区按费用从高到低取回 1 张牌到手牌（同费按消耗顺序），若本回合消耗过牌：获得 12 点格挡。",
+      "upgrade": "从消耗区按费用从高到低取回 2 张牌到手牌（同费按消耗顺序），若本回合消耗过牌：获得 18 点格挡。"
+    },
+    {
+      "id": "dust_to_dust",
+      "name": "尘归尘",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "消耗手牌中的所有诅咒牌，获得 9 点格挡。",
+      "upgrade": "消耗手牌中的所有诅咒牌，获得 13 点格挡。"
+    },
+    {
+      "id": "ash_offering",
+      "name": "献灰",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗手牌中随机 2 张牌，获得 4 点余烬，抽 2 张牌。消耗。",
+      "upgrade": "消耗手牌中随机 2 张牌，获得 5 点余烬，抽 3 张牌。消耗。"
+    },
+    {
+      "id": "blood_edge",
+      "name": "血刃",
+      "owner": "oathbound",
+      "rarity": "starter",
+      "base": "失去 2 点生命，造成 14 点伤害。",
+      "upgrade": "失去 2 点生命，造成 18 点伤害。"
+    },
+    {
+      "id": "blood_rite",
+      "name": "血祭",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "失去 3 点生命，抽 2 张牌，获得 1 点能量。消耗。",
+      "upgrade": "失去 3 点生命，抽 3 张牌，获得 1 点能量。消耗。"
+    },
+    {
+      "id": "leech_bite",
+      "name": "吸血撕咬",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 7 点伤害，按实际扣除的敌人生命回复生命（每次命中最多 8 点）。",
+      "upgrade": "造成 10 点伤害，按实际扣除的敌人生命回复生命（每次命中最多 16 点）。"
+    },
+    {
+      "id": "blood_pact",
+      "name": "血契",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "每当你因卡牌失去生命时，获得 1 点力量，每回合生效后首次因卡牌失去生命且存活时，抽 1 张牌。",
+      "upgrade": "每当你因卡牌失去生命时，获得 2 点力量，每回合生效后首次因卡牌失去生命且存活时，抽 2 张牌。"
+    },
+    {
+      "id": "martyr",
+      "name": "殉道",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "失去 5 点生命，造成 30 点伤害。",
+      "upgrade": "失去 5 点生命，造成 38 点伤害。"
+    },
+    {
+      "id": "numb",
+      "name": "痛觉麻痹",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 8 点格挡，若本回合失去过生命：获得 8 点格挡。",
+      "upgrade": "获得 11 点格挡，若本回合失去过生命：获得 12 点格挡。"
+    },
+    {
+      "id": "crimson_mail",
+      "name": "猩红护甲",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "获得 12 点格挡，每实际回复 1 生命获得 2 格挡，每回合最多 20 格挡；满血时不触发。",
+      "upgrade": "获得 17 点格挡，每实际回复 1 生命获得 2 格挡，每回合最多 30 格挡；满血时不触发。"
+    },
+    {
+      "id": "sanguine",
+      "name": "饮血",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "每当敌人死亡时，回复 6 点生命。",
+      "upgrade": "每当敌人死亡时，回复 9 点生命。"
+    },
+    {
+      "id": "eye_for_eye",
+      "name": "以血还血",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 6 点伤害，额外造成本回合失去生命 × 2 的伤害。",
+      "upgrade": "造成 9 点伤害，额外造成本回合失去生命 × 3 的伤害。"
+    },
+    {
+      "id": "flex",
+      "name": "蓄力",
+      "owner": "oathbound",
+      "rarity": "starter",
+      "base": "获得 1 点力量，回合结束时失去。",
+      "upgrade": "获得 2 点力量，回合结束时失去。"
+    },
+    {
+      "id": "inflame",
+      "name": "怒吼",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 3 层力量。",
+      "upgrade": "获得 4 层力量。"
+    },
+    {
+      "id": "bone_crusher",
+      "name": "碎骨",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 24 点伤害，若力量 ≥ 3：获得 1 点能量。",
+      "upgrade": "造成 32 点伤害，若力量 ≥ 3：获得 1 点能量。"
+    },
+    {
+      "id": "overpower",
+      "name": "力量碾压",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "造成 8 点伤害（额外 +力量 × 2）。",
+      "upgrade": "造成 11 点伤害（额外 +力量 × 2）。"
+    },
+    {
+      "id": "frenzy",
+      "name": "狂暴",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "获得 4 点力量，回合结束时失去，抽 1 张牌。",
+      "upgrade": "获得 6 点力量，回合结束时失去，抽 1 张牌。"
+    },
+    {
+      "id": "demon_heart",
+      "name": "恶魔之心",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "获得 12 点格挡，每回合开始时获得 3 点力量，每回合结束时获得 5 点格挡。",
+      "upgrade": "获得 18 点格挡，每回合开始时获得 5 点力量，每回合结束时获得 8 点格挡。"
+    },
+    {
+      "id": "heavy_blow",
+      "name": "重锤",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "移除目标全部格挡，造成 20 点伤害。",
+      "upgrade": "移除目标全部格挡，造成 27 点伤害。"
+    },
+    {
+      "id": "intimidate",
+      "name": "震慑",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "对所有敌人施加 1 层虚弱。消耗。",
+      "upgrade": "对所有敌人施加 2 层虚弱。消耗。"
+    },
+    {
+      "id": "blood_fury",
+      "name": "血怒",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 3 点生命，对所有敌人造成 5 点伤害 × 2，获得 2 点力量，回合结束时失去。",
+      "upgrade": "失去 3 点生命，对所有敌人造成 7 点伤害 × 2，获得 3 点力量，回合结束时失去。"
+    },
+    {
+      "id": "echo_card",
+      "name": "回响",
+      "owner": "scholar",
+      "rarity": "starter",
+      "base": "获得 1 层回响，获得 5 点格挡。消耗。",
+      "upgrade": "获得 1 层回响，获得 7 点格挡。"
+    },
+    {
+      "id": "double_chant",
+      "name": "双重咏唱",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 2 层回响。消耗。",
+      "upgrade": "获得 2 层回响。消耗。"
+    },
+    {
+      "id": "echo_blade",
+      "name": "回声刃",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 7 点伤害，抽 1 张牌，若拥有回响：获得 1 点余烬。",
+      "upgrade": "造成 10 点伤害，抽 1 张牌，若拥有回响：获得 1 点余烬。"
+    },
+    {
+      "id": "resonance",
+      "name": "共鸣",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "每回合开始时获得 1 层回响。",
+      "upgrade": "每回合开始时获得 1 层回响。"
+    },
+    {
+      "id": "mirror",
+      "name": "镜像",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "每回合生效后的第一张攻击牌额外触发 1 次。每张独立触发，可与回响叠加；每次重放计入出牌和攻击次数，不额外支付能量。",
+      "upgrade": "每回合生效后的第一张攻击牌额外触发 1 次。每张独立触发，可与回响叠加；每次重放计入出牌和攻击次数，不额外支付能量。"
+    },
+    {
+      "id": "ash_word",
+      "name": "灰语",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "对目标施加 1 层虚弱，对目标施加 1 层易伤。",
+      "upgrade": "对目标施加 2 层虚弱，对目标施加 2 层易伤。"
+    },
+    {
+      "id": "aria",
+      "name": "咏叹",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "抽 2 张牌，若拥有回响：获得 2 点余烬。",
+      "upgrade": "抽 3 张牌，若拥有回响：获得 2 点余烬。"
+    },
+    {
+      "id": "rune_burst",
+      "name": "符文爆发",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成 11 点伤害，若拥有回响：对所有敌人造成 4 点伤害。",
+      "upgrade": "对所有敌人造成 15 点伤害，若拥有回响：对所有敌人造成 6 点伤害。"
+    },
+    {
+      "id": "finale",
+      "name": "终章",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "造成 16 点伤害，手牌中每有一张牌 +2。",
+      "upgrade": "造成 22 点伤害，手牌中每有一张牌 +2。"
+    },
+    {
+      "id": "rune_shield",
+      "name": "符文护盾",
+      "owner": "scholar",
+      "rarity": "starter",
+      "base": "获得 5 点格挡。保留。每保留一回合格挡 +3，最多蓄力 10 层。",
+      "upgrade": "获得 8 点格挡。保留。每保留一回合格挡 +3，最多蓄力 10 层。"
+    },
+    {
+      "id": "focus",
+      "name": "专注",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "获得 2 层蓄能，手中所有蓄力牌立即蓄力 1 回合。",
+      "upgrade": "获得 3 层蓄能，手中所有蓄力牌立即蓄力 1 回合。"
+    },
+    {
+      "id": "rune_wall",
+      "name": "符文壁",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 9 点格挡，每回合结束时获得 2 点格挡。保留。每保留一回合格挡 +4，最多蓄力 10 层。消耗。",
+      "upgrade": "获得 13 点格挡，每回合结束时获得 3 点格挡。保留。每保留一回合格挡 +4，最多蓄力 10 层。消耗。"
+    },
+    {
+      "id": "charged_blade",
+      "name": "蓄势之刃",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "造成 9 点伤害。保留。每保留一回合伤害 +4，最多蓄力 10 层。",
+      "upgrade": "造成 13 点伤害。保留。每保留一回合伤害 +4，最多蓄力 10 层。"
+    },
+    {
+      "id": "meditate",
+      "name": "冥想",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "若拥有格挡：获得 1 层蓄能；抽 1 张牌。保留。消耗。",
+      "upgrade": "若拥有格挡：获得 2 层蓄能；抽 1 张牌。保留。消耗。"
+    },
+    {
+      "id": "erudition",
+      "name": "博学",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "每回合开始时多抽 1 张牌。",
+      "upgrade": "每回合开始时多抽 1 张牌。"
+    },
+    {
+      "id": "ward_rune",
+      "name": "守护符文",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "回合结束时，手牌中每有一张牌获得 2 点格挡，保留的蓄力牌额外蓄力 1 层；每回合首张蓄力 ≥2 的牌返还固定 1 能量。",
+      "upgrade": "回合结束时，手牌中每有一张牌获得 3 点格挡，保留的蓄力牌额外蓄力 1 层；每回合首张蓄力 ≥2 的牌返还固定 1 能量。"
+    },
+    {
+      "id": "ash_equation",
+      "name": "灰烬方程",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "余烬翻倍，抽 2 张牌。消耗。",
+      "upgrade": "余烬翻倍，抽 2 张牌。消耗。"
+    },
+    {
+      "id": "foresight",
+      "name": "预读",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "抽 3 张牌，随机弃置 1 张手牌。",
+      "upgrade": "抽 4 张牌，随机弃置 1 张手牌。"
+    },
+    {
+      "id": "ashes",
+      "name": "灰烬",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。",
+      "upgrade": null
+    },
+    {
+      "id": "dazed",
+      "name": "眩晕",
+      "owner": "shared",
+      "rarity": "status",
+      "base": "无法打出。占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）。",
+      "upgrade": "无法打出。占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）。"
+    },
+    {
+      "id": "cross_guard",
+      "name": "交锋",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 7 点伤害，获得 6 点格挡。",
+      "upgrade": "造成 10 点伤害，获得 8 点格挡。"
+    },
+    {
+      "id": "pommel_jab",
+      "name": "柄击",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 7 点伤害，对目标施加 1 层虚弱。",
+      "upgrade": "造成 10 点伤害，对目标施加 1 层虚弱。"
+    },
+    {
+      "id": "trail_cut",
+      "name": "踏痕斩",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 8 点伤害，若拥有格挡：获得 2 点余烬。",
+      "upgrade": "造成 11 点伤害，若拥有格挡：获得 2 点余烬。"
+    },
+    {
+      "id": "frontier_sweep",
+      "name": "开路横斩",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "对所有敌人造成 7 点伤害，若本回合已打出 2 张以上攻击牌：对所有敌人施加 1 层易伤。",
+      "upgrade": "对所有敌人造成 10 点伤害，若本回合已打出 2 张以上攻击牌：对所有敌人施加 2 层易伤。"
+    },
+    {
+      "id": "steady_grip",
+      "name": "稳握",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "获得 4 点格挡，若本回合已打出 2 张以上卡牌：抽 1 张牌。消耗。",
+      "upgrade": "获得 7 点格挡，若本回合已打出 2 张以上卡牌：抽 1 张牌。消耗。"
+    },
+    {
+      "id": "measured_step",
+      "name": "量步",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "抽 1 张牌，获得 8 点格挡。",
+      "upgrade": "抽 1 张牌，获得 11 点格挡。"
+    },
+    {
+      "id": "shield_edge",
+      "name": "盾缘",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 6 点伤害，若拥有格挡：获得 2 点临时荆棘：每次受到攻击时反伤，下回合开始时全部移除。",
+      "upgrade": "造成 9 点伤害，若拥有格挡：获得 3 点临时荆棘：每次受到攻击时反伤，下回合开始时全部移除。"
+    },
+    {
+      "id": "brace_line",
+      "name": "架盾",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "若拥有格挡：每回合结束时获得 1 点格挡；获得 7 点格挡。",
+      "upgrade": "若拥有格挡：每回合结束时获得 2 点格挡；获得 10 点格挡。"
+    },
+    {
+      "id": "ember_patrol",
+      "name": "提灯巡守",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "获得 9 点格挡，若本回合已打出 2 张以上卡牌：获得 1 层蓄能。",
+      "upgrade": "获得 12 点格挡，若本回合已打出 2 张以上卡牌：获得 1 层蓄能。"
+    },
+    {
+      "id": "rally_step",
+      "name": "整步",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "获得 3 点格挡，若本回合已打出 1 张以上攻击牌：获得 1 点余烬。",
+      "upgrade": "获得 5 点格挡，若本回合已打出 1 张以上攻击牌：获得 1 点余烬。"
+    },
+    {
+      "id": "lantern_poke",
+      "name": "灯火突刺",
+      "owner": "traveler",
+      "rarity": "common",
+      "base": "造成 6 点伤害，获得 1 点余烬，若本回合已打出 2 张以上攻击牌：抽 1 张牌。",
+      "upgrade": "造成 9 点伤害，获得 1 点余烬，若本回合已打出 2 张以上攻击牌：抽 1 张牌。"
+    },
+    {
+      "id": "pursuit_step",
+      "name": "追风步",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "抽 1 张牌，若本回合已打出 2 张以上卡牌：获得 2 点力量，回合结束时失去。消耗。",
+      "upgrade": "抽 2 张牌，若本回合已打出 2 张以上卡牌：获得 3 点力量，回合结束时失去。消耗。"
+    },
+    {
+      "id": "hooking_cut",
+      "name": "钩刃",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "造成 4 点伤害 × 2，对目标施加 1 层易伤。",
+      "upgrade": "造成 6 点伤害 × 2，对目标施加 1 层易伤。"
+    },
+    {
+      "id": "blade_rain",
+      "name": "碎刃雨",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成 6 点伤害 × 2，对所有敌人施加 1 层虚弱，若本回合已打出 3 张以上卡牌：抽 1 张牌。",
+      "upgrade": "对所有敌人造成 8 点伤害 × 2，对所有敌人施加 2 层虚弱，若本回合已打出 3 张以上卡牌：抽 2 张牌。"
+    },
+    {
+      "id": "marching_rhythm",
+      "name": "行军拍",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "抽 2 张牌，若本回合已打出 2 张以上攻击牌：获得 1 层蓄能。",
+      "upgrade": "抽 3 张牌，若本回合已打出 2 张以上攻击牌：获得 1 层蓄能。"
+    },
+    {
+      "id": "swift_return",
+      "name": "回身刺",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "造成 5 点伤害，若本回合已打出 2 张以上攻击牌：获得 4 点格挡。",
+      "upgrade": "造成 7 点伤害，若本回合已打出 2 张以上攻击牌：获得 6 点格挡。"
+    },
+    {
+      "id": "ember_plate",
+      "name": "余烬锻甲",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "消耗 2 点余烬，获得 12 点格挡，抽 1 张牌。需要 2 点余烬。",
+      "upgrade": "消耗 2 点余烬，获得 16 点格挡，抽 1 张牌。需要 2 点余烬。"
+    },
+    {
+      "id": "iron_escort",
+      "name": "铁卫护送",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 14 点格挡，对所有敌人施加 1 层虚弱，抽 1 张牌。",
+      "upgrade": "获得 18 点格挡，对所有敌人施加 1 层虚弱，抽 2 张牌。"
+    },
+    {
+      "id": "shield_rush",
+      "name": "持盾冲锋",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 10 点格挡，造成等于当前格挡 +3的伤害，对目标施加 1 层易伤。",
+      "upgrade": "获得 14 点格挡，造成等于当前格挡 +3的伤害，对目标施加 2 层易伤。"
+    },
+    {
+      "id": "road_armor",
+      "name": "旅途重甲",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 5 点格挡，获得 2 层敏捷。",
+      "upgrade": "获得 8 点格挡，获得 2 层敏捷。"
+    },
+    {
+      "id": "thorn_stance",
+      "name": "刺盾姿态",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 1 层荆棘，使自身的荆棘层数翻倍，抽 1 张牌。消耗。",
+      "upgrade": "获得 2 层荆棘，使自身的荆棘层数翻倍，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "guard_breaker",
+      "name": "破阵刃",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "造成 12 点伤害，对目标施加 2 层虚弱，若本回合已打出 2 张以上攻击牌：对目标施加 2 层易伤。",
+      "upgrade": "造成 17 点伤害，对目标施加 2 层虚弱，若本回合已打出 2 张以上攻击牌：对目标施加 3 层易伤。"
+    },
+    {
+      "id": "blade_tempest",
+      "name": "连刃风暴",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "对所有敌人造成 4 点伤害 × 3，若本回合已打出 2 张以上攻击牌：每打出一张攻击牌，本回合之后的攻击牌伤害 +1。",
+      "upgrade": "对所有敌人造成 5 点伤害 × 3，若本回合已打出 2 张以上攻击牌：每打出一张攻击牌，本回合之后的攻击牌伤害 +2。"
+    },
+    {
+      "id": "last_lantern",
+      "name": "长夜终灯",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "造成 20 点伤害，若本回合已打出 2 张以上攻击牌：造成 12 点伤害。",
+      "upgrade": "造成 26 点伤害，若本回合已打出 2 张以上攻击牌：造成 16 点伤害。"
+    },
+    {
+      "id": "unbroken_stride",
+      "name": "不息步伐",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "抽 2 张牌，若本回合已打出 3 张以上攻击牌：获得 1 层回响。消耗。",
+      "upgrade": "抽 3 张牌，若本回合已打出 3 张以上攻击牌：获得 1 层回响。消耗。"
+    },
+    {
+      "id": "vanguard_oath",
+      "name": "先锋誓言",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "生效后交替打出技能和攻击，每完成一对获得 8 格挡并抽 1 张牌。每回合前 2 对生效，已配对的牌不重复使用。",
+      "upgrade": "生效后交替打出技能和攻击，每完成一对获得 12 格挡并抽 1 张牌。每回合前 2 对生效，已配对的牌不重复使用。"
+    },
+    {
+      "id": "encircling_blades",
+      "name": "环刃",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "造成 3 点伤害 × 4，若本回合已打出 2 张以上攻击牌：获得 1 层蓄能。",
+      "upgrade": "造成 4 点伤害 × 4，若本回合已打出 2 张以上攻击牌：获得 2 层蓄能。"
+    },
+    {
+      "id": "steadfast_guard",
+      "name": "不动阵地",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "每回合结束时获得 6 点格挡，获得 4 层荆棘。",
+      "upgrade": "每回合结束时获得 8 点格挡，获得 5 层荆棘。"
+    },
+    {
+      "id": "bastion_oath",
+      "name": "壁垒誓约",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "获得 18 点格挡，格挡不会在回合开始时消失。消耗。",
+      "upgrade": "获得 24 点格挡，格挡不会在回合开始时消失。消耗。"
+    },
+    {
+      "id": "iron_rebuke",
+      "name": "铁壁回敬",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "造成等于当前格挡 × 2 +6的伤害，对目标施加 2 层虚弱。",
+      "upgrade": "造成等于当前格挡 × 2 +10的伤害，对目标施加 3 层虚弱。"
+    },
+    {
+      "id": "lantern_shelter",
+      "name": "灯下庇护",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "消耗 3 点余烬，清除自身的虚弱、易伤、脆弱与燃烧，获得 20 点格挡。需要 3 点余烬。保留。",
+      "upgrade": "消耗 3 点余烬，清除自身的虚弱、易伤、脆弱与燃烧，获得 28 点格挡。需要 3 点余烬。保留。"
+    },
+    {
+      "id": "long_road",
+      "name": "漫长守望",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "回合结束时，若仍有能量未使用，获得 8 格挡且下回合多抽 2 张牌。",
+      "upgrade": "回合结束时，若仍有能量未使用，获得 11 格挡且下回合多抽 2 张牌。"
+    },
+    {
+      "id": "dawn_charge",
+      "name": "破晓冲锋",
+      "owner": "traveler",
+      "rarity": "rare",
+      "base": "对所有敌人造成 12 点伤害，获得 3 点余烬，若本回合已打出 2 张以上攻击牌：获得 2 层蓄能。",
+      "upgrade": "对所有敌人造成 16 点伤害，获得 4 点余烬，若本回合已打出 2 张以上攻击牌：获得 2 层蓄能。"
+    },
+    {
+      "id": "cinder_hook",
+      "name": "火钳勾击",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "若目标正在燃烧：抽 1 张牌；造成 7 点伤害，对目标施加 2 层燃烧。",
+      "upgrade": "若目标正在燃烧：抽 1 张牌；造成 10 点伤害，对目标施加 3 层燃烧。"
+    },
+    {
+      "id": "charred_dart",
+      "name": "炭刺",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "造成 3 点伤害，若目标正在燃烧：获得 2 点格挡。",
+      "upgrade": "造成 5 点伤害，若目标正在燃烧：获得 3 点格挡。"
+    },
+    {
+      "id": "smoke_screen",
+      "name": "烟屏",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "获得 6 点格挡，获得等于目标燃烧层数 × 1 的基础格挡（基础上限 8），对目标施加 1 层虚弱。",
+      "upgrade": "获得 9 点格挡，获得等于目标燃烧层数 × 1 的基础格挡（基础上限 12），对目标施加 1 层虚弱。"
+    },
+    {
+      "id": "tend_coals",
+      "name": "拨炭",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "对目标施加 3 层燃烧，抽 1 张牌。",
+      "upgrade": "对目标施加 4 层燃烧，抽 1 张牌。"
+    },
+    {
+      "id": "scalding_sweep",
+      "name": "灼灰横扫",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "对所有敌人造成 4 点伤害，对所有敌人施加 1 层燃烧。",
+      "upgrade": "对所有敌人造成 6 点伤害，对所有敌人施加 1 层燃烧。"
+    },
+    {
+      "id": "coal_wrap",
+      "name": "裹炭",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "获得 8 点格挡，若余烬 ≥ 4：获得 2 点余烬。",
+      "upgrade": "获得 11 点格挡，若余烬 ≥ 4：获得 2 点余烬。"
+    },
+    {
+      "id": "furnace_breath",
+      "name": "炉口吐息",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "若目标正在燃烧：获得 6 点格挡；造成 18 点伤害，对目标施加 4 层燃烧。",
+      "upgrade": "若目标正在燃烧：获得 8 点格挡；造成 24 点伤害，对目标施加 4 层燃烧。"
+    },
+    {
+      "id": "ash_shell",
+      "name": "灰壳",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "消耗手牌中随机 1 张牌，获得 14 点格挡，获得 2 点余烬。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，获得 18 点格挡，获得 3 点余烬。消耗。"
+    },
+    {
+      "id": "shard_throw",
+      "name": "残片投掷",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "造成 6 点伤害，若余烬 ≥ 3：消耗 2 点余烬，从消耗区随机取回 1 张牌到手牌。消耗。",
+      "upgrade": "造成 9 点伤害，若余烬 ≥ 3：消耗 2 点余烬，从消耗区随机取回 1 张牌到手牌。消耗。"
+    },
+    {
+      "id": "salvage_scraps",
+      "name": "捡拾残页",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "从消耗区随机取回 1 张牌到手牌，获得 4 点格挡。",
+      "upgrade": "从消耗区随机取回 1 张牌到手牌，获得 7 点格挡。"
+    },
+    {
+      "id": "sift_ash",
+      "name": "筛灰",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "消耗手牌中随机 1 张牌，抽 2 张牌。",
+      "upgrade": "消耗手牌中随机 1 张牌，抽 3 张牌。"
+    },
+    {
+      "id": "pocket_coals",
+      "name": "藏炭",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "消耗手牌中随机 1 张牌，获得 3 点余烬。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，获得 4 点余烬。消耗。"
+    },
+    {
+      "id": "buried_knife",
+      "name": "埋灰短刃",
+      "owner": "picker",
+      "rarity": "common",
+      "base": "造成 14 点伤害，若本回合消耗过牌：从消耗区按费用从高到低取回 1 张牌到手牌（同费按消耗顺序）。消耗。",
+      "upgrade": "造成 19 点伤害，若本回合消耗过牌：从消耗区按费用从高到低取回 1 张牌到手牌（同费按消耗顺序）。消耗。"
+    },
+    {
+      "id": "smoke_cover",
+      "name": "烟幕护身",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "消耗手牌中随机 1 张牌，获得 7 点格挡，对所有敌人施加 1 层虚弱。",
+      "upgrade": "消耗手牌中随机 1 张牌，获得 10 点格挡，对所有敌人施加 2 层虚弱。"
+    },
+    {
+      "id": "flashpoint",
+      "name": "燃点",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "造成 8 点伤害，若目标正在燃烧：对目标施加 2 层易伤。",
+      "upgrade": "造成 12 点伤害，若目标正在燃烧：对目标施加 2 层易伤。"
+    },
+    {
+      "id": "coal_lance",
+      "name": "炭火长枪",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "造成等于其燃烧层数 × 2 的伤害，造成 14 点伤害。",
+      "upgrade": "造成等于其燃烧层数 × 3 的伤害，造成 18 点伤害。"
+    },
+    {
+      "id": "black_smoke",
+      "name": "浓烟",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "消耗手牌中随机 1 张牌，对所有敌人施加 2 层燃烧，对所有敌人施加 1 层虚弱。",
+      "upgrade": "消耗手牌中随机 1 张牌，对所有敌人施加 3 层燃烧，对所有敌人施加 2 层虚弱。"
+    },
+    {
+      "id": "firebreak",
+      "name": "隔火带",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "对目标施加 2 层燃烧，获得等于目标燃烧层数 × 2 的基础格挡（基础上限 18）。",
+      "upgrade": "对目标施加 3 层燃烧，获得等于目标燃烧层数 × 2 的基础格挡（基础上限 24）。"
+    },
+    {
+      "id": "coal_heart",
+      "name": "炉灰余温",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "每回合结束时，所有敌人获得 1 层燃烧。",
+      "upgrade": "每回合结束时，所有敌人获得 2 层燃烧。"
+    },
+    {
+      "id": "ember_salvage",
+      "name": "烬中寻宝",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "从消耗区随机取回 2 张牌到手牌，获得 1 点余烬。消耗。",
+      "upgrade": "从消耗区随机取回 3 张牌到手牌，获得 1 点余烬。消耗。"
+    },
+    {
+      "id": "scrap_volley",
+      "name": "碎片齐射",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "消耗手牌中随机 1 张牌，每消耗一张获得 1 点能量，对所有敌人造成 8 点伤害。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，每消耗一张获得 1 点能量，对所有敌人造成 12 点伤害。消耗。"
+    },
+    {
+      "id": "burial_veil",
+      "name": "葬灰帷幕",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "消耗手牌中随机 2 张牌，获得 13 点格挡，抽 1 张牌。",
+      "upgrade": "消耗手牌中随机 2 张牌，获得 18 点格挡，抽 2 张牌。"
+    },
+    {
+      "id": "reclaimed_spark",
+      "name": "回收火星",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "从消耗区随机取回 1 张牌到手牌，获得 1 层蓄能。消耗。",
+      "upgrade": "从消耗区随机取回 1 张牌到手牌，获得 2 层蓄能。消耗。"
+    },
+    {
+      "id": "ash_carver",
+      "name": "刻灰刀",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "造成 9 点伤害，从消耗区随机取回 1 张牌到手牌。",
+      "upgrade": "造成 13 点伤害，从消耗区随机取回 1 张牌到手牌。"
+    },
+    {
+      "id": "sheltering_ash",
+      "name": "积灰护甲",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "每当你的一张牌被消耗时，获得 3 点格挡，每回合结束时获得 3 点格挡。",
+      "upgrade": "每当你的一张牌被消耗时，获得 4 点格挡，每回合结束时获得 4 点格挡。"
+    },
+    {
+      "id": "flashover",
+      "name": "火线蔓延",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "对目标施加 6 层燃烧，将目标当前的燃烧层数施加给其他所有存活敌人（不移除目标燃烧）。",
+      "upgrade": "对目标施加 8 层燃烧，将目标当前的燃烧层数施加给其他所有存活敌人（不移除目标燃烧）。"
+    },
+    {
+      "id": "funeral_pyre",
+      "name": "送葬火炬",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "移除目标所有燃烧，每层造成 4 点伤害，造成 14 点伤害，对目标施加 5 层燃烧。",
+      "upgrade": "移除目标所有燃烧，每层造成 5 点伤害，造成 18 点伤害，对目标施加 7 层燃烧。"
+    },
+    {
+      "id": "choking_embers",
+      "name": "窒息余火",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "对所有敌人施加 6 层燃烧，对所有敌人施加 2 层虚弱，对所有敌人施加 2 层脆弱。",
+      "upgrade": "对所有敌人施加 8 层燃烧，对所有敌人施加 3 层虚弱，对所有敌人施加 3 层脆弱。"
+    },
+    {
+      "id": "white_hot",
+      "name": "白热",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗目标所有燃烧：每层获得 1 点余烬（基础上限 10 点），获得 1 点能量，抽 2 张牌。消耗。",
+      "upgrade": "消耗目标所有燃烧：每层获得 1 点余烬（基础上限 14 点），获得 1 点能量，抽 3 张牌。消耗。"
+    },
+    {
+      "id": "undying_furnace",
+      "name": "不息炉膛",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "每回合首次因一张牌实际消耗至少 3 点余烬时，对所有敌人施加 6 层燃烧。",
+      "upgrade": "每回合首次因一张牌实际消耗至少 3 点余烬时，对所有敌人施加 9 层燃烧。"
+    },
+    {
+      "id": "ash_reserve",
+      "name": "灰烬储备",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "获得 8 点格挡，每回合生效后第 2 次消耗时，获得 8 格挡，并从消耗区取回 1 张费用最高的牌。每回合仅一次。",
+      "upgrade": "获得 12 点格挡，每回合生效后第 2 次消耗时，获得 12 格挡，并从消耗区取回 1 张费用最高的牌。每回合仅一次。"
+    },
+    {
+      "id": "last_salvage",
+      "name": "终末打捞",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "从消耗区随机取回 3 张牌到手牌，获得 10 点格挡，获得 1 层蓄能。消耗。",
+      "upgrade": "从消耗区随机取回 4 张牌到手牌，获得 14 点格挡，获得 2 层蓄能。消耗。"
+    },
+    {
+      "id": "phoenix_breath",
+      "name": "灰中复苏",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗手牌中随机 2 张牌，回复 12 点生命。消耗。",
+      "upgrade": "消耗手牌中随机 2 张牌，回复 16 点生命。消耗。"
+    },
+    {
+      "id": "ash_storm",
+      "name": "灰暴",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "对所有敌人造成 16 点伤害，消耗手牌中随机 1 张牌，抽 2 张牌。消耗。",
+      "upgrade": "对所有敌人造成 22 点伤害，消耗手牌中随机 1 张牌，抽 3 张牌。消耗。"
+    },
+    {
+      "id": "empty_the_satchel",
+      "name": "倾尽行囊",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗手牌中的所有牌，每消耗一张获得 1 点能量，抽 3 张牌。消耗。",
+      "upgrade": "消耗手牌中的所有牌，每消耗一张获得 1 点能量，抽 4 张牌。消耗。"
+    },
+    {
+      "id": "embers_requiem",
+      "name": "残烬挽歌",
+      "owner": "picker",
+      "rarity": "rare",
+      "base": "消耗手牌中随机 1 张牌，造成 10 点伤害 × 2，从消耗区随机取回 2 张牌到手牌。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，造成 13 点伤害 × 2，从消耗区随机取回 2 张牌到手牌。消耗。"
+    },
+    {
+      "id": "crimson_step",
+      "name": "猩红步",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "失去 2 点生命，获得 6 点格挡。",
+      "upgrade": "失去 2 点生命，获得 8 点格挡。"
+    },
+    {
+      "id": "scar_cut",
+      "name": "伤疤斩",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 8 点伤害，若本回合失去过生命：获得 2 点余烬。",
+      "upgrade": "造成 11 点伤害，若本回合失去过生命：获得 2 点余烬。"
+    },
+    {
+      "id": "blood_insight",
+      "name": "痛中醒悟",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "抽 2 张牌，若本回合失去过生命：获得 4 点格挡。",
+      "upgrade": "抽 2 张牌，若本回合失去过生命：获得 7 点格挡。"
+    },
+    {
+      "id": "crimson_thrust",
+      "name": "猩红突刺",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 10 点伤害，若本回合失去过生命：对目标施加 2 层易伤。",
+      "upgrade": "造成 14 点伤害，若本回合失去过生命：对目标施加 2 层易伤。"
+    },
+    {
+      "id": "bind_wounds",
+      "name": "裹伤",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 9 点格挡，若本回合失去过生命：抽 1 张牌。",
+      "upgrade": "获得 12 点格挡，若本回合失去过生命：抽 1 张牌。"
+    },
+    {
+      "id": "blood_sip",
+      "name": "血滴",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "失去 1 点生命，造成 5 点伤害，按实际扣除的敌人生命回复生命。消耗。",
+      "upgrade": "失去 1 点生命，造成 7 点伤害，按实际扣除的敌人生命回复生命。消耗。"
+    },
+    {
+      "id": "ember_pulse",
+      "name": "烬血脉动",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "失去 2 点生命，获得 2 点余烬。",
+      "upgrade": "失去 2 点生命，获得 3 点余烬。"
+    },
+    {
+      "id": "line_breaker",
+      "name": "破阵横扫",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 2 点力量，回合结束时失去，对所有敌人造成 7 点伤害，若本回合失去过生命：获得 6 点格挡。",
+      "upgrade": "获得 3 点力量，回合结束时失去，对所有敌人造成 10 点伤害，若本回合失去过生命：获得 8 点格挡。"
+    },
+    {
+      "id": "double_punch",
+      "name": "双拳",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 4 点伤害 × 2，获得 1 点力量，回合结束时失去。",
+      "upgrade": "造成 6 点伤害 × 2，获得 1 点力量，回合结束时失去。"
+    },
+    {
+      "id": "battle_breath",
+      "name": "战息",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 7 点格挡，获得 1 点力量，回合结束时失去。",
+      "upgrade": "获得 10 点格挡，获得 2 点力量，回合结束时失去。"
+    },
+    {
+      "id": "iron_elbow",
+      "name": "铁肘",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 6 点伤害，获得 4 点格挡，若力量 ≥ 3：获得 6 点格挡。",
+      "upgrade": "造成 9 点伤害，获得 6 点格挡，若力量 ≥ 3：获得 8 点格挡。"
+    },
+    {
+      "id": "threatening_cut",
+      "name": "威吓斩",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "造成 8 点伤害，若力量 ≥ 3：对目标施加 2 层虚弱。",
+      "upgrade": "造成 11 点伤害，若力量 ≥ 3：对目标施加 3 层虚弱。"
+    },
+    {
+      "id": "gather_fury",
+      "name": "聚怒",
+      "owner": "oathbound",
+      "rarity": "common",
+      "base": "获得 2 点力量，回合结束时失去，若本回合失去过生命：抽 1 张牌。消耗。",
+      "upgrade": "获得 3 点力量，回合结束时失去，若本回合失去过生命：抽 1 张牌。消耗。"
+    },
+    {
+      "id": "oath_reenactment",
+      "name": "血誓重演",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放或牌堆选牌效果的牌；其他代价照付，原牌结算后弃置或消耗）。消耗。",
+      "upgrade": "选择弃牌堆中一张攻击或技能，免能量重放一次（不能选择重放或牌堆选牌效果的牌；其他代价照付，原牌结算后弃置或消耗）。消耗。"
+    },
+    {
+      "id": "blood_reckoning",
+      "name": "血债追偿",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "造成 8 点伤害，若本回合失去过生命：抽 2 张牌。",
+      "upgrade": "造成 12 点伤害，若本回合失去过生命：抽 2 张牌。"
+    },
+    {
+      "id": "scar_shield",
+      "name": "伤痕盾",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "失去 3 点生命，获得 14 点格挡，获得 1 层荆棘。",
+      "upgrade": "失去 3 点生命，获得 19 点格挡，获得 2 层荆棘。"
+    },
+    {
+      "id": "vein_cutter",
+      "name": "割脉刃",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "造成 11 点伤害，按实际扣除的敌人生命回复生命，对目标施加 1 层虚弱。消耗。",
+      "upgrade": "造成 15 点伤害，按实际扣除的敌人生命回复生命，对目标施加 2 层虚弱。消耗。"
+    },
+    {
+      "id": "pain_trade",
+      "name": "以痛换势",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "失去 4 点生命，获得 2 点能量。消耗。",
+      "upgrade": "失去 3 点生命，获得 2 点能量。消耗。"
+    },
+    {
+      "id": "scar_echo",
+      "name": "旧伤回响",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "额外造成本回合失去生命 × 2 的伤害，抽 1 张牌。保留。",
+      "upgrade": "额外造成本回合失去生命 × 3 的伤害，抽 2 张牌。保留。"
+    },
+    {
+      "id": "blood_watch",
+      "name": "血色守望",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "每当你失去生命时，获得 6 点格挡。",
+      "upgrade": "每当你失去生命时，获得 9 点格挡。"
+    },
+    {
+      "id": "battle_readiness",
+      "name": "战意整备",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "获得 8 点格挡，获得 1 层力量，若本回合失去过生命：获得 1 层蓄能。消耗。",
+      "upgrade": "获得 11 点格挡，获得 2 层力量，若本回合失去过生命：获得 1 层蓄能。消耗。"
+    },
+    {
+      "id": "splinter_armor",
+      "name": "裂甲重击",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "造成 5 点伤害（额外 +力量 × 1），对目标施加 2 层易伤。",
+      "upgrade": "造成 8 点伤害（额外 +力量 × 1），对目标施加 2 层易伤。"
+    },
+    {
+      "id": "hammer_rain",
+      "name": "乱锤",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "造成 6 点伤害 × 3，若本回合失去过生命：获得 2 点力量，回合结束时失去。",
+      "upgrade": "造成 8 点伤害 × 3，若本回合失去过生命：获得 3 点力量，回合结束时失去。"
+    },
+    {
+      "id": "battle_orders",
+      "name": "战吼号令",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "获得 3 点力量，回合结束时失去，对所有敌人施加 1 层虚弱。",
+      "upgrade": "获得 4 点力量，回合结束时失去，对所有敌人施加 1 层虚弱。"
+    },
+    {
+      "id": "crushing_stride",
+      "name": "碾踏",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成 10 点伤害，对所有敌人施加 1 层易伤，若本回合失去过生命：获得 8 点格挡。",
+      "upgrade": "对所有敌人造成 13 点伤害，对所有敌人施加 2 层易伤，若本回合失去过生命：获得 10 点格挡。"
+    },
+    {
+      "id": "unshaken",
+      "name": "岿然",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "清除自身的虚弱、易伤、脆弱与燃烧，获得 9 点格挡。消耗。",
+      "upgrade": "清除自身的虚弱、易伤、脆弱与燃烧，获得 13 点格挡。消耗。"
+    },
+    {
+      "id": "oath_renewal",
+      "name": "誓血回生",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 4 点生命，获得 5 层再生（回合末治疗后减少1层）。消耗。",
+      "upgrade": "失去 4 点生命，获得 6 层再生（回合末治疗后减少1层）。消耗。"
+    },
+    {
+      "id": "scarlet_harvest",
+      "name": "猩红收割",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "对所有敌人造成 9 点伤害，按实际扣除的敌人生命回复生命，若本回合失去过生命：获得 2 层再生（回合末治疗后减少1层）。消耗。",
+      "upgrade": "对所有敌人造成 13 点伤害，按实际扣除的敌人生命回复生命，若本回合失去过生命：获得 3 层再生（回合末治疗后减少1层）。消耗。"
+    },
+    {
+      "id": "final_offering",
+      "name": "最后献礼",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 4 点生命，弃置所有手牌，抽 5 张牌。消耗。",
+      "upgrade": "失去 3 点生命，弃置所有手牌，抽 6 张牌。消耗。"
+    },
+    {
+      "id": "crimson_covenant",
+      "name": "血色盟约",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "每回合生效后因卡牌累计失去至少 4 生命且存活时，回复 2 生命（不超过本次累计失血）并获得 1 能量。每回合仅一次。",
+      "upgrade": "每回合生效后因卡牌累计失去至少 4 生命且存活时，回复 3 生命（不超过本次累计失血）并获得 1 能量。每回合仅一次。"
+    },
+    {
+      "id": "oath_judgement",
+      "name": "誓约裁决",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 3 点生命，造成 14 点伤害，额外造成本回合失去生命 × 4 的伤害。",
+      "upgrade": "失去 3 点生命，造成 20 点伤害，额外造成本回合失去生命 × 5 的伤害。"
+    },
+    {
+      "id": "redoubt_of_blood",
+      "name": "血筑堡垒",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 4 点生命，获得 24 点格挡，格挡不会在回合开始时消失。消耗。",
+      "upgrade": "失去 4 点生命，获得 30 点格挡，格挡不会在回合开始时消失。消耗。"
+    },
+    {
+      "id": "mountain_splitter",
+      "name": "断岳",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "使自身的力量层数翻倍，造成 12 点伤害（额外 +力量 × 1）。消耗。",
+      "upgrade": "使自身的力量层数翻倍，造成 16 点伤害（额外 +力量 × 1）。消耗。"
+    },
+    {
+      "id": "titan_blows",
+      "name": "巨人连击",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "获得 2 点力量，回合结束时失去，造成 5 点伤害 × 4，对目标施加 1 层虚弱。",
+      "upgrade": "获得 3 点力量，回合结束时失去，造成 7 点伤害 × 4，对目标施加 2 层虚弱。"
+    },
+    {
+      "id": "war_avatar",
+      "name": "战意化身",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "因卡牌获得临时力量时，获得其数值 3 倍的格挡，每回合最多 20 格挡。",
+      "upgrade": "因卡牌获得临时力量时，获得其数值 3 倍的格挡，每回合最多 30 格挡。"
+    },
+    {
+      "id": "unstoppable_rage",
+      "name": "不可阻挡",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "失去 3 点生命，获得 6 点力量，回合结束时失去，抽 2 张牌。消耗。",
+      "upgrade": "失去 3 点生命，获得 8 点力量，回合结束时失去，抽 3 张牌。消耗。"
+    },
+    {
+      "id": "earthbreaker",
+      "name": "撼地",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "对所有敌人造成 15 点伤害（额外 +力量 × 1），对所有敌人施加 2 层虚弱。",
+      "upgrade": "对所有敌人造成 20 点伤害（额外 +力量 × 1），对所有敌人施加 3 层虚弱。"
+    },
+    {
+      "id": "iron_blooded",
+      "name": "铁血",
+      "owner": "oathbound",
+      "rarity": "rare",
+      "base": "每回合生效后打出第 2 张攻击牌时，将最多 2 点已有临时力量转为永久力量。不会凭空获得力量。",
+      "upgrade": "每回合生效后打出第 2 张攻击牌时，将最多 3 点已有临时力量转为永久力量。不会凭空获得力量。"
+    },
+    {
+      "id": "echo_veil",
+      "name": "余响护幕",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "获得 8 点格挡，若拥有回响：抽 1 张牌。",
+      "upgrade": "获得 12 点格挡，若拥有回响：抽 1 张牌。"
+    },
+    {
+      "id": "whisper_needle",
+      "name": "低语针",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 2 点伤害，若拥有回响：获得 1 点余烬。",
+      "upgrade": "造成 4 点伤害，若拥有回响：获得 1 点余烬。"
+    },
+    {
+      "id": "reverberant_cut",
+      "name": "震音斩",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 9 点伤害，结算时每张手牌获得 2 点基础格挡（基础上限 8）。",
+      "upgrade": "造成 12 点伤害，结算时每张手牌获得 2 点基础格挡（基础上限 12）。"
+    },
+    {
+      "id": "quiet_sentence",
+      "name": "静默句",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "对目标施加 2 层虚弱，抽 1 张牌。",
+      "upgrade": "对目标施加 3 层虚弱，抽 1 张牌。"
+    },
+    {
+      "id": "rune_splinters",
+      "name": "符文碎屑",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "对所有敌人造成 4 点伤害，获得 1 点余烬，若拥有回响：抽 1 张牌。",
+      "upgrade": "对所有敌人造成 6 点伤害，获得 2 点余烬，若拥有回响：抽 1 张牌。"
+    },
+    {
+      "id": "listen_to_ash",
+      "name": "听灰",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "消耗手牌中随机 1 张牌，抽 2 张牌，若拥有回响：获得 2 点余烬。消耗。",
+      "upgrade": "消耗手牌中随机 1 张牌，抽 3 张牌，若拥有回响：获得 3 点余烬。消耗。"
+    },
+    {
+      "id": "inscribed_edge",
+      "name": "铭文刃",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 6 点伤害，对目标施加 1 层易伤，若拥有回响：获得 4 点格挡。",
+      "upgrade": "造成 9 点伤害，对目标施加 2 层易伤，若拥有回响：获得 6 点格挡。"
+    },
+    {
+      "id": "surge_glyph",
+      "name": "蓄光",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 5 点伤害，获得 5 点格挡。保留。每保留一回合伤害 +2、格挡 +2，最多蓄力 10 层。",
+      "upgrade": "造成 7 点伤害，获得 7 点格挡。保留。每保留一回合伤害 +2、格挡 +2，最多蓄力 10 层。"
+    },
+    {
+      "id": "folded_ward",
+      "name": "折页护符",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "获得 3 点格挡，若拥有回响：获得 1 层蓄能。保留。每保留一回合格挡 +2，最多蓄力 10 层。消耗。",
+      "upgrade": "获得 5 点格挡，若拥有回响：获得 1 层蓄能。保留。每保留一回合格挡 +2，最多蓄力 10 层。消耗。"
+    },
+    {
+      "id": "patient_study",
+      "name": "耐心研读",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "抽 2 张牌。保留。",
+      "upgrade": "抽 3 张牌。保留。"
+    },
+    {
+      "id": "stored_spark",
+      "name": "封存火花",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 4 点伤害，获得 1 点余烬，获得 1 层蓄能。保留。消耗。",
+      "upgrade": "造成 6 点伤害，获得 2 点余烬，获得 1 层蓄能。保留。消耗。"
+    },
+    {
+      "id": "measured_breath",
+      "name": "调息",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "获得 8 点格挡，获得 1 层蓄能。",
+      "upgrade": "获得 11 点格挡，获得 1 层蓄能。"
+    },
+    {
+      "id": "delayed_thrust",
+      "name": "迟发刺",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "造成 9 点伤害，若本牌已蓄力至少 2 层：对目标施加 1 层易伤。保留。每保留一回合伤害 +2，最多蓄力 10 层。",
+      "upgrade": "造成 12 点伤害，若本牌已蓄力至少 2 层：对目标施加 2 层易伤。保留。每保留一回合伤害 +2，最多蓄力 10 层。"
+    },
+    {
+      "id": "ink_reserve",
+      "name": "储墨",
+      "owner": "scholar",
+      "rarity": "common",
+      "base": "获得 5 点格挡，获得 2 点余烬，若拥有回响：获得 1 层蓄能。保留。",
+      "upgrade": "获得 8 点格挡，获得 3 点余烬，若拥有回响：获得 1 层蓄能。保留。"
+    },
+    {
+      "id": "refracted_blade",
+      "name": "折光刃",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "若拥有回响：使目标的易伤层数翻倍；造成 6 点伤害 × 2。",
+      "upgrade": "若拥有回响：使目标的易伤层数翻倍；造成 8 点伤害 × 2。"
+    },
+    {
+      "id": "harmonic_shield",
+      "name": "和声盾",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 11 点格挡，若拥有回响：获得 3 点余烬。",
+      "upgrade": "获得 15 点格挡，若拥有回响：获得 4 点余烬。"
+    },
+    {
+      "id": "resounding_bell",
+      "name": "鸣钟",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成 16 点伤害，若拥有回响：获得 1 层蓄能。",
+      "upgrade": "对所有敌人造成 22 点伤害，若拥有回响：获得 2 层蓄能。"
+    },
+    {
+      "id": "woven_words",
+      "name": "编织咒语",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "抽 2 张牌，结算时每张手牌获得 2 点基础格挡（基础上限 12）。",
+      "upgrade": "抽 3 张牌，结算时每张手牌获得 2 点基础格挡（基础上限 16）。"
+    },
+    {
+      "id": "opening_chord",
+      "name": "开篇和弦",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 2 层回响，获得 6 点格挡。",
+      "upgrade": "获得 3 层回响，获得 8 点格挡。"
+    },
+    {
+      "id": "fractured_rune",
+      "name": "破碎符文",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "造成 8 点伤害，若拥有回响：手中所有蓄力牌立即蓄力 1 回合。",
+      "upgrade": "造成 12 点伤害，若拥有回响：手中所有蓄力牌立即蓄力 1 回合。"
+    },
+    {
+      "id": "sealed_page",
+      "name": "封存咒页",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 2 层蓄能。保留。消耗。",
+      "upgrade": "获得 3 层蓄能。保留。消耗。"
+    },
+    {
+      "id": "crystal_barrier",
+      "name": "晶壁",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 18 点格挡，抽 1 张牌。保留。每保留一回合格挡 +4，最多蓄力 10 层。",
+      "upgrade": "获得 24 点格挡，抽 1 张牌。保留。每保留一回合格挡 +4，最多蓄力 10 层。"
+    },
+    {
+      "id": "constellation_arrow",
+      "name": "星图箭",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "造成 9 点伤害，对目标施加 1 层虚弱。保留。每保留一回合伤害 +3，最多蓄力 10 层。",
+      "upgrade": "造成 12 点伤害，对目标施加 2 层虚弱。保留。每保留一回合伤害 +3，最多蓄力 10 层。"
+    },
+    {
+      "id": "rune_cache",
+      "name": "符文储匣",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "获得 2 层蓄能，从消耗区随机取回 1 张牌到手牌。消耗。",
+      "upgrade": "获得 3 层蓄能，从消耗区随机取回 1 张牌到手牌。消耗。"
+    },
+    {
+      "id": "orbital_shards",
+      "name": "环绕碎晶",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "对所有敌人造成 6 点伤害，若本牌已蓄力至少 2 层：获得 6 点格挡。保留。每保留一回合伤害 +2，最多蓄力 10 层。",
+      "upgrade": "对所有敌人造成 9 点伤害，若本牌已蓄力至少 2 层：获得 9 点格挡。保留。每保留一回合伤害 +2，最多蓄力 10 层。"
+    },
+    {
+      "id": "quiet_observatory",
+      "name": "寂静观测",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "回合结束时，手牌中每有一张牌获得 1 点格挡，每回合结束时获得 4 点格挡。",
+      "upgrade": "回合结束时，手牌中每有一张牌获得 2 点格挡，每回合结束时获得 5 点格挡。"
+    },
+    {
+      "id": "silent_prelude",
+      "name": "寂静序曲",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "每回合首张蓄力至少 2 的牌结算后，获得 6 格挡和 1 层回响，留给下一张手动打出的牌。",
+      "upgrade": "每回合首张蓄力至少 2 的牌结算后，获得 9 格挡和 1 层回响，留给下一张手动打出的牌。"
+    },
+    {
+      "id": "endless_sentence",
+      "name": "长句终结",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "造成 5 点伤害 × 3，若拥有回响：抽 2 张牌。",
+      "upgrade": "造成 7 点伤害 × 3，若拥有回响：抽 3 张牌。"
+    },
+    {
+      "id": "grand_recitation",
+      "name": "宏大咏唱",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "抽 3 张牌，获得 3 点余烬，获得 1 层回响。消耗。",
+      "upgrade": "抽 4 张牌，获得 4 点余烬，获得 1 层回响。消耗。"
+    },
+    {
+      "id": "shattered_chorus",
+      "name": "破碎合唱",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "移除所有敌人的全部易伤，每层造成 6 点基础伤害（移除后结算攻击修正），对所有敌人造成 18 点伤害。",
+      "upgrade": "移除所有敌人的全部易伤，每层造成 8 点基础伤害（移除后结算攻击修正），对所有敌人造成 26 点伤害。"
+    },
+    {
+      "id": "living_manuscript",
+      "name": "活页秘典",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "每回合生效后实际完成第 2 次回响或镜像重放后，抽 2 张牌并获得 1 能量。每回合仅一次。",
+      "upgrade": "每回合生效后实际完成第 2 次回响或镜像重放后，抽 3 张牌并获得 1 能量。每回合仅一次。"
+    },
+    {
+      "id": "falling_stars",
+      "name": "群星坠落",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "对所有敌人造成 14 点伤害，对所有敌人施加 2 层易伤，获得 1 层蓄能。保留。每保留一回合伤害 +3，最多蓄力 10 层。",
+      "upgrade": "对所有敌人造成 18 点伤害，对所有敌人施加 3 层易伤，获得 1 层蓄能。保留。每保留一回合伤害 +3，最多蓄力 10 层。"
+    },
+    {
+      "id": "timeless_ward",
+      "name": "恒久护印",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "获得 16 点格挡，获得 2 层蓄能。保留。每保留一回合格挡 +3，最多蓄力 10 层。消耗。",
+      "upgrade": "获得 22 点格挡，获得 3 层蓄能。保留。每保留一回合格挡 +3，最多蓄力 10 层。消耗。"
+    },
+    {
+      "id": "future_memory",
+      "name": "未来记忆",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "抽 2 张牌，手中所有蓄力牌立即蓄力 2 回合。保留。消耗。",
+      "upgrade": "抽 3 张牌，手中所有蓄力牌立即蓄力 3 回合。保留。消耗。"
+    },
+    {
+      "id": "singularity",
+      "name": "归一",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "造成 18 点伤害，手牌中每有一张牌 +3，弃置所有手牌。保留。每保留一回合伤害 +4，最多蓄力 10 层。",
+      "upgrade": "造成 24 点伤害，手牌中每有一张牌 +4，弃置所有手牌。保留。每保留一回合伤害 +4，最多蓄力 10 层。"
+    },
+    {
+      "id": "astral_shelter",
+      "name": "星界庇护",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "每回合结束时，自动消耗手牌中蓄力最少的一张牌的 1 点蓄力：获得 6 格挡并获得 1 层荆棘。只触发一次；无蓄力则不触发。",
+      "upgrade": "每回合结束时，自动消耗手牌中蓄力最少的一张牌的 1 点蓄力：获得 9 格挡并获得 1 层荆棘。只触发一次；无蓄力则不触发。"
+    },
+    {
+      "id": "sealed_sanctuary",
+      "name": "封印圣所",
+      "owner": "scholar",
+      "rarity": "rare",
+      "base": "获得 22 点格挡，获得 3 层再生（回合末治疗后减少1层）。保留。消耗。",
+      "upgrade": "获得 28 点格挡，获得 4 层再生（回合末治疗后减少1层）。保留。消耗。"
+    },
+    {
+      "id": "trail_supply",
+      "name": "战途补给",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "本回合每打出 1 张攻击牌可兑换抽 1 张牌，本次最多 2；已兑换部分不能重复计算。消耗。",
+      "upgrade": "本回合每打出 1 张攻击牌可兑换抽 1 张牌，本次最多 3；已兑换部分不能重复计算。消耗。"
+    },
+    {
+      "id": "unburden_armor",
+      "name": "卸甲疾行",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "消耗当前格挡：每 10 点获得 1 点能量，最多获得 2 点（不足一份不消耗）。消耗。",
+      "upgrade": "消耗当前格挡：每 10 点获得 1 点能量，最多获得 3 点（不足一份不消耗）。消耗。"
+    },
+    {
+      "id": "ash_index",
+      "name": "灰中索引",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "本回合每消耗 1 张牌可兑换抽 1 张牌，本次最多 3；已兑换部分不能重复计算。消耗。",
+      "upgrade": "本回合每消耗 1 张牌可兑换抽 1 张牌，本次最多 4；已兑换部分不能重复计算。消耗。"
+    },
+    {
+      "id": "borrow_flame",
+      "name": "借火鼓风",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "消耗目标燃烧：每 4 层获得 1 点能量，最多获得 2 点（不足一份不消耗）。消耗。",
+      "upgrade": "消耗目标燃烧：每 4 层获得 1 点能量，最多获得 3 点（不足一份不消耗）。消耗。"
+    },
+    {
+      "id": "pulse_memory",
+      "name": "回脉忆战",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "本回合每实际回复 2 生命可兑换抽 1 张牌，本次最多 3；已兑换部分不能重复计算。消耗。",
+      "upgrade": "本回合每实际回复 2 生命可兑换抽 1 张牌，本次最多 4；已兑换部分不能重复计算。消耗。"
+    },
+    {
+      "id": "borrow_fury",
+      "name": "借怒",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "消耗当前临时力量：每 2 点获得 1 点能量，最多获得 2 点（不足一份不消耗）。消耗。",
+      "upgrade": "消耗当前临时力量：每 2 点获得 1 点能量，最多获得 3 点（不足一份不消耗）。消耗。"
+    },
+    {
+      "id": "echo_footnotes",
+      "name": "回声批注",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "本回合每完成 1 次回响或镜像可兑换抽 1 张牌，本次最多 2；已兑换部分不能重复计算。消耗。",
+      "upgrade": "本回合每完成 1 次回响或镜像可兑换抽 1 张牌，本次最多 3；已兑换部分不能重复计算。消耗。"
+    },
+    {
+      "id": "release_charge",
+      "name": "释能演算",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "消耗手牌蓄力层数（从蓄力最低的牌起）：每 3 层获得 1 点能量，最多获得 2 点（不足一份不消耗）。消耗。",
+      "upgrade": "消耗手牌蓄力层数（从蓄力最低的牌起）：每 3 层获得 1 点能量，最多获得 3 点（不足一份不消耗）。消耗。"
+    },
+    {
+      "id": "coal_credit",
+      "name": "燃烬借力",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "消耗 2 点余烬，消耗手牌中随机 1 张牌，获得 1 点能量。需要 2 点余烬。消耗。",
+      "upgrade": "消耗 2 点余烬，消耗手牌中随机 1 张牌，获得 1 点能量，获得 5 点格挡。需要 2 点余烬。消耗。"
+    },
+    {
+      "id": "ember_sift",
+      "name": "烬中翻阅",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "消耗 2 点余烬，抽 2 张牌，随机弃置 1 张手牌。需要 2 点余烬。消耗。",
+      "upgrade": "消耗 2 点余烬，抽 3 张牌，随机弃置 1 张手牌。需要 2 点余烬。消耗。"
+    },
+    {
+      "id": "stone_throw",
+      "name": "投石",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "随机弃置 1 张手牌，造成 8 点伤害，抽 1 张牌。消耗。",
+      "upgrade": "随机弃置 1 张手牌，造成 11 点伤害，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "camp_guard",
+      "name": "守夜",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 6 点格挡，若余烬 ≥ 3：下回合开始时额外保留最多 8 点已有格挡，然后移除此状态；不会凭空获得格挡。",
+      "upgrade": "获得 9 点格挡，若余烬 ≥ 3：下回合开始时额外保留最多 12 点已有格挡，然后移除此状态；不会凭空获得格挡。"
+    },
+    {
+      "id": "sweeping_embers",
+      "name": "扫火",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "对所有敌人造成 6 点伤害，获得 1 点余烬。",
+      "upgrade": "对所有敌人造成 8 点伤害，获得 1 点余烬。"
+    },
+    {
+      "id": "coal_tip",
+      "name": "炭尖",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "造成 7 点伤害，若目标正在燃烧：获得 2 点余烬。",
+      "upgrade": "造成 10 点伤害，若目标正在燃烧：获得 3 点余烬。"
+    },
+    {
+      "id": "shutter_lamp",
+      "name": "掩灯",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 3 点格挡，若余烬 ≥ 3：对所有敌人施加 1 层虚弱。消耗。",
+      "upgrade": "获得 5 点格挡，若余烬 ≥ 3：对所有敌人施加 1 层虚弱。消耗。"
+    },
+    {
+      "id": "tinder_bundle",
+      "name": "干薪束",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 3 点余烬。消耗。",
+      "upgrade": "获得 5 点余烬。消耗。"
+    },
+    {
+      "id": "field_notes",
+      "name": "行旅札记",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "抽 2 张牌，随机弃置 1 张手牌，获得 1 点余烬。",
+      "upgrade": "抽 3 张牌，随机弃置 1 张手牌，获得 2 点余烬。"
+    },
+    {
+      "id": "spark_lure",
+      "name": "诱火",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "对目标施加 3 层燃烧，对目标施加 1 层虚弱。",
+      "upgrade": "对目标施加 4 层燃烧，对目标施加 1 层虚弱。"
+    },
+    {
+      "id": "lantern_flash",
+      "name": "灯闪",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "造成 6 点伤害，对目标施加 1 层易伤，若余烬 ≥ 3：获得 4 点格挡。",
+      "upgrade": "造成 9 点伤害，对目标施加 1 层易伤，若余烬 ≥ 3：获得 6 点格挡。"
+    },
+    {
+      "id": "warm_cloak",
+      "name": "炽边斗篷",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 6 点格挡，若余烬 ≥ 3：对所有敌人施加 2 层燃烧。",
+      "upgrade": "获得 9 点格挡，若余烬 ≥ 3：对所有敌人施加 3 层燃烧。"
+    },
+    {
+      "id": "fanning_strike",
+      "name": "扇火斩",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "造成 8 点伤害，若余烬 ≥ 2：消耗 2 点余烬，随机弃置 1 张手牌，抽 2 张牌。",
+      "upgrade": "造成 11 点伤害，若余烬 ≥ 2：消耗 2 点余烬，随机弃置 1 张手牌，抽 3 张牌。"
+    },
+    {
+      "id": "ration_bite",
+      "name": "一口干粮",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "回复 3 点生命。消耗。",
+      "upgrade": "回复 5 点生命。消耗。"
+    },
+    {
+      "id": "banked_spark",
+      "name": "守住火种",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 7 点格挡，若余烬 ≥ 4：获得 1 层蓄能。保留。",
+      "upgrade": "获得 10 点格挡，若余烬 ≥ 4：获得 1 层蓄能。保留。"
+    },
+    {
+      "id": "steady_breath",
+      "name": "匀息",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "获得 2 点格挡，若本回合已打出 2 张以上卡牌：获得 1 点余烬。",
+      "upgrade": "获得 4 点格挡，若本回合已打出 2 张以上卡牌：获得 1 点余烬。"
+    },
+    {
+      "id": "sling_volley",
+      "name": "连掷火石",
+      "owner": "shared",
+      "rarity": "common",
+      "base": "造成 3 点伤害 × 4，若余烬 ≥ 5：获得 1 层蓄能。",
+      "upgrade": "造成 4 点伤害 × 4，若余烬 ≥ 5：获得 2 层蓄能。"
+    },
+    {
+      "id": "ember_exchange",
+      "name": "燃料交换",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗 3 点余烬，获得 2 点能量。需要 3 点余烬。消耗。",
+      "upgrade": "消耗 3 点余烬，获得 2 点能量，抽 1 张牌。需要 3 点余烬。消耗。"
+    },
+    {
+      "id": "firestorm",
+      "name": "火雨",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗 2 点余烬，对所有敌人造成 10 点伤害，对所有敌人施加 3 层燃烧。需要 2 点余烬。",
+      "upgrade": "消耗 2 点余烬，对所有敌人造成 14 点伤害，对所有敌人施加 4 层燃烧。需要 2 点余烬。"
+    },
+    {
+      "id": "insulated_coat",
+      "name": "隔热外衣",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "获得 18 点格挡，获得 2 点余烬，获得 1 层再生（回合末治疗后减少1层）。消耗。",
+      "upgrade": "获得 24 点格挡，获得 3 点余烬，获得 2 层再生（回合末治疗后减少1层）。消耗。"
+    },
+    {
+      "id": "heat_sink",
+      "name": "卸热",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗所有余烬：造成每点余烬 2 的伤害，获得每点余烬 2 的格挡。",
+      "upgrade": "消耗所有余烬：造成每点余烬 3 的伤害，获得每点余烬 2 的格挡。"
+    },
+    {
+      "id": "charcoal_insight",
+      "name": "炭火启示",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗 2 点余烬，抽 3 张牌。需要 2 点余烬。",
+      "upgrade": "消耗 2 点余烬，抽 4 张牌。需要 2 点余烬。"
+    },
+    {
+      "id": "rekindle_coals",
+      "name": "重拨余火",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "消耗 2 点余烬，从消耗区随机取回 1 张牌到手牌，抽 1 张牌。需要 2 点余烬。保留。",
+      "upgrade": "消耗 2 点余烬，从消耗区随机取回 1 张牌到手牌，抽 2 张牌。需要 2 点余烬。保留。"
+    },
+    {
+      "id": "truce_smoke",
+      "name": "停战烟",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "对所有敌人施加 2 层虚弱，随机弃置 1 张手牌，抽 2 张牌。",
+      "upgrade": "对所有敌人施加 2 层虚弱，随机弃置 1 张手牌，抽 3 张牌。"
+    },
+    {
+      "id": "warding_lantern",
+      "name": "辟邪灯",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "获得 9 点格挡，若余烬 ≥ 6：获得 1 层敏捷，获得 1 层荆棘。",
+      "upgrade": "获得 12 点格挡，若余烬 ≥ 6：获得 2 层敏捷，获得 1 层荆棘。"
+    },
+    {
+      "id": "spare_torch",
+      "name": "掷出火把",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "造成 9 点伤害，获得 2 点余烬，对目标施加 3 层燃烧。消耗。",
+      "upgrade": "造成 14 点伤害，获得 3 点余烬，对目标施加 4 层燃烧。消耗。"
+    },
+    {
+      "id": "traveling_supplies",
+      "name": "随身药包",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "回复 4 点生命，抽 1 张牌。消耗。",
+      "upgrade": "回复 6 点生命，抽 1 张牌。消耗。"
+    },
+    {
+      "id": "emergency_stash",
+      "name": "翻找行囊",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "抽 3 张牌，随机弃置 2 张手牌，获得 1 层蓄能。消耗。",
+      "upgrade": "抽 4 张牌，随机弃置 2 张手牌，获得 1 层蓄能。消耗。"
+    },
+    {
+      "id": "enduring_warmth",
+      "name": "余温未散",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "回复 5 点生命，获得 10 点格挡。消耗。",
+      "upgrade": "回复 7 点生命，获得 14 点格挡。消耗。"
+    },
+    {
+      "id": "sharpened_coal",
+      "name": "淬炭刃",
+      "owner": "shared",
+      "rarity": "uncommon",
+      "base": "造成 8 点伤害，获得 1 层力量。消耗。",
+      "upgrade": "造成 12 点伤害，获得 1 层力量。消耗。"
+    },
+    {
+      "id": "crown_of_sparks",
+      "name": "火星冠冕",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "每回合首次因卡牌实际消耗余烬时，获得等于此次消耗量的临时力量，最多 4 点。",
+      "upgrade": "每回合首次因卡牌实际消耗余烬时，获得等于此次消耗量的临时力量，最多 6 点。"
+    },
+    {
+      "id": "final_conflagration",
+      "name": "终夜焚天",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "消耗所有余烬：对所有敌人造成每点余烬 4 的伤害，对所有敌人施加 1 层虚弱。",
+      "upgrade": "消耗所有余烬：对所有敌人造成每点余烬 5 的伤害，对所有敌人施加 2 层虚弱。"
+    },
+    {
+      "id": "smoldering_star",
+      "name": "闷燃之星",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "造成 18 点伤害，若余烬 ≥ 8：对目标施加 8 层燃烧，对目标施加 2 层易伤。",
+      "upgrade": "造成 22 点伤害，若余烬 ≥ 8：对目标施加 12 层燃烧，对目标施加 3 层易伤。"
+    },
+    {
+      "id": "bonfire_shelter",
+      "name": "篝火避难所",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "每回合结束时，若至少有 3 点余烬，自动消耗 3 点并获得 18 格挡；不足则不触发。",
+      "upgrade": "每回合结束时，若至少有 3 点余烬，自动消耗 3 点并获得 24 格挡；不足则不触发。"
+    },
+    {
+      "id": "phoenix_respite",
+      "name": "涅槃之息",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "消耗 6 点余烬，回复 10 点生命，获得 4 层再生（回合末治疗后减少1层）。需要 6 点余烬。消耗。",
+      "upgrade": "消耗 6 点余烬，回复 14 点生命，获得 5 层再生（回合末治疗后减少1层）。需要 6 点余烬。消耗。"
+    },
+    {
+      "id": "embers_to_dawn",
+      "name": "燃尽迎曦",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "消耗 5 点余烬，获得 3 点能量，抽 2 张牌，获得 2 层力量。需要 5 点余烬。消耗。",
+      "upgrade": "消耗 5 点余烬，获得 3 点能量，抽 3 张牌，获得 3 层力量。需要 5 点余烬。消耗。"
+    },
+    {
+      "id": "lasting_light",
+      "name": "长明灯",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "每回合首次因打出卡牌实际消耗余烬时，获得 6 点格挡并抽 1 张牌。",
+      "upgrade": "每回合首次因打出卡牌实际消耗余烬时，获得 12 点格挡并抽 2 张牌。"
+    },
+    {
+      "id": "lantern_procession",
+      "name": "百灯夜行",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "对所有敌人造成 14 点伤害，获得 3 点余烬，获得 8 点格挡。",
+      "upgrade": "对所有敌人造成 18 点伤害，获得 4 点余烬，获得 11 点格挡。"
+    },
+    {
+      "id": "sunward_step",
+      "name": "向阳而行",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "获得 12 点格挡，弃置所有手牌，抽 4 张牌。消耗。",
+      "upgrade": "获得 16 点格挡，弃置所有手牌，抽 5 张牌。消耗。"
+    },
+    {
+      "id": "sealed_flame",
+      "name": "封存烈火",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "获得 5 点余烬，获得 1 层蓄能。保留。消耗。",
+      "upgrade": "获得 7 点余烬，获得 2 层蓄能。保留。消耗。"
+    },
+    {
+      "id": "twilight_flame",
+      "name": "暮火裁决",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "造成 20 点伤害，对目标施加 2 层虚弱，对目标施加 2 层易伤。",
+      "upgrade": "造成 27 点伤害，对目标施加 3 层虚弱，对目标施加 3 层易伤。"
+    },
+    {
+      "id": "regret",
+      "name": "悔恨",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。回合结束时，若仍在手中：失去 2 点生命。",
+      "upgrade": null
+    },
+    {
+      "id": "doubt",
+      "name": "疑惧",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。回合结束时，若仍在手中：获得 1 层虚弱。",
+      "upgrade": null
+    },
+    {
+      "id": "frailty",
+      "name": "朽败",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。回合结束时，若仍在手中：获得 1 层脆弱。",
+      "upgrade": null
+    },
+    {
+      "id": "cold_ash",
+      "name": "冷灰",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。回合结束时，若仍在手中：消耗 2 点余烬。",
+      "upgrade": null
+    },
+    {
+      "id": "exposure",
+      "name": "破绽",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "无法打出。回合结束时，若仍在手中：获得 1 层易伤。",
+      "upgrade": null
+    },
+    {
+      "id": "burden",
+      "name": "重负",
+      "owner": "shared",
+      "rarity": "curse",
+      "base": "保留。无法打出。",
+      "upgrade": null
+    },
+    {
+      "id": "blade_recall",
+      "name": "回锋整备",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 4 点格挡，从弃牌堆选择 1 张攻击牌移入手牌（回响不重复移动）。",
+      "upgrade": "获得 7 点格挡，从弃牌堆选择 1 张攻击牌移入手牌（回响不重复移动）。"
+    },
+    {
+      "id": "shield_rotation",
+      "name": "换岗布防",
+      "owner": "traveler",
+      "rarity": "uncommon",
+      "base": "获得 6 点格挡，从弃牌堆选择 1 张技能牌移入抽牌堆顶（回响不重复移动），获得 1 层蓄能。",
+      "upgrade": "获得 9 点格挡，从弃牌堆选择 1 张技能牌移入抽牌堆顶（回响不重复移动），获得 1 层蓄能。"
+    },
+    {
+      "id": "ash_sifting",
+      "name": "灰中分拣",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "从抽牌堆随机查看最多 3 张牌，选择 1 张移入弃牌堆（回响不重复移动），抽 2 张牌，获得 1 点余烬。",
+      "upgrade": "从抽牌堆随机查看最多 3 张牌，选择 1 张移入弃牌堆（回响不重复移动），抽 2 张牌，获得 3 点余烬。"
+    },
+    {
+      "id": "cinder_salvage",
+      "name": "拾薪归炉",
+      "owner": "picker",
+      "rarity": "uncommon",
+      "base": "从弃牌堆选择 1 张带消耗的牌移入手牌（回响不重复移动），对所有敌人施加 3 层燃烧。",
+      "upgrade": "从弃牌堆选择 1 张带消耗的牌移入手牌（回响不重复移动），对所有敌人施加 4 层燃烧。"
+    },
+    {
+      "id": "blood_tether",
+      "name": "血线牵引",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "失去 3 点生命，从弃牌堆选择 1 张攻击或技能移入手牌（回响不重复移动）。消耗。",
+      "upgrade": "失去 2 点生命，从弃牌堆选择 1 张攻击或技能移入手牌（回响不重复移动）。消耗。"
+    },
+    {
+      "id": "scar_hold",
+      "name": "伤痕固守",
+      "owner": "oathbound",
+      "rarity": "uncommon",
+      "base": "失去 3 点生命，获得 8 点格挡，本回合结束时保留当前手牌（之后新抽到的牌不保留）。",
+      "upgrade": "失去 3 点生命，获得 12 点格挡，本回合结束时保留当前手牌（之后新抽到的牌不保留）。"
+    },
+    {
+      "id": "star_page_search",
+      "name": "星页检索",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "从抽牌堆随机查看最多 3 张牌，选择 1 张移入手牌（回响不重复移动），获得 1 层回响。",
+      "upgrade": "从抽牌堆随机查看最多 4 张牌，选择 1 张移入手牌（回响不重复移动），获得 1 层回响。"
+    },
+    {
+      "id": "palimpsest",
+      "name": "叠页演算",
+      "owner": "scholar",
+      "rarity": "uncommon",
+      "base": "从弃牌堆选择 1 张牌移入抽牌堆顶（回响不重复移动），手中所有蓄力牌立即蓄力 1 回合。保留。",
+      "upgrade": "从弃牌堆选择 1 张牌移入抽牌堆顶（回响不重复移动），手中所有蓄力牌立即蓄力 2 回合。保留。"
+    },
+    {
+      "id": "ember_retrieval",
+      "name": "余烬拾遗",
+      "owner": "shared",
+      "rarity": "rare",
+      "base": "从消耗区选择 1 张牌移入手牌（不能选择带消耗区回收效果的牌；回响不重复移动）。消耗。",
+      "upgrade": "从消耗区选择 1 张牌移入手牌（不能选择带消耗区回收效果的牌；回响不重复移动）。消耗。"
+    }
+  ],
+  "note": "所有基础/升级交叉比较。近似设计忽略数字、费用、段数、单群体、保留/消耗及角色；保留实际条件、成长资源与效果顺序。自动检查无法代替对“附送小效果”的人工定位审查。"
+}

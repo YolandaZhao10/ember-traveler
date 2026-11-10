@@ -26,6 +26,7 @@ export type StatusId =
   | 'vulnerable'
   | 'frail'
   | 'thorns'
+  | 'tempThorns'
   | 'burn'
   | 'metallicize'
   | 'barricade'
@@ -54,6 +55,7 @@ export type StatusId =
   | 'study'
   | 'comboFlow'
   | 'guardReserve'
+  | 'guardOnce'
   | 'ashInsight'
   | 'bloodDraw'
   | 'chargeMaster'
@@ -181,7 +183,8 @@ export type Intent =
   | { kind: 'debuff' }
   | { kind: 'special' }
   | { kind: 'escape' }
-  | { kind: 'defend_buff' };
+  | { kind: 'defend_buff' }
+  | { kind: 'defend_debuff' };
 
 export type EnemyAction =
   | { kind: 'attack'; amount: number; times?: number; piercing?: boolean }
@@ -194,7 +197,7 @@ export type EnemyAction =
   | { kind: 'stealGold'; amount: number }
   | { kind: 'addCardToDiscard'; cardId: string; count: number }
   | { kind: 'addCardToDraw'; cardId: string; count: number }
-  | { kind: 'clearDebuffs' };
+  | { kind: 'clearDebuffs'; keepBurnRatio?: number };
 
 export interface EnemyMove {
   id: string;

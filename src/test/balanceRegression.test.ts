@@ -54,7 +54,7 @@ describe('平衡边界回归', () => {
   });
   it.each([false, true])('吸血受实际扣血、回复上限和玩家存活约束（升级=%s）', up => {
     const cs = battle('leech_bite', up); cs.player.statuses.strength = 30;
-    const cap = up ? 8 : 6;
+    const cap = up ? 16 : 8;
     expect(playCard(cs, 'leech_bite', 'e0').state.player.hp).toBe(30 + cap);
     expect(describeCard(card('leech_bite', up), null)).toContain(`最多 ${cap} 点`);
     cs.enemies[0].block = 100;

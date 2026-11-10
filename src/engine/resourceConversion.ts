@@ -1,3 +1,4 @@
+import { clampCharge } from './constants';
 import type { Effect, Entity, PlayerCombat } from './types';
 
 export type ResourceConversion = Extract<Effect, { kind: 'convertResource' }>;
@@ -16,7 +17,7 @@ export function convertResource(p: PlayerCombat, target: Entity | null, effect: 
   } else if (resource === 'block') available = p.block;
   else if (resource === 'burn') available = target && target.hp > 0 ? target.statuses.burn ?? 0 : 0;
   else if (resource === 'tempStrength') available = Math.min(Math.max(0, p.statuses.strength ?? 0), p.statuses.strengthDown ?? 0);
-  else if (resource === 'charge') available = p.hand.reduce((n, c) => n + Math.max(0, c.bonus ?? 0), 0);
+  else if (resource === 'charge') available = p.hand.reduce((n, c) => n + clampCharge(c.bonus ?? 0), 0);
   const earned = Math.max(0, Math.min(max, Math.floor(available / per))), spent = earned * per;
   if (!spent) return 0;
   if (credit) p.turnFlags[spentKey] = (p.turnFlags[spentKey] ?? 0) + spent;
@@ -27,9 +28,9 @@ export function convertResource(p: PlayerCombat, target: Entity | null, effect: 
     p.statuses.strengthDown = (p.statuses.strengthDown ?? 0) - spent;
   } else if (resource === 'charge') {
     let left = spent;
-    for (const c of [...p.hand].sort((a, b) => (a.bonus ?? 0) - (b.bonus ?? 0))) {
-      const use = Math.min(left, Math.max(0, c.bonus ?? 0));
-      if (use) c.bonus = (c.bonus ?? 0) - use;
+    for (const c of [...p.hand].sort((a, b) => clampCharge(a.bonus ?? 0) - clampCharge(b.bonus ?? 0))) {
+      const use = Math.min(left, clampCharge(c.bonus ?? 0));
+      if (use) c.bonus = clampCharge(c.bonus ?? 0) - use;
       left -= use;
       if (!left) break;
     }

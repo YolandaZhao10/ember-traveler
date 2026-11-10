@@ -33,10 +33,10 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [46, 53], sprite: 'wind_scribe',
-    description: '将 2 张眩晕插入抽牌堆随机位置，扰乱接下来的过牌；之后轻击并为同伴增加力量，再用纸刃攻击。每四轮塞牌一次。',
+    description: '将 2 张眩晕插入抽牌堆随机位置，扰乱接下来的过牌；之后轻击并施加1回合脆弱，再用纸刃攻击。每四轮塞牌一次。',
     moves: [
       { id: 'page', name: '迷失书页', intent: 'debuff', actions: [{ kind: 'addCardToDraw', cardId: 'dazed', count: 2 }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'addCardToDraw', cardId: 'dazed', count: 2 }] },
-      { id: 'chorus', name: '风中合诵', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+      { id: 'chorus', name: '风中合诵', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
       { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
     ], chooseMove: c => cycle(c, ['page', 'chorus', 'cut', 'cut']),
   },

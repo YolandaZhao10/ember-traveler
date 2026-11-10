@@ -287,8 +287,8 @@ describe('战斗基础', () => {
       const energy = s.player.energy;
       s = playCard(s, handCard(s, 'burn_pages').uid, null).state;
       expect(s.player.exhaust.length).toBe(2); // 目标手牌与焚书自身各消耗一次
-      expect(s.player.block).toBe(8); // 两次灰烬盛宴
-      expect(enemyHp - s.enemies[0].hp).toBe(16); // 两次火种传递
+      expect(s.player.block).toBe(16); // 两次灰烬盛宴
+      expect(enemyHp - s.enemies[0].hp).toBe(24); // 两次火种传递
       expect(s.player.energy).toBe(energy + 1);
       // 焚书本身消耗、另消耗一张、骨灰坛只抽一张 → 手牌 -1 -1 +1
       expect(s.player.hand.length).toBe(handBefore - 1);
@@ -346,7 +346,7 @@ describe('战斗基础', () => {
       const e2 = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'leech_bite').uid, 'e0').state; // 7+3 = 10 吸血
       expect(e2 - s.enemies[0].hp).toBe(10);
-      expect(s.player.hp).toBe(36); // 吸血按实际伤害，普通版最多回复 6
+      expect(s.player.hp).toBe(38); // 吸血按实际伤害，普通版最多回复 8
       s = endPlayerTurn(s).state;
       expect(s.player.statuses.strength).toBe(2); // 力竭 -1
       expect(s.player.statuses.strengthDown).toBeUndefined();

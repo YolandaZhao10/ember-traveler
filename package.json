@@ -1,7 +1,7 @@
 {
   "name": "ember-traveler",
   "private": true,
-  "version": "0.1.23",
+  "version": "0.1.24",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,7 +26,8 @@
     "audit:sustain": "vite-node scripts/audit-sustain.ts",
     "audit:power-builds": "vite-node scripts/audit-power-builds.ts",
     "package:desktop": "npm run build && node scripts/package-desktop.mjs",
-    "audit:pollution": "vite-node scripts/audit-pollution.ts"
+    "audit:pollution": "vite-node scripts/audit-pollution.ts",
+    "audit:hard-final": "vite-node scripts/audit-hard-final.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

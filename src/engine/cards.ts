@@ -1,6 +1,6 @@
 import { convertResource, conversionText } from './resourceConversion';
 import { RELIC_TUNING as T } from '../data/relicBalance';
-import { EMBER_MAX } from './constants';
+import { EMBER_MAX, CHARGE_MAX, clampCharge } from './constants';
 import { CARDS } from '../data/cards';
 import { STATUSES } from '../data/statuses';
 import type { CardDef, CardInstance, Condition, Effect, Entity, PlayerCombat, Statuses } from './types';
@@ -48,7 +48,7 @@ export function viewCard(card: CardInstance): CardView {
     requireEmber: u.requireEmber ?? d.requireEmber ?? 0,
     flavor: d.flavor,
     upgraded: card.upgraded,
-    bonus: card.bonus ?? 0,
+    bonus: clampCharge(card.bonus ?? 0),
   };
 }
 
@@ -313,7 +313,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'status': {
         const name = STATUSES[e.status].name;
         const tgt = e.target === 'self' ? '' : e.target === 'all' ? '对所有敌人' : '对目标';
-        if (STATUSES[e.status].kind === 'power' && e.target === 'self') {
+        if ((STATUSES[e.status].kind === 'power' || e.status === 'guardOnce' || e.status === 'tempThorns') && e.target === 'self') {
           parts.push(STATUSES[e.status].description(e.amount).replace(/。$/, ''));
         } else if (e.target === 'self') {
           parts.push(`获得 ${e.amount} 层${name}${e.status === 'regen' ? '（回合末治疗后减少1层）' : ''}`);
@@ -407,7 +407,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
     if (view.retain) tail.push('保留');
     if (view.charge) {
       const seg = [view.charge.damage ? `伤害 +${view.charge.damage}` : '', view.charge.block ? `格挡 +${view.charge.block}` : ''].filter(Boolean).join('、');
-      tail.push(`每保留一回合${seg}${view.bonus ? `（已蓄力 ${view.bonus}）` : ''}`);
+      tail.push(`每保留一回合${seg}，最多蓄力 ${CHARGE_MAX} 层${view.bonus ? `（已蓄力 ${view.bonus}/${CHARGE_MAX}）` : ''}`);
     }
     if (view.exhaust) tail.push('消耗');
     if (view.cost < 0) tail.push('无法打出');
