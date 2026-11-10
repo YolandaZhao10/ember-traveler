@@ -389,14 +389,14 @@ def({
   tier: 'elite',
   hp: [78, 78],
   sprite: 'taxman',
-  description: '抢走金币并定期净化，账本壁垒施加2回合脆弱。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
+  description: '抢走金币并定期净化，账本壁垒施加2回合脆弱。前6回合不会逃跑，第7回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
   moves: [
     { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }] },
     { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
     { id: 'ledger', name: '账本壁垒', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
     { id: 'escape', name: '携账逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
-  chooseMove: (ctx) => ctx.enemy.turn >= 5 && chance(ctx.rng, 0.2) ? 'escape' : cycle(ctx, ['levy', 'verdict', 'ledger']),
+  chooseMove: (ctx) => ctx.enemy.turn >= 6 && chance(ctx.rng, 0.2) ? 'escape' : cycle(ctx, ['levy', 'verdict', 'ledger']),
 });
 
 def({

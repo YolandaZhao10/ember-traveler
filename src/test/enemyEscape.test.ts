@@ -10,15 +10,15 @@ const battle = (ids = ['looter'], seed = 'ESCAPE') => createCombat('escape-test'
 afterEach(() => vi.unstubAllGlobals());
 
 describe('偷钱怪逃跑', () => {
-  it.each(['looter', 'ash_taxman'])('%s前五回合绝无逃跑，第六回合起随机预告且有完整玩家回合可阻止', id => {
+  it.each([{ id: 'looter', protectedTurns: 5 }, { id: 'ash_taxman', protectedTurns: 6 }])('$id前$protectedTurns回合不逃跑，之后随机预告且有完整玩家回合可阻止', ({ id, protectedTurns }) => {
     let attempts = 0;
     for (let seed = 0; seed < 300; seed++) {
       let cs = battle([id], `ESCAPE-BOUNDARY-${seed}`);
-      for (let turn = 1; turn <= 5; turn++) {
+      for (let turn = 1; turn <= protectedTurns; turn++) {
         expect(cs.turn).toBe(turn); expect(enemyIntent(cs, cs.enemies[0])?.kind).not.toBe('escape');
         cs = endPlayerTurn(cs).state; cs = enemyAct(cs, 'e0').state; cs = startPlayerTurn(cs).state;
       }
-      expect(cs.turn).toBe(6); expect(cs.phase).toBe('player'); expect(cs.enemies[0].hp).toBeGreaterThan(0);
+      expect(cs.turn).toBe(protectedTurns + 1); expect(cs.phase).toBe('player'); expect(cs.enemies[0].hp).toBeGreaterThan(0);
       if (cs.enemies[0].moveId === 'escape') {
         attempts++;
         expect(intentText(enemyIntent(cs, cs.enemies[0])).text).toBe('逃跑');
