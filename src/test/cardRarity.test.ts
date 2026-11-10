@@ -25,7 +25,7 @@ describe('全卡表基础/升级效果审查', () => {
  it('角色配额包含资源、循环与重放牌，通用池含两张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([owner === undefined ? 22 : 20,owner === undefined ? 18 : owner === 'oathbound' ? 23 : 22,owner === undefined ? 16 : 15]);
+   expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual([owner === undefined ? 22 : owner === 'scholar' ? 21 : 20,owner === undefined ? 18 : owner === 'oathbound' || owner === 'scholar' ? 23 : 22,owner === undefined ? 16 : 15]);
   }
  });
 });

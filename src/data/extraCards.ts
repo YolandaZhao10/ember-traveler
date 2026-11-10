@@ -165,6 +165,7 @@ add('oathbound', 'rare', [
 
 // 灰语学者：回响放大组合牌，保留蓄力牌提供跨回合规划。
 add('scholar', 'common', [
+  A('echo_primer', '引声刺', 'echo', 1, [hit(6), status('echo', 1)], [hit(9), status('echo', 1)], { exhaust: true }),
   S('echo_veil', '余响护幕', 'echo', 1, [block(8), when(echo, draw(1))], [block(12), when(echo, draw(1))]),
   A('whisper_needle', '低语针', 'echo', 0, [hit(2), when(echo, ember(1))], [hit(4), when(echo, ember(1))]),
   A('reverberant_cut', '震音斩', 'echo', 1, [hit(9), { kind: 'blockPerHand', amount: 2, max: 8 }], [hit(12), { kind: 'blockPerHand', amount: 2, max: 12 }]),
@@ -181,6 +182,7 @@ add('scholar', 'common', [
   S('ink_reserve', '储墨', 'focus', 1, [block(5), ember(2), when(echo, status('energyNext', 1))], [block(8), ember(3), when(echo, status('energyNext', 1))], { retain: true }),
 ]);
 add('scholar', 'uncommon', [
+  S('echo_recall', '回声归页', 'echo', 1, [{ kind: 'moveCard', from: 'discard', to: 'draw', filter: 'action' }, status('echo', 1)], [{ kind: 'moveCard', from: 'discard', to: 'draw', filter: 'action' }, status('echo', 2)], { exhaust: true }),
   A('refracted_blade', '折光刃', 'echo', 1, [when(echo, { kind: 'doubleStatus', status: 'vulnerable' }), hit(6, { times: 2 })], [when(echo, { kind: 'doubleStatus', status: 'vulnerable' }), hit(8, { times: 2 })]),
   S('harmonic_shield', '和声盾', 'echo', 1, [block(11), when(echo, ember(3))], [block(15), when(echo, ember(4))]),
   A('resounding_bell', '鸣钟', 'echo', 2, [hit(16, { aoe: true }), when(echo, status('energyNext', 1))], [hit(22, { aoe: true }), when(echo, status('energyNext', 2))], { target: 'all_enemies' }),

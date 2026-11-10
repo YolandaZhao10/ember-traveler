@@ -5,6 +5,7 @@ import { EVENT_RELICS } from '../data/specialRelics';
 import { RELICS } from '../data/relics';
 import * as R from '../engine/run';
 import { loadRun, saveRun } from '../engine/save';
+import { makeRng } from '../engine/rng';
 import type { ChapterId, EventOutcome, RunState } from '../engine/types';
 
 function outcomes(list: EventOutcome[]): EventOutcome[] {
@@ -115,7 +116,42 @@ describe('扩展问号事件', () => {
     const upgraded = event('street_workshop'); upgraded.deck.forEach(c => c.upgraded = true);
     expect(R.eventChoiceUnavailableReason(upgraded, 'temper')).toBe('没有可升级的卡牌'); expect(R.eventChoose(upgraded, 'temper')).toBe(upgraded);
     expect(R.eventChoiceAvailable(upgraded, 'leave')).toBe(true);
-    const empty = event('lost_peddler'); empty.deck = []; expect(R.eventChoiceAvailable(empty, 'sell')).toBe(false);
+    const empty = event('lost_peddler'); empty.deck = []; expect(R.eventChoiceAvailable(empty, 'remove')).toBe(false); expect(R.eventChoiceAvailable(empty, 'relic')).toBe(true);
+  });
+  it('迷途商贩45金币删一张，赠礼不删牌、不收费，选择后不能重复领取，SL不重掷', () => {
+    const start = event('lost_peddler'); start.gold = 45;
+    const poor = { ...start, gold: 44 }; expect(R.eventChoose(poor, 'remove')).toBe(poor);
+    const paid = R.eventChoose(start, 'remove'); expect(paid.gold).toBe(0); expect(paid.event!.pendingPick).toBe('remove');
+    const removed = R.eventPickCard(paid, paid.deck[0].uid);
+    expect(removed.deck).toHaveLength(start.deck.length - 1); expect(removed.gold).toBe(0);
+    expect(R.eventPickCard(removed, removed.deck[0].uid)).toBe(removed);
+    for (let seed = 0; seed < 60; seed++) {
+      const before = event('lost_peddler', `PEDDLER-GIFT-${seed}`), gift = R.eventChoose(before, 'relic');
+      expect(gift.relics).toHaveLength(before.relics.length + 1);
+      expect(new Set(gift.relics).size).toBe(gift.relics.length);
+      expect(gift.deck).toEqual(before.deck);
+      expect(gift.event!.pendingPick).toBeNull(); expect(gift.event!.done).toBe(true);
+      // 获得遗物本身可能附送金币，赠礼选项没有收费。
+      expect(gift.gold).toBeGreaterThanOrEqual(before.gold);
+      expect(R.eventChoose(gift, 'relic')).toBe(gift);
+      expect(R.eventChoose(R.resetCurrentNode(gift), 'relic')).toEqual(gift);
+    }
+  });
+  it('迷途商贩在同等未见候选中更少出现，优先未见与轮内不重复规则仍保留', () => {
+    const base = R.newRun('PEDDLER-WEIGHT');
+    const sample = () => {
+      let count = 0;
+      for (let seed = 0; seed < 2000; seed++) {
+        const run = JSON.parse(JSON.stringify(base)); run.rng.event = makeRng(`PEDDLER-WEIGHT-${seed}`, 'e');
+        if (enter(run).event!.eventId === 'lost_peddler') count++;
+      }
+      return count;
+    };
+    const weight = EVENTS.lost_peddler.weight!;
+    expect(weight).toBeGreaterThan(0); expect(weight).toBeLessThan(1);
+    const rare = sample(); let uniform: number;
+    try { EVENTS.lost_peddler.weight = 1; uniform = sample(); } finally { EVENTS.lost_peddler.weight = weight; }
+    expect(rare).toBeGreaterThan(0); expect(rare).toBeLessThan(uniform! * .6);
   });
   it('专属遗物与升级选择刷新保持，SL恢复代价、奖励和事件历史', () => {
     storage();

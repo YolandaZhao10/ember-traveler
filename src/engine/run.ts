@@ -664,7 +664,8 @@ function startEvent(run: RunState): RunState {
   const last = run.usedEvents[run.usedEvents.length - 1];
   const candidates = pool.length > 1 ? pool.filter(e => e.id !== last) : pool;
   const least = Math.min(...candidates.map(e => counts.get(e.id) ?? 0));
-  const ev = pick(run.rng.event, candidates.filter(e => (counts.get(e.id) ?? 0) === least));
+  const ev = weightedPick(run.rng.event, candidates.filter(e => (counts.get(e.id) ?? 0) === least)
+    .map(e => ({ item: e, weight: e.weight ?? 1 })));
   run.usedEvents.push(ev.id);
   run.event = { eventId: ev.id, resolvedText: null, pendingPick: null, done: false };
   run.screen = 'event';

@@ -41,9 +41,10 @@ def({
 
 def({
   id: 'lost_peddler',
+  weight: 0.35,
   title: '迷途商贩',
   icon: '🎒',
-  text: '一个推着破车的商贩从灰雾里钻出来。「要清一清行囊吗？我收旧东西，也帮人丢东西。」',
+  text: '一个推着破车的商贩从灰雾里钻出来。「要清一清行囊吗？或者，挑件旧物带上。难得遇见旅人，这件就送你了。」',
   choices: [
     {
       id: 'remove',
@@ -53,10 +54,10 @@ def({
       outcomes: [{ kind: 'gold', amount: -45 }, { kind: 'removeCard' }],
     },
     {
-      id: 'sell',
-      label: '出售一张牌',
-      detail: '移除一张牌，获得 30 金币。',
-      outcomes: [{ kind: 'removeCard' }, { kind: 'gold', amount: 30 }],
+      id: 'relic',
+      label: '收下旅途赠礼',
+      detail: '免费获得一件随机遗物。',
+      outcomes: [{ kind: 'relic' }],
     },
     { id: 'leave', label: '离开', detail: '谢绝好意。', outcomes: [] },
   ],

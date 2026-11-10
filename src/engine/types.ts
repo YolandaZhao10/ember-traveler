@@ -323,6 +323,8 @@ export interface EventChoice {
 export interface EventDef {
   id: string;
   chapter?: ChapterId;
+  /** 同等出现次数的候选之间使用的相对权重，缺省为1。 */
+  weight?: number;
   title: string;
   text: string;
   icon: string;
