@@ -28,7 +28,7 @@ function nextTurn(input: CombatState) {
   return startPlayerTurn(cs).state;
 }
 const variants = (ids: string[]) => ids.flatMap(id => [false, true].map(upgraded => ({ id, upgraded })));
-const newlyExhausting = ['burn_pages', 'blood_rite', 'folded_ward', 'shutter_lamp', 'intimidate'];
+const newlyExhausting = ['burn_pages', 'blood_rite', 'folded_ward', 'shutter_lamp', 'intimidate', 'flex'];
 
 describe('零费资源牌的真实消耗边界', () => {
   it.each(variants(newlyExhausting))('$id 升级=$upgraded：零能量可打出，卡牌仅消耗一次并离开抽弃循环', ({ id, upgraded }) => {
@@ -97,7 +97,6 @@ describe('零费资源牌的真实消耗边界', () => {
 // 可重复零费牌必须明确审核预算；新增牌不能仅凭费用为零就绕过资源循环限制。
 const repeatBudgets: Record<string, { damage?: number[]; block?: number[]; ember?: number | number[]; strength?: number[] }> = {
   quick_stab: { damage: [3, 5], ember: 1 },
-  flex: { strength: [1, 2] },
   rally_step: { block: [3, 5], ember: 1 },
   swift_return: { damage: [5, 7], block: [4, 6] },
   charred_dart: { damage: [3, 5], block: [2, 3] },
@@ -145,7 +144,6 @@ describe('可重复零费牌的收益预算', () => {
     expect(after.player.exhaust).toHaveLength(0);
     expect(after.player.cardsPlayedThisTurn).toBe(id === 'whisper_needle' ? 4 : 3);
     if (['crimson_step', 'ember_pulse'].includes(id)) expect(after.player.hp).toBe(98);
-    if (id === 'flex') expect(nextTurn(after).player.statuses.strength ?? 0).toBe(0);
   });
 });
 

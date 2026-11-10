@@ -3,6 +3,7 @@ import { CARD_LIST, CARDS, cardAvailableTo } from '../../data/cards';
 import { CHARACTER_LIST, CHARACTERS } from '../../data/characters';
 import { archetypeName, cardTypeName, describeCard } from '../../engine/cards';
 import type { Archetype, CardDef, CardInstance, CardType, CharacterId, Rarity } from '../../engine/types';
+import { canUpgrade } from '../../engine/run';
 import { closeOverlay } from '../store';
 import { Card } from './Card';
 import { Modal } from './Common';
@@ -45,7 +46,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
 
   const pool = CARD_LIST.filter((card) => {
     if (group === 'curse' || group === 'status') return card.type === group;
-    if (card.cost < 0) return false;
+    if (card.type === 'curse' || card.type === 'status') return false;
     if (group === 'all') return true;
     return group === 'shared' ? !card.owner : cardAvailableTo(card, group) && (includeShared || card.owner === group);
   }).sort((a, b) => group === 'all' || group === 'shared' || group === 'curse' ? 0 : Number(!a.owner) - Number(!b.owner));
@@ -53,7 +54,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
   const cards = pool.filter((card) => (archetype === 'all' || card.archetype === archetype)
     && (rarity === 'all' || card.rarity === rarity)
     && (type === 'all' || card.type === type)
-    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && card.cost >= 0), null)}`.includes(query.trim()));
+    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && canUpgrade(instance(card.id))), null)}`.includes(query.trim()));
   const detail = selected ? CARDS[selected] : null;
 
   return (
@@ -64,9 +65,9 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
           <p className="subtitle">{ownerName(detail)} · {archetypeName(detail.archetype)} · {detail.name}</p>
           <div className="catalog-comparison">
             <div><h4>基础版</h4><Card card={instance(detail.id)} size="lg" showFlavor presentation /></div>
-            {detail.cost >= 0 && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation /></div>}
+            {canUpgrade(instance(detail.id)) && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation /></div>}
           </div>
-          {detail.cost < 0 && <p className="subtitle">{detail.type === 'status' ? '状态牌仅存在于本场战斗' : '诅咒牌'}，无法升级，不会作为普通奖励出现。</p>}
+          {!canUpgrade(instance(detail.id)) && <p className="subtitle">{detail.type === 'status' ? '状态牌仅存在于本场战斗' : '诅咒牌'}，无法升级，不会作为普通奖励出现。</p>}
         </div>
       ) : (
         <>
@@ -99,7 +100,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
             {cards.map((card) => (
               <button className="catalog-entry" key={card.id} data-card-id={card.id} onClick={() => showDetail(card.id)} aria-label={`查看${card.name}`}>
                 <span className="catalog-owner">{ownerName(card)}</span>
-                <Card card={instance(card.id, upgraded && card.cost >= 0)} size="sm" presentation />
+                <Card card={instance(card.id, upgraded && canUpgrade(instance(card.id)))} size="sm" presentation />
               </button>
             ))}
             {!cards.length && <p className="subtitle">没有匹配的卡牌，试试其他关键词或筛选。</p>}

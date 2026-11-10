@@ -22,7 +22,7 @@ describe('卡牌近似设计回归审查', () => {
       switch (e.kind) {
         case 'damage': case 'damageByBlock': case 'damagePerBurn': case 'consumeVulnerable': return !e.aoe;
         case 'damagePerHpLost': case 'damagePerAttack': case 'damagePerEmber': case 'consumeBurn':
-        case 'removeBlock': case 'spreadBurn': case 'blockPerBurn': case 'burnToEmber': return true;
+        case 'removeBlock': case 'spreadBurn': case 'blockPerBurn': case 'burnToEmber': case 'consumeTempStrength': return true;
         case 'emberBurst': return !!e.damagePer && !e.aoe;
         case 'exhaustHand': return !!e.damagePerCard;
         case 'doubleStatus': return e.target !== 'self';

@@ -7,8 +7,8 @@ import { makeRng } from '../engine/rng';
 import * as R from '../engine/run';
 
 const polluters = [
-  ['tomb_puppet','dust','ashes'],['rust_snail','acid','ashes'],
-  ['furnace_drone','shell','cold_ash'],['cinder_stoker','coal','cold_ash'],
+  ['tomb_puppet','dust','ashes'],['rust_snail','acid','slime'],
+  ['furnace_drone','shell','cold_ash'],['cinder_stoker','coal','scorch'],
   ['star_pilgrim','repair','exposure'],['last_warden','sheathe','doubt'],
 ];
 describe('章节敌人特色与精英比例', () => {

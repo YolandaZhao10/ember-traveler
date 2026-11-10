@@ -309,10 +309,10 @@ def({
   tier: 'normal',
   hp: [30, 34],
   sprite: 'snail',
-  description: '缩壳后喷出锈灰，造成轻伤并将 1 张灰烬塞入弃牌堆，随后碾压。',
+  description: '缩壳后喷出锈灰，造成轻伤并将 1 张黏液塞入弃牌堆，随后碾压。',
   moves: [
     { id: 'shell', name: '缩壳', intent: 'defend', actions: [{ kind: 'block', amount: 12 }] },
-    { id: 'acid', name: '锈灰喷吐', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
+    { id: 'acid', name: '锈灰喷吐', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'slime', count: 1 }] },
     { id: 'roll', name: '碾压', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['shell', 'acid', 'roll']),

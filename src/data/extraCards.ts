@@ -77,7 +77,7 @@ add('traveler', 'rare', [
 add('picker', 'common', [
   A('cinder_hook', '火钳勾击', 'cinder', 1, [when(burning, draw(1)), hit(7), status('burn', 2, 'target')], [when(burning, draw(1)), hit(10), status('burn', 3, 'target')]),
   A('charred_dart', '炭刺', 'cinder', 0, [hit(3), when(burning, block(2))], [hit(5), when(burning, block(3))]),
-  S('smoke_screen', '烟屏', 'cinder', 1, [block(6), { kind: 'blockPerBurn', amount: 1, max: 8 }, status('weak', 1, 'target')], [block(9), { kind: 'blockPerBurn', amount: 1, max: 12 }, status('weak', 1, 'target')], { target: 'enemy' }),
+  S('smoke_screen', '烟屏', 'cinder', 1, [block(6), { kind: 'blockPerBurn', amount: 1 }, status('weak', 1, 'target')], [block(9), { kind: 'blockPerBurn', amount: 1 }, status('weak', 1, 'target')], { target: 'enemy' }),
   S('tend_coals', '拨炭', 'cinder', 1, [status('burn', 4, 'target'), draw(1)], [status('burn', 5, 'target'), draw(1)], { target: 'enemy' }),
   A('scalding_sweep', '灼灰横扫', 'cinder', 1, [hit(4, { aoe: true }), status('burn', 2, 'all')], [hit(6, { aoe: true }), status('burn', 2, 'all')], { target: 'all_enemies' }),
   S('coal_wrap', '裹炭', 'cinder', 1, [block(8), when({ kind: 'emberAtLeast', value: 4 }, ember(2))], [block(11), when({ kind: 'emberAtLeast', value: 4 }, ember(2))]),
@@ -161,7 +161,7 @@ add('oathbound', 'rare', [
   A('titan_blows', '巨人连击', 'might', 3, [strength(2), hit(5, { times: 4 }), status('weak', 1, 'target')], [strength(3), hit(7, { times: 4 }), status('weak', 2, 'target')]),
   P('war_avatar', '战意化身', 'might', 1, [status('furyWard', 20)], [status('furyWard', 30)]),
   S('unstoppable_rage', '不可阻挡', 'might', 1, [lose(3), strength(6), draw(2)], [lose(3), strength(8), draw(3)], { exhaust: true }),
-  A('earthbreaker', '撼地', 'might', 2, [hit(15, { strengthMult: 1, aoe: true }), status('weak', 2, 'all')], [hit(20, { strengthMult: 1, aoe: true }), status('weak', 3, 'all')], { target: 'all_enemies' }),
+  A('earthbreaker', '撼地', 'might', 2, [hit(15, { strengthMult: 1, aoe: true })], [hit(20, { strengthMult: 1, aoe: true })], { target: 'all_enemies' }),
   P('iron_blooded', '铁血', 'might', 2, [status('temperedMight', 2)], [status('temperedMight', 3)]),
 ]);
 

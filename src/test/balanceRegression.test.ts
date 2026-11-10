@@ -52,11 +52,10 @@ describe('平衡边界回归', () => {
     const result = playCard(burning, 'ember_tongue', 'e0').state;
     expect(result.player.ember).toBe(1); expect(result.player.exhaust.map(c => c.defId)).toContain('ember_tongue');
   });
-  it.each([false, true])('吸血受实际扣血、回复上限和玩家存活约束（升级=%s）', up => {
+  it.each([false, true])('吸血撕咬不设单次治疗上限，按实际扣血回复且不能复活（升级=%s）', up => {
     const cs = battle('leech_bite', up); cs.player.statuses.strength = 30;
-    const cap = up ? 16 : 8;
-    expect(playCard(cs, 'leech_bite', 'e0').state.player.hp).toBe(30 + cap);
-    expect(describeCard(card('leech_bite', up), null)).toContain(`最多 ${cap} 点`);
+    expect(playCard(cs, 'leech_bite', 'e0').state.player.hp).toBe(30 + (up ? 40 : 37));
+    expect(describeCard(card('leech_bite', up), null)).not.toContain('最多');
     cs.enemies[0].block = 100;
     expect(playCard(cs, 'leech_bite', 'e0').state.player.hp).toBe(30);
     cs.enemies[0].block = 0; cs.enemies[0].hp = 2;
@@ -64,6 +63,34 @@ describe('平衡边界回归', () => {
     cs.player.hp = 1; cs.enemies[0].statuses.thorns = 1;
     const dead = playCard(cs, 'leech_bite', 'e0').state;
     expect(dead.player.hp).toBe(0); expect(dead.outcome).toBe('lost');
+  });
+  it.each([false, true])('吸血撕咬在回响与镜像下逐击吸血，仍只扣一次费用与移动一个实体（升级=%s）', up => {
+    const cs = battle('leech_bite', up); cs.player.maxHp = 500;
+    cs.player.statuses = { strength: 30, echo: 1, mirror: 1 };
+    const result = playCard(cs, 'leech_bite', 'e0');
+    const healed = up ? 40 : 37;
+    expect(result.events.filter(e => e.type === 'heal').map(e => e.type === 'heal' ? e.amount : 0)).toEqual([healed, healed, healed]);
+    expect(result.state.player.hp).toBe(30 + healed * 3);
+    expect(result.state.player.energy).toBe(2); expect(result.state.player.cardsPlayedThisTurn).toBe(3);
+    expect(result.state.player.discard).toEqual([card('leech_bite', up)]);
+    expect(result.state.player.statuses.echo ?? 0).toBe(0);
+    cs.player.hp = 499;
+    const full = playCard(cs, 'leech_bite', 'e0');
+    expect(full.state.player.hp).toBe(500);
+    expect(full.events.filter(e => e.type === 'heal')).toEqual([{ type: 'heal', targetId: 'player', amount: 1 }]);
+  });
+  it.each([false, true])('血誓重演回响吸血撕咬只治疗两次，重放牌消耗、被选实体回弃牌堆（升级=%s）', up => {
+    const cs = battle('oath_reenactment', up); cs.player.maxHp = 500;
+    cs.player.statuses = { strength: 30, echo: 1 };
+    cs.player.discard = [card('leech_bite', up)];
+    const result = playCard(cs, 'oath_reenactment', 'e0', 'leech_bite');
+    const healed = up ? 40 : 37;
+    expect(result.events.filter(e => e.type === 'heal').map(e => e.type === 'heal' ? e.amount : 0)).toEqual([healed, healed]);
+    expect(result.state.player.hp).toBe(30 + healed * 2);
+    expect(result.state.player.energy).toBe(up ? 2 : 1);
+    expect(result.state.player.cardsPlayedThisTurn).toBe(4);
+    expect(result.state.player.exhaust).toEqual([card('oath_reenactment', up)]);
+    expect(result.state.player.discard).toEqual([card('leech_bite', up)]);
   });
   it.each([false, true])('同费余烬爆发的单体伤害高于终夜焚天，群攻保留虚弱特色（升级=%s）', up => {
     const single = battle('ember_burst', up), aoe = battle('final_conflagration', up);

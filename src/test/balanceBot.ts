@@ -1,5 +1,6 @@
 import { RELIC_TUNING as T } from '../data/relicBalance';
 import { appliedBurn } from '../engine/burnHistory';
+import { temporaryStrength } from '../engine/resourceConversion';
 import { CARDS } from '../data/cards';
 import { calcBlock, calcDamage, viewCard } from '../engine/cards';
 import { aliveEnemies, enemyIntent, discardReplayChoices } from '../engine/combat';
@@ -24,7 +25,8 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
   for (const e of v.effects) {
     switch (e.kind) {
       case 'damage': {
-        const extra = (e.strengthMult ? (p.statuses.strength ?? 0) * e.strengthMult : 0) + (e.perHandCard ? p.hand.length * e.perHandCard : 0) + (v.charge?.damage ? v.charge.damage * v.bonus : 0);
+        const extra = (e.strengthMult ? (p.statuses.strength ?? 0) * e.strengthMult : 0) + (e.perHandCard ? p.hand.length * e.perHandCard : 0) + (v.charge?.damage ? v.charge.damage * v.bonus : 0)
+          + (e.perExhaustedCard ? Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity) : 0);
         dmg += calcDamage(e.amount, p.statuses, target?.statuses ?? null, extra) * (e.times ?? 1) * (e.aoe ? aliveEnemies(cs).length : 1);
         if (e.lifesteal) util += 2;
         break;
@@ -61,6 +63,9 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
       case 'energy':
         util += e.amount * 3;
         break;
+      case 'convertResource':
+        if (e.resource === 'ember') util += Math.min(e.max, Math.floor(p.ember / e.per)) * (e.reward === 'draw' ? 2 : 3);
+        break;
       case 'gainEmber':
         util += e.amount > 0 ? e.amount * 1.2 : 0;
         break;
@@ -85,6 +90,11 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
       case 'damagePerBurn':
         dmg += aliveEnemies(cs).reduce((s, en) => s + (en.statuses.burn ?? 0) * e.amount, 0);
         break;
+      case 'consumeTempStrength': {
+        const spent = temporaryStrength(p.statuses);
+        dmg += calcDamage(e.base + spent * e.damagePer, { ...p.statuses, strength: (p.statuses.strength ?? 0) - spent }, target?.statuses ?? null);
+        break;
+      }
       case 'consumeBurn': {
         const b = target?.statuses.burn ?? 0;
         dmg += b * e.damagePer;

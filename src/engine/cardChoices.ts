@@ -12,6 +12,7 @@ function effectRole(effect: Effect): CardRole | null {
     case 'damagePerBurn':
     case 'reapplyBurn':
     case 'consumeBurn':
+    case 'consumeTempStrength':
     case 'consumeVulnerable':
     case 'spreadBurn':
     case 'removeBlock':
@@ -52,6 +53,7 @@ function effectRole(effect: Effect): CardRole | null {
       return 'engine';
     // 失血、弃牌与普通消耗手牌可能是代价，不用它们覆盖这张牌的收益。
     case 'loseHp':
+    case 'takeDamage':
     case 'discardRandom':
     case 'conditional':
       return null;

@@ -22,10 +22,10 @@ describe('全卡表基础/升级效果审查', () => {
    if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}
   }
  });
- it('角色配额包含资源、循环与重放牌，通用池含两张转换牌与一张消耗区回收牌',()=>{
+ it('角色配额包含资源、循环与重放牌，通用池含四张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   const expected: Record<string, number[]> = { shared: [22, 18, 16], traveler: [20, 22, 15], picker: [20, 23, 15], oathbound: [22, 22, 15], scholar: [21, 23, 15] };
+   const expected: Record<string, number[]> = { shared: [22, 19, 17], traveler: [20, 22, 15], picker: [20, 23, 15], oathbound: [22, 22, 15], scholar: [21, 23, 15] };
    expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual(expected[owner ?? 'shared']);
   }
  });

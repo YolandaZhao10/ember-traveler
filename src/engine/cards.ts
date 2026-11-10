@@ -1,4 +1,4 @@
-import { convertResource, conversionText } from './resourceConversion';
+import { convertResource, conversionText, temporaryStrength } from './resourceConversion';
 import { appliedBurn, recordBurn } from './burnHistory';
 import { RELIC_TUNING as T } from '../data/relicBalance';
 import { EMBER_MAX, CHARGE_MAX, clampCharge } from './constants';
@@ -184,6 +184,9 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
   const chargeBlk = view?.charge?.block ? view.charge.block * view.bonus : 0;
   for (const e of effects) {
     switch (e.kind) {
+      case 'takeDamage':
+        parts.push(`受到 ${e.amount} 点伤害（可用格挡抵挡）`);
+        break;
       case 'damage': {
         const t = e.aoe ? '对所有敌人' : '';
         const times = e.times && e.times > 1 ? ` × ${e.times}` : '';
@@ -198,8 +201,8 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
           if (ctx) extra += Math.max(0, ctx.player.hand.length - 1) * e.perHandCard;
         }
         if (e.perExhaustedCard) {
-          notes.push(`，消耗区每张牌 +${e.perExhaustedCard}（最多 +${e.exhaustBonusMax ?? 0}）`);
-          if (ctx) extra += Math.min(ctx.player.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? 0);
+          notes.push(`，消耗区每张牌 +${e.perExhaustedCard}${e.exhaustBonusMax === undefined ? '' : `（最多 +${e.exhaustBonusMax}）`}`);
+          if (ctx) extra += Math.min(ctx.player.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity);
         }
         const healing = e.lifesteal ? `，按实际扣除的敌人生命回复生命${e.lifestealCap === undefined ? '' : `（每次命中最多 ${e.lifestealCap} 点）`}` : '';
         parts.push(`${t}造成 ${dmgText(e.amount, ctx, extra)} 点伤害${times}${notes.join('')}${healing}`);
@@ -262,8 +265,8 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`获得 ${blockText(e.amount + chargeBlk, ctx)} 点格挡`);
         break;
       case 'blockPerBurn': {
-        const current = ctx?.target ? (ctx.target.hp > 0 ? blockText(Math.min((ctx.target.statuses.burn ?? 0) * e.amount, e.max), ctx) : '0') : null;
-        parts.push(`获得等于目标燃烧层数 × ${e.amount} 的基础格挡（基础上限 ${e.max}）${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
+        const current = ctx?.target ? (ctx.target.hp > 0 ? blockText(Math.min((ctx.target.statuses.burn ?? 0) * e.amount, e.max ?? Infinity), ctx) : '0') : null;
+        parts.push(`获得等于目标燃烧层数 × ${e.amount} 的基础格挡${e.max === undefined ? '' : `（基础上限 ${e.max}）`}${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
         break;
       }
       case 'blockPerHand':
@@ -275,7 +278,13 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (ctx?.target) delete ctx.target.statuses.vulnerable;
         break;
       case 'convertResource': {
+        const beforeEmber = ctx?.player.ember;
         const earned = ctx ? convertResource(ctx.player, ctx.target, e) : null;
+        if (ctx && beforeEmber !== undefined && ctx.player.ember < beforeEmber) {
+          const spent = beforeEmber - ctx.player.ember;
+          ctx.player.ember = beforeEmber;
+          previewEmberSpend(spent);
+        }
         parts.push(conversionText(e) + (earned === null ? '' : `（当前 ${earned}）`));
         break;
       }
@@ -379,6 +388,17 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`消耗目标所有燃烧：每层获得 ${e.amount} 点余烬（基础上限 ${e.max} 点）${current !== null ? `（当前获得 ${current} 点余烬）` : ''}`);
         break;
       }
+      case 'consumeTempStrength': {
+        let current = '';
+        if (ctx) {
+          const spent = temporaryStrength(ctx.player.statuses);
+          ctx.player.statuses.strength = (ctx.player.statuses.strength ?? 0) - spent;
+          ctx.player.statuses.strengthDown = (ctx.player.statuses.strengthDown ?? 0) - spent;
+          current = `（当前消耗 ${spent} 点，造成 ${dmgText(e.base + spent * e.damagePer, ctx, chargeDmg)} 点伤害）`;
+        }
+        parts.push(`消耗全部临时力量：造成 ${e.base} 点基础伤害，每消耗 1 点额外 +${e.damagePer} 伤害${current}`);
+        break;
+      }
       case 'consumeBurn': {
         const cur = ctx?.target ? `（当前 ${dmgText((ctx.target.statuses.burn ?? 0) * e.damagePer, ctx)}）` : '';
         parts.push(`移除目标所有燃烧，每层造成 ${e.damagePer} 点伤害${cur}`);
@@ -428,8 +448,12 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
     }
     if (view.exhaust) tail.push('消耗');
     if (view.cost < 0) tail.push('无法打出');
-    if (view.ethereal) tail.push('占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）');
-    if (view.handEndEffects.length) tail.push(`回合结束时，若仍在手中：${describeEffects(view.handEndEffects, null).replace(/。$/, '')}`);
+    if (view.type === 'status') {
+      if (view.cost >= 0 && view.effects.length === 0) tail.push('打出以清除此状态牌');
+      tail.push('仅本场战斗');
+    }
+    if (view.ethereal && !view.handEndEffects.length) tail.push('占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）');
+    if (view.handEndEffects.length) tail.push(`回合结束时，若仍在手中：${describeEffects(view.handEndEffects, null).replace(/。$/, '')}${view.ethereal ? '，然后自动消耗（优先于保留）' : ''}`);
     if (tail.length) text = (text ? text + '。' : '') + tail.join('。');
   }
   return text ? text + '。' : '';

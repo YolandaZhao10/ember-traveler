@@ -26,10 +26,20 @@ const PALETTE: Record<Archetype, { bg1: string; bg2: string; fg: string; glow: s
 function Glyph({ id, type, fg }: { id: string; type: CardType; fg: string }) {
   const s = { fill: 'none', stroke: fg, strokeWidth: 3, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (id) {
+    case 'coal_page_search':
+      return <g {...s}><path d="M25 22 H61 L75 36 V78 H25 Z M61 22 V36 H75 M35 45 H63 M35 57 H54 M35 68 H48" /><path d="M60 49 C72 61 79 72 65 78 C54 78 54 66 60 49 Z" /></g>;
+    case 'ember_bellows':
+      return <g {...s}><path d="M24 30 L65 43 V62 L24 76 Z M27 43 L59 49 M27 59 L59 56 M65 46 L84 42 V62 L65 59 M21 21 L30 33 M21 85 L30 74" /></g>;
     case 'rekindle_history':
       return <g {...s}><path d="M25 47 A29 29 0 1 1 27 72 M25 47 V27 M25 47 H43" /><path d="M51 27 C58 44 72 49 63 66 C56 80 36 70 38 57 C39 48 48 43 51 27 Z M50 55 Q42 68 53 70" /></g>;
     case 'dazed':
       return <path d="M66 51 C67 29 34 27 31 49 C27 76 73 82 80 50 C87 15 25 11 18 49 M43 51 C43 39 60 40 59 51 C58 61 45 61 43 54" {...s} />;
+    case 'scorch':
+      return <g {...s}><path d="M48 18 C55 37 77 42 72 63 C67 85 28 82 26 61 C24 48 39 37 48 18 Z M48 49 C41 60 39 69 51 72 C63 71 60 60 48 49 Z" /><path d="M21 25 L28 31 M76 21 L70 29" /></g>;
+    case 'slime':
+      return <g {...s}><path d="M23 65 C24 51 35 47 37 34 C40 14 60 16 63 35 C66 51 78 50 79 66 C77 84 23 84 23 65 Z" /><circle cx="43" cy="53" r="3" /><circle cx="60" cy="57" r="4" /></g>;
+    case 'tangle':
+      return <g {...s}><path d="M21 23 C76 13 82 66 41 76 C10 84 16 37 56 34 C89 30 82 83 25 78 M20 49 L80 51 M50 19 L48 83" /></g>;
     case 'strike':
     case 'quick_stab':
       return <path d="M30 70 L70 30 M62 30 H70 V38 M30 62 L38 70" {...s} />;

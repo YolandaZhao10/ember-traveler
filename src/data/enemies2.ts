@@ -36,10 +36,10 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'cinder_stoker', name: '添火侍从', tier: 'normal', hp: [37, 42], sprite: 'cinder_stoker',
-    description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张冷灰塞入弃牌堆，再挥钳。每四次行动强化一次。',
+    description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张灼伤塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
-      { id: 'coal', name: '扬起冷灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }], hardActions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'coal', name: '扬起热灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }], hardActions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }] },
       { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),

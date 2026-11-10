@@ -80,9 +80,9 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   let cs=use(battle(['blood_pact','blood_edge']),'blood_pact');cs.player.hp=2;const draw=cs.player.draw.length;
   cs=use(cs,'blood_edge');expect(cs.outcome).toBe('lost');expect(cs.player.draw).toHaveLength(draw);
  });
- it('狂力的临时力量要先打，再打多段；回合结束全部临时部分消退',()=>{
+ it('狂暴先提供临时力量，再由力量碾压兑现单体伤害',()=>{
   let cs=battle(['frenzy','overpower']);cs=use(cs,'frenzy');const hp=cs.enemies[0].hp;cs=use(cs,'overpower');
-  expect(hp-cs.enemies[0].hp).toBe(20);expect(endPlayerTurn(cs).state.player.statuses.strength??0).toBe(0);
+  expect(hp-cs.enemies[0].hp).toBe(24);expect(cs.player.statuses.strengthDown??0).toBe(0);expect(endPlayerTurn(cs).state.player.statuses.strength??0).toBe(0);
  });
  it('回响先给下一张防护或爆发准备复制，能力部署不消耗回响',()=>{
   let cs=battle(['echo_card','mirror','echo_blade']);cs=use(cs,'echo_card');expect(cs.player.block).toBe(5);

@@ -645,7 +645,7 @@ export function restRefine(input: RunState, cardUid: string): RunState {
 }
 
 export function canUpgrade(card: CardInstance): boolean {
-  return !card.upgraded && CARDS[card.defId].cost >= 0;
+  return !card.upgraded && CARDS[card.defId].cost >= 0 && !['curse', 'status'].includes(CARDS[card.defId].type);
 }
 
 // ---------- 事件 ----------

@@ -28,8 +28,9 @@ describe('高压开场与第三章首领', () => {
     const sequence = [];
     for (let i = 0; i < 4; i++) {
       sequence.push(cs.enemies[0].moveId); const intent = enemyIntent(cs, cs.enemies[0]);
+      cs = endPlayerTurn(cs).state; // 状态牌在回合末造成的伤害不属于敌人的攻击预告。
       const before = cs.player.hp;
-      cs = enemyAct(endPlayerTurn(cs).state, 'e0').state;
+      cs = enemyAct(cs, 'e0').state;
       expect(before - cs.player.hp).toBe(intent?.kind === 'attack' || intent?.kind === 'attack_debuff' ? intent.amount * intent.times : 0);
       cs = startPlayerTurn(cs).state;
     }

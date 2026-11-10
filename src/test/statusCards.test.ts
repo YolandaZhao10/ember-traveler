@@ -69,15 +69,15 @@ describe('眩晕与后期塞牌', () => {
     }
   });
   it.each([
-    ['star_moth', 'dust', 'discard', 2], ['wind_scribe', 'page', 'draw', 2],
-    ['orrery_keeper', 'mist', 'discard', 2], ['eclipse_archon', 'veil', 'draw', 2],
-    ['last_warden', 'seal', 'draw', 2], ['nightless_lord', 'wall', 'discard', 3],
+    ['star_moth', 'dust', 'discard', 2], ['wind_scribe', 'page', 'draw', 1],
+    ['orrery_keeper', 'mist', 'discard', 1], ['eclipse_archon', 'veil', 'draw', 1],
+    ['last_warden', 'seal', 'draw', 1], ['nightless_lord', 'wall', 'discard', 1],
   ] as const)('%s的%s将眩晕放入%s，数量%s且重复调用不复制', (id, move, pile, count) => {
     const cs = battle(id); cs.enemies[0].moveId = move;
     cs.player.draw = Array.from({ length: 6 }, (_, i) => card('strike', `old-${i}`));
     const input = endPlayerTurn(cs).state, result = enemyAct(input, 'e0');
     expect(result.state.player[pile].filter(c => c.defId === 'dazed')).toHaveLength(count);
-    expect(result.state.player.draw.filter(c => c.defId !== 'dazed')).toEqual(cs.player.draw);
+    expect(result.state.player.draw.filter(c => !['dazed','scorch','slime','tangle'].includes(c.defId))).toEqual(cs.player.draw);
     expect(enemyAct(result.state, 'e0').state).toBe(result.state);
     expect(enemyAct(input, 'e0')).toEqual(result);
     const cards = [...result.state.player.draw, ...result.state.player.discard];
@@ -91,7 +91,7 @@ describe('眩晕与后期塞牌', () => {
     }
     const cs = battle(); cs.difficulty = encounterDifficulty(64, 'boss');
     cs.enemies[0].moveId = 'page';
-    expect(enemyAct(endPlayerTurn(cs).state, 'e0').state.player.draw.filter(c => c.defId === 'dazed')).toHaveLength(2);
+    expect(enemyAct(endPlayerTurn(cs).state, 'e0').state.player.draw.filter(c => ['dazed','tangle'].includes(c.defId))).toHaveLength(2);
   });
   it('刷新与SL保持插牌位置，战后永久牌组不带走眩晕', () => {
     let run = R.newRun('STATUS-SAVE'); run = R.travelTo(run, run.map.startIds[0]);

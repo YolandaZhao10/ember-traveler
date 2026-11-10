@@ -82,6 +82,7 @@ export type Effect =
   | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number }
   | { kind: 'damagePerHpLost'; mult: number }
   | { kind: 'loseHp'; amount: number }
+  | { kind: 'takeDamage'; amount: number }
   | { kind: 'tempStrength'; amount: number }
   | { kind: 'doubleEmber' }
   | { kind: 'discardRandom'; count: number | 'all' }
@@ -91,13 +92,13 @@ export type Effect =
   | { kind: 'damagePerAttack'; amount: number }
   | { kind: 'damagePerEmber'; amount: number; per?: number }
   | { kind: 'block'; amount: number }
-  | { kind: 'blockPerBurn'; amount: number; max: number }
+  | { kind: 'blockPerBurn'; amount: number; max?: number }
   | { kind: 'blockPerHand'; amount: number; max: number }
   | { kind: 'consumeVulnerable'; damagePer: number; aoe?: boolean }
   | { kind: 'draw'; amount: number }
   | { kind: 'moveCard'; from: 'draw' | 'discard' | 'exhaust'; to: 'hand' | 'draw' | 'discard'; filter?: 'attack' | 'skill' | 'action' | 'exhaust'; sample?: number }
   | { kind: 'retainHand' }
-  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge'; per: number; max: number; reward: 'draw' | 'energy' }
+  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; max: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number }
@@ -110,6 +111,7 @@ export type Effect =
   | { kind: 'spreadBurn' }
   | { kind: 'burnToEmber'; amount: number; max: number }
   | { kind: 'consumeBurn'; damagePer: number }
+  | { kind: 'consumeTempStrength'; base: number; damagePer: number }
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
   | { kind: 'replayDiscard' }
   | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
@@ -126,7 +128,7 @@ export interface CardDef {
   cost: number;
   target: TargetMode;
   effects: Effect[];
-  /** 回合结束时仍在手中的诅咒，在减益递减后触发。 */
+  /** 回合结束时仍在手中的诅咒或状态牌，在减益递减后触发。 */
   handEndEffects?: Effect[];
   exhaust?: boolean;
   /** 回合结束时仍在手中则自动消耗，优先于保留。 */

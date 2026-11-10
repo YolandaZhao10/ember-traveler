@@ -39,12 +39,13 @@ add('common', [
   A('lantern_flash', '灯闪', 1, [hit(6), status('vulnerable', 1, 'target'), when(coals(3), block(4))], [hit(9), status('vulnerable', 1, 'target'), when(coals(3), block(6))]),
   S('warm_cloak', '炽边斗篷', 1, [block(6), when(coals(3), status('burn', 2, 'all'))], [block(9), when(coals(3), status('burn', 3, 'all'))]),
   A('fanning_strike', '扇火斩', 1, [hit(8), when(coals(2), ember(-2), discard(1), draw(2))], [hit(11), when(coals(2), ember(-2), discard(1), draw(3))]),
-  S('ration_bite', '一口干粮', 0, [heal(3)], [heal(5)], { exhaust: true }),
+  S('ration_bite', '一口干粮', 0, [discard(1), heal(6)], [discard(1), heal(8)], { exhaust: true }),
   S('banked_spark', '守住火种', 1, [block(7), when(coals(4), status('energyNext', 1))], [block(10), when(coals(4), status('energyNext', 1))], { retain: true }),
   S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))]),
   A('sling_volley', '连掷火石', 2, [hit(3, { times: 4 }), when(coals(5), status('energyNext', 1))], [hit(4, { times: 4 }), when(coals(5), status('energyNext', 2))]),
 ]);
 add('uncommon', [
+  S('coal_page_search', '炭中寻页', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'draw' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'draw' }], { requireEmber: 2, exhaust: true }),
   S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, exhaust: true }),
   A('firestorm', '火雨', 2, [ember(-2), hit(10, { aoe: true }), status('burn', 3, 'all')], [ember(-2), hit(14, { aoe: true }), status('burn', 4, 'all')], { target: 'all_enemies', requireEmber: 2 }),
   S('insulated_coat', '隔热外衣', 2, [block(18), ember(2), status('regen', 1)], [block(24), ember(3), status('regen', 2)], { exhaust: true }),
@@ -60,6 +61,7 @@ add('uncommon', [
   A('sharpened_coal', '淬炭刃', 1, [hit(8), status('strength', 1)], [hit(12), status('strength', 1)], { exhaust: true }),
 ]);
 add('rare', [
+  S('ember_bellows', '烬炉鼓风', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'energy' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'energy' }], { requireEmber: 2, exhaust: true }),
   P('crown_of_sparks', '火星冠冕', 2, [status('sparkCrown', 4)], [status('sparkCrown', 6)]),
   A('final_conflagration', '终夜焚天', 2, [{ kind: 'emberBurst', damagePer: 4, aoe: true }, { kind: 'status', status: 'weak', amount: 1, target: 'all' }], [{ kind: 'emberBurst', damagePer: 5, aoe: true }, { kind: 'status', status: 'weak', amount: 2, target: 'all' }], { target: 'all_enemies' }),
   A('smoldering_star', '闷燃之星', 2, [hit(18), when(coals(8), status('burn', 8, 'target'), status('vulnerable', 2, 'target'))], [hit(22), when(coals(8), status('burn', 12, 'target'), status('vulnerable', 3, 'target'))]),

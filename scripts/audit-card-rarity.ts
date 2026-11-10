@@ -47,7 +47,7 @@ function fight(cs: CombatState) {
 const probes = probeEveryCard();
 const failures = probes.filter(p => p.invalid || p.allowed !== p.played).map(p => `${p.id}/${p.upgraded}/${p.context}: effect probe`);
 const rows = [];
-if (!process.argv.includes('--probes-only')) for (const def of CARD_LIST.filter(c => c.cost >= 0 && (!arg('--only') || arg('--only')!.split(',').includes(c.id)))) {
+if (!process.argv.includes('--probes-only')) for (const def of CARD_LIST.filter(c => c.cost >= 0 && c.type !== 'status' && (!arg('--only') || arg('--only')!.split(',').includes(c.id)))) {
  const owner = def.owner ?? 'traveler', ch = CHARACTERS[owner];
  for (const upgraded of [false,true]) for (const group of [false,true]) {
   // 每张牌使用同流派的相同六张支持牌；只有两个候选位升级，其他牌保持基础版。

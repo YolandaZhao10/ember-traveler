@@ -32,13 +32,13 @@ describe('新增21个遗物的真实触发', () => {
   });
   it('炭灰袋与灵种每回合仅第一次消耗触发，窑芯需要至少两张', () => {
     let cs = battle(['coal_pouch', 'phoenix_ash', 'kiln_spark'], ['pick_up', 'bone_ash']);
-    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(1);
+    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(3);
     expect(endPlayerTurn(cs).state.enemies[0].statuses.burn ?? 0).toBe(0);
-    cs = play(cs, 'bone_ash'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(1);
+    cs = play(cs, 'bone_ash'); expect(cs.player.hp).toBe(61); expect(cs.player.ember).toBe(3);
     cs = endPlayerTurn(cs).state; expect(cs.enemies[0].statuses.burn).toBe(2);
     expect(endPlayerTurn(cs).state).toBe(cs);
     cs = startPlayerTurn(cs).state; cs.player.hand.push({ uid: 'again', defId: 'pick_up', upgraded: false });
-    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(62); expect(cs.player.ember).toBe(2);
+    cs = play(cs, 'pick_up'); expect(cs.player.hp).toBe(62); expect(cs.player.ember).toBe(6);
   });
   it('烟灰面罩需要存活燃烧敌人，格挡在新回合清除之后获得', () => {
     let cs = battle(['soot_mask']); expect(cs.player.block).toBe(0);

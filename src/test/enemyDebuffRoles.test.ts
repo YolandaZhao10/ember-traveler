@@ -44,11 +44,11 @@ describe('单次攻击敌人的削弱整备',()=>{
     expect(cs.player.statuses.vulnerable??0).toBe(0);
     const before=cs.player.hp;expect(before-enemyAct(cs,'e0').state.player.hp).toBe(6);
   });
-  it('困难添火侍从塞冷灰同时施加一回合脆弱，标准只塞牌',()=>{
+  it('困难添火侍从塞灼伤同时施加一回合脆弱，标准只塞牌',()=>{
     for(const hard of [false,true]) {
       let cs=battle('cinder_stoker',hard);cs.enemies[0].moveId='coal';cs=enemyAct(endPlayerTurn(cs).state,'e0').state;
       expect(cs.player.statuses.frail??0).toBe(hard?1:0);expect(cs.enemies[0].statuses.strength??0).toBe(0);
-      expect(cs.player.discard.map(c=>c.defId)).toEqual(['cold_ash']);
+      expect(cs.player.discard.map(c=>c.defId)).toEqual(['scorch']);
     }
   });
 });

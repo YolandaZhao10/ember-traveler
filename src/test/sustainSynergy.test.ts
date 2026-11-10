@@ -80,7 +80,7 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  });
  it('回生甲按实际治疗计算，每回合有上限，满血和致死失血无收益',()=>{
   let cs=use(battle(),'crimson_mail',up);cs.player.block=0;
-  cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(10);
+  cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(16);
   for(let i=0;i<6;i++)cs=use(cs,'ration_bite',true);
   expect(cs.player.block).toBe(up?30:20);
   cs=next(cs);cs.player.hp=cs.player.maxHp;cs=use(cs,'ration_bite',true);expect(cs.player.block).toBe(0);
@@ -88,12 +88,12 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  });
  it('铁血需要临时力量与两次攻击；等待回合不会自动叠力量',()=>{
   let cs=use(battle(),'iron_blooded',up);cs=next(cs);expect(cs.player.statuses.strength??0).toBe(0);
-  cs.player.energy=20;cs=use(cs,'flex',true);cs=use(cs,'strike');cs=use(cs,'strike');
-  expect(cs.player.statuses.strengthDown??0).toBe(0);cs=endPlayerTurn(cs).state;expect(cs.player.statuses.strength).toBe(2);
+  cs.player.energy=20;cs=use(cs,'frenzy');cs=use(cs,'strike');cs=use(cs,'strike');
+  expect(cs.player.statuses.strengthDown).toBe(up?1:2);cs=endPlayerTurn(cs).state;expect(cs.player.statuses.strength).toBe(up?3:2);
  });
  it('战意化身仅临时力量起甲，永久力量不生效，每回合封顶',()=>{
   let cs=use(battle(),'war_avatar',up);cs=use(cs,'inflame');expect(cs.player.block).toBe(0);
-  for(let i=0;i<8;i++)cs=use(cs,'flex',true);expect(cs.player.block).toBe(up?30:20);
+  for(let i=0;i<8;i++)cs=use(cs,'frenzy');expect(cs.player.block).toBe(up?30:20);
  });
  it('先锋誓言需要攻守配对，每回合最多两对，回响同类不白送收益',()=>{
   let cs=use(battle(),'vanguard_oath',up);cs=use(cs,'strike');cs=use(cs,'strike');expect(cs.player.block).toBe(0);

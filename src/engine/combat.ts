@@ -1,4 +1,4 @@
-import { convertResource, conversionText } from './resourceConversion';
+import { convertResource, conversionText, temporaryStrength } from './resourceConversion';
 import { appliedBurn, recordBurn } from './burnHistory';
 import { cardTransferChoices, cardTransferEffect, type CardTransfer } from './cardTransfer';
 import { CARDS } from '../data/cards';
@@ -933,12 +933,16 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
   for (const e of effects) {
     if (cs.outcome !== 'ongoing') return;
     switch (e.kind) {
+      case 'takeDamage':
+        dealDamage(cs, p, e.amount, ev, 'burn');
+        if (p.hp <= 0) finishLost(cs, ev);
+        break;
       case 'damage': {
         const times = e.times ?? 1;
         let extra = chargeDmg;
         if (e.strengthMult) extra += (p.statuses.strength ?? 0) * e.strengthMult;
         if (e.perHandCard) extra += p.hand.length * e.perHandCard;
-        if (e.perExhaustedCard) extra += Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? 0);
+        if (e.perExhaustedCard) extra += Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity);
         for (let i = 0; i < times; i++) {
           const ts = targets(e.aoe);
           if (ts.length === 0) break;
@@ -1047,7 +1051,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       }
       case 'blockPerBurn':
         for (const t of targets(false)) {
-          const b = calcBlock(Math.min((t.statuses.burn ?? 0) * e.amount, e.max), p.statuses);
+          const b = calcBlock(Math.min((t.statuses.burn ?? 0) * e.amount, e.max ?? Infinity), p.statuses);
           gainBlock(p, b, ev, cs);
           log(cs, ev, `借助 ${t.name} 的燃烧获得 ${b} 点格挡`);
         }
@@ -1071,11 +1075,16 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       case 'convertResource': {
         const beforeBurn = target?.statuses.burn ?? 0, beforeStrength = p.statuses.strength ?? 0;
+        const beforeEmber = p.ember;
         const earned = convertResource(p, target ?? null, e);
+        if (p.ember < beforeEmber) {
+          ev.push({ type: 'ember', amount: p.ember - beforeEmber, total: p.ember });
+          onEmberSpent(beforeEmber - p.ember);
+        }
         if (e.reward === 'draw') drawCards(cs, earned, ev);
         else p.energy += earned;
-        if (target && beforeBurn !== (target.statuses.burn ?? 0)) ev.push({ type: 'status', targetId: target.id, status: 'burn', amount: (target.statuses.burn ?? 0) - beforeBurn });
-        if (beforeStrength !== (p.statuses.strength ?? 0)) ev.push({ type: 'status', targetId: p.id, status: 'strength', amount: (p.statuses.strength ?? 0) - beforeStrength });
+        if (e.resource === 'burn' && target && beforeBurn !== (target.statuses.burn ?? 0)) ev.push({ type: 'status', targetId: target.id, status: 'burn', amount: (target.statuses.burn ?? 0) - beforeBurn });
+        if (e.resource === 'tempStrength' && beforeStrength !== (p.statuses.strength ?? 0)) ev.push({ type: 'status', targetId: p.id, status: 'strength', amount: (p.statuses.strength ?? 0) - beforeStrength });
         log(cs, ev, `${conversionText(e)}；本次${e.reward === 'draw' ? '抽牌' : '获得能量'} ${earned}`);
         break;
       }
@@ -1212,6 +1221,17 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           const before = p.ember;
           gainEmber(cs, Math.min(layers * e.amount, e.max), ev, true);
           log(cs, ev, `消耗 ${t.name} 的 ${layers} 层燃烧，获得 ${p.ember - before} 点余烬`);
+        }
+        break;
+      case 'consumeTempStrength':
+        for (const t of targets(false)) {
+          const spent = temporaryStrength(p.statuses);
+          if (spent) {
+            addStatus(p, 'strength', -spent, ev);
+            addStatus(p, 'strengthDown', -spent, ev);
+          }
+          const r = hit(e.base + spent * e.damagePer, t, chargeDmg);
+          log(cs, ev, `消耗 ${spent} 点临时力量，对 ${t.name} 造成 ${r.lost} 点生命伤害`);
         }
         break;
       case 'consumeBurn': {
@@ -1410,7 +1430,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
     if (cs.outcome !== 'ongoing') break;
     const cv = viewCard(c);
     if (cv.handEndEffects.length) {
-      log(cs, ev, `诅咒「${cv.name}」触发`);
+      log(cs, ev, `${cv.type === 'status' ? '状态牌' : '诅咒'}「${cv.name}」触发`);
       resolveEffects(cs, cv.handEndEffects, null, ev, 0, cv);
     }
   }

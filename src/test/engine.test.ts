@@ -33,9 +33,9 @@ describe('内容数量', () => {
     expect(defs.filter((e) => e.tier === 'boss').length).toBeGreaterThanOrEqual(1);
     expect(EVENT_LIST.length).toBeGreaterThanOrEqual(6);
   });
-  it('每张非诅咒卡都有可区分的升级版本', () => {
+  it('每张可升级卡都有可区分的升级版本', () => {
     for (const c of CARD_LIST) {
-      if (c.cost < 0) continue;
+      if (c.cost < 0 || c.type === 'status') continue;
       const a = describeCard(card(c.id), null) + viewCard(card(c.id)).cost;
       const b = describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost;
       expect(b, c.id).not.toEqual(a);
@@ -327,13 +327,14 @@ describe('战斗基础', () => {
     const mk = (deck: CardInstance[], enemies: string[], relics: string[], ch: 'oathbound' | 'scholar' | 'traveler' = 'traveler') =>
       createCombat('t', enemies, 'normal', deck, 60, 60, relics, makeRng('x', 'c'), 0, ch).state;
 
-    it('血誓印、失去生命触发血契与铁颅、临时力量回合结束消失、吸血', () => {
+    it('血誓印、失去生命触发血契与铁颅、蓄力临时力量消耗、吸血', () => {
       let s = mk([card('blood_pact'), card('flex'), card('blood_edge'), card('leech_bite'), card('strike')], ['rubble_golem'], ['blood_seal', 'iron_skull'], 'oathbound');
       expect(s.player.hp).toBe(58);
       expect(s.player.statuses.strength).toBe(1);
       s = playCard(s, handCard(s, 'blood_pact').uid, null).state;
-      s = playCard(s, handCard(s, 'flex').uid, null).state; // +1 临时
-      expect(s.player.statuses.strength).toBe(2);
+      s = playCard(s, handCard(s, 'flex').uid, null).state; // +1临时力量与2余烬
+      expect(s.player.hp).toBe(58); expect(s.player.statuses.strength).toBe(2);
+      expect(s.player.exhaust.some(c => c.defId === 'flex')).toBe(true);
       const hpBefore = s.player.hp;
       const ehp = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'blood_edge').uid, 'e0').state; // 失去 2 → 血契 +1 力量（先于伤害）→ 14+3=17
@@ -346,9 +347,9 @@ describe('战斗基础', () => {
       const e2 = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'leech_bite').uid, 'e0').state; // 7+3 = 10 吸血
       expect(e2 - s.enemies[0].hp).toBe(10);
-      expect(s.player.hp).toBe(38); // 吸血按实际伤害，普通版最多回复 8
+      expect(s.player.hp).toBe(40); // 吸血按实际扣血回复，不设单次治疗上限
       s = endPlayerTurn(s).state;
-      expect(s.player.statuses.strength).toBe(2); // 力竭 -1
+      expect(s.player.statuses.strength).toBe(2); // 永久力量跨回合保留
       expect(s.player.statuses.strengthDown).toBeUndefined();
     });
 

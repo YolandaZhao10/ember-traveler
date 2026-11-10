@@ -8,7 +8,7 @@ import { STATUSES } from '../../data/statuses';
 import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName, previewEnemyAttack } from '../../engine/combat';
 import { calcBlock, describeCard } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
-import { sortedDeck } from '../../engine/run';
+import { canUpgrade, sortedDeck } from '../../engine/run';
 import type { CardInstance, CombatState, EnemyState, EnemyAction } from '../../engine/types';
 import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
@@ -81,8 +81,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
             <Card card={overlay.card} size="lg" showFlavor />
             <div className="info">
               <p>点击卡牌外区域关闭。</p>
-              <p>升级后的版本：</p>
-              {!overlay.card.upgraded && <Card card={{ ...overlay.card, upgraded: true }} size="sm" showFlavor />}
+              {canUpgrade(overlay.card) && <><p>升级后的版本：</p><Card card={{ ...overlay.card, upgraded: true }} size="sm" showFlavor /></>}
               {overlay.card.upgraded && <p className="subtitle">（已升级）</p>}
             </div>
           </div>

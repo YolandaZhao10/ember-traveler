@@ -102,7 +102,7 @@ describe('常规与角色专属遗物的强度边界和差异', () => {
     cs = play(cs, 'pick_up', 'second');
     expect(cs.player.draw.length).toBe(afterFirst - 1); // 只来自拾取本身
     expect(cs.player.statuses.frail).toBe(1);
-    expect(cs.player.ember).toBe(1);
+    expect(cs.player.ember).toBe(5); // 两张拾取各2，炭筛仅首次1
     expect(cs.player.block).toBe(0);
     expect(cs.enemies[0].statuses.weak).toBe(1);
   });

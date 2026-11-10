@@ -538,13 +538,13 @@ def({
   target: 'self',
   exhaust: true,
   effects: [
-    { kind: 'gainEmber', amount: 1 },
-    { kind: 'draw', amount: 1 },
+    { kind: 'discardRandom', count: 1 },
+    { kind: 'gainEmber', amount: 4 },
   ],
   upgrade: {
     effects: [
-      { kind: 'gainEmber', amount: 2 },
-      { kind: 'draw', amount: 1 },
+      { kind: 'discardRandom', count: 1 },
+      { kind: 'gainEmber', amount: 6 },
     ],
   },
 });
@@ -728,8 +728,8 @@ def({
   cost: 0,
   target: 'self',
   exhaust: true,
-  effects: [{ kind: 'draw', amount: 1 }],
-  upgrade: { effects: [{ kind: 'draw', amount: 2 }] },
+  effects: [{ kind: 'draw', amount: 1 }, { kind: 'gainEmber', amount: 2 }],
+  upgrade: { effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 3 }] },
   flavor: '别人不要的，我要。',
 });
 def({
@@ -760,8 +760,8 @@ def({
   cost: 1,
   target: 'enemy',
   exhaust: true,
-  effects: [{ kind: 'damage', amount: 18, perExhaustedCard: 2, exhaustBonusMax: 12 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 25, perExhaustedCard: 3, exhaustBonusMax: 18 }] },
+  effects: [{ kind: 'damage', amount: 18, perExhaustedCard: 2 }],
+  upgrade: { effects: [{ kind: 'damage', amount: 25, perExhaustedCard: 3 }] },
 });
 def({
   id: 'ash_feast',
@@ -894,8 +894,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 7, lifesteal: true, lifestealCap: 8 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true, lifestealCap: 16 }] },
+  effects: [{ kind: 'damage', amount: 7, lifesteal: true }],
+  upgrade: { effects: [{ kind: 'damage', amount: 10, lifesteal: true }] },
 });
 def({
   id: 'blood_pact',
@@ -988,8 +988,9 @@ def({
   owner: 'oathbound',
   cost: 0,
   target: 'self',
-  effects: [{ kind: 'tempStrength', amount: 1 }],
-  upgrade: { effects: [{ kind: 'tempStrength', amount: 2 }] },
+  exhaust: true,
+  effects: [{ kind: 'tempStrength', amount: 1 }, { kind: 'gainEmber', amount: 2 }],
+  upgrade: { effects: [{ kind: 'tempStrength', amount: 2 }, { kind: 'gainEmber', amount: 3 }] },
 });
 def({
   id: 'inflame',
@@ -1024,8 +1025,8 @@ def({
   owner: 'oathbound',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 8, strengthMult: 2 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 11, strengthMult: 2 }] },
+  effects: [{ kind: 'consumeTempStrength', base: 8, damagePer: 4 }],
+  upgrade: { effects: [{ kind: 'consumeTempStrength', base: 11, damagePer: 5 }] },
   flavor: '力量越大，责任越小。',
 });
 def({
@@ -1094,7 +1095,7 @@ def({
   upgrade: {
     effects: [
       { kind: 'loseHp', amount: 3 },
-      { kind: 'damage', amount: 7, times: 2, aoe: true },
+      { kind: 'damage', amount: 5, times: 3, aoe: true },
       { kind: 'tempStrength', amount: 3 },
     ],
   },
@@ -1387,6 +1388,21 @@ def({
   id: 'dazed', name: '眩晕', type: 'status', rarity: 'status', archetype: 'status',
   cost: -1, target: 'none', effects: [], ethereal: true, upgrade: {},
   flavor: '星光残影遮住视线，静息之后便会散去。仅存在于本场战斗。',
+});
+def({
+  id: 'scorch', name: '灼伤', type: 'status', rarity: 'status', archetype: 'status',
+  cost: -1, target: 'none', effects: [], handEndEffects: [{ kind: 'takeDamage', amount: 2 }],
+  ethereal: true, upgrade: {}, flavor: '留一点盾，挡住灰中的余热。',
+});
+def({
+  id: 'slime', name: '黏液', type: 'status', rarity: 'status', archetype: 'status',
+  cost: 1, target: 'self', effects: [], exhaust: true, upgrade: {},
+  flavor: '花费一点能量清除，或让它暂时留在循环里。',
+});
+def({
+  id: 'tangle', name: '缠缚', type: 'status', rarity: 'status', archetype: 'status',
+  cost: 0, target: 'self', effects: [{ kind: 'discardRandom', count: 1 }], exhaust: true, upgrade: {},
+  flavor: '解开结时，先把重要的牌用掉。',
 });
 
 EXTRA_CHARACTER_CARDS.forEach(def);

@@ -59,6 +59,6 @@ export function rarityProbe(id: string, upgraded: boolean, context: RarityContex
   };
 }
 export function probeEveryCard() {
-  return CARD_LIST.flatMap(c => (c.cost < 0 ? [false] : [false, true]).flatMap(upgraded =>
+  return CARD_LIST.flatMap(c => (c.cost < 0 || c.type === 'status' ? [false] : [false, true]).flatMap(upgraded =>
     RARITY_CONTEXTS.map(context => rarityProbe(c.id, upgraded, context))));
 }

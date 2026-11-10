@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { describeCard, viewDef } from '../engine/cards';
 import { createCombat, endPlayerTurn, playCard, startPlayerTurn } from '../engine/combat';
 import { makeRng } from '../engine/rng';
+import { BLOCK_MAX } from '../engine/constants';
 import type { CardInstance } from '../engine/types';
 const card = (defId: string, upgraded = false, uid = defId): CardInstance => ({ uid, defId, upgraded });
 function battle(id: string, up = false) {
@@ -15,16 +16,28 @@ function battle(id: string, up = false) {
 function played(id: string, up = false) { return playCard(battle(id, up), id, 'e0').state; }
 
 describe('差异化卡牌的实际取舍', () => {
-  it.each([false, true])('骨灰按当前消耗区成长且封顶，不提前计入自己（升级=%s）', up => {
+  it.each([false, true])('骨灰按当前消耗区成长且无额外伤害上限，不提前计入自己（升级=%s）', up => {
     const naked = played('bone_ash', up);
     expect(1000 - naked.enemies[0].hp).toBe(up ? 25 : 18);
     const cs = battle('bone_ash', up); cs.player.exhaust = Array.from({ length: 20 }, (_, i) => card('ashes', false, `x${i}`));
     cs.player.statuses = { strength: 2, weak: 1 }; cs.enemies[0].statuses.vulnerable = 1;
     const snapshot = JSON.stringify(cs);
     const text = describeCard(cs.player.hand[0], {player:cs.player,target:cs.enemies[0],relics:[],isFirstAttack:true,crescendoBonus:0});
-    const damage = Math.floor(Math.floor(((up ? 43 : 30) + 2) * .75) * 1.5);
+    const damage = Math.floor(Math.floor(((up ? 25 + 20 * 3 : 18 + 20 * 2) + 2) * .75) * 1.5);
     expect(text).toContain(`造成 ${damage} 点伤害`); expect(JSON.stringify(cs)).toBe(snapshot);
-    expect(1000 - playCard(cs,'bone_ash','e0').state.enemies[0].hp).toBe(damage);
+    expect(text).not.toContain('最多');
+    const after = playCard(cs,'bone_ash','e0').state;
+    expect(1000 - after.enemies[0].hp).toBe(damage);
+    expect(after.player.exhaust).toHaveLength(21);
+  });
+  it.each([false, true])('骨灰回响两次按原消耗区结算，实体只在两次攻击后消耗（升级=%s）', up => {
+    const cs = battle('bone_ash', up); cs.player.statuses.echo = 1;
+    cs.player.exhaust = Array.from({ length: 30 }, (_, i) => card('ashes', false, `x${i}`));
+    const result = playCard(cs, 'bone_ash', 'e0');
+    const expected = up ? 115 : 78;
+    expect(result.events.filter(e => e.type === 'damage').map(e => e.type === 'damage' ? e.amount : 0)).toEqual([expected, expected]);
+    expect(result.state.player.exhaust).toHaveLength(31);
+    expect(result.state.player.energy).toBe(9);
   });
   it.each([false,true])('碎骨返能和威吓斩控制需要力量达标（升级=%s）', up => {
     for (const strength of [2,3]) {
@@ -50,11 +63,29 @@ describe('差异化卡牌的实际取舍', () => {
     const after = playCard(cs,'woven_words',null).state;
     expect(after.player.hand).toHaveLength(10); expect(after.player.block).toBe(Math.floor(((up?16:12)+2)*.75));
   });
-  it('烟屏用燃烧支撑防御，零燃烧不白得额外格挡', () => {
-    expect(played('smoke_screen').player.block).toBe(6);
-    const cs = battle('smoke_screen'); cs.enemies[0].statuses.burn = 30;
-    const after = playCard(cs,'smoke_screen','e0').state;
-    expect(after.player.block).toBe(14); expect(after.enemies[0].statuses.burn).toBe(30);
+  it.each([false, true])('烟屏燃烧转格挡无卡牌上限，只读取所选敌人的当前燃烧（升级=%s）', up => {
+    for (const burn of [0, 30, 1000]) {
+      const cs = battle('smoke_screen', up); cs.enemies[0].statuses.burn = burn;
+      cs.enemies[0].burnApplied = 2000; cs.enemies[1].statuses.burn = 500;
+      const snapshot = structuredClone(cs);
+      const text = describeCard(cs.player.hand[0], { player:cs.player,target:cs.enemies[0],relics:[],isFirstAttack:false,crescendoBonus:0 });
+      expect(text).not.toContain('上限'); expect(text).toContain(`当前 ${burn} 点格挡`);
+      expect(cs).toEqual(snapshot);
+      const after = playCard(cs,'smoke_screen','e0').state;
+      expect(after.player.block).toBe((up ? 9 : 6) + burn);
+      expect(after.enemies[0].statuses).toMatchObject({ burn, weak: 1 });
+      expect(after.enemies[1].statuses.weak).toBeUndefined();
+    }
+  });
+  it.each([false, true])('烟屏仍正确修正敏捷/脆弱，回响重放，角色总格挡遵循9999边界（升级=%s）', up => {
+    const cs = battle('smoke_screen', up); cs.player.statuses = { dexterity: 2, frail: 1, echo: 1 };
+    cs.enemies[0].statuses.burn = 40;
+    const after = playCard(cs, 'smoke_screen', 'e0').state;
+    expect(after.player.block).toBe((Math.floor(((up ? 9 : 6) + 2) * .75) + 31) * 2);
+    expect(after.enemies[0].statuses.weak).toBe(2); expect(after.player.energy).toBe(9);
+    cs.player.block = BLOCK_MAX - 1;
+    const capped = playCard(cs, 'smoke_screen', 'e0').state;
+    expect(capped.player.block).toBe(BLOCK_MAX); expect(capped.player.blockGainedThisTurn).toBe(1);
   });
   it('折光刃以回响放大已有易伤，鸣钟为下回合蓄能', () => {
     const cs = battle('refracted_blade'); cs.player.statuses.echo = 1; cs.enemies[0].statuses.vulnerable = 2;
