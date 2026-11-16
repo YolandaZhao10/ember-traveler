@@ -4,6 +4,7 @@ import { temporaryStrength } from '../engine/resourceConversion';
 import { CARDS } from '../data/cards';
 import { calcBlock, calcDamage, usesHpFallback, viewCard } from '../engine/cards';
 import { aliveEnemies, enemyIntent, discardReplayChoices } from '../engine/combat';
+import { signatureCount } from '../engine/signature';
 import type { CardInstance, CombatState } from '../engine/types';
 
 export function incomingDamage(cs: CombatState): number {
@@ -28,7 +29,8 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
     switch (e.kind) {
       case 'damage': {
         const extra = (e.strengthMult ? (p.statuses.strength ?? 0) * e.strengthMult : 0) + (e.perHandCard ? p.hand.length * e.perHandCard : 0) + (v.charge?.damage ? v.charge.damage * v.bonus : 0)
-          + (e.perExhaustedCard ? Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity) : 0);
+          + (e.perExhaustedCard ? Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity) : 0)
+          + (e.perSignature ? Math.min(signatureCount(p) * e.perSignature, e.signatureMax ?? Infinity) : 0);
         dmg += calcDamage(e.amount, p.statuses, target?.statuses ?? null, extra) * (e.times ?? 1) * (e.aoe ? aliveEnemies(cs).length : 1);
         if (e.lifesteal) util += 2;
         break;
@@ -70,6 +72,7 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         break;
       case 'gainEmber':
         util += e.amount > 0 ? (e.amount + (v.charge?.ember ?? 0) * v.bonus) * 1.2 : 0;
+        if (e.perSignature) util += Math.min(signatureCount(p) * e.perSignature, e.signatureMax ?? Infinity) * 1.2;
         break;
       case 'status':
         util += e.target === 'self' ? 5 : 3;

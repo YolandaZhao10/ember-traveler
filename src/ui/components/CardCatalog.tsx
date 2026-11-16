@@ -50,11 +50,13 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
     if (group === 'all') return true;
     return group === 'shared' ? !card.owner : cardAvailableTo(card, group) && (includeShared || card.owner === group);
   }).sort((a, b) => group === 'all' || group === 'shared' || group === 'curse' ? 0 : Number(!a.owner) - Number(!b.owner));
+  // 角色页按该角色的招牌动作措辞；全部、通用等页面没有角色上下文，用通用说法。
+  const voice: CharacterId | null = CHARACTER_LIST.some(c => c.id === group) ? group as CharacterId : null;
   const routes = [...new Set(pool.map((card) => card.archetype))];
   const cards = pool.filter((card) => (archetype === 'all' || card.archetype === archetype)
     && (rarity === 'all' || card.rarity === rarity)
     && (type === 'all' || card.type === type)
-    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && canUpgrade(instance(card.id))), null)}`.includes(query.trim()));
+    && `${card.name} ${archetypeName(card.archetype)} ${describeCard(instance(card.id, upgraded && canUpgrade(instance(card.id))), null, voice)}`.includes(query.trim()));
   const detail = selected ? CARDS[selected] : null;
 
   return (
@@ -64,8 +66,8 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
           <button className="btn small ghost" onClick={() => setSelected(null)}>← 返回图鉴</button>
           <p className="subtitle">{ownerName(detail)} · {archetypeName(detail.archetype)} · {detail.name}</p>
           <div className="catalog-comparison">
-            <div><h4>基础版</h4><Card card={instance(detail.id)} size="lg" showFlavor presentation /></div>
-            {canUpgrade(instance(detail.id)) && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation /></div>}
+            <div><h4>基础版</h4><Card card={instance(detail.id)} size="lg" showFlavor presentation character={voice} /></div>
+            {canUpgrade(instance(detail.id)) && <div><h4>升级版</h4><Card card={instance(detail.id, true)} size="lg" showFlavor presentation character={voice} /></div>}
           </div>
           {!canUpgrade(instance(detail.id)) && <p className="subtitle">{detail.type === 'status' ? '状态牌仅存在于本场战斗' : '诅咒牌'}，无法升级，不会作为普通奖励出现。</p>}
         </div>
@@ -100,7 +102,7 @@ export function CardCatalog({ initialCharacter }: { initialCharacter?: Character
             {cards.map((card) => (
               <button className="catalog-entry" key={card.id} data-card-id={card.id} onClick={() => showDetail(card.id)} aria-label={`查看${card.name}`}>
                 <span className="catalog-owner">{ownerName(card)}</span>
-                <Card card={instance(card.id, upgraded && canUpgrade(instance(card.id)))} size="sm" presentation />
+                <Card card={instance(card.id, upgraded && canUpgrade(instance(card.id)))} size="sm" presentation character={voice} />
               </button>
             ))}
             {!cards.length && <p className="subtitle">没有匹配的卡牌，试试其他关键词或筛选。</p>}

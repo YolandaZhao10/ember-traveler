@@ -1,6 +1,6 @@
 import type { CardDef, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback' | 'kindred'> & { target?: CardDef['target']; upgradeCost?: number };
 type Entry = Omit<CardDef, 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -74,4 +74,21 @@ add('rare', [
   S('sunward_step', '向阳而行', 1, [block(12), { kind: 'discardRandom', count: 'all' }, draw(4)], [block(16), { kind: 'discardRandom', count: 'all' }, draw(5)], { exhaust: true }),
   S('sealed_flame', '封存烈火', 0, [ember(5), status('energyNext', 1)], [ember(7), status('energyNext', 2)], { retain: true, exhaust: true }),
   A('twilight_flame', '暮火裁决', 2, [hit(20), status('weak', 2, 'target'), status('vulnerable', 2, 'target')], [hit(27), status('weak', 3, 'target'), status('vulnerable', 3, 'target')]),
+]);
+
+// 共鸣牌：按当前角色本回合的招牌动作次数结算（定义见 characters.ts），四个角色各有自己的触发方式。
+// 给能量的分支与旅途誓火每回合各只生效一次，回响、镜像或取回后再次打出也不例外。
+const kin = (value: number): Condition => ({ kind: 'signatureThisTurnAtLeast', value });
+add('common', [
+  A('kindred_spark', '火种共鸣', 1, [hit(5, { perSignature: 3, signatureMax: 12 })], [hit(8, { perSignature: 3, signatureMax: 12 })], { kindred: true }),
+]);
+add('uncommon', [
+  S('kindred_afterglow', '同源余火', 1, [block(6), { kind: 'gainEmber', amount: 0, perSignature: 1, signatureMax: 4 }], [block(9), { kind: 'gainEmber', amount: 0, perSignature: 1, signatureMax: 4 }], { kindred: true }),
+]);
+add('rare', [
+  S('kindred_refrain', '余烬回声', 0,
+    [{ kind: 'conditional', cond: kin(3), then: [energy(2)], else: [ember(2)], oncePerTurn: 'kindredRefrain' }],
+    [{ kind: 'conditional', cond: kin(2), then: [energy(2)], else: [ember(2)], oncePerTurn: 'kindredRefrain' }], { exhaust: true, kindred: true }),
+  P('kindred_vow', '旅途誓火', 1, [status('kindredVow', 1)], [status('kindredVow', 1)], { upgradeCost: 0, kindred: true }),
+  A('kindred_dawn', '黎明前夜', 2, [hit(12, { aoe: true }), when(kin(4), hit(12, { aoe: true }), ember(3))], [hit(16, { aoe: true }), when(kin(4), hit(12, { aoe: true }), ember(3))], { target: 'all_enemies', kindred: true }),
 ]);

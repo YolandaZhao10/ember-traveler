@@ -6,7 +6,7 @@ import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
 import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName, previewEnemyAttack } from '../../engine/combat';
-import { calcBlock, describeCard } from '../../engine/cards';
+import { calcBlock, describeCard, statusDescription } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { canUpgrade, sortedDeck } from '../../engine/run';
 import type { CardInstance, CombatState, EnemyState, EnemyAction } from '../../engine/types';
@@ -96,7 +96,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
       const def = STATUSES[overlay.status];
       return (
         <Modal title={`${def.name} · ${overlay.ownerName}`} onClose={closeOverlay}>
-          <p>{def.description(overlay.amount)}</p>
+          <p>{statusDescription(overlay.status, overlay.amount, run.character)}</p>
           {overlay.detail && <p>{overlay.detail}</p>}
           <p className="subtitle">
             {def.kind === 'debuff' ? '负面状态' : def.kind === 'buff' ? '增益状态' : '持续能力'}

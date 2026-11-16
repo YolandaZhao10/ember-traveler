@@ -1,10 +1,11 @@
 import { RELICS } from '../../data/relics';
 import { STATUSES } from '../../data/statuses';
 import { statusEntries } from '../../engine/combat';
-import type { Intent, PowerInstance, Statuses } from '../../engine/types';
+import { statusDescription } from '../../engine/cards';
+import type { CharacterId, Intent, PowerInstance, Statuses } from '../../engine/types';
 import { openOverlay } from '../store';
 
-export function StatusChips({ statuses, ownerName, powers = [] }: { statuses: Statuses; ownerName: string; powers?: PowerInstance[] }) {
+export function StatusChips({ statuses, ownerName, powers = [], character }: { statuses: Statuses; ownerName: string; powers?: PowerInstance[]; character?: CharacterId }) {
   const entries = statusEntries(statuses).filter(({ id }) => !powers.some(p => p.status === id));
   return (
     <div className="statuses">
@@ -25,7 +26,7 @@ export function StatusChips({ statuses, ownerName, powers = [] }: { statuses: St
               e.stopPropagation();
               openOverlay({ kind: 'status', status: id, amount, ownerName });
             }}
-            title={def.description(amount)}
+            title={statusDescription(id, amount, character)}
           >
             {def.name}
             {def.id !== 'barricade' && <b>{amount}</b>}

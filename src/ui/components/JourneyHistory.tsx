@@ -30,7 +30,7 @@ export function JourneyHistory() {
         {selected.score ? <JourneyScore score={selected.score} /> : selected.outcome === 'won' && <p className="subtitle">此旧记录未保存评分。</p>}
         <h4>结束时的牌组 · {selected.deck.reduce((n,c) => n + c.count, 0)} 张</h4>
         <div className="cardgrid history-deck">{selected.deck.map((c, i) => <div className="history-card" key={`${c.defId}-${c.upgraded}`}>
-          {CARDS[c.defId] ? <Card card={{ defId: c.defId, upgraded: c.upgraded, uid: `record-${i}` }} size="sm" presentation /> : <span>{RETIRED_CARDS[c.defId] ? `${RETIRED_CARDS[c.defId].name}${c.upgraded ? '+' : ''}（已移除）` : `${c.defId}${c.upgraded ? '+' : ''}`}</span>}<b>× {c.count}</b>
+          {CARDS[c.defId] ? <Card card={{ defId: c.defId, upgraded: c.upgraded, uid: `record-${i}` }} size="sm" presentation character={selected.character} /> : <span>{RETIRED_CARDS[c.defId] ? `${RETIRED_CARDS[c.defId].name}${c.upgraded ? '+' : ''}（已移除）` : `${c.defId}${c.upgraded ? '+' : ''}`}</span>}<b>× {c.count}</b>
         </div>)}</div>
         <h4>持有遗物 · {selected.relics.length} 件</h4>
         <div className="history-relics">{selected.relics.map(id => <span key={id} title={RELICS[id]?.description}>{RELICS[id]?.icon} {RELICS[id]?.name ?? id}</span>)}</div>

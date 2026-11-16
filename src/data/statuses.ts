@@ -1,4 +1,5 @@
 import type { StatusDef, StatusId } from '../engine/types';
+import { kindredVowText } from '../engine/signature';
 
 export const STATUSES: Record<StatusId, StatusDef> = {
   emberBastion: { id: 'emberBastion', name: '燃料壁垒', kind: 'power', description: n => `每回合结束时，若至少有 3 点余烬，自动消耗 3 点并获得 ${n} 格挡；不足则不触发。` },
@@ -21,6 +22,8 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   guardOnce: { id: 'guardOnce', name: '守夜准备', kind: 'buff', description: n => `下回合开始时额外保留最多 ${n} 点已有格挡，然后移除此状态；不会凭空获得格挡。` },
   guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
   ashInsight: { id: 'ashInsight', name: '灰中启示', kind: 'power', description: n => `每回合生效后的前 2 次消耗，每次抽 ${n} 张牌。` },
+  // 状态提示没有角色上下文时用通用说法；卡面与战斗内提示按当前角色改写。
+  kindredVow: { id: 'kindredVow', name: '旅途誓火', kind: 'power', description: n => kindredVowText(n) },
   emberOath: { id: 'emberOath', name: '烬血誓约', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，获得 ${n} 点余烬。` },
   bloodDraw: { id: 'bloodDraw', name: '血之筹码', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，抽 ${n} 张牌。` },
   chargeMaster: { id: 'chargeMaster', name: '凝神', kind: 'power', description: n => `保留的蓄力牌额外蓄力 ${n} 层；每回合首张蓄力 ≥2 的牌返还固定 1 能量。` },

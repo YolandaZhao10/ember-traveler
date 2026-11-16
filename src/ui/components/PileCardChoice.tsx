@@ -15,7 +15,7 @@ export function PileCardChoice({ cardUid }: { cardUid: string }) {
   const confirm = () => { if (choice && !busy) void playCardDirect(cardUid, null, choice.uid); };
   if (!cs || !source) return null;
   return <Modal title={`${viewCard(source).name} · 选择卡牌`} onClose={closeOverlay} wide>
-    <p className="subtitle">{describeCard(source, null)}</p>
+    <p className="subtitle">{describeCard(source, null, run?.character)}</p>
     <p className="subtitle">确认时支付 {viewCard(source).cost} 能量。选择只移动一张原牌，不视为打出；后续抽牌照常结算。</p>
     <PileChoices cards={choices} selectedUid={choiceUid} onPick={setChoiceUid} onConfirm={confirm} onCancel={closeOverlay} canConfirm={!!choice} busy={busy} />
     <div className="upgrade-actions">

@@ -2,6 +2,8 @@ import { convertResource, conversionText, temporaryStrength } from './resourceCo
 import { appliedBurn, recordBurn } from './burnHistory';
 import { cardTransferChoices, cardTransferEffect, type CardTransfer } from './cardTransfer';
 import { CARDS } from '../data/cards';
+import { CHARACTERS, type SignatureDef } from '../data/characters';
+import { KINDRED_VOW_AT, signatureCount } from './signature';
 import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
 import { RELICS } from '../data/relics';
@@ -161,6 +163,25 @@ function gainEmber(cs: CombatState, amount: number, ev: CombatEvent[], fromCard:
   }
 }
 
+/**
+ * 记录本回合的招牌动作。只有当前角色自己的动作计数；lost 用于血誓者单次大额失血的加权。
+ * 旅途誓火在计数首次达到门槛时触发，每回合一次。
+ */
+function addSignature(cs: CombatState, ev: CombatEvent[], kind: SignatureDef['kind'], lost = 0) {
+  const p = cs.player;
+  const def = CHARACTERS[cs.character].signature;
+  if (def.kind !== kind) return;
+  const before = signatureCount(p);
+  const after = before + (def.heavy && lost >= def.heavy.atLeast ? def.heavy.weight : def.weight);
+  p.turnFlags.signature = after;
+  if (p.statuses.kindredVow && !p.turnFlags.kindredVow && before < KINDRED_VOW_AT && after >= KINDRED_VOW_AT && p.hp > 0 && cs.outcome === 'ongoing') {
+    p.turnFlags.kindredVow = 1;
+    p.energy += p.statuses.kindredVow;
+    drawCards(cs, p.statuses.kindredVow, ev);
+    log(cs, ev, `旅途誓火：获得 ${p.statuses.kindredVow} 点能量并抽 ${p.statuses.kindredVow} 张牌`);
+  }
+}
+
 /** 玩家因卡牌失去生命（无视格挡），触发血契 / 猩红护甲 / 铁颅 */
 function playerLoseHp(cs: CombatState, amount: number, ev: CombatEvent[], fromCard: boolean) {
   const p = cs.player;
@@ -174,6 +195,7 @@ function playerLoseHp(cs: CombatState, amount: number, ev: CombatEvent[], fromCa
     p.selfHpLost += lost;
     p.turnFlags.cardHpLost = (p.turnFlags.cardHpLost ?? 0) + lost;
     log(cs, ev, `失去 ${lost} 点生命`);
+    if (lost > 0) addSignature(cs, ev, 'cardHpLoss', lost);
     if (lost > 0 && p.hp > 0 && p.statuses.bloodDraw && !p.turnFlags.bloodDraw) {
       p.turnFlags.bloodDraw = 1;
       drawCards(cs, p.statuses.bloodDraw, ev);
@@ -307,6 +329,7 @@ function exhaustCard(cs: CombatState, card: CardInstance, ev: CombatEvent[], ran
   ev.push({ type: 'cardRemoved', card: { ...card }, destination: 'exhaust', random });
   p.turnFlags.exhausted = (p.turnFlags.exhausted ?? 0) + 1;
   log(cs, ev, `「${viewCard(card).name}」被消耗`);
+  addSignature(cs, ev, 'exhaust');
   if (p.hp > 0 && cs.outcome === 'ongoing' && p.statuses.ashInsight && (p.turnFlags.ashInsight ?? 0) < 2) {
     p.turnFlags.ashInsight = (p.turnFlags.ashInsight ?? 0) + 1;
     drawCards(cs, p.statuses.ashInsight, ev);
@@ -725,10 +748,11 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   log(cs, ev, `打出「${v.name}」${target ? ` → ${target.name}` : ''}`);
 
   // 每次实际重放都独立结算一次出牌计数与触发；费用和实体卡去向仍只处理一次。
-  const finishPlay = (v: CardView, releaseCharge: boolean) => {
+  const finishPlay = (v: CardView, releaseCharge: boolean, guarded: boolean) => {
     // 计数
     p.cardsPlayedThisTurn += 1;
     if (v.type === 'attack') p.attacksPlayedThisTurn += 1;
+    if (v.type === 'attack' && guarded) addSignature(cs, ev, 'guardedAttack');
     if (cs.outcome === 'ongoing' && p.hp > 0) {
       if (v.type === 'attack' && p.attacksPlayedThisTurn === 3 && p.statuses.comboFlow) {
         p.energy += p.statuses.comboFlow;
@@ -806,6 +830,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     }
   };
   const resolvePlay = (v: CardView, target: EnemyState | null, releaseCharge: boolean) => {
+    // 是否持盾以打出这一刻为准，本牌自己获得的格挡不算。
+    const guarded = p.block > 0;
     let extraDamage = 0;
     if (v.type === 'attack') {
       if (p.attacksPlayedThisTurn === 0 && cs.relics.includes('flint')) {
@@ -821,7 +847,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       playerLoseHp(cs, v.hpFallback, ev, true);
     }
     resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer, hpPaid);
-    finishPlay(v, releaseCharge);
+    finishPlay(v, releaseCharge, guarded);
     handleEnemyDeaths(cs, ev);
   };
   const resolveSource = () => {
@@ -840,6 +866,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       !!p.statuses.chargeMaster && !!selected.charge && selected.bonus >= 2 && !p.turnFlags.chargeMaster);
   };
   resolveSource();
+  // 学者：手动打出蓄力不少于 2 层的牌计一次；之后每次完成的回响或镜像重放另计。
+  if (v.charge && v.bonus >= 2) addSignature(cs, ev, 'replayOrCharged');
 
   // 只读取本次手动出牌之前的回响。重放获得的新回响留给下一张牌，不能递归复制。
   if (v.type !== 'power' && cs.outcome === 'ongoing') {
@@ -870,6 +898,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       triggerRelics(cs, 'echo', ev);
       resolveSource();
       p.turnFlags.resolvedCopies = (p.turnFlags.resolvedCopies ?? 0) + 1;
+      addSignature(cs, ev, 'replayOrCharged');
       if (p.hp > 0 && cs.outcome === 'ongoing' && p.statuses.repriseStudy) {
         p.turnFlags.repriseStudy = (p.turnFlags.repriseStudy ?? 0) + 1;
         if (p.turnFlags.repriseStudy === 2) { drawCards(cs, p.statuses.repriseStudy, ev); p.energy += 1; }
@@ -955,6 +984,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         if (e.strengthMult) extra += (p.statuses.strength ?? 0) * e.strengthMult;
         if (e.perHandCard) extra += p.hand.length * e.perHandCard;
         if (e.perExhaustedCard) extra += Math.min(p.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity);
+        if (e.perSignature) extra += Math.min(signatureCount(p) * e.perSignature, e.signatureMax ?? Infinity);
         for (let i = 0; i < times; i++) {
           const ts = targets(e.aoe);
           if (ts.length === 0) break;
@@ -1135,7 +1165,8 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         // 生命代付时本牌的余烬消耗整项跳过，也不触发消耗余烬的联动。
         if (e.amount < 0 && skipEmberCost) break;
         const before = p.ember;
-        gainEmber(cs, e.amount > 0 ? e.amount + chargeEmber : e.amount, ev, e.amount > 0);
+        const amount = (e.amount > 0 ? e.amount + chargeEmber : e.amount) + (e.perSignature ? Math.min(signatureCount(p) * e.perSignature, e.signatureMax ?? Infinity) : 0);
+        gainEmber(cs, amount, ev, amount > 0);
         onEmberSpent(before - p.ember);
         break;
       }
@@ -1293,7 +1324,13 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         break;
       }
       case 'conditional':
-        if (checkCondition(e.cond, p, target, view?.bonus ?? 0)) resolveEffects(cs, e.then, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined, transfer);
+        {
+          // 每回合一次的分支用完后改走 else；回响、镜像或取回后再次打出都共用同一个回合计数。
+          const met = checkCondition(e.cond, p, target, view?.bonus ?? 0) && !(e.oncePerTurn && p.turnFlags[`once:${e.oncePerTurn}`]);
+          if (met && e.oncePerTurn) p.turnFlags[`once:${e.oncePerTurn}`] = 1;
+          const branch = met ? e.then : e.else;
+          if (branch) resolveEffects(cs, branch, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined, transfer);
+        }
         break;
     }
   }

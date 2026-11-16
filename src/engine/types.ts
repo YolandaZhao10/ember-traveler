@@ -64,7 +64,7 @@ export type StatusId =
   | 'vanguardCycle' | 'patientGuard' | 'drawNext'
   | 'emberConduit' | 'ashRecall' | 'burningRelay' | 'sparkCrown'
   | 'chargedEcho' | 'repriseStudy' | 'retainedWard' | 'emberBastion'
-  | 'arcaneWard' | 'emberOath';
+  | 'arcaneWard' | 'emberOath' | 'kindredVow';
 
 export type Condition =
   | { kind: 'strengthAtLeast'; value: number }
@@ -76,10 +76,12 @@ export type Condition =
   | { kind: 'lostHpThisTurn' }
   | { kind: 'charged'; value: number }
   | { kind: 'exhaustedThisTurn' }
-  | { kind: 'hasEcho' };
+  | { kind: 'hasEcho' }
+  /** 本回合招牌动作计数达到 value；具体动作由角色定义 */
+  | { kind: 'signatureThisTurnAtLeast'; value: number };
 
 export type Effect =
-  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number }
+  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number; /** 本回合每次招牌动作计数的加伤及其上限 */ perSignature?: number; signatureMax?: number }
   | { kind: 'damagePerHpLost'; mult: number }
   | { kind: 'loseHp'; amount: number }
   | { kind: 'takeDamage'; amount: number }
@@ -101,7 +103,7 @@ export type Effect =
   | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; max: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
-  | { kind: 'gainEmber'; amount: number }
+  | { kind: 'gainEmber'; amount: number; /** 本回合每次招牌动作计数额外获得的余烬及其上限 */ perSignature?: number; signatureMax?: number }
   | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean; /** 不随余烬变化的基础伤害，与每点余烬加成合并为一次命中 */ base?: number }
   | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
   | { kind: 'heal'; amount: number }
@@ -115,7 +117,8 @@ export type Effect =
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
   | { kind: 'replayDiscard' }
   | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
-  | { kind: 'conditional'; cond: Condition; then: Effect[] };
+  /** else 在条件不满足时结算；oncePerTurn 为回合内计数键：then 每回合只生效一次，之后改走 else */
+  | { kind: 'conditional'; cond: Condition; then: Effect[]; else?: Effect[]; oncePerTurn?: string };
 
 export interface CardDef {
   id: string;
@@ -138,6 +141,8 @@ export interface CardDef {
   /** 每保留一回合，伤害 / 格挡 / 获得的余烬增加；max 为低于全局上限的单牌蓄力上限 */
   charge?: { damage?: number; block?: number; ember?: number; max?: number };
   requireEmber?: number;
+  /** 共鸣牌：效果按当前角色的招牌动作计数结算，奖励加权时一并提高 */
+  kindred?: boolean;
   /** 余烬不足 requireEmber 时仍可打出：改为失去这么多生命，并跳过本次余烬消耗。 */
   hpFallback?: number;
   flavor?: string;

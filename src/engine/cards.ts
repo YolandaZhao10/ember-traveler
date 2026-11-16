@@ -4,7 +4,8 @@ import { RELIC_TUNING as T } from '../data/relicBalance';
 import { EMBER_MAX, CHARGE_MAX, clampCharge } from './constants';
 import { CARDS } from '../data/cards';
 import { STATUSES } from '../data/statuses';
-import type { CardDef, CardInstance, Condition, Effect, Entity, PlayerCombat, Statuses } from './types';
+import { kindredVowText, signatureCount, signatureEachText, signatureReachedText } from './signature';
+import type { CardDef, CardInstance, CharacterId, Condition, Effect, Entity, PlayerCombat, StatusId, Statuses } from './types';
 
 /** 当前卡牌（含升级）生效的定义视图 */
 export interface CardView {
@@ -103,10 +104,17 @@ export function checkCondition(cond: Condition, p: PlayerCombat, target: Entity 
       return p.cardsPlayedThisTurn >= cond.value;
     case 'hasBlock':
       return p.block > 0;
+    case 'signatureThisTurnAtLeast':
+      return signatureCount(p) >= cond.value;
   }
 }
 
-function condText(cond: Condition): string {
+/** 状态提示：涉及招牌动作的状态按当前角色写出具体动作。 */
+export function statusDescription(status: StatusId, amount: number, character?: CharacterId | null): string {
+  return status === 'kindredVow' ? kindredVowText(amount, character) : STATUSES[status].description(amount);
+}
+
+function condText(cond: Condition, character?: CharacterId | null): string {
   switch (cond.kind) {
     case 'strengthAtLeast': return `若力量 ≥ ${cond.value}`;
     case 'exhaustedThisTurn': return '若本回合消耗过牌';
@@ -125,6 +133,8 @@ function condText(cond: Condition): string {
       return '若本回合失去过生命';
     case 'hasEcho':
       return '若拥有回响';
+    case 'signatureThisTurnAtLeast':
+      return `若本回合${signatureReachedText(character, cond.value)}`;
   }
 }
 
@@ -160,7 +170,8 @@ function emberSpendAmount(ctx: DescribeContext | null): number | null {
   return e;
 }
 
-export function describeEffects(effects: Effect[], ctx: DescribeContext | null, view?: CardView): string {
+/** character 决定招牌动作的具体写法；缺省（图鉴等）时用通用说法。 */
+export function describeEffects(effects: Effect[], ctx: DescribeContext | null, view?: CardView, character?: CharacterId | null): string {
   // 同一张牌先增力量再攻击时，后续数字要使用增长后的力量；预览不能修改战斗。
   if (ctx) ctx = {
     ...ctx,
@@ -228,6 +239,13 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         if (e.perExhaustedCard) {
           notes.push(`，消耗区每张牌 +${e.perExhaustedCard}${e.exhaustBonusMax === undefined ? '' : `（最多 +${e.exhaustBonusMax}）`}`);
           if (ctx) extra += Math.min(ctx.player.exhaust.length * e.perExhaustedCard, e.exhaustBonusMax ?? Infinity);
+        }
+        if (e.perSignature) {
+          const s = signatureEachText(character, e.perSignature);
+          const limit = [s.note, e.signatureMax === undefined ? '' : `最多 +${e.signatureMax}`].filter(Boolean).join('，');
+          const bonus = ctx ? Math.min(signatureCount(ctx.player) * e.perSignature, e.signatureMax ?? Infinity) : null;
+          notes.push(`，本回合${s.each} +${s.value}${limit ? `（${limit}）` : ''}${bonus !== null ? `（当前 +${bonus}）` : ''}`);
+          if (bonus) extra += bonus;
         }
         const healing = e.lifesteal ? `，按实际扣除的敌人生命回复生命${e.lifestealCap === undefined ? '' : `（每次命中最多 ${e.lifestealCap} 点）`}` : '';
         parts.push(`${t}造成 ${dmgText(e.amount, ctx, extra)} 点伤害${times}${notes.join('')}${healing}`);
@@ -323,7 +341,14 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`获得 ${e.amount} 点能量`);
         break;
       case 'gainEmber':
-        if (e.amount >= 0) {
+        if (e.perSignature) {
+          const s = signatureEachText(character, e.perSignature);
+          const limit = [s.note, e.signatureMax === undefined ? '' : `最多 ${e.signatureMax} 点`].filter(Boolean).join('，');
+          const earned = ctx ? Math.min(signatureCount(ctx.player) * e.perSignature, e.signatureMax ?? Infinity) : null;
+          const total = earned === null ? null : e.amount + earned + (e.amount + earned > 0 && ctx!.relics.includes('ash_hourglass') ? 1 : 0);
+          parts.push(`${e.amount > 0 ? `获得 ${e.amount} 点余烬，` : ''}本回合${s.each}获得 ${s.value} 点余烬${limit ? `（${limit}）` : ''}${total !== null ? `（当前共 ${total} 点）` : ''}`);
+          if (ctx && total) ctx.player.ember = Math.min(EMBER_MAX, ctx.player.ember + total);
+        } else if (e.amount >= 0) {
           const bonus = (e.amount > 0 ? chargeEmber : 0) + (ctx && e.amount > 0 && ctx.relics.includes('ash_hourglass') ? 1 : 0);
           parts.push(`获得 ${e.amount + bonus} 点余烬`);
           if (ctx) ctx.player.ember = Math.min(EMBER_MAX, ctx.player.ember + e.amount + bonus);
@@ -355,7 +380,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         const name = STATUSES[e.status].name;
         const tgt = e.target === 'self' ? '' : e.target === 'all' ? '对所有敌人' : '对目标';
         if ((STATUSES[e.status].kind === 'power' || e.status === 'guardOnce' || e.status === 'tempThorns') && e.target === 'self') {
-          parts.push(STATUSES[e.status].description(e.amount).replace(/。$/, ''));
+          parts.push(statusDescription(e.status, e.amount, character).replace(/。$/, ''));
         } else if (e.target === 'self') {
           parts.push(`获得 ${e.amount} 层${name}${e.status === 'regen' ? '（回合末治疗后减少1层）' : ''}`);
         } else {
@@ -461,7 +486,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         break;
       case 'conditional':
         // 分号明确结束条件范围，后面的无条件效果不能被误读为也需要条件。
-        parts.push(`${condText(e.cond)}：${describeEffects(e.then, ctx).replace(/。$/, '')}；`);
+        parts.push(`${condText(e.cond, character)}：${describeEffects(e.then, ctx, undefined, character).replace(/。$/, '')}${e.oncePerTurn ? '（每回合限 1 次）' : ''}${e.else ? `；否则${describeEffects(e.else, ctx, undefined, character).replace(/。$/, '')}` : ''}；`);
         break;
     }
   }
@@ -483,15 +508,15 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       tail.push('仅本场战斗');
     }
     if (view.ethereal && !view.handEndEffects.length) tail.push('占用抽牌位，不补抽。回合结束时若仍在手中，自动消耗（优先于保留）');
-    if (view.handEndEffects.length) tail.push(`回合结束时，若仍在手中：${describeEffects(view.handEndEffects, null).replace(/。$/, '')}${view.ethereal ? '，然后自动消耗（优先于保留）' : ''}`);
+    if (view.handEndEffects.length) tail.push(`回合结束时，若仍在手中：${describeEffects(view.handEndEffects, null, undefined, character).replace(/。$/, '')}${view.ethereal ? '，然后自动消耗（优先于保留）' : ''}`);
     if (tail.length) text = (text ? text + '。' : '') + tail.join('。');
   }
   return text ? text + '。' : '';
 }
 
-export function describeCard(card: CardInstance, ctx: DescribeContext | null): string {
+export function describeCard(card: CardInstance, ctx: DescribeContext | null, character?: CharacterId | null): string {
   const v = viewCard(card);
-  return describeEffects(v.effects, ctx, v);
+  return describeEffects(v.effects, ctx, v, character);
 }
 
 export function cardTypeName(t: CardDef['type']): string {

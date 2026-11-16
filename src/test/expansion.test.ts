@@ -72,17 +72,17 @@ describe('扩展卡池与遗物配额', () => {
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
-  it('通用牌普通23、罕见19、稀有17；初始和诅咒另计，四角色都能获得', () => {
+  it('通用牌普通24、罕见20、稀有20；初始和诅咒另计，四角色都能获得', () => {
     const shared = CARD_LIST.filter(c => !c.owner);
-    for (const [rarity, count] of [['common', 23], ['uncommon', 19], ['rare', 17]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
+    for (const [rarity, count] of [['common', 24], ['uncommon', 20], ['rare', 20]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
     expect(shared.filter(c => c.rarity === 'starter')).toHaveLength(3);
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
   });
-  it('卡牌319张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(319); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(44);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(319);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(319);
+  it('卡牌324张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(324); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(324);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(324);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);
@@ -94,7 +94,8 @@ describe('扩展卡池与遗物配额', () => {
   it.each(characters)('%s 普通、精英、商店及首领奖励过滤正确，所有专属牌均能生成', character => {
     const run = R.newRun(`POOL-${character}`, character);
     const seen = new Set<string>();
-    for (let i = 0; i < 800; i++) {
+    // 通用稀有池扩大后，固定种子下需要更多抽样才能覆盖每一张牌。
+    for (let i = 0; i < 1600; i++) {
       const tier = (['normal', 'elite', 'shop', 'boss'] as const)[i % 4];
       run.floor = Math.floor(i / 4) % 40;
       const reward = R.generateCardChoices(run, tier, 3);
