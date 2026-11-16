@@ -1,6 +1,6 @@
 import type { Archetype, CardDef, CharacterId, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback'> & { target?: CardDef['target']; upgradeCost?: number; upgradeRequireEmber?: number };
 type Entry = Omit<CardDef, 'owner' | 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -21,8 +21,8 @@ const guarded: Condition = { kind: 'hasBlock' };
 const recover = (count: number): Effect => ({ kind: 'returnExhausted', count });
 const exhaust = (count: number | 'all'): Effect => ({ kind: 'exhaustHand', count });
 function make(type: CardDef['type'], id: string, name: string, archetype: Archetype, cost: number, effects: Effect[], upgraded: Effect[], options: Options = {}): Entry {
-  const { upgradeCost, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
-  return { id, name, archetype, type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }) } };
+  const { upgradeCost, upgradeRequireEmber, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
+  return { id, name, archetype, type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }), ...(upgradeRequireEmber === undefined ? {} : { requireEmber: upgradeRequireEmber }) } };
 }
 const A = (id: string, name: string, route: Archetype, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('attack', id, name, route, cost, effects, up, opts);
 const S = (id: string, name: string, route: Archetype, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('skill', id, name, route, cost, effects, up, opts);
@@ -212,6 +212,24 @@ add('scholar', 'rare', [
   S('sealed_sanctuary', '封印圣所', 'focus', 2, [block(22), status('regen', 3)], [block(28), status('regen', 4)], { retain: true, exhaust: true }),
 ]);
 
+
+// 余烬接口：血誓者以失血换余烬、余烬不足时用生命代付；学者把余烬花在回响与蓄力上。
+add('oathbound', 'common', [
+  S('blood_kindling', '血燃', 'blood', 1, [block(7), when(wounded, ember(3))], [block(10), when(wounded, ember(4))]),
+]);
+add('oathbound', 'uncommon', [
+  P('ember_blood_oath', '烬血誓约', 'blood', 1, [status('emberOath', 2)], [status('emberOath', 3)]),
+  A('molten_blood_strike', '熔血重击', 'might', 2, [ember(-3), hit(16), strength(3)], [ember(-3), hit(21), strength(4)], { requireEmber: 3, hpFallback: 5 }),
+]);
+add('scholar', 'common', [
+  S('ember_annotation', '烬文注释', 'echo', 0, [ember(-2), status('echo', 1)], [ember(-1), status('echo', 1)], { requireEmber: 2, upgradeRequireEmber: 1, exhaust: true }),
+]);
+add('scholar', 'uncommon', [
+  S('ember_gradation', '余烬刻度', 'focus', 1, [ember(-3), block(8), { kind: 'chargeHand', amount: 1 }], [ember(-3), block(12), { kind: 'chargeHand', amount: 1 }], { requireEmber: 3 }),
+]);
+add('scholar', 'rare', [
+  A('burning_final_draft', '燃页终稿', 'focus', 2, [{ kind: 'emberBurst', base: 10, damagePer: 3 }], [{ kind: 'emberBurst', base: 14, damagePer: 4 }], { retain: true, charge: { damage: 3 } }),
+]);
 
 // 角色资源转换：真实支付护甲/燃烧/临时力量/蓄力，或核销本回合计数。
 // 计数兑换不改变连击等原有触发，且不会因回响、重放或回收重复核销。

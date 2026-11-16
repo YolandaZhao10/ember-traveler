@@ -442,6 +442,8 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'enemy',
+  retain: true,
+  charge: { damage: 3, max: 4 },
   effects: [{ kind: 'damage', amount: 9 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 5 }] }],
   upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 6 }] }] },
 });
@@ -517,6 +519,7 @@ def({
   cost: 1,
   target: 'enemy',
   requireEmber: 2,
+  hpFallback: 4,
   effects: [
     { kind: 'gainEmber', amount: -2 },
     { kind: 'damage', amount: 18 },

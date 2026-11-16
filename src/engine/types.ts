@@ -64,7 +64,7 @@ export type StatusId =
   | 'vanguardCycle' | 'patientGuard' | 'drawNext'
   | 'emberConduit' | 'ashRecall' | 'burningRelay' | 'sparkCrown'
   | 'chargedEcho' | 'repriseStudy' | 'retainedWard' | 'emberBastion'
-  | 'arcaneWard';
+  | 'arcaneWard' | 'emberOath';
 
 export type Condition =
   | { kind: 'strengthAtLeast'; value: number }
@@ -102,7 +102,7 @@ export type Effect =
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number }
-  | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean }
+  | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean; /** 不随余烬变化的基础伤害，与每点余烬加成合并为一次命中 */ base?: number }
   | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
   | { kind: 'heal'; amount: number }
   | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number }
@@ -135,9 +135,11 @@ export interface CardDef {
   ethereal?: boolean;
   /** 回合结束时保留在手牌 */
   retain?: boolean;
-  /** 每保留一回合，伤害 / 格挡增加 */
-  charge?: { damage?: number; block?: number };
+  /** 每保留一回合，伤害 / 格挡 / 获得的余烬增加；max 为低于全局上限的单牌蓄力上限 */
+  charge?: { damage?: number; block?: number; ember?: number; max?: number };
   requireEmber?: number;
+  /** 余烬不足 requireEmber 时仍可打出：改为失去这么多生命，并跳过本次余烬消耗。 */
+  hpFallback?: number;
   flavor?: string;
   upgrade: {
     name?: string;

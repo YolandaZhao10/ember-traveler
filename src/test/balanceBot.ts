@@ -2,7 +2,7 @@ import { RELIC_TUNING as T } from '../data/relicBalance';
 import { appliedBurn } from '../engine/burnHistory';
 import { temporaryStrength } from '../engine/resourceConversion';
 import { CARDS } from '../data/cards';
-import { calcBlock, calcDamage, viewCard } from '../engine/cards';
+import { calcBlock, calcDamage, usesHpFallback, viewCard } from '../engine/cards';
 import { aliveEnemies, enemyIntent, discardReplayChoices } from '../engine/combat';
 import type { CardInstance, CombatState } from '../engine/types';
 
@@ -22,6 +22,8 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
   let dmg = 0;
   let blk = 0;
   let util = 0;
+  // 余烬不足时的生命代付与失血牌同价估值。
+  if (usesHpFallback(v, p.ember)) util -= p.hp < 20 ? 30 : v.hpFallback * 0.8;
   for (const e of v.effects) {
     switch (e.kind) {
       case 'damage': {
@@ -42,7 +44,7 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         break;
       case 'emberBurst': {
         const n = Math.max(p.ember, cs.relics.includes('ember_censer') ? T.censerMinimumEmber : 0);
-        if (e.damagePer) dmg += e.damagePer * n * (e.aoe ? aliveEnemies(cs).length : 1);
+        if (e.damagePer) dmg += ((e.base ?? 0) + (v.charge?.damage ?? 0) * v.bonus + e.damagePer * n) * (e.aoe ? aliveEnemies(cs).length : 1);
         if (e.blockPer) blk += calcBlock(e.blockPer * n, p.statuses);
         if (e.damagePer && target && e.damagePer * n >= target.hp + target.block) util += 10; // 能直接击杀
         else if (n < 6) util -= 8; // 余烬太少不值得爆发
@@ -67,7 +69,7 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         if (e.resource === 'ember') util += Math.min(e.max, Math.floor(p.ember / e.per)) * (e.reward === 'draw' ? 2 : 3);
         break;
       case 'gainEmber':
-        util += e.amount > 0 ? e.amount * 1.2 : 0;
+        util += e.amount > 0 ? (e.amount + (v.charge?.ember ?? 0) * v.bonus) * 1.2 : 0;
         break;
       case 'status':
         util += e.target === 'self' ? 5 : 3;

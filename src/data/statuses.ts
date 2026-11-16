@@ -21,6 +21,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   guardOnce: { id: 'guardOnce', name: '守夜准备', kind: 'buff', description: n => `下回合开始时额外保留最多 ${n} 点已有格挡，然后移除此状态；不会凭空获得格挡。` },
   guardReserve: { id: 'guardReserve', name: '架势', kind: 'power', description: n => `回合开始时，最多保留 ${n} 点已有格挡。固守生效时保留全部。` },
   ashInsight: { id: 'ashInsight', name: '灰中启示', kind: 'power', description: n => `每回合生效后的前 2 次消耗，每次抽 ${n} 张牌。` },
+  emberOath: { id: 'emberOath', name: '烬血誓约', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，获得 ${n} 点余烬。` },
   bloodDraw: { id: 'bloodDraw', name: '血之筹码', kind: 'power', description: n => `每回合生效后首次因卡牌失去生命且存活时，抽 ${n} 张牌。` },
   chargeMaster: { id: 'chargeMaster', name: '凝神', kind: 'power', description: n => `保留的蓄力牌额外蓄力 ${n} 层；每回合首张蓄力 ≥2 的牌返还固定 1 能量。` },
   strength: {
@@ -194,7 +195,7 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     id: 'echo',
     name: '回响',
     kind: 'buff',
-    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次，每次分别计入出牌次数，只支付一次能量；其他代价照付。余烬不足时跳过重放，本次回响机会仍消耗。`,
+    description: (n) => `接下来打出的 ${n} 张非能力牌效果触发两次，每次分别计入出牌次数，只支付一次能量；其他代价照付。余烬不足时跳过重放，本次回响机会仍消耗；可用生命代付的牌则照常重放并失去生命。`,
   },
   resonance: {
     id: 'resonance',

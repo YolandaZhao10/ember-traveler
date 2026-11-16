@@ -1,6 +1,6 @@
 import type { CardDef, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'requireEmber'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback'> & { target?: CardDef['target']; upgradeCost?: number };
 type Entry = Omit<CardDef, 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -43,10 +43,11 @@ add('common', [
   S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))]),
   A('sling_volley', '连掷火石', 2, [hit(3, { times: 4 }), when(coals(5), status('energyNext', 1))], [hit(4, { times: 4 }), when(coals(5), status('energyNext', 2))]),
   A('sharpened_coal', '淬炭刃', 1, [hit(6), status('strength', 1)], [hit(9), status('strength', 1)], { exhaust: true }),
+  S('ember_wick', '余烬灯芯', 0, [ember(2)], [ember(3)], { retain: true, charge: { ember: 1, max: 4 }, exhaust: true }),
 ]);
 add('uncommon', [
   S('coal_page_search', '炭中寻页', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'draw' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'draw' }], { requireEmber: 2, exhaust: true }),
-  S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, exhaust: true }),
+  S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, hpFallback: 5, exhaust: true }),
   A('firestorm', '火雨', 2, [ember(-2), hit(10, { aoe: true }), status('burn', 3, 'all')], [ember(-2), hit(14, { aoe: true }), status('burn', 4, 'all')], { target: 'all_enemies', requireEmber: 2 }),
   S('insulated_coat', '隔热外衣', 2, [block(18), ember(2), status('regen', 1)], [block(24), ember(3), status('regen', 2)], { exhaust: true }),
   A('heat_sink', '卸热', 1, [{ kind: 'emberBurst', damagePer: 2, blockPer: 2 }], [{ kind: 'emberBurst', damagePer: 3, blockPer: 2 }]),
@@ -58,6 +59,7 @@ add('uncommon', [
   S('traveling_supplies', '随身药包', 0, [heal(4), draw(1)], [heal(6), draw(1)], { exhaust: true }),
   S('emergency_stash', '翻找行囊', 0, [draw(3), discard(2), status('energyNext', 1)], [draw(4), discard(2), status('energyNext', 1)], { exhaust: true }),
   S('enduring_warmth', '余温未散', 1, [heal(5), { kind: 'clearDebuffs' }], [heal(7), { kind: 'clearDebuffs' }], { exhaust: true }),
+  S('quiet_burning_page', '静燃之页', 1, [block(7), when({ kind: 'charged', value: 2 }, draw(2))], [block(10), when({ kind: 'charged', value: 2 }, draw(2))], { retain: true, charge: { block: 3, max: 6 } }),
 ]);
 add('rare', [
   S('ember_bellows', '烬炉鼓风', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'energy' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'energy' }], { requireEmber: 2, exhaust: true }),

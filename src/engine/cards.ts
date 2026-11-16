@@ -20,8 +20,10 @@ export interface CardView {
   exhaust: boolean;
   ethereal: boolean;
   retain: boolean;
-  charge?: { damage?: number; block?: number };
+  charge?: { damage?: number; block?: number; ember?: number; max?: number };
   requireEmber: number;
+  /** 余烬不足时代付的生命；0 表示不能代付 */
+  hpFallback: number;
   flavor?: string;
   upgraded: boolean;
   /** 蓄力层数 */
@@ -47,10 +49,21 @@ export function viewCard(card: CardInstance): CardView {
     retain: d.retain ?? false,
     charge: d.charge,
     requireEmber: u.requireEmber ?? d.requireEmber ?? 0,
+    hpFallback: d.hpFallback ?? 0,
     flavor: d.flavor,
     upgraded: card.upgraded,
-    bonus: clampCharge(card.bonus ?? 0),
+    bonus: clampCharge(card.bonus ?? 0, d.charge?.max),
   };
+}
+
+/** 这张牌实际能达到的蓄力层数上限。 */
+export function chargeCap(view: Pick<CardView, 'charge'>): number {
+  return clampCharge(CHARGE_MAX, view.charge?.max);
+}
+
+/** 余烬不足且可用生命代付时，本次结算改为失去生命并跳过余烬消耗。 */
+export function usesHpFallback(view: Pick<CardView, 'hpFallback' | 'requireEmber'>, ember: number): boolean {
+  return view.hpFallback > 0 && ember < view.requireEmber;
 }
 
 export function viewDef(defId: string, upgraded = false): CardView {
@@ -182,6 +195,18 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
   const parts: string[] = [];
   const chargeDmg = view?.charge?.damage ? view.charge.damage * view.bonus : 0;
   const chargeBlk = view?.charge?.block ? view.charge.block * view.bonus : 0;
+  const chargeEmber = view?.charge?.ember ? view.charge.ember * view.bonus : 0;
+  // 战斗中余烬不足：与结算一致，先失去生命并触发失血联动，本牌的余烬消耗全部跳过。
+  const fallback = !!ctx && !!view && usesHpFallback(view, ctx.player.ember);
+  if (ctx && view && fallback) {
+    parts.push(`失去 ${view.hpFallback} 点生命（余烬不足，不消耗余烬）`);
+    ctx.player.hpLostThisTurn += view.hpFallback;
+    previewStrength(ctx.player.statuses.bloodRage ?? 0);
+    if (ctx.player.statuses.emberOath && !ctx.player.turnFlags.emberOath) {
+      ctx.player.turnFlags.emberOath = 1;
+      ctx.player.ember = Math.min(EMBER_MAX, ctx.player.ember + ctx.player.statuses.emberOath);
+    }
+  }
   for (const e of effects) {
     switch (e.kind) {
       case 'takeDamage':
@@ -299,9 +324,11 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         break;
       case 'gainEmber':
         if (e.amount >= 0) {
-          const bonus = ctx && ctx.relics.includes('ash_hourglass') ? 1 : 0;
+          const bonus = (e.amount > 0 ? chargeEmber : 0) + (ctx && e.amount > 0 && ctx.relics.includes('ash_hourglass') ? 1 : 0);
           parts.push(`获得 ${e.amount + bonus} 点余烬`);
           if (ctx) ctx.player.ember = Math.min(EMBER_MAX, ctx.player.ember + e.amount + bonus);
+        } else if (fallback) {
+          // 已在开头说明改为失去生命。
         } else {
           parts.push(`消耗 ${-e.amount} 点余烬`);
           previewEmberSpend(-e.amount);
@@ -313,8 +340,9 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         const segs: string[] = [];
         if (e.damagePer) {
           const t = e.aoe ? '对所有敌人' : '';
-          const total = spend !== null ? `（当前 ${dmgText(e.damagePer * spend, ctx)}）` : '';
-          segs.push(`${t}造成每点余烬 ${e.damagePer} 的伤害${total}`);
+          const base = (e.base ?? 0) + chargeDmg;
+          const total = spend !== null ? `（当前 ${dmgText(base + e.damagePer * spend, ctx)}）` : '';
+          segs.push(e.base === undefined ? `${t}造成每点余烬 ${e.damagePer} 的伤害${total}` : `${t}造成 ${base} 点伤害，每点余烬 +${e.damagePer}${total}`);
         }
         if (e.blockPer) {
           const total = spend !== null ? `（当前 ${blockText(e.blockPer * spend, ctx)}）` : '';
@@ -440,11 +468,13 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
   let text = parts.join('，').replace(/；，/g, '；').replace(/；$/, '');
   if (view) {
     const tail: string[] = [];
-    if (view.requireEmber) tail.unshift(`需要 ${view.requireEmber} 点余烬`);
+    if (view.hpFallback) tail.unshift(`余烬不足时改为失去 ${view.hpFallback} 点生命`);
+    else if (view.requireEmber) tail.unshift(`需要 ${view.requireEmber} 点余烬`);
     if (view.retain) tail.push('保留');
     if (view.charge) {
-      const seg = [view.charge.damage ? `伤害 +${view.charge.damage}` : '', view.charge.block ? `格挡 +${view.charge.block}` : ''].filter(Boolean).join('、');
-      tail.push(`每保留一回合${seg}，最多蓄力 ${CHARGE_MAX} 层${view.bonus ? `（已蓄力 ${view.bonus}/${CHARGE_MAX}）` : ''}`);
+      const seg = [view.charge.damage ? `伤害 +${view.charge.damage}` : '', view.charge.block ? `格挡 +${view.charge.block}` : '', view.charge.ember ? `获得的余烬 +${view.charge.ember}` : ''].filter(Boolean).join('、');
+      const cap = chargeCap(view);
+      tail.push(`每保留一回合${seg}，最多蓄力 ${cap} 层${view.bonus ? `（已蓄力 ${view.bonus}/${cap}）` : ''}`);
     }
     if (view.exhaust) tail.push('消耗');
     if (view.cost < 0) tail.push('无法打出');

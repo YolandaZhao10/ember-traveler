@@ -2,7 +2,7 @@ import { conditionalDominations } from '../src/test/cardDominance';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { CARD_LIST, CARDS } from '../src/data/cards';
 import { describeCard, viewDef } from '../src/engine/cards';
-import { cardDesign, cardMechanics, containsPowerCore, effectDesign, REVIEWED_DESIGN_PAIRS } from '../src/test/cardDesign';
+import { cardDesign, cardMechanics, containsPowerCore, effectIdentity, REVIEWED_DESIGN_PAIRS } from '../src/test/cardDesign';
 import type { CardDef } from '../src/engine/types';
 const arg = (name: string) => { const i = process.argv.indexOf(name); return i < 0 ? undefined : process.argv[i + 1]; };
 if (arg('--cards')) for (const c of JSON.parse(readFileSync(arg('--cards')!, 'utf8')) as CardDef[]) CARDS[c.id] = c;
@@ -24,7 +24,7 @@ const report = {
  cards: CARD_LIST.length, variants: variants.length,
  conditionalDominations: conditionalDominations(),
  exactMechanics: collisions(cardMechanics),
- rewardEffectIdentity: collisions((id,up)=>{const v=viewDef(id,up);return effectDesign(v.effects,'exact')+effectDesign(v.handEndEffects,'exact');},true),
+ rewardEffectIdentity: collisions(effectIdentity,true),
  globalRewardDesign: collisions(cardDesign,true).filter(pair=>!REVIEWED_DESIGN_PAIRS.has(pair.ids)),
  reviewedDesignPairs: collisions(cardDesign,true).filter(pair=>REVIEWED_DESIGN_PAIRS.has(pair.ids)),
  powerCoverage: [...new Map(variants.flatMap(a => variants.filter(b => a.id !== b.id && CARDS[a.id].type === 'power' && CARDS[b.id].type === 'power'

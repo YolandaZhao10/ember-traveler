@@ -6,7 +6,7 @@ import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
 import { RELICS } from '../data/relics';
 import { RELIC_TUNING as T } from '../data/relicBalance';
-import { calcBlock, calcDamage, checkCondition, viewCard, type CardView } from './cards';
+import { calcBlock, calcDamage, checkCondition, usesHpFallback, viewCard, type CardView } from './cards';
 import { scaleEnemyValue } from './difficulty';
 import { ensurePowerInstances } from './powers';
 import { BLOCK_MAX, EMBER_MAX, clampCharge } from './constants';
@@ -192,6 +192,11 @@ function playerLoseHp(cs: CombatState, amount: number, ev: CombatEvent[], fromCa
       if (cs.relics.includes('scar_band')) { gainEmber(cs, 1, ev, false); relicProc(cs, 'scar_band', ev); }
       if (cs.relics.includes('blood_pendant')) { drawCards(cs, 1, ev); relicProc(cs, 'blood_pendant', ev); }
     }
+    if (lost > 0 && p.hp > 0 && p.statuses.emberOath && !p.turnFlags.emberOath) {
+      p.turnFlags.emberOath = 1;
+      gainEmber(cs, p.statuses.emberOath, ev, false);
+      log(cs, ev, `烬血誓约：获得 ${p.statuses.emberOath} 点余烬`);
+    }
     if (lost > 0) triggerRelics(cs, 'selfHpLoss', ev);
     if (lost > 0 && p.hp > 0 && p.statuses.bloodOath && !p.turnFlags.bloodOathDone) {
       p.turnFlags.bloodOathLoss = (p.turnFlags.bloodOathLoss ?? 0) + lost;
@@ -281,7 +286,7 @@ function triggerRelics(cs: CombatState, trigger: RelicCombatTrigger, ev: CombatE
           }
           case 'cleanse': addStatus(p, effect.status, -Math.min(effect.amount, p.statuses[effect.status] ?? 0), ev); break;
           case 'charge':
-            for (const c of p.hand) if (viewCard(c).retain && viewCard(c).charge) c.bonus = clampCharge((c.bonus ?? 0) + effect.amount);
+            for (const c of p.hand) if (viewCard(c).retain && viewCard(c).charge) c.bonus = clampCharge((c.bonus ?? 0) + effect.amount, viewCard(c).charge?.max);
             break;
         }
       }
@@ -659,7 +664,7 @@ export function discardReplayChoices(cs: CombatState): CardInstance[] {
   return cs.player.discard.filter(card => {
     const v = viewCard(card);
     return (v.type === 'attack' || v.type === 'skill') && !needsDiscardReplay(card) && !cardTransferEffect(card)
-      && v.requireEmber <= cs.player.ember && (v.target !== 'enemy' || aliveEnemies(cs).length > 0);
+      && (v.requireEmber <= cs.player.ember || v.hpFallback > 0) && (v.target !== 'enemy' || aliveEnemies(cs).length > 0);
   });
 }
 
@@ -668,7 +673,7 @@ export function canPlayCard(cs: CombatState, card: CardInstance): { ok: boolean;
   if (cs.phase !== 'player' || cs.outcome !== 'ongoing') return { ok: false, reason: '现在不能出牌' };
   if (v.cost < 0) return { ok: false, reason: v.type === 'status' ? '状态牌无法打出' : '诅咒牌无法打出' };
   if (v.cost > cs.player.energy) return { ok: false, reason: '能量不足' };
-  if (v.requireEmber > cs.player.ember) return { ok: false, reason: `需要 ${v.requireEmber} 点余烬` };
+  if (v.requireEmber > cs.player.ember && !v.hpFallback) return { ok: false, reason: `需要 ${v.requireEmber} 点余烬` };
   if (v.target === 'enemy' && aliveEnemies(cs).length === 0) return { ok: false, reason: '没有目标' };
   if (needsDiscardReplay(card) && !discardReplayChoices(cs).length) return { ok: false, reason: '弃牌堆没有可重放的攻击或技能' };
   if (cardTransferEffect(card) && !cardTransferChoices(cs, card).length) return { ok: false, reason: '牌堆中没有符合条件的牌' };
@@ -809,7 +814,13 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       }
       if (p.statuses.crescendo) extraDamage += p.attacksPlayedThisTurn * p.statuses.crescendo;
     }
-    resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer);
+    // 生命代付按每次结算（含回响、镜像与重演）开始时的余烬判断；失血联动先结算，再跳过本牌的余烬消耗。
+    const hpPaid = usesHpFallback(v, p.ember);
+    if (hpPaid) {
+      log(cs, ev, `余烬不足 ${v.requireEmber} 点：「${v.name}」改为失去 ${v.hpFallback} 点生命`);
+      playerLoseHp(cs, v.hpFallback, ev, true);
+    }
+    resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer, hpPaid);
     finishPlay(v, releaseCharge);
     handleEnemyDeaths(cs, ev);
   };
@@ -817,7 +828,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     resolvePlay(v, target, releaseCharge);
     if (!replay || cs.outcome !== 'ongoing' || p.hp <= 0) return;
     const selected = viewCard(replay);
-    if (selected.requireEmber > p.ember || (selected.target === 'enemy' && (!target || !alive(target)))) {
+    if ((selected.requireEmber > p.ember && !selected.hpFallback) || (selected.target === 'enemy' && (!target || !alive(target)))) {
       log(cs, ev, '重放停止：所选目标已倒下或余烬不足');
       return;
     }
@@ -843,7 +854,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
     }
     for (const source of repeats) {
       if (cs.outcome !== 'ongoing' || p.hp <= 0) break;
-      if (v.requireEmber > p.ember) {
+      if (v.requireEmber > p.ember && !v.hpFallback) {
         log(cs, ev, `${source}停止：重放「${v.name}」需要 ${v.requireEmber} 点余烬`);
         continue;
       }
@@ -887,7 +898,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
 }
 
 type CardMoveResolution = { effect: CardTransfer; card: CardInstance; index: number; resolved: boolean };
-function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution) {
+function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution, skipEmberCost = false) {
   const p = cs.player;
   const onEmberSpent = (amount: number) => {
     if (amount <= 0 || !view || view.type === 'curse' || p.hp <= 0 || cs.outcome !== 'ongoing') return;
@@ -907,6 +918,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
   };
   const chargeDmg = view?.charge?.damage ? view.charge.damage * view.bonus : 0;
   const chargeBlk = view?.charge?.block ? view.charge.block * view.bonus : 0;
+  const chargeEmber = view?.charge?.ember ? view.charge.ember * view.bonus : 0;
   const targets = (aoe: boolean | undefined): EnemyState[] => {
     if (aoe) return aliveEnemies(cs);
     return target && alive(target) ? [target] : [];
@@ -1112,7 +1124,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         for (const card of p.hand) {
           const charged = viewCard(card);
           if (!charged.charge) continue;
-          card.bonus = clampCharge((card.bonus ?? 0) + e.amount);
+          card.bonus = clampCharge((card.bonus ?? 0) + e.amount, charged.charge.max);
           log(cs, ev, `「${charged.name}」立即蓄力 ${e.amount} 回合（累计 ${card.bonus}）`);
         }
         break;
@@ -1120,8 +1132,10 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         p.energy += e.amount;
         break;
       case 'gainEmber': {
+        // 生命代付时本牌的余烬消耗整项跳过，也不触发消耗余烬的联动。
+        if (e.amount < 0 && skipEmberCost) break;
         const before = p.ember;
-        gainEmber(cs, e.amount, ev, e.amount > 0);
+        gainEmber(cs, e.amount > 0 ? e.amount + chargeEmber : e.amount, ev, e.amount > 0);
         onEmberSpent(before - p.ember);
         break;
       }
@@ -1130,7 +1144,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         log(cs, ev, `消耗 ${n} 点余烬`);
         if (e.damagePer) {
           for (const t of targets(e.aoe)) {
-            const r = hit(e.damagePer * n, t);
+            const r = hit((e.base ?? 0) + e.damagePer * n, t, chargeDmg);
             log(cs, ev, `余烬爆发：对 ${t.name} 造成 ${r.lost} 点生命伤害`);
           }
         }
@@ -1452,7 +1466,7 @@ export function endPlayerTurn(input: CombatState): StepResult {
   for (const c of p.hand) {
     const cv = viewCard(c);
     if (cv.retain || p.turnFlags[`retain:${c.uid}`]) {
-      if (cv.charge) c.bonus = clampCharge((c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0));
+      if (cv.charge) c.bonus = clampCharge((c.bonus ?? 0) + (cs.relics.includes('star_chart') ? 2 : 1) + (p.statuses.chargeMaster ?? 0), cv.charge.max);
       kept.push(c);
     } else p.discard.push(c);
   }
