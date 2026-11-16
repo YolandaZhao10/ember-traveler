@@ -7,7 +7,7 @@ import { createCombat, playCard, endPlayerTurn, enemyAct, startPlayerTurn } from
 import { encounterDifficulty } from '../src/engine/difficulty';
 import { makeRng } from '../src/engine/rng';
 import { planMove } from '../src/test/cardFloorBenchmark';
-import { BUILD_LOADOUTS } from '../src/test/buildLoadouts';
+import { BUILD_LOADOUTS, EMBER_LOADOUTS } from '../src/test/buildLoadouts';
 import type { CardDef, CombatState } from '../src/engine/types';
 const arg=(key:string)=>{const i=process.argv.indexOf(key);return i<0?undefined:process.argv[i+1];};
 const seeds=Number(arg('--seeds')??10);
@@ -23,6 +23,8 @@ const early: Record<string,string[]>={
  echo:['echo_blade','ash_word','aria','echo_veil','reverberant_cut','quiet_sentence'],
  focus:['charged_blade','focus','measured_breath','surge_glyph','delayed_thrust','patient_study'],
 };
+// 四套余烬构筑自带第一章牌表；按 --route 过滤后与原八条路线一起跑。
+const builds=[...BUILD_LOADOUTS,...EMBER_LOADOUTS].filter(b=>!arg('--route')||b.route===arg('--route'));
 const resources:Record<string,string>={combo:'trail_supply',bulwark:'unburden_armor',cinder:'borrow_flame',ash:'ash_index',blood:'pulse_memory',might:'borrow_fury',echo:'echo_footnotes',focus:'release_charge'};
 const stages=[{id:'early-single',floor:6,tier:'normal' as const,enemies:['tomb_puppet']},
  {id:'early-group',floor:8,tier:'normal' as const,enemies:['tomb_puppet','ash_rat']},
@@ -38,30 +40,31 @@ function fight(cs:CombatState){
  return{resourcePlays,won:cs.outcome==='won',stalled:cs.outcome==='ongoing',invalid,turns:cs.turn,hpLoss:(hp-cs.player.hp)/hp,enemyLeft:cs.enemies.reduce((s,e)=>s+e.hp,0)/total};
 }
 const rows=[];
-for(const build of BUILD_LOADOUTS.filter(b=>!arg('--route')||b.route===arg('--route')))for(const stage of stages){
+for(const build of builds)for(const stage of stages){
  const ch=CHARACTERS[build.character],mature=stage.floor>20;
- const supporting=[...(mature?build.cards:early[build.route])];
+ const supporting=[...(mature?build.cards:'early' in build?build.early:early[build.route])];
  if(mature&&arg('--synergy')) {
   const replacements:Record<string,Record<string,string>>={ash:{dust_to_dust:'ash_reserve',stoke:'last_salvage',ember_burst:'ash_storm'},blood:{inflame:'crimson_covenant',sanguine:'blood_watch'},might:{leech_bite:'war_avatar'}};
   for(let i=0;i<supporting.length;i++)supporting[i]=replacements[build.route]?.[supporting[i]]??supporting[i];
  }
  const ids=['strike','strike','defend','defend',...ch.starterDeck.slice(-2),...supporting];
- if(arg('--resources'))ids.push(arg('--resources')==='candidate'?resources[build.route]:'defend');
+ if(arg('--resources'))ids.push(arg('--resources')==='candidate'?resources[build.route]??'coal_page_search':'defend');
  const relics=[ch.starterRelic,...(mature?build.relics.filter(id=>stage.floor>=60||RELICS[id].chapter!==3):[])];
  const growth=relics.reduce((n,id)=>n+(RELICS[id].journey??[]).filter(r=>r.trigger==='obtain').flatMap(r=>r.effects).reduce((a,e)=>a+(e.kind==='maxHp'?e.amount:0),0),0);
  const hp=ch.maxHp+growth;
  const deck=ids.map((defId,i)=>({uid:`build-${i}`,defId,upgraded:mature&&i>=6}));
  const results=Array.from({length:seeds},(_,seed)=>fight(createCombat(stage.id,stage.enemies,stage.tier,deck,hp,hp,relics,makeRng(`BUILD-${seed}`,'c'),100,build.character,encounterDifficulty(stage.floor,stage.tier)).state));
  const mean=(k:'hpLoss'|'enemyLeft'|'turns')=>results.reduce((s,r)=>s+r[k],0)/seeds;
- rows.push({route:build.route,stage:stage.id,seeds,wins:results.filter(r=>r.won).length,stalled:results.filter(r=>r.stalled).length,invalid:results.filter(r=>r.invalid).length,resourcePlays:results.reduce((s,r)=>s+r.resourcePlays,0),hpLoss:mean('hpLoss'),enemyLeft:mean('enemyLeft'),turns:mean('turns')});
+ rows.push({route:build.route,character:build.character,stage:stage.id,seeds,wins:results.filter(r=>r.won).length,stalled:results.filter(r=>r.stalled).length,invalid:results.filter(r=>r.invalid).length,resourcePlays:results.reduce((s,r)=>s+r.resourcePlays,0),hpLoss:mean('hpLoss'),enemyLeft:mean('enemyLeft'),turns:mean('turns')});
  console.log(JSON.stringify(rows.at(-1)));
 }
 const output=arg('--output');if(output)writeFileSync(output,JSON.stringify({seeds,rows},null,2));
 const failures=rows.filter(r=>r.stalled||r.invalid).map(r=>`${r.route}/${r.stage}:停滞或非法状态`);
 if(arg('--before')){
  const before=JSON.parse(readFileSync(arg('--before')!,'utf8')).rows as typeof rows;
- for(const build of BUILD_LOADOUTS.filter(b=>!arg('--route')||b.route===arg('--route'))){
+ for(const build of builds){
   const a=rows.filter(r=>r.route===build.route),b=before.filter(r=>r.route===build.route);
+  if(!b.length){console.log(`${build.route} 无历史基线，跳过配对`);continue;}
   // 胜场优先；同胜场时比较存活与剩余敌血，不能以拖长战斗伪造收益。
   const score=(rs:typeof rows)=>rs.reduce((s,r)=>s+r.wins/r.seeds*3-r.hpLoss-r.enemyLeft,0);
   // 旧模板已零胜时不能把它误判成新版退化；另用 --synergy 构筑做绝对可行性检查。
@@ -70,6 +73,6 @@ if(arg('--before')){
   if(a.length!==b.length||delta< -0.05)failures.push(`${build.route}:前后配对退化 ${delta}`);
  }
 }
-if(arg('--resources')==='candidate')for(const build of BUILD_LOADOUTS.filter(b=>!arg('--route')||b.route===arg('--route')))if(rows.filter(r=>r.route===build.route).every(r=>r.resourcePlays===0))failures.push(`${build.route}:资源牌未被实际打出`);
+if(arg('--resources')==='candidate')for(const build of builds)if(rows.filter(r=>r.route===build.route).every(r=>r.resourcePlays===0))failures.push(`${build.route}:资源牌未被实际打出`);
 if(arg('--synergy')&&arg('--resources')!=='control')for(const route of new Set(rows.map(r=>r.route)))if(rows.filter(r=>r.route===route&&!r.stage.startsWith('early')).every(r=>r.wins===0))failures.push(`${route}:配套构筑在两个首领中均零胜`);
 console.log('Failures:',failures);if(failures.length)process.exitCode=1;

@@ -12,3 +12,26 @@ export const BUILD_LOADOUTS: { route: string; character: CharacterId; cards: str
 // 每条路线各带一件第三章奖励；其余均为已取得的前章与常规来源遗物。
 const chapterThreeRelics = ['astral_crown','moonward_aegis','starfire_seal','constellation_engine','sky_reliquary','astral_crown','eclipse_lens','constellation_engine'];
 BUILD_LOADOUTS.forEach((loadout, i) => loadout.relics.push(chapterThreeRelics[i]));
+
+/**
+ * 余烬路线：四角色各一套，以共享余烬牌为主，只带少量本角色的余烬接口牌。
+ * early 为第一章压力场景用的六张普通牌。独立导出，不改变其他审计脚本的既有构筑与基线。
+ */
+export const EMBER_LOADOUTS: ((typeof BUILD_LOADOUTS)[number] & { early: string[] })[] = [
+ { route:'ember-traveler', character:'traveler',
+   cards:['stoke','torch','searing_strike','coal_tip','camp_guard','warm_cloak','heat_sink','spare_torch','flame_breath','ember_blade','forge','ember_burst'],
+   early:['stoke','torch','searing_strike','coal_tip','camp_guard','warm_cloak'],
+   relics:['crowned_lantern','everburning_heart','charcoal_heart','ash_hourglass','ember_censer','rusted_plate','constellation_engine'] },
+ { route:'ember-picker', character:'picker',
+   cards:['ignite','ember_gust','coal_credit','ember_sift','sweeping_embers','stoke','firestorm','rekindle_coals','charcoal_insight','flame_breath','smoldering_star','ember_burst'],
+   early:['ignite','ember_gust','coal_credit','ember_sift','sweeping_embers','stoke'],
+   relics:['crowned_lantern','foundry_core','coal_pouch','cinder_censer','ash_hourglass','bone_urn','starfire_seal'] },
+ { route:'ember-oathbound', character:'oathbound',
+   cards:['ember_pulse','scar_cut','sling_volley','ration_bite','sharpened_coal','ember_blade','ember_exchange','insulated_coat','stoke','crown_of_sparks','cinder_mend','ember_burst'],
+   early:['stoke','torch','sling_volley','ration_bite','ember_pulse','scar_cut'],
+   relics:['sovereign_sigil','furnace_crown','scar_band','iron_skull','charcoal_heart','war_horn','astral_crown'] },
+ { route:'ember-scholar', character:'scholar',
+   cards:['banked_spark','searing_strike','ink_reserve','stoke','charcoal_insight','emergency_stash','ember_dance','ash_shield','sealed_flame','twilight_flame','ash_equation','ember_burst'],
+   early:['banked_spark','searing_strike','ink_reserve','stoke','torch','coal_tip'],
+   relics:['crowned_lantern','deep_archive','tuning_fork','bookmark','ash_hourglass','lens','eclipse_lens'] },
+];
