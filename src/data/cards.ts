@@ -1412,6 +1412,26 @@ EXTRA_CHARACTER_CARDS.forEach(def);
 EXTRA_SHARED_CARDS.forEach(def);
 EXTRA_CURSES.forEach(def);
 CYCLE_CARDS.forEach(def);
+
+/**
+ * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对；
+ * 只影响从共享池抽奖励时的权重，不限制其他角色获得。
+ */
+const SHARED_HOOKS: Record<CharacterId, string[]> = {
+  // 投石、守夜、匀息、辟邪灯、卸热、掷出火把、熔炉、篝火避难所
+  traveler: ['stone_throw', 'camp_guard', 'steady_breath', 'warding_lantern', 'heat_sink', 'spare_torch', 'forge', 'bonfire_shelter'],
+  // 燃烧、燃烬借力、疾风余烬、火雨、重拨余火、闷燃之星、余烬拾遗
+  picker: ['ignite', 'coal_credit', 'ember_gust', 'firestorm', 'rekindle_coals', 'smoldering_star', 'ember_retrieval'],
+  // 一口干粮、连掷火石、灰烬之刃、燃料交换、隔热外衣、淬炭刃、余烬疗愈、火星冠冕、涅槃之息
+  oathbound: ['ration_bite', 'sling_volley', 'ember_blade', 'ember_exchange', 'insulated_coat', 'sharpened_coal', 'cinder_mend', 'crown_of_sparks', 'phoenix_respite'],
+  // 守住火种、灼热打击、炭火启示、翻找行囊、封存烈火、暮火裁决、余烬灯芯、静燃之页
+  scholar: ['banked_spark', 'searing_strike', 'charcoal_insight', 'emergency_stash', 'sealed_flame', 'twilight_flame', 'ember_wick', 'quiet_burning_page'],
+};
+for (const [character, ids] of Object.entries(SHARED_HOOKS) as [CharacterId, string[]][]) for (const id of ids) {
+  const card = CARDS[id];
+  if (!card || card.owner || card.hook) throw new Error(`接口牌登记有误：${id}`);
+  card.hook = character;
+}
 export const CARD_LIST: CardDef[] = Object.values(CARDS);
 
 /** 已从游戏移除的牌。旧存档读档时换成 replacement（保留升级）；历史记录只读，用 name 显示。 */

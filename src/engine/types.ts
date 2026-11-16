@@ -128,6 +128,8 @@ export interface CardDef {
   archetype: Archetype;
   /** 专属角色；省略表示所有角色可用 */
   owner?: CharacterId;
+  /** 仅共享牌：主接口角色。奖励从共享池抽牌时，本角色的接口牌更常出现。 */
+  hook?: CharacterId;
   cost: number;
   target: TargetMode;
   effects: Effect[];

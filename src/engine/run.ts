@@ -374,12 +374,42 @@ export function cardRarityWeights(floor: number, tier: CardRewardTier, level: Di
   return weights;
 }
 
-/** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的75%权重。 */
-function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState): CardDef[] {
+/** 每个奖励槽抽共享池的概率；牌组里已有足够多共享牌时提高。 */
+export const SHARED_REWARD_CHANCE = 0.25;
+export const SHARED_REWARD_CHANCE_INVESTED = 0.35;
+export const SHARED_INVESTED_AT = 3;
+
+/** 只数会出现在奖励里的共享牌：打击、防御、引火等初始牌与诅咒不算。 */
+export function sharedRewardChance(deck: CardInstance[]): number {
+  const picked = deck.filter(c => {
+    const d = CARDS[c.defId];
+    return !!d && !d.owner && (d.rarity === 'common' || d.rarity === 'uncommon' || d.rarity === 'rare');
+  }).length;
+  return picked >= SHARED_INVESTED_AT ? SHARED_REWARD_CHANCE_INVESTED : SHARED_REWARD_CHANCE;
+}
+
+/** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的来源权重。固定消耗一次随机数。 */
+function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState, deck: CardInstance[]): CardDef[] {
   const shared = pool.filter(c => !c.owner), owned = pool.filter(c => c.owner === character);
   if (!shared.length) return owned;
   if (!owned.length) return shared;
-  return chance(rng, .25) ? shared : owned;
+  return chance(rng, sharedRewardChance(deck)) ? shared : owned;
+}
+
+/**
+ * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现，其他角色的接口牌更少。
+ * 专属牌恒为 1；旅人暂不加权，全部为 1。
+ */
+export function sharedRewardWeight(card: CardDef, character: CharacterId): number {
+  if (card.owner || character === 'traveler') return 1;
+  if (card.kindred || card.hook === character) return 1.5;
+  return card.hook ? 0.75 : 1;
+}
+
+/** 与均匀抽取同样只消耗一次随机数；权重全为 1 时结果与原先的均匀抽取完全相同。 */
+function pickRewardCard(rng: RngState, cards: CardDef[], character: CharacterId): CardDef {
+  const weighted = cards.map(item => ({ item, weight: sharedRewardWeight(item, character) }));
+  return weighted.every(w => w.weight === 1) ? pick(rng, cards) : weightedPick(rng, weighted);
 }
 
 export function generateCardChoices(run: RunState, tier: CardRewardTier, n: number): CardInstance[] {
@@ -390,9 +420,11 @@ export function generateCardChoices(run: RunState, tier: CardRewardTier, n: numb
     const r = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map((k) => ({ item: k, weight: weights[k] })));
     const pool = CARD_LIST.filter((c) => c.rarity === r && !chosen.includes(c.id) && (tier === 'boss' ? c.owner === run.character : cardAvailableTo(c, run.character)));
     if (!pool.length) continue;
-    const sourced = tier === 'normal' || tier === 'elite' ? rewardOwnerPool(pool, run.character, run.rng.reward) : pool;
+    // 来源比例与共享池加权只用于普通和精英奖励；首领与商店沿用原规则。
+    const battle = tier === 'normal' || tier === 'elite';
+    const sourced = battle ? rewardOwnerPool(pool, run.character, run.rng.reward, run.deck) : pool;
     const choices = n === 3 && tier !== 'shop' ? distinctRewardPool(sourced, chosen.map(id => CARDS[id])) : sourced;
-    chosen.push(pick(run.rng.reward, choices).id);
+    chosen.push((battle ? pickRewardCard(run.rng.reward, choices, run.character) : pick(run.rng.reward, choices)).id);
   }
   return chosen.map((id) => makeCard(run, id));
 }
@@ -831,7 +863,7 @@ function applyOutcomes(run: RunState, outcomes: EventOutcome[], texts: string[])
           const weights = cardRarityWeights(run.floor, 'normal', run.difficulty.cardRarity);
           const rarity = o.rarity ?? weightedPick(run.rng.event, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
           const pool = CARD_LIST.filter(c => cardAvailableTo(c, run.character) && c.rarity === rarity);
-          defId = pick(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event)).id;
+          defId = pickRewardCard(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event, run.deck), run.character).id;
         }
         run.deck.push(makeCard(run, defId));
         texts.push(`获得卡牌「${CARDS[defId].name}」。`);
