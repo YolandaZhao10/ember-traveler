@@ -242,7 +242,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         }
         if (e.perSignature) {
           const s = signatureEachText(character, e.perSignature);
-          const limit = [s.note, e.signatureMax === undefined ? '' : `最多 +${e.signatureMax}`].filter(Boolean).join('，');
+          const limit = [s.heavy ? `${s.heavy.label} +${s.heavy.value}` : '', e.signatureMax === undefined ? '' : `最多 +${e.signatureMax}`].filter(Boolean).join('，');
           const bonus = ctx ? Math.min(signatureCount(ctx.player) * e.perSignature, e.signatureMax ?? Infinity) : null;
           notes.push(`，本回合${s.each} +${s.value}${limit ? `（${limit}）` : ''}${bonus !== null ? `（当前 +${bonus}）` : ''}`);
           if (bonus) extra += bonus;
@@ -343,7 +343,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'gainEmber':
         if (e.perSignature) {
           const s = signatureEachText(character, e.perSignature);
-          const limit = [s.note, e.signatureMax === undefined ? '' : `最多 ${e.signatureMax} 点`].filter(Boolean).join('，');
+          const limit = [s.heavy ? `${s.heavy.label}获得 ${s.heavy.value} 点` : '', e.signatureMax === undefined ? '' : `最多 ${e.signatureMax} 点`].filter(Boolean).join('，');
           const earned = ctx ? Math.min(signatureCount(ctx.player) * e.perSignature, e.signatureMax ?? Infinity) : null;
           const total = earned === null ? null : e.amount + earned + (e.amount + earned > 0 && ctx!.relics.includes('ash_hourglass') ? 1 : 0);
           parts.push(`${e.amount > 0 ? `获得 ${e.amount} 点余烬，` : ''}本回合${s.each}获得 ${s.value} 点余烬${limit ? `（${limit}）` : ''}${total !== null ? `（当前共 ${total} 点）` : ''}`);

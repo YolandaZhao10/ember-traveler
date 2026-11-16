@@ -2,7 +2,7 @@ import { convertResource, conversionText, temporaryStrength } from './resourceCo
 import { appliedBurn, recordBurn } from './burnHistory';
 import { cardTransferChoices, cardTransferEffect, type CardTransfer } from './cardTransfer';
 import { CARDS } from '../data/cards';
-import { CHARACTERS, type SignatureDef } from '../data/characters';
+import { CHARACTERS, type SignatureKind } from '../data/characters';
 import { KINDRED_VOW_AT, signatureCount } from './signature';
 import { ENEMIES } from '../data/enemies';
 import { STATUSES } from '../data/statuses';
@@ -164,15 +164,15 @@ function gainEmber(cs: CombatState, amount: number, ev: CombatEvent[], fromCard:
 }
 
 /**
- * 记录本回合的招牌动作。只有当前角色自己的动作计数；lost 用于血誓者单次大额失血的加权。
+ * 记录本回合的招牌动作。只有当前角色自己的动作计数；lost 用于因卡牌单次大额失血的加权。
  * 旅途誓火在计数首次达到门槛时触发，每回合一次。
  */
-function addSignature(cs: CombatState, ev: CombatEvent[], kind: SignatureDef['kind'], lost = 0) {
+function addSignature(cs: CombatState, ev: CombatEvent[], kind: SignatureKind, lost = 0) {
   const p = cs.player;
   const def = CHARACTERS[cs.character].signature;
-  if (def.kind !== kind) return;
+  if (!def.kinds.includes(kind)) return;
   const before = signatureCount(p);
-  const after = before + (def.heavy && lost >= def.heavy.atLeast ? def.heavy.weight : def.weight);
+  const after = before + (kind === 'cardHpLoss' && def.heavy && lost >= def.heavy.atLeast ? def.heavy.weight : def.weight);
   p.turnFlags.signature = after;
   if (p.statuses.kindredVow && !p.turnFlags.kindredVow && before < KINDRED_VOW_AT && after >= KINDRED_VOW_AT && p.hp > 0 && cs.outcome === 'ongoing') {
     p.turnFlags.kindredVow = 1;
@@ -846,7 +846,11 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       log(cs, ev, `余烬不足 ${v.requireEmber} 点：「${v.name}」改为失去 ${v.hpFallback} 点生命`);
       playerLoseHp(cs, v.hpFallback, ev, true);
     }
-    resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer, hpPaid);
+    // 只记这张牌自身的效果；能力、遗物在出牌过程中带出的燃烧或临时力量不算。
+    const marks: PlayedMarks = { burn: false, tempStrength: false };
+    resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer, hpPaid, marks);
+    if (marks.burn) addSignature(cs, ev, 'burnCard');
+    if (marks.tempStrength) addSignature(cs, ev, 'tempStrengthCard');
     finishPlay(v, releaseCharge, guarded);
     handleEnemyDeaths(cs, ev);
   };
@@ -927,7 +931,9 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
 }
 
 type CardMoveResolution = { effect: CardTransfer; card: CardInstance; index: number; resolved: boolean };
-function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution, skipEmberCost = false) {
+/** 一次出牌中，牌自身效果是否对敌人施加了燃烧、是否让自己获得了临时力量。 */
+type PlayedMarks = { burn: boolean; tempStrength: boolean };
+function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution, skipEmberCost = false, marks?: PlayedMarks) {
   const p = cs.player;
   const onEmberSpent = (amount: number) => {
     if (amount <= 0 || !view || view.type === 'curse' || p.hp <= 0 || cs.outcome !== 'ongoing') return;
@@ -1013,6 +1019,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         playerLoseHp(cs, e.amount, ev, true);
         break;
       case 'tempStrength':
+        if (marks && e.amount > 0) marks.tempStrength = true;
         gainStrength(cs, e.amount, ev);
         addStatus(p, 'strengthDown', e.amount, ev);
         if (p.statuses.furyWard) {
@@ -1191,6 +1198,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         for (const t of ents) {
           if (t.id === 'player' && e.status === 'strength') gainStrength(cs, e.amount, ev);
           else addStatus(t, e.status, e.amount, ev);
+          if (marks && e.status === 'burn' && e.amount > 0 && t.id !== 'player') marks.burn = true;
           log(cs, ev, `${t.name} 获得 ${e.amount} 层${STATUSES[e.status].name}`);
         }
         break;
@@ -1242,6 +1250,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
       case 'reapplyBurn':
         for (const t of targets(false)) {
           const layers = appliedBurn(t);
+          if (marks && layers > 0) marks.burn = true;
           addStatus(t, 'burn', layers, ev);
           log(cs, ev, `旧火重燃：对 ${t.name} 再施加本场累计的 ${layers} 层燃烧`);
         }
@@ -1252,6 +1261,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           if (layers <= 0) break;
           for (const t of aliveEnemies(cs)) {
             if (t.id === source.id) continue;
+            if (marks) marks.burn = true;
             addStatus(t, 'burn', layers, ev);
             log(cs, ev, `将 ${source.name} 的 ${layers} 层燃烧传播给 ${t.name}`);
           }
@@ -1297,6 +1307,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         for (const t of e.target === 'self' ? [p] : targets(false)) {
           const cur = t.statuses[e.status] ?? 0;
           if (cur > 0) {
+            if (marks && e.status === 'burn' && t.id !== 'player') marks.burn = true;
             if (t.id === 'player' && e.status === 'strength') gainStrength(cs, cur, ev);
             else addStatus(t, e.status, cur, ev);
             log(cs, ev, `${t.name} 的${STATUSES[e.status].name}翻倍为 ${t.statuses[e.status]}`);
@@ -1329,7 +1340,7 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
           const met = checkCondition(e.cond, p, target, view?.bonus ?? 0) && !(e.oncePerTurn && p.turnFlags[`once:${e.oncePerTurn}`]);
           if (met && e.oncePerTurn) p.turnFlags[`once:${e.oncePerTurn}`] = 1;
           const branch = met ? e.then : e.else;
-          if (branch) resolveEffects(cs, branch, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined, transfer);
+          if (branch) resolveEffects(cs, branch, target, ev, extraDamage, view ? { ...view, charge: undefined } : undefined, transfer, false, marks);
         }
         break;
     }

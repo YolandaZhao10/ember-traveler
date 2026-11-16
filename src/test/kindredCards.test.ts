@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { CARD_LIST } from '../data/cards';
-import { CHARACTER_LIST } from '../data/characters';
+import { CHARACTER_LIST, CHARACTERS } from '../data/characters';
 import { describeCard, statusDescription, viewCard, viewDef } from '../engine/cards';
 import { canPlayCard, createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn } from '../engine/combat';
 import { makeRng } from '../engine/rng';
-import { signatureCount } from '../engine/signature';
-import type { CardInstance, CharacterId, CombatState } from '../engine/types';
+import { KINDRED_VOW_AT, signatureCount } from '../engine/signature';
+import type { CardInstance, CharacterId, CombatState, Effect } from '../engine/types';
 
 const card = (defId: string, upgraded = false, uid = defId): CardInstance => ({ uid, defId, upgraded });
 function battle(character: CharacterId, ids: string[], enemies = 1): CombatState {
@@ -61,20 +61,87 @@ describe('各角色的招牌动作计数', () => {
     expect(signatureCount(other.player)).toBe(0);
   });
 
-  it('血誓者：每次因卡牌失去生命计 1 次，单次失去 4 点以上计 2 次，生命代付同样算', () => {
+  it('拾灰者：每打出一张以自身效果对敌人施加燃烧的牌也计 1 次，按牌而不按层数；能力带出的燃烧不算', () => {
+    let cs = battle('picker', ['light_up', 'ignite', 'add_fuel', 'strike']);
+    cs = use(cs, 'light_up-0');
+    expect(cs.enemies[0].statuses.burn).toBe(3);
+    expect(signatureCount(cs.player)).toBe(1);
+    cs = use(cs, 'strike-3');
+    expect(signatureCount(cs.player)).toBe(1);
+    // 回响重放是又一次出牌，再计一次。
+    cs.player.statuses.echo = 1;
+    cs = use(cs, 'ignite-1');
+    expect(signatureCount(cs.player)).toBe(3);
+    // 添油让已有燃烧翻倍算施加燃烧，本牌消耗另计。
+    cs = use(cs, 'add_fuel-2');
+    expect(signatureCount(cs.player)).toBe(5);
+    // 目标没有燃烧时添油没有施加任何燃烧，只算自身消耗。
+    expect(signatureCount(use(battle('picker', ['add_fuel']), 'add_fuel-0').player)).toBe(1);
+    // 炉膛导流在出牌过程中给敌人上了燃烧，但不是这张牌自身的效果。
+    const conduit = battle('picker', ['ember_exchange']);
+    conduit.player.ember = 3; conduit.player.statuses.emberConduit = 6;
+    const after = use(conduit, 'ember_exchange-0');
+    expect(after.enemies[0].statuses.burn).toBe(6);
+    expect(signatureCount(after.player)).toBe(1);
+    // 其他角色施加燃烧不计数。
+    expect(signatureCount(use(battle('traveler', ['ignite']), 'ignite-0').player)).toBe(0);
+  });
+
+  it('血誓者：每次因卡牌失去生命计 2 次，单次失去 4 点以上计 3 次，生命代付同样算', () => {
     let cs = battle('oathbound', ['ember_pulse', 'pain_trade', 'ember_blade', 'strike']);
     cs = use(cs, 'ember_pulse-0');
-    expect(signatureCount(cs.player)).toBe(1);
+    expect(signatureCount(cs.player)).toBe(2);
     cs = use(cs, 'pain_trade-1');
-    expect(signatureCount(cs.player)).toBe(3);
+    expect(signatureCount(cs.player)).toBe(5);
     // 余烬足够时灰烬之刃不失血，不计数。
-    expect(signatureCount(use(cs, 'ember_blade-2').player)).toBe(3);
+    expect(signatureCount(use(cs, 'ember_blade-2').player)).toBe(5);
     cs.player.ember = 0;
     cs = use(cs, 'ember_blade-2');
-    expect(signatureCount(cs.player)).toBe(5);
+    expect(signatureCount(cs.player)).toBe(8);
     // 敌人造成的伤害不是因卡牌失去生命。
     const hit = endPlayerTurn(battle('oathbound', ['strike'])).state;
     expect(signatureCount(enemyAct(hit, 'e0').state.player)).toBe(0);
+  });
+
+  it('血誓者：每打出一张以自身效果获得临时力量的牌也计 2 次，按牌而不按点数；永久力量和能力带出的临时力量不算', () => {
+    let cs = battle('oathbound', ['flex', 'frenzy', 'inflame', 'blood_fury', 'strike']);
+    cs = use(cs, 'flex-0');
+    expect(signatureCount(cs.player)).toBe(2);
+    cs = use(cs, 'frenzy-1');
+    expect(cs.player.statuses.strengthDown).toBe(5);
+    expect(signatureCount(cs.player)).toBe(4);
+    // 怒吼给的是永久力量。
+    cs = use(cs, 'inflame-2');
+    expect(signatureCount(cs.player)).toBe(4);
+    // 血怒既失去 3 点生命又获得临时力量，两个动作各计一次。
+    cs = use(cs, 'blood_fury-3');
+    expect(signatureCount(cs.player)).toBe(8);
+    // 火星加冕在消耗余烬时带出的临时力量不是这张牌自身的效果。
+    const crowned = battle('oathbound', ['ember_blade']);
+    crowned.player.ember = 2; crowned.player.statuses.sparkCrown = 4;
+    const after = use(crowned, 'ember_blade-0');
+    expect(after.player.statuses.strengthDown).toBe(2);
+    expect(signatureCount(after.player)).toBe(0);
+    // 其他角色获得临时力量不计数。
+    const traveler = use(use(battle('traveler', ['chain_slash', 'strike']), 'strike-1'), 'chain_slash-0');
+    expect(traveler.player.statuses.strengthDown).toBe(2);
+    expect(signatureCount(traveler.player)).toBe(0);
+  });
+
+  it('血誓者一次大额失血就达到 3 次计数，直接触发旅途誓火；两次小额失血在第二次触发', () => {
+    let heavy = battle('oathbound', ['pain_trade', 'ember_pulse']);
+    heavy.player.statuses.kindredVow = 1;
+    heavy = use(heavy, 'pain_trade-0');
+    // 以痛换势自带 2 能量，再加旅途誓火的 1 能量与 1 张牌。
+    expect([signatureCount(heavy.player), heavy.player.energy, heavy.player.hand.length]).toEqual([3, 12, 2]);
+    expect(use(heavy, 'ember_pulse-1').player.energy).toBe(12);
+
+    let light = battle('oathbound', ['ember_pulse', 'ember_pulse']);
+    light.player.statuses.kindredVow = 1;
+    light = use(light, 'ember_pulse-0');
+    expect([signatureCount(light.player), light.player.energy, light.player.hand.length]).toEqual([2, 9, 1]);
+    light = use(light, 'ember_pulse-1');
+    expect([signatureCount(light.player), light.player.energy, light.player.hand.length]).toEqual([4, 10, 1]);
   });
 
   it('灰语学者：每次完成回响或镜像重放、每打出一张蓄力 ≥2 的牌各计 2 次', () => {
@@ -285,28 +352,51 @@ describe('卡面按角色写出具体动作，不出现「招牌动作」', () =
   it('火种共鸣与同源余火按角色换算每次动作的实际加成', () => {
     const spark = (voice: CharacterId | null) => describeCard(card('kindred_spark'), null, voice);
     expect(spark('traveler')).toBe('造成 5 点伤害，本回合拥有格挡时每打出 1 张攻击牌 +3（最多 +12）。');
-    expect(spark('picker')).toBe('造成 5 点伤害，本回合每有 1 张牌被消耗 +3（最多 +12）。');
-    expect(spark('oathbound')).toBe('造成 5 点伤害，本回合每次因卡牌失去生命 +3（单次失去 4 点以上算 2 次，最多 +12）。');
+    expect(spark('picker')).toBe('造成 5 点伤害，本回合每有 1 张牌被消耗、每打出 1 张施加燃烧的牌 +3（最多 +12）。');
+    expect(spark('oathbound')).toBe('造成 5 点伤害，本回合每次因卡牌失去生命、每打出 1 张获得临时力量的牌 +6（单次失去 4 点以上 +9，最多 +12）。');
     expect(spark('scholar')).toBe('造成 5 点伤害，本回合每完成 1 次回响或镜像重放、每打出 1 张蓄力 ≥2 的牌 +6（最多 +12）。');
     expect(spark(null)).toBe('造成 5 点伤害，本回合每完成 1 次角色专长动作 +3（最多 +12）。');
     expect(describeCard(card('kindred_afterglow'), null, 'traveler')).toBe('获得 6 点格挡，本回合拥有格挡时每打出 1 张攻击牌获得 1 点余烬（最多 4 点）。');
+    expect(describeCard(card('kindred_afterglow'), null, 'oathbound')).toBe('获得 6 点格挡，本回合每次因卡牌失去生命、每打出 1 张获得临时力量的牌获得 2 点余烬（单次失去 4 点以上获得 3 点，最多 4 点）。');
     expect(describeCard(card('kindred_afterglow'), null, 'scholar')).toBe('获得 6 点格挡，本回合每完成 1 次回响或镜像重放、每打出 1 张蓄力 ≥2 的牌获得 2 点余烬（最多 4 点）。');
   });
 
   it('门槛类文字按角色换算成需要完成的动作次数', () => {
     expect(describeCard(card('kindred_refrain'), null, 'traveler')).toBe('若本回合拥有格挡时已打出 3 张以上攻击牌：获得 2 点能量（每回合限 1 次）；否则获得 2 点余烬。消耗。');
-    expect(describeCard(card('kindred_refrain'), null, 'oathbound')).toBe('若本回合因卡牌失去生命 3 次以上（单次失去 4 点以上算 2 次）：获得 2 点能量（每回合限 1 次）；否则获得 2 点余烬。消耗。');
+    expect(describeCard(card('kindred_refrain'), null, 'oathbound')).toBe('若本回合因卡牌失去生命与打出获得临时力量的牌合计 2 次以上，或有 1 次单次失去 4 点以上生命：获得 2 点能量（每回合限 1 次）；否则获得 2 点余烬。消耗。');
+    expect(describeCard(card('kindred_refrain', true), null, 'oathbound')).toContain('若本回合因卡牌失去生命与打出获得临时力量的牌合计 1 次以上：');
+    expect(describeCard(card('kindred_dawn'), null, 'oathbound')).toContain('若本回合因卡牌失去生命与打出获得临时力量的牌合计 2 次以上：');
     expect(describeCard(card('kindred_refrain'), null, 'scholar')).toContain('若本回合已完成 2 次以上回响、镜像重放或打出蓄力 ≥2 的牌：');
     expect(describeCard(card('kindred_refrain', true), null, 'scholar')).toContain('若本回合已完成 1 次以上回响、镜像重放或打出蓄力 ≥2 的牌：');
-    expect(describeCard(card('kindred_refrain', true), null, 'picker')).toContain('若本回合已有 2 张以上牌被消耗：');
-    expect(describeCard(card('kindred_dawn'), null, 'picker')).toBe('对所有敌人造成 12 点伤害，若本回合已有 4 张以上牌被消耗：对所有敌人造成 12 点伤害，获得 3 点余烬。');
+    expect(describeCard(card('kindred_refrain', true), null, 'picker')).toContain('若本回合被消耗的牌与打出的施加燃烧的牌合计 2 张以上：');
+    expect(describeCard(card('kindred_dawn'), null, 'picker')).toBe('对所有敌人造成 12 点伤害，若本回合被消耗的牌与打出的施加燃烧的牌合计 4 张以上：对所有敌人造成 12 点伤害，获得 3 点余烬。');
     expect(describeCard(card('kindred_dawn'), null)).toContain('若本回合已完成 4 次以上角色专长动作：');
+  });
+
+  it('门槛文字里的「合计 N 次，或有 M 次大额失血」与实际计数完全等价', () => {
+    const thresholds = new Set<number>([KINDRED_VOW_AT]);
+    const collect = (effects: Effect[]) => { for (const e of effects) if (e.kind === 'conditional') { if (e.cond.kind === 'signatureThisTurnAtLeast') thresholds.add(e.cond.value); collect(e.then); collect(e.else ?? []); } };
+    for (const def of CARD_LIST) { collect(def.effects); collect(def.upgrade.effects ?? []); }
+    expect([...thresholds].sort()).toEqual([2, 3, 4]);
+    for (const { id } of CHARACTER_LIST) {
+      const { weight, heavy } = CHARACTERS[id].signature;
+      for (const threshold of thresholds) {
+        const actions = Math.max(1, Math.ceil(threshold / weight));
+        const heavyActions = heavy ? Math.max(1, Math.ceil(threshold / heavy.weight)) : actions;
+        // normal 为普通动作次数，big 为单次大额失血次数。
+        for (let normal = 0; normal <= 6; normal++) for (let big = 0; big <= (heavy ? 4 : 0); big++) {
+          const met = normal * weight + big * (heavy?.weight ?? 0) >= threshold;
+          const described = normal + big >= actions || (heavyActions < actions && big >= heavyActions);
+          expect(described, `${id} 门槛 ${threshold}：普通 ${normal} 次、大额 ${big} 次`).toBe(met);
+        }
+      }
+    }
   });
 
   it('旅途誓火的卡面与状态提示按角色写出触发时机', () => {
     expect(describeCard(card('kindred_vow'), null, 'traveler')).toBe('每回合拥有格挡时打出第 3 张攻击牌后，获得 1 点能量并抽 1 张牌。每回合仅一次。');
-    expect(statusDescription('kindredVow', 1, 'picker')).toBe('每回合第 3 张牌被消耗时，获得 1 点能量并抽 1 张牌。每回合仅一次。');
-    expect(statusDescription('kindredVow', 1, 'oathbound')).toBe('每回合第 3 次因卡牌失去生命时（单次失去 4 点以上算 2 次），获得 1 点能量并抽 1 张牌。每回合仅一次。');
+    expect(statusDescription('kindredVow', 1, 'picker')).toBe('每回合被消耗的牌与打出的施加燃烧的牌合计达到 3 张时，获得 1 点能量并抽 1 张牌。每回合仅一次。');
+    expect(statusDescription('kindredVow', 1, 'oathbound')).toBe('每回合因卡牌失去生命与打出获得临时力量的牌合计达到 2 次时，或单次失去 4 点以上生命时，获得 1 点能量并抽 1 张牌。每回合仅一次。');
     expect(statusDescription('kindredVow', 2, 'scholar')).toBe('每回合第 2 次完成回响、镜像重放或打出蓄力 ≥2 的牌时，获得 2 点能量并抽 2 张牌。每回合仅一次。');
     expect(statusDescription('kindredVow', 1)).toBe('每回合第 3 次完成角色专长动作时，获得 1 点能量并抽 1 张牌。每回合仅一次。');
     expect(statusDescription('strength', 2, 'traveler')).toBe(statusDescription('strength', 2));

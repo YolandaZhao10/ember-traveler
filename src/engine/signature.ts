@@ -19,21 +19,29 @@ const GENERIC: Pick<SignatureDef, 'weight' | 'heavy' | 'text'> = {
 const signatureOf = (character?: CharacterId | null) => (character ? CHARACTERS[character].signature : GENERIC);
 /** 达到指定计数至少需要完成几次动作（每次动作可能计多次）。 */
 const actionsFor = (count: number, weight: number) => Math.max(1, Math.ceil(count / weight));
+/** 普通动作与全靠大额失血各需几次；没有大额规则时两者相同。 */
+function actionsNeeded(s: Pick<SignatureDef, 'weight' | 'heavy'>, count: number): [number, number] {
+  const actions = actionsFor(count, s.weight);
+  return [actions, s.heavy ? actionsFor(count, s.heavy.weight) : actions];
+}
 
-/** 「本回合……」的逐次加成用语；value 已换算成当前角色每做一次动作的实际加成。 */
-export function signatureEachText(character: CharacterId | null | undefined, per: number): { each: string; value: number; note: string } {
+/**
+ * 「本回合……」的逐次加成用语；value 已换算成当前角色每做一次动作的实际加成，
+ * heavy 为单次大额失血时的加成。
+ */
+export function signatureEachText(character: CharacterId | null | undefined, per: number): { each: string; value: number; heavy?: { label: string; value: number } } {
   const s = signatureOf(character);
-  return { each: s.text.each, value: per * s.weight, note: s.text.note ?? '' };
+  return { each: s.text.each, value: per * s.weight, ...(s.heavy ? { heavy: { label: s.heavy.label, value: per * s.heavy.weight } } : {}) };
 }
 
 /** 条件用语：接在「若本回合」之后。 */
 export function signatureReachedText(character: CharacterId | null | undefined, count: number): string {
   const s = signatureOf(character);
-  return `${s.text.reached(actionsFor(count, s.weight))}${s.text.note ? `（${s.text.note}）` : ''}`;
+  return s.text.reached(...actionsNeeded(s, count));
 }
 
 /** 旅途誓火的完整说明；卡面与状态提示共用。 */
 export function kindredVowText(amount: number, character?: CharacterId | null): string {
   const s = signatureOf(character);
-  return `每回合${s.text.nth(actionsFor(KINDRED_VOW_AT, s.weight))}${s.text.note ? `（${s.text.note}）` : ''}，获得 ${amount} 点能量并抽 ${amount} 张牌。每回合仅一次。`;
+  return `每回合${s.text.nth(...actionsNeeded(s, KINDRED_VOW_AT))}，获得 ${amount} 点能量并抽 ${amount} 张牌。每回合仅一次。`;
 }
