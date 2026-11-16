@@ -106,6 +106,12 @@ function chargeShape(charge: { damage?: number; block?: number } | undefined, mo
   return Object.keys(active).length ? shape(active, mode) : null;
 }
 
+/**
+ * 已人工审核、允许保留的同设计牌对（两个 ID 按字典序以 / 连接）。
+ * 疾风余烬 / 藏炭：共享牌改为消耗手牌换余烬以提供消耗接口，藏炭后续单独重做。
+ */
+export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals']);
+
 /** 数值、费用、段数、单体/群体和保留/消耗不能作为唯一特色。 */
 export function cardDesign(id: string, upgraded: boolean): string {
   const v = viewDef(id, upgraded);

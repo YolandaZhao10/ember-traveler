@@ -20,7 +20,6 @@ export const CARD_FLOOR_CASES = [
   { id: 'chain_slash', baseline: 'strike', support: ['quick_stab', 'quick_stab'] },
   { id: 'scorch_mark', baseline: 'strike', support: ['light_up', 'tend_coals'] },
   { id: 'iron_rebuke', baseline: 'strike', support: ['raise_shield', 'iron_will'] },
-  { id: 'spark_lure', baseline: 'strike', support: ['ignite', 'kindle'] },
   { id: 'thousand_cuts', baseline: 'strike', support: ['quick_stab', 'quick_stab'] },
 ] as const;
 

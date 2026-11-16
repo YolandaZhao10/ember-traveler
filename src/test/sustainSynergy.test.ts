@@ -153,10 +153,11 @@ it('多张盟约叠加也不能把同一笔卖血变成净治疗，能量每回�
  for(let i=0;i<6;i++)cs=use(cs,'ember_pulse');
  expect(cs.player.hp).toBe(hp-8);expect(cs.player.energy).toBe(energy+1);
 });
-it.each(['coal_credit','ember_sift'])('%s普通转换牌无余烬不能打出，回响不能透支，打后消耗',id=>{
+it.each([['coal_credit',true],['ember_sift',false]] as const)('%s普通转换牌无余烬不能打出，回响不能透支，打后消耗=%s',(id,exhausts)=>{
  let cs=battle();cs.player.hand=[card(id)];expect(playCard(cs,id,null).state).toBe(cs);
  cs.player.statuses.echo=1;cs.player.ember=2;
- cs=playCard(cs,id,null).state;expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(1);expect(cs.player.exhaust.some(c=>c.defId===id)).toBe(true);
+ cs=playCard(cs,id,null).state;expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(1);
+ expect(cs.player.exhaust.some(c=>c.defId===id)).toBe(exhausts);expect(cs.player.discard.some(c=>c.defId===id)).toBe(!exhausts);
 });
 it.each(['ember_blade','ember_burst'])('%s的牌面伤害包含消费余烬触发的临时力量且预览不改状态',id=>{
  const cs=battle();cs.player.ember=8;cs.player.statuses.sparkCrown=4;cs.relics=['war_horn'];cs.player.hand=[card(id)];

@@ -390,8 +390,8 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'all_enemies',
-  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'burn', amount: 3, target: 'all' }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'burn', amount: 4, target: 'all' }] },
+  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }],
+  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }] },
 });
 def({
   id: 'ash_shield',
@@ -538,13 +538,13 @@ def({
   target: 'self',
   exhaust: true,
   effects: [
-    { kind: 'discardRandom', count: 1 },
-    { kind: 'gainEmber', amount: 4 },
+    { kind: 'exhaustHand', count: 1 },
+    { kind: 'gainEmber', amount: 5 },
   ],
   upgrade: {
     effects: [
-      { kind: 'discardRandom', count: 1 },
-      { kind: 'gainEmber', amount: 6 },
+      { kind: 'exhaustHand', count: 1 },
+      { kind: 'gainEmber', amount: 8 },
     ],
   },
 });
@@ -1410,6 +1410,11 @@ EXTRA_SHARED_CARDS.forEach(def);
 EXTRA_CURSES.forEach(def);
 CYCLE_CARDS.forEach(def);
 export const CARD_LIST: CardDef[] = Object.values(CARDS);
+
+/** 已从游戏移除的牌。旧存档读档时换成 replacement（保留升级）；历史记录只读，用 name 显示。 */
+export const RETIRED_CARDS: Record<string, { name: string; replacement: string }> = {
+  spark_lure: { name: '诱火', replacement: 'ignite' },
+};
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {
   return CARD_LIST.filter((c) => c.rarity === r);

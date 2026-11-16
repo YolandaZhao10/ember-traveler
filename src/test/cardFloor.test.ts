@@ -232,22 +232,6 @@ describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
     }
   });
 
-  it('诱火两回合内的燃烧与真实虚弱减伤合计超过打击，同时不会变成超额持续伤害', () => {
-    for (const up of upgrades) {
-      const before = battle('spark_lure', up);
-      let candidate = use(before, 'spark_lure');
-      let control = battle('strike', up);
-      expect(before.player.energy - candidate.player.energy).toBe(1);
-      for (let i = 0; i < 2; i++) { candidate = round(candidate); control = round(control); }
-      const damage = before.enemies[0].hp - candidate.enemies[0].hp;
-      const savedHp = candidate.player.hp - control.player.hp;
-      const base = measure('strike', up).damage;
-      expect(savedHp).toBeGreaterThan(0);
-      expect(damage + savedHp).toBeGreaterThan(base);
-      expect(damage + savedHp).toBeLessThanOrEqual(base * 2);
-    }
-  });
-
   it('荆棘甲提高即时防护，反伤仍需要敌人实际攻击', () => {
     for (const up of upgrades) {
       const armor = measure('thorn_mail', up);
