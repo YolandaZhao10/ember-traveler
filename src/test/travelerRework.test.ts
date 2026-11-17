@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import { CARDS } from '../data/cards';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CARDS, RETIRED_CARDS } from '../data/cards';
 import { describeCard } from '../engine/cards';
 import { canPlayCard, createCombat, endPlayerTurn, playCard } from '../engine/combat';
 import { makeRng } from '../engine/rng';
-import type { CardInstance, CombatState } from '../engine/types';
+import * as R from '../engine/run';
+import { loadRun, saveRun } from '../engine/save';
+import type { CardInstance, CombatState, RunState } from '../engine/types';
 
 const card = (defId: string, uid = defId, upgraded = false): CardInstance => ({ uid, defId, upgraded, bonus: 0 });
 const text = (id: string, upgraded: boolean) => describeCard(card(id, id, upgraded), null);
@@ -209,6 +211,63 @@ describe('旅人新牌：引灯连斩', () => {
     for (const uid of ['a', 'b']) cs = playCard(cs, uid, cs.enemies[0].id).state;
     expect([lost(cs), cs.player.ember]).toEqual([12, 0]);
     expect(canPlayCard(cs, cs.player.hand.find(c => c.uid === 'c')!).ok).toBe(false);
+  });
+});
+
+describe('不息步伐移除与旧存档', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  function storage() {
+    const values = new Map<string, string>();
+    vi.stubGlobal('localStorage', { getItem: (k: string) => values.get(k) ?? null, setItem: (k: string, v: string) => values.set(k, v), removeItem: (k: string) => values.delete(k) });
+  }
+
+  it('不息步伐不再是可获得的牌，替代牌急速同为旅人的 0 费消耗技能', () => {
+    expect(CARDS.unbroken_stride).toBeUndefined();
+    expect(Object.values(CARDS).some(c => c.name === '不息步伐')).toBe(false);
+    expect(RETIRED_CARDS.unbroken_stride).toEqual({ name: '不息步伐', replacement: 'haste' });
+    const haste = CARDS.haste;
+    expect([haste.name, haste.owner, haste.cost, haste.type, haste.exhaust]).toEqual(['急速', 'traveler', 0, 'skill', true]);
+  });
+
+  it('旧存档各处的不息步伐读档后换成急速并保留升级与标识，回退点同样处理，不消耗随机流', () => {
+    storage();
+    const run: RunState = R.travelTo(R.newRun('RETIRED-STRIDE', 'traveler'), R.newRun('RETIRED-STRIDE', 'traveler').map.startIds[0]);
+    expect(run.combat).not.toBeNull();
+    const old = (uid: string, upgraded = false): CardInstance => ({ uid, defId: 'unbroken_stride', upgraded });
+    const deckSize = run.deck.length;
+    for (const snapshot of [run, run.checkpoint!]) {
+      snapshot.deck.push(old('deck-old', true));
+      const p = snapshot.combat!.player;
+      p.hand.push({ ...old('hand-old'), bonus: 0 });
+      p.draw.push(old('draw-old', true));
+      p.discard.push(old('discard-old'));
+      p.exhaust.push(old('exhaust-old'));
+      snapshot.reward = { gold: 12, goldTaken: false, cardTaken: false, relic: null, relicTaken: false, cards: [old('reward-old', true)] };
+      snapshot.shop = { removePrice: 75, removeUsed: false, relics: [], cards: [{ card: old('shop-old'), price: 150, sold: false }] };
+    }
+    const rng = JSON.stringify(run.rng);
+    saveRun(run);
+    const loaded = loadRun()!;
+    expect(loaded).not.toBeNull();
+    for (const snapshot of [loaded, loaded.checkpoint!]) {
+      const p = snapshot.combat!.player;
+      const everywhere = [...snapshot.deck, ...p.hand, ...p.draw, ...p.discard, ...p.exhaust, ...snapshot.reward!.cards, ...snapshot.shop!.cards.map(item => item.card)];
+      for (const c of everywhere) expect(() => describeCard(c, null)).not.toThrow();
+      expect(everywhere.some(c => !CARDS[c.defId])).toBe(false);
+      expect(snapshot.deck).toHaveLength(deckSize + 1);
+      expect(snapshot.deck.find(c => c.uid === 'deck-old')).toEqual({ uid: 'deck-old', defId: 'haste', upgraded: true });
+      expect(p.hand.find(c => c.uid === 'hand-old')).toEqual({ uid: 'hand-old', defId: 'haste', upgraded: false, bonus: 0 });
+      expect(p.draw.find(c => c.uid === 'draw-old')).toEqual({ uid: 'draw-old', defId: 'haste', upgraded: true });
+      expect(p.discard.find(c => c.uid === 'discard-old')?.defId).toBe('haste');
+      expect(p.exhaust.find(c => c.uid === 'exhaust-old')?.defId).toBe('haste');
+      expect(snapshot.reward!.cards).toEqual([{ uid: 'reward-old', defId: 'haste', upgraded: true }]);
+      expect(snapshot.shop!.cards).toEqual([{ card: { uid: 'shop-old', defId: 'haste', upgraded: false }, price: 150, sold: false }]);
+    }
+    expect(JSON.stringify(loaded.rng)).toBe(rng);
+    // 换成的急速可以正常打出：获得 1 点能量、抽牌并消耗。
+    const cs = loaded.combat!; cs.player.hand = cs.player.hand.filter(c => c.uid === 'hand-old'); cs.player.draw = [card('defend', 'd1'), card('defend', 'd2')];
+    const energy = cs.player.energy, after = playCard(cs, 'hand-old', null).state;
+    expect([after.player.energy, after.player.hand.length, after.player.exhaust.some(c => c.uid === 'hand-old')]).toEqual([energy + 1, 1, true]);
   });
 });
 

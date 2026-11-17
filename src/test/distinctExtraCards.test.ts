@@ -50,18 +50,6 @@ describe('专属卡牌的不同用途', () => {
     }
   });
 
-  it.each([false, true])('不息步伐在三次攻击后准备下一张牌的回响，不重复自己或返还能量（升级=%s）', up => {
-    for (const previous of [2, 3]) {
-      const cs = battle('unbroken_stride', up);
-      cs.player.attacksPlayedThisTurn = previous;
-      const result = play(cs, 'unbroken_stride');
-      expect(result.player.hand).toHaveLength(up ? 3 : 2);
-      expect(result.player.statuses.echo ?? 0).toBe(previous === 3 ? 1 : 0);
-      expect(result.player.energy).toBe(3);
-      expect(result.player.exhaust.map(c => c.defId)).toContain('unbroken_stride');
-    }
-  });
-
   it.each([false, true])('藏炭把随机一张剩余手牌转为余烬，不再附赠格挡（升级=%s）', up => {
     const cs = battle('pocket_coals', up);
     cs.player.hand.push(card('strike', 'candidate-a'), card('defend', 'candidate-b'));

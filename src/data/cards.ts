@@ -1437,6 +1437,7 @@ export const CARD_LIST: CardDef[] = Object.values(CARDS);
 /** 已从游戏移除的牌。旧存档读档时换成 replacement（保留升级）；历史记录只读，用 name 显示。 */
 export const RETIRED_CARDS: Record<string, { name: string; replacement: string }> = {
   spark_lure: { name: '诱火', replacement: 'ignite' },
+  unbroken_stride: { name: '不息步伐', replacement: 'haste' },
 };
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {

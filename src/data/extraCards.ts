@@ -63,7 +63,6 @@ add('traveler', 'uncommon', [
 add('traveler', 'rare', [
   A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 2))], { target: 'all_enemies' }),
   A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(1), hit(10))], [hit(26), when(attacks(1), hit(13))]),
-  S('unbroken_stride', '不息步伐', 'combo', 0, [draw(2), when(attacks(3), status('echo', 1))], [draw(3), when(attacks(3), status('echo', 1))], { exhaust: true }),
   P('vanguard_oath', '先锋誓言', 'combo', 2, [status('vanguardCycle', 8)], [status('vanguardCycle', 12)]),
   A('encircling_blades', '环刃', 'combo', 1, [hit(3, { times: 4 }), when(attacks(2), status('energyNext', 1))], [hit(4, { times: 4 }), when(attacks(2), status('energyNext', 2))]),
   P('steadfast_guard', '不动阵地', 'bulwark', 2, [status('metallicize', 6), status('thorns', 4)], [status('metallicize', 8), status('thorns', 5)]),
