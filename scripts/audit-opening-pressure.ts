@@ -14,7 +14,7 @@ const args = process.argv.slice(2), value = (flag: string) => args.includes(flag
 const seeds = Number(value('--seeds') ?? 8);
 if (!Number.isInteger(seeds) || seeds < 1) throw new Error('invalid seeds');
 const early: Record<string, string[]> = {
-  combo: ['quick_stab','twin_blades','chain_slash','spin_kick','rhythm','measured_step'],
+  combo: ['quick_stab','twin_blades','chain_slash','lantern_poke','rhythm','measured_step'],
   bulwark: ['raise_shield','shield_bash','riposte','vigil','brace_line','ember_patrol'],
   cinder: ['light_up','wildfire','scorch_mark','lingering_fire','tend_coals','smoke_screen'],
   ash: ['bone_ash','bone_ash','sift_ash','salvage_scraps','ash_shell','buried_knife'],

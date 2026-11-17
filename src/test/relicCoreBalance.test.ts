@@ -71,9 +71,9 @@ describe('核心遗物适度削弱与机制差异', () => {
     expect(cs.player.statuses.echo ?? 0).toBe(0);
     expect(battle(['echo_stone']).player.statuses.echo).toBe(1);
     cs = playCard(cs, 'war_drum-0', null).state;
-    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.crescendo).toBe(1);
+    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.comboFlow).toBe(1);
     cs = playCard(cs, 'war_drum-1', null).state;
-    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.crescendo).toBe(2);
+    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.comboFlow).toBe(2);
     cs = next(cs); cs.player.hand = [card('war_drum', 'again')];
     cs = playCard(cs, 'again', null).state;
     expect(cs.player.statuses.echo).toBe(2);

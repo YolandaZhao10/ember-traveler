@@ -284,7 +284,7 @@ describe('给能量的效果每回合各只生效一次', () => {
 
 describe('指定组合不会无限出牌：旅人的战鼓 + 鼓手之心 + 旅途誓火 + 余烬回声', () => {
   it('四个回能来源一回合合计最多 5 点能量；带大量零费攻击和余音连打十回合，每回合出牌数都有限', () => {
-    const ids = ['war_drum', 'kindred_vow', 'tempo', 'kindred_refrain', 'kindred_refrain', 'raise_shield', 'raise_shield', ...Array(10).fill('quick_stab'), 'spin_kick', 'spin_kick'];
+    const ids = ['war_drum', 'kindred_vow', 'tempo', 'kindred_refrain', 'kindred_refrain', 'raise_shield', 'raise_shield', ...Array(10).fill('quick_stab'), 'echo_blade', 'echo_blade'];
     const deck = ids.map((id, i) => card(id, false, `deck-${i}`));
     let cs = createCombat('kindred-loop', ['tomb_puppet'], 'normal', deck, 500, 500, ['drummer_heart'], makeRng('KINDRED-LOOP', 'c'), 100, 'traveler').state;
     cs.enemies[0].hp = cs.enemies[0].maxHp = 100000;

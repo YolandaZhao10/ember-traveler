@@ -63,7 +63,7 @@ describe('拾灰者灰烬路线五张牌的调整', () => {
   });
 
   it.each([false, true])('灰中索引：没有上限，本回合每消耗过 1 张牌抽 1 张；升级后额外再抽 1 张（升级=%s）', up => {
-    expect(text('ash_index', up)).toBe(up ? '本回合每消耗 1 张牌可兑换抽 1 张牌；已兑换部分不能重复计算，抽 1 张牌。消耗。' : '本回合每消耗 1 张牌可兑换抽 1 张牌；已兑换部分不能重复计算。消耗。');
+    expect(text('ash_index', up)).toBe(up ? '本回合每消耗 1 张牌抽 1 张牌，不重复计算，另抽 1 张牌。消耗。' : '本回合每消耗 1 张牌抽 1 张牌，不重复计算。消耗。');
     expect(viewDef('ash_index', up).effects[0]).toEqual({ kind: 'convertResource', resource: 'exhausts', per: 1, reward: 'draw' });
     for (const exhausted of [0, 1, 3, 6]) {
       const cs = battle('ash_index', up);
@@ -102,10 +102,12 @@ describe('拾灰者灰烬路线五张牌的调整', () => {
     expect(res.state.rng).not.toEqual(cs.rng);
   });
 
-  it('其他带上限的兑换牌不受影响；另外四张自选牌仍然自选', () => {
+  it('没有取消上限的兑换牌仍带上限；另外四张自选牌仍然自选', () => {
+    // 之后的调整又取消了这几张的上限：战途补给、借火鼓风、炭中寻页、烬炉鼓风。
+    const uncapped = ['ash_index', 'trail_supply', 'borrow_flame', 'coal_page_search', 'ember_bellows'];
     for (const def of CARD_LIST) for (const up of [false, true]) {
       if (def.type === 'curse' && up) continue;
-      for (const e of viewDef(def.id, up).effects) if (e.kind === 'convertResource' && def.id !== 'ash_index') expect(e.max, def.id).toBeGreaterThan(0);
+      for (const e of viewDef(def.id, up).effects) if (e.kind === 'convertResource' && !uncapped.includes(def.id)) expect(e.max, def.id).toBeGreaterThan(0);
     }
     for (const id of ['sift_ash', 'ash_shell', 'burial_veil', 'ash_offering']) {
       expect(viewDef(id, true).effects[0], id).toMatchObject({ kind: 'exhaustHand', choose: true });

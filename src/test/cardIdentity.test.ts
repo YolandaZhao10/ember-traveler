@@ -99,18 +99,18 @@ describe('荆棘与盾牌的新取舍', () => {
     expect(play('thorn_mail',up).player.block).toBe(up?10:7);
     expect(play('thorn_mail',up).player.statuses.thorns).toBe(up?4:3);
   });
-  it.each([false,true])('碎盾先消耗格挡再按 3 倍群攻，升级只降费用；盾击保留格挡、带固定加成且只击中所选敌人（升级=%s）',up=>{
+  it.each([false,true])('碎盾先消耗格挡再按 2 倍群攻，升级后 3 倍、费用不变；盾击保留格挡、带固定加成且只击中所选敌人（升级=%s）',up=>{
     const before=battle('shield_shatter',up);before.player.block=12;
     const after=playCard(before,'shield_shatter',null).state;
-    expect(after.player.block).toBe(0);expect(after.enemies.map(e=>e.hp)).toEqual([1000-36,1000-36]);
-    expect(after.player.energy).toBe(up?9:8);expect(describeCard(card('shield_shatter',up),null)).toBe('消耗所有格挡，对所有敌人造成等于当前格挡 × 3的伤害。');
+    expect(after.player.block).toBe(0);expect(after.enemies.map(e=>e.hp)).toEqual(up?[1000-36,1000-36]:[1000-24,1000-24]);
+    expect(after.player.energy).toBe(8);expect(describeCard(card('shield_shatter',up),null)).toBe(`消耗所有格挡，对所有敌人造成等于当前格挡 × ${up?3:2}的伤害。`);
     const shield=battle('shield_bash',up);shield.player.block=12;const kept=playCard(shield,'shield_bash','e0').state;
     expect(kept.player.block).toBe(up?15:12);expect(kept.enemies[0].hp).toBe(1000-(up?15+6:12+4));expect(kept.enemies[1].hp).toBe(1000);
     expect(describeCard(card('shield_bash',up),null)).toBe(up?'获得 3 点格挡，造成等于当前格挡 +6的伤害。':'造成等于当前格挡 +4的伤害。');
   });
   it('碎盾回响不能重复消费同一份格挡，零格挡不制造基础伤害，反伤死亡停止后续目标',()=>{
     const echoed=battle('shield_shatter');echoed.player.block=10;echoed.player.statuses.echo=1;
-    expect(playCard(echoed,'shield_shatter',null).state.enemies.map(e=>e.hp)).toEqual([970,970]);
+    expect(playCard(echoed,'shield_shatter',null).state.enemies.map(e=>e.hp)).toEqual([980,980]);
     expect(play('shield_shatter').enemies.map(e=>e.hp)).toEqual([1000,1000]);
     const lethal=battle('shield_shatter');lethal.player.hp=4;lethal.player.block=10;lethal.enemies[0].statuses.thorns=5;
     const after=playCard(lethal,'shield_shatter',null).state;

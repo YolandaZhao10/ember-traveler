@@ -64,7 +64,8 @@ export type StatusId =
   | 'vanguardCycle' | 'patientGuard' | 'drawNext'
   | 'emberConduit' | 'ashRecall' | 'burningRelay' | 'sparkCrown'
   | 'chargedEcho' | 'repriseStudy' | 'retainedWard' | 'emberBastion'
-  | 'arcaneWard' | 'emberOath' | 'kindredVow';
+  | 'arcaneWard' | 'emberOath' | 'kindredVow'
+  | 'blockNext' | 'barricadeOnce' | 'comboBlock' | 'emberDraw' | 'emberEngine';
 
 export type Condition =
   | { kind: 'strengthAtLeast'; value: number }
@@ -87,8 +88,10 @@ export type Effect =
   | { kind: 'takeDamage'; amount: number }
   | { kind: 'tempStrength'; amount: number }
   | { kind: 'doubleEmber' }
-  | { kind: 'discardRandom'; count: number | 'all' }
-  | { kind: 'clearDebuffs' }
+  /** choose：由玩家在手牌里选择要弃置的牌，规则同 exhaustHand 的 choose；缺省为随机。 */
+  | { kind: 'discardRandom'; count: number | 'all'; choose?: true }
+  /** 缺省清除虚弱、易伤、脆弱与燃烧；scope 为 all 时清除自身的全部状态，增益与能力也一并清除。 */
+  | { kind: 'clearDebuffs'; scope?: 'all' }
   | { kind: 'removeBlock' }
   | { kind: 'damageByBlock'; bonus?: number; aoe?: boolean; mult?: number; consume?: boolean }
   | { kind: 'damagePerAttack'; amount: number }
@@ -98,26 +101,32 @@ export type Effect =
   | { kind: 'blockPerHand'; amount: number; max: number }
   | { kind: 'consumeVulnerable'; damagePer: number; aoe?: boolean }
   | { kind: 'draw'; amount: number }
-  | { kind: 'moveCard'; from: 'draw' | 'discard' | 'exhaust'; to: 'hand' | 'draw' | 'discard'; filter?: 'attack' | 'skill' | 'action' | 'exhaust'; sample?: number }
+  /** to 为 exhaust 时选中的牌被消耗并触发消耗联动；optional：没有可选的牌时仍可打出，只是不移动任何牌。 */
+  | { kind: 'moveCard'; from: 'draw' | 'discard' | 'exhaust'; to: 'hand' | 'draw' | 'discard' | 'exhaust'; filter?: 'attack' | 'skill' | 'action' | 'exhaust'; sample?: number; optional?: true }
   | { kind: 'retainHand' }
-  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; /** 单次兑换的上限；缺省表示没有上限。 */ max?: number; reward: 'draw' | 'energy' }
+  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; /** 单次兑换的上限；缺省表示没有上限。 */ max?: number; reward: 'draw' | 'energy'; /** 仅余烬与燃烧：把来源全部消耗，不足一份的余数也一并消耗。 */ consumeAll?: true }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number; /** 本回合每次招牌动作计数额外获得的余烬及其上限 */ perSignature?: number; signatureMax?: number }
   | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean; /** 不随余烬变化的基础伤害，与每点余烬加成合并为一次命中 */ base?: number }
-  | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
+  /** plain 只影响卡面写法：蓄能写成「下回合获得 N 点能量」。 */
+  | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self'; plain?: true }
   | { kind: 'heal'; amount: number }
   /** choose：由玩家在手牌里选择要消耗的牌（必须选满，手牌不足时选完为止）；缺省为随机。 */
-  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number; choose?: true }
+  | { kind: 'exhaustHand'; count: number | 'all'; /** junk 为诅咒牌和状态牌 */ filter?: 'curse' | 'junk'; damagePerCard?: number; energyPerCard?: number; choose?: true }
   | { kind: 'damagePerBurn'; amount: number; aoe?: boolean }
   | { kind: 'reapplyBurn' }
   | { kind: 'spreadBurn' }
-  | { kind: 'burnToEmber'; amount: number; max: number }
+  /** max 缺省表示没有上限；energyPer：每消耗这么多层燃烧另得 1 点能量。 */
+  | { kind: 'burnToEmber'; amount: number; max?: number; energyPer?: number }
+  /** 立即结算一次燃烧伤害（与敌人回合开始时的结算相同）；relay：因此死亡的敌人把剩余燃烧施加给其他所有敌人。 */
+  | { kind: 'burnTick'; aoe?: boolean; relay?: boolean }
   | { kind: 'consumeBurn'; damagePer: number }
   | { kind: 'consumeTempStrength'; base: number; damagePer: number }
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
   | { kind: 'replayDiscard' }
-  | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
+  /** to 缺省回到手牌；draw 表示放入抽牌堆的随机位置。 */
+  | { kind: 'returnExhausted'; count: number; selection?: 'highestCost'; to?: 'draw' }
   /** else 在条件不满足时结算；oncePerTurn 为回合内计数键：then 每回合只生效一次，之后改走 else */
   | { kind: 'conditional'; cond: Condition; then: Effect[]; else?: Effect[]; oncePerTurn?: string };
 
@@ -141,9 +150,13 @@ export interface CardDef {
   ethereal?: boolean;
   /** 回合结束时保留在手牌 */
   retain?: boolean;
-  /** 每保留一回合，伤害 / 格挡 / 获得的余烬增加；max 为低于全局上限的单牌蓄力上限 */
-  charge?: { damage?: number; block?: number; ember?: number; max?: number };
+  /** 条件保留：回合结束时余烬不少于这个数才保留。 */
+  retainAtEmber?: number;
+  /** 每保留一回合，伤害 / 格挡 / 获得的余烬增加；max 为低于全局上限的单牌蓄力上限；uncapped 表示不设上限 */
+  charge?: { damage?: number; block?: number; ember?: number; max?: number; uncapped?: true };
   requireEmber?: number;
+  /** 只影响卡面：效果里已写明消耗余烬时，不再重复「需要 N 点余烬」。 */
+  hideRequireText?: true;
   /** 共鸣牌：效果按当前角色的招牌动作计数结算，奖励加权时一并提高 */
   kindred?: boolean;
   /** 余烬不足 requireEmber 时仍可打出：改为失去这么多生命，并跳过本次余烬消耗。 */
@@ -349,9 +362,9 @@ export interface EventDef {
 // ---------- 战斗 ----------
 export type Pile = 'draw' | 'hand' | 'discard' | 'exhaust';
 export interface PowerInstance {
-  status: 'tempo' | 'flameAura' | 'mirror';
+  status: 'tempo' | 'flameAura' | 'mirror' | 'emberEngine';
   amount: number;
-  /** 余音跨回合累计出牌数；镜像为本回合是否已触发。 */
+  /** 余音跨回合累计出牌数；镜像为本回合是否已触发；薪火不绝为跨回合累计获得的余烬。 */
   progress: number;
 }
 

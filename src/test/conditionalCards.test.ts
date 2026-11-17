@@ -15,7 +15,7 @@ describe('条件牌的用途和收益',()=>{
   it('全卡池基础/升级与普通升级对稀有基础不出现同费条件完全下位',()=>expect(conditionalDominations()).toEqual([]));
   it('确实能识别旧盾缘，而不是只对新定义返回空列表',()=>{
     const old=CARDS.shield_edge.effects;
-    try { CARDS.shield_edge.effects=[{kind:'damage',amount:7},{kind:'conditional',cond:{kind:'hasBlock'},then:[{kind:'block',amount:5}]}];
+    try { CARDS.shield_edge.effects=[{kind:'damage',amount:6},{kind:'conditional',cond:{kind:'hasBlock'},then:[{kind:'block',amount:5}]}];
       expect(conditionalDominations()).toContainEqual({weaker:'shield_edge',weakerUpgraded:false,stronger:'cross_guard',strongerUpgraded:false});
     } finally { CARDS.shield_edge.effects=old; }
   });

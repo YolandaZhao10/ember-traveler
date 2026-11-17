@@ -121,18 +121,6 @@ def({
   upgrade: { effects: [{ kind: 'damage', amount: 11 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'tempStrength', amount: 3 }] }] },
 });
 def({
-  id: 'spin_kick',
-  name: '回旋踢',
-  type: 'attack',
-  rarity: 'uncommon',
-  archetype: 'combo',
-  owner: 'traveler',
-  cost: 1,
-  target: 'enemy',
-  effects: [{ kind: 'damage', amount: 9 }, { kind: 'draw', amount: 1 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'draw', amount: 1 }] },
-});
-def({
   id: 'rhythm',
   exhaust: true,
   name: '节奏',
@@ -149,7 +137,7 @@ def({
   id: 'haste',
   name: '急速',
   type: 'skill',
-  rarity: 'uncommon',
+  rarity: 'rare',
   archetype: 'combo',
   owner: 'traveler',
   cost: 0,
@@ -181,10 +169,10 @@ def({
   rarity: 'uncommon',
   archetype: 'combo',
   owner: 'traveler',
-  cost: 1,
+  cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'tempo', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'tempo', amount: 2, target: 'self' }] },
+  upgrade: { cost: 1 },
 });
 def({
   id: 'war_drum',
@@ -195,8 +183,8 @@ def({
   owner: 'traveler',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'crescendo', amount: 1, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'crescendo', amount: 2, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 6, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 8, target: 'self' }] },
 });
 def({
   id: 'trip',
@@ -272,8 +260,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'self',
-  effects: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 16 }],
+  upgrade: { effects: [{ kind: 'block', amount: 22 }] },
 });
 def({
   id: 'riposte',
@@ -302,10 +290,10 @@ def({
   rarity: 'rare',
   archetype: 'bulwark',
   owner: 'traveler',
-  cost: 2,
+  cost: 3,
   target: 'self',
   effects: [{ kind: 'status', status: 'barricade', amount: 1, target: 'self' }],
-  upgrade: { cost: 1 },
+  upgrade: { cost: 2 },
   flavor: '城墙不会在清晨倒塌。',
 });
 def({
@@ -329,8 +317,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }],
-  upgrade: { cost: 1 },
+  effects: [{ kind: 'damageByBlock', aoe: true, mult: 2, consume: true }],
+  upgrade: { effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }] },
   flavor: '让他们尝尝城墙的重量。',
 });
 def({
@@ -1438,6 +1426,10 @@ export const CARD_LIST: CardDef[] = Object.values(CARDS);
 export const RETIRED_CARDS: Record<string, { name: string; replacement: string }> = {
   spark_lure: { name: '诱火', replacement: 'ignite' },
   unbroken_stride: { name: '不息步伐', replacement: 'haste' },
+  // 旅人连击：换成同流派、稀有度不高于原牌的现有牌。
+  swift_return: { name: '回身刺', replacement: 'quick_stab' },
+  spin_kick: { name: '回旋踢', replacement: 'lantern_poke' },
+  hooking_cut: { name: '钩刃', replacement: 'twin_blades' },
 };
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {

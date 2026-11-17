@@ -48,7 +48,7 @@ describe('拾灰者：升级后选择消耗哪几张手牌', () => {
     const res = playCard(cs, 'src', null);
     expect(res.state).toBe(cs);
     expect(res.events).toEqual([]);
-    expect(res.pending).toEqual({ group: 0, count, hand: cs.player.hand.slice(1) });
+    expect(res.pending).toEqual({ group: 0, count, hand: cs.player.hand.slice(1), action: 'exhaust' });
     expect(JSON.stringify(cs)).toBe(before);
     // 等待选牌只存在于返回值里，战斗状态没有任何「选牌中」的字段，存档与回退不会卡住。
     expect(before).not.toContain('pending');
@@ -81,7 +81,7 @@ describe('拾灰者：升级后选择消耗哪几张手牌', () => {
 
   it.each(CHOSEN)('$id+：手牌不足时选完现有的即可；手牌为空时直接打出，其余效果照常', ({ id, count }) => {
     const one = battle(id, true, ['strike']);
-    expect(playCard(one, 'src', null).pending).toEqual({ group: 0, count: 1, hand: [one.player.hand[1]] });
+    expect(playCard(one, 'src', null).pending).toEqual({ group: 0, count: 1, hand: [one.player.hand[1]], action: 'exhaust' });
     const played = playCard(one, 'src', null, { exhaust: [['h0']] }).state;
     expect(exhausted(played)).toEqual(['h0']);
     if (count === 2) expect(playCard(one, 'src', null, { exhaust: [[]] }).state).toBe(one);

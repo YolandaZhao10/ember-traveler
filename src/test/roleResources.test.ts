@@ -27,8 +27,8 @@ it('每角色各新增一张抽牌和一张加费罕见专属，基础与升级�
   }
 });
 describe.each([false, true])('角色资源转换（升级=%s）', up => {
-  // 灰中索引已取消单次上限，另在 ashRework 测试里覆盖。
-  it.each(ids.filter(id => id !== 'ash_index'))('%s高资源也遵守单次上限，升级收益与卡面一致', id => {
+  // 灰中索引、战途补给已取消单次上限，另在各自的调整测试里覆盖。
+  it.each(ids.filter(id => id !== 'ash_index' && id !== 'trail_supply'))('%s高资源也遵守单次上限，升级收益与卡面一致', id => {
     let cs = battle();
     cs.player.attacksPlayedThisTurn = 100; cs.player.block = 100;
     Object.assign(cs.player.turnFlags, { exhausted: 100, actualHealing: 100, resolvedCopies: 100 });
@@ -100,6 +100,6 @@ describe.each([false, true])('角色资源转换（升级=%s）', up => {
     const before = JSON.stringify(cs);
     const text = describeCard(c, { player: cs.player, target: cs.enemies[0], relics: cs.relics, isFirstAttack: false, crescendoBonus: 0 });
     expect(text).toContain('当前 0'); expect(JSON.stringify(cs)).toBe(before);
-    const next = playCard(cs, c.uid, 'e0').state; expect(next.player.energy).toBe(3); expect(next.player.hand).toHaveLength(id === 'ash_index' && up ? 1 : 0); // 灰中索引升级后固定多抽 1 张
+    const next = playCard(cs, c.uid, 'e0').state; expect(next.player.energy).toBe(3 - viewDef(id, up).cost); expect(next.player.hand).toHaveLength(id === 'ash_index' && up ? 1 : 0); // 灰中索引升级后固定多抽 1 张
   });
 });

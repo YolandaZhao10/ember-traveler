@@ -25,7 +25,7 @@ describe('全卡表基础/升级效果审查', () => {
  it('角色配额包含资源、循环与重放牌，通用池含四张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   const expected: Record<string, number[]> = { shared: [24, 20, 20], traveler: [20, 24, 13], picker: [19, 24, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
+   const expected: Record<string, number[]> = { shared: [24, 20, 20], traveler: [21, 21, 14], picker: [19, 24, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
    expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual(expected[owner ?? 'shared']);
   }
  });
@@ -44,9 +44,9 @@ describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s
  });
  it('铁壁回敬消耗两能量换双倍格挡伤害和虚弱，不能消费格挡或超过合理倍数',()=>{
   const cs=setup('iron_rebuke',up);cs.player.block=13;
-  const after=use(cs);expect(after.enemies[0].hp).toBe(10000-26-(up?10:6));
+  const after=use(cs);expect(after.enemies[0].hp).toBe(10000-26);
   expect(after.player.block).toBe(13);expect(after.player.energy).toBe(1);
-  expect(after.enemies[0].statuses.weak).toBe(up?3:2);
+  expect(after.enemies[0].statuses.weak).toBe(up?4:2);
   expect(describeCard(cs.player.hand[0],null)).toContain('格挡 × 2');
  });
  it('送葬火炬的两费燃烧结算不低于两次同级引爆倍率，并重新点火',()=>{
@@ -64,7 +64,7 @@ describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s
  });
  it('不动阵地保留持续格挡与荆棘收益',()=>{
   let guard=use(setup('steadfast_guard',up));
-  expect(guard.player.statuses.thorns).toBe(up?5:4);
+  expect(guard.player.statuses.thorns).toBe(up?2:1);
   guard=endPlayerTurn(guard).state;expect(guard.player.block).toBe(up?8:6);
  });
  it('恒久护印给予更大的单次防护和蓄能；普通调息保持可循环优势',()=>{

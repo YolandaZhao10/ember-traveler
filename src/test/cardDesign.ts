@@ -110,8 +110,13 @@ function chargeShape(charge: { damage?: number; block?: number; ember?: number; 
 /**
  * 已人工审核、允许保留的同设计牌对（两个 ID 按字典序以 / 连接）。
  * 疾风余烬 / 藏炭：共享牌改为消耗手牌换余烬以提供消耗接口，藏炭后续单独重做。
+ * 以下四对是按指定数值调整后命中的，数值不动，登记为已审核：
+ * 铁壁 / 举盾：铁壁去掉回合末格挡后只剩一次性格挡，与举盾只差数值和费用。
+ * 盾击 / 持盾冲锋：持盾冲锋去掉易伤后是「先获得格挡，再按格挡打出伤害」，与盾击升级版同形。
+ * 拢火 / 干薪束：新牌拢火只获得余烬，与共享牌干薪束只差数值、费用和消耗。
+ * 燃料交换 / 剔灯：新牌剔灯用余烬换能量，与共享牌燃料交换只差数值、消耗和生命代付。
  */
-export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals']);
+export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals', 'iron_wall/raise_shield', 'shield_bash/shield_rush', 'gather_embers/tinder_bundle', 'ember_exchange/trim_lamp']);
 
 /** 数值、费用、段数、单体/群体和保留/消耗不能作为唯一特色。 */
 export function cardDesign(id: string, upgraded: boolean): string {

@@ -11,8 +11,8 @@ export function StatusChips({ statuses, ownerName, powers = [], character }: { s
   return (
     <div className="statuses">
       {powers.map((power, index) => {
-        const progress = power.status === 'tempo' ? `${power.progress}/3` : power.status === 'mirror' ? power.progress ? '已触发' : '待触发' : '';
-        const name = `${STATUSES[power.status].name}${power.status === 'tempo' && power.amount > 1 ? '+' : ''}`;
+        const progress = power.status === 'tempo' ? `${power.progress}/3` : power.status === 'emberEngine' ? `${power.progress}/${power.amount}` : power.status === 'mirror' ? power.progress ? '已触发' : '待触发' : '';
+        const name = `${STATUSES[power.status].name}${(power.status === 'tempo' && power.amount > 1) || (power.status === 'emberEngine' && power.amount < 4) ? '+' : ''}`;
         return <button key={`power-${index}`} className="chip power" title={`${name}：${STATUSES[power.status].description(power.amount)} ${progress}`} onClick={e => {
           e.stopPropagation(); openOverlay({ kind: 'status', status: power.status, amount: power.amount, ownerName, detail: progress ? `这张${name}的进度：${progress}` : undefined });
         }}>{name}<b>{progress || `#${index + 1}`}</b></button>;

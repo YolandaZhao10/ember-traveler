@@ -18,7 +18,8 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   cs=use(cs,'war_drum');cs=use(cs,'quick_stab');cs.player.statuses.echo=1;
   cs=use(cs,'twin_blades');expect(cs.player.attacksPlayedThisTurn).toBe(3);expect(cs.player.energy).toBe(2);
   cs=use(cs,'quick_stab');expect(cs.player.energy).toBe(2);
-  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(50);expect(cs.player.energy).toBe(0);
+  // 战鼓不再逐张加伤：千刃 6 点 × 5 段。
+  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(30);expect(cs.player.energy).toBe(0);
  });
  it('续势不在第六次攻击重复返能，叠加两张只提高第三次返能',()=>{
   let cs=battle(['war_drum','war_drum',...Array(6).fill('quick_stab')]);cs=use(use(cs,'war_drum'),'war_drum');
@@ -38,8 +39,8 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   const before=battle(['shield_bash','shield_shatter']);before.player.block=20;
   const bash=use(before,'shield_bash'),shatter=use(before,'shield_shatter');
   expect(bash.player.block).toBe(20);expect(shatter.player.block).toBe(0);
-  // 盾击：格挡 20 +4；碎盾：格挡 20 × 3。
-  expect(before.enemies[0].hp-bash.enemies[0].hp).toBe(24);expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(60);
+  // 盾击：格挡 20 +4；碎盾：格挡 20 × 2。
+  expect(before.enemies[0].hp-bash.enemies[0].hp).toBe(24);expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(40);
  });
  it('铺火后添油翻倍并防护，引爆会花掉后续持续伤害',()=>{
   let cs=battle(['light_up','add_fuel','detonate']);cs=use(cs,'light_up');cs=use(cs,'add_fuel');

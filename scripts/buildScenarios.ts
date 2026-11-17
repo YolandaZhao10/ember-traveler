@@ -8,7 +8,7 @@ export type BuildLoadout = (typeof BUILD_LOADOUTS)[number] & { early?: string[] 
 export const ALL_BUILDS: BuildLoadout[] = [...BUILD_LOADOUTS, ...EMBER_LOADOUTS];
 
 const EARLY_CARDS: Record<string, string[]> = {
- combo:['quick_stab','twin_blades','chain_slash','spin_kick','rhythm','measured_step'],
+ combo:['quick_stab','twin_blades','chain_slash','lantern_poke','rhythm','measured_step'],
  bulwark:['raise_shield','shield_bash','riposte','vigil','brace_line','ember_patrol'],
  cinder:['light_up','wildfire','scorch_mark','lingering_fire','tend_coals','smoke_screen'],
  ash:['bone_ash','bone_ash','sift_ash','salvage_scraps','ash_shell','buried_knife'],

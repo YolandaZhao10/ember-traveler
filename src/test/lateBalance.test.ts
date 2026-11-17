@@ -39,9 +39,9 @@ describe('终局公平性与成长边界', () => {
     cs=playCard(cs,'hand-0',null).state;
     cs=playCard(cs,'hand-1','e0').state; expect(cs.player.block).toBe(0);
     cs.player.statuses.echo=1; cs=playCard(cs,'hand-2','e0').state;
-    expect(cs.player.attacksPlayedThisTurn).toBe(3); expect(cs.player.block).toBe(8);
+    expect(cs.player.attacksPlayedThisTurn).toBe(3); expect(cs.player.block).toBe(6);
     for(const uid of ['hand-3','hand-4','hand-5']) cs=playCard(cs,uid,'e0').state;
-    expect(cs.player.block).toBe(8);
+    expect(cs.player.block).toBe(6);
   });
   it('蓄力上限同时约束保留、立即充能与卡面；回响不能绕过', () => {
     let cs=battle(['focus','charged_blade']); cs.player.hand[1].bonus=9; cs.player.statuses.echo=1;

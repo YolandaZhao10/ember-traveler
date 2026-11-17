@@ -68,7 +68,7 @@ describe('扩展卡池与遗物配额', () => {
   });
   it.each(characters)('%s 专属牌配额含资源牌、循环牌与血誓重演，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    const expected = { traveler: [20, 24, 13], picker: [19, 24, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
+    const expected = { traveler: [21, 21, 14], picker: [19, 24, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
     expect(['common', 'uncommon', 'rare'].map(rarity => cards.filter(c => c.rarity === rarity).length)).toEqual(expected[owner]);
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
@@ -80,10 +80,10 @@ describe('扩展卡池与遗物配额', () => {
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner), c.name).toBe(!c.hook || c.hook === owner);
   });
-  it('卡牌324张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(324); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(324);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(324);
+  it('卡牌323张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(323); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(323);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(323);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);

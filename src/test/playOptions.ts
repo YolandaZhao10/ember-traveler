@@ -46,7 +46,9 @@ export function playWithChoices(cs: CombatState, uid: string, target: string | n
 /** 机器人只能从公开弃牌堆、手牌和存活敌人中选择，与玩家的确认入口一致。replayUid 可直接传给 playCard。 */
 export function playOptions(cs: CombatState, card: CardInstance): { target: string | null; replayUid?: string | PlayChoice }[] {
   const transferring = !!cardTransferEffect(card);
-  const choices = transferring ? cardTransferChoices(cs, card) : needsDiscardReplay(card) ? discardReplayChoices(cs) : [undefined];
+  const pool = transferring ? cardTransferChoices(cs, card) : [];
+  // 可选的牌堆选牌没有候选时照常打出，不带选择。
+  const choices = transferring ? (pool.length || !cardTransferEffect(card)!.optional ? pool : [undefined]) : needsDiscardReplay(card) ? discardReplayChoices(cs) : [undefined];
   return choices.flatMap(choice => {
     const v = viewCard(transferring ? card : choice ?? card);
     const targets = v.target === 'enemy' ? aliveEnemies(cs).map(e => e.id) : [null];

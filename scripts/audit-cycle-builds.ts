@@ -9,7 +9,7 @@ import { planMove } from '../src/test/cardFloorBenchmark';
 import type { CharacterId, CombatState } from '../src/engine/types';
 
 const builds: Record<CharacterId, { support: string[]; control: string[] }> = {
-  traveler: { support: ['spin_kick', 'rhythm', 'raise_shield', 'haste', 'trail_supply', 'unburden_armor', 'vanguard_oath'], control: ['measured_step', 'brace_line', 'sunward_step'] },
+  traveler: { support: ['lantern_poke', 'rhythm', 'raise_shield', 'haste', 'trail_supply', 'unburden_armor', 'vanguard_oath'], control: ['measured_step', 'brace_line', 'sunward_step'] },
   picker: { support: ['light_up', 'wildfire', 'burn_pages', 'borrow_flame', 'ash_index', 'tinder_bundle', 'sheltering_ash'], control: ['sift_ash', 'smoke_cover', 'sunward_step'] },
   oathbound: { support: ['vein_cutter', 'crimson_covenant', 'blood_watch', 'blood_rite', 'pulse_memory', 'borrow_fury', 'flex'], control: ['bind_wounds', 'gather_fury', 'sunward_step'] },
   scholar: { support: ['charged_blade', 'rune_shield', 'patient_study', 'echo_footnotes', 'release_charge', 'double_chant', 'future_memory'], control: ['woven_words', 'rune_cache', 'sunward_step'] },

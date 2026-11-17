@@ -8,7 +8,7 @@ import type { CardInstance, CharacterId, CombatEvent, RunDifficulty, RunState, S
 import { setSoundEnabled, sfx } from './sound';
 import { STATUSES } from '../data/statuses';
 import { canPlayCard, needsDiscardReplay, type ExhaustChoiceRequest, type PlayChoice } from '../engine/combat';
-import { cardTransferEffect } from '../engine/cardTransfer';
+import { cardTransferChoices, cardTransferEffect } from '../engine/cardTransfer';
 import { viewCard } from '../engine/cards';
 import { impactCues, type ImpactItem } from './combatFx';
 import { cardExitCues, type CardExitItem } from './cardExitFx';
@@ -369,7 +369,10 @@ export async function playSelected(targetId: string | null, choice?: string | Pl
   if (!uid || !run || !run.combat || state.busy) return;
   const card = run.combat.player.hand.find((c) => c.uid === uid);
   if (!card) return;
-  if ((needsDiscardReplay(card) || cardTransferEffect(card)) && !replayUid) {
+  // 可选的牌堆选牌在没有任何候选时直接打出，不弹选牌窗口。
+  const transfer = cardTransferEffect(card);
+  const picksPile = needsDiscardReplay(card) || (!!transfer && !(transfer.optional && !cardTransferChoices(run.combat, card).length));
+  if (picksPile && !replayUid) {
     const check = canPlayCard(run.combat, card);
     if (!check.ok) { toast(check.reason ?? '无法打出'); return; }
     openOverlay({ kind: needsDiscardReplay(card) ? 'replay' : 'cardTransfer', cardUid: uid });
@@ -377,7 +380,7 @@ export async function playSelected(targetId: string | null, choice?: string | Pl
   }
   const res = R.combatPlayCard(run, uid, targetId, choice);
   if (res.pending) {
-    // 还缺一组「选择手牌消耗」：此时没有提交任何结果，选完后带着全部选择重新出牌。
+    // 还缺一组「选择手牌消耗／弃置」：此时没有提交任何结果，选完后带着全部选择重新出牌。
     openOverlay({ kind: 'exhaustChoice', cardUid: uid, targetId, replayUid, exhaust: typeof choice === 'object' ? choice.exhaust ?? [] : [], request: res.pending });
     return;
   }

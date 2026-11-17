@@ -41,7 +41,7 @@ describe('基础与通用卡牌的不同用途', () => {
     expect(result.player.hand.map(c => c.defId)).toEqual(up ? ['demon_heart', 'heavy_blow'] : ['demon_heart']);
     expect(result.player.exhaust.map(c => c.defId)).toEqual(up ? ['strike', 'stone_throw'] : ['strike', 'stone_throw', 'heavy_blow']);
     expect(result.player.energy).toBe(2);
-    expect(describeCard(card('ash_return', up), null)).toContain('按费用从高到低');
+    expect(describeCard(card('ash_return', up), null)).toContain(`从消耗区取回 ${up ? 2 : 1} 张费用最高的牌`);
   });
   it.each([false, true])('尘归尘只消耗诅咒，无诅咒时也不误伤有用牌（升级=%s）', up => {
     for (const cursed of [false, true]) {
