@@ -275,8 +275,8 @@ describe('给能量的效果每回合各只生效一次', () => {
     let stacked = withCount(battle('picker', ['pick_up', 'pick_up']), 2);
     stacked.player.statuses.kindredVow = 2;
     stacked = use(stacked, 'pick_up-0');
-    // 拾取自身抽 1 张，再加旅途誓火的 2 张。
-    expect([stacked.player.energy, stacked.player.hand.length]).toEqual([11, 4]);
+    // 拾取自身抽 2 张，再加旅途誓火的 2 张。
+    expect([stacked.player.energy, stacked.player.hand.length]).toEqual([11, 5]);
     stacked = use(stacked, 'pick_up-1');
     expect(stacked.player.energy).toBe(11);
   });

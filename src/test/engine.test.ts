@@ -287,7 +287,7 @@ describe('战斗基础', () => {
       const energy = s.player.energy;
       s = playCard(s, handCard(s, 'burn_pages').uid, null).state;
       expect(s.player.exhaust.length).toBe(2); // 目标手牌与焚书自身各消耗一次
-      expect(s.player.block).toBe(16); // 两次灰烬盛宴
+      expect(s.player.block).toBe(10); // 两次灰烬盛宴
       expect(enemyHp - s.enemies[0].hp).toBe(24); // 两次火种传递
       expect(s.player.energy).toBe(energy + 1);
       // 焚书本身消耗、另消耗一张、骨灰坛只抽一张 → 手牌 -1 -1 +1

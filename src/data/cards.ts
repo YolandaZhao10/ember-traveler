@@ -731,8 +731,8 @@ def({
   cost: 0,
   target: 'self',
   exhaust: true,
-  effects: [{ kind: 'draw', amount: 1 }, { kind: 'gainEmber', amount: 2 }],
-  upgrade: { effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 3 }] },
+  effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 1 }],
+  upgrade: { effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 2 }] },
   flavor: '别人不要的，我要。',
 });
 def({
@@ -775,8 +775,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'ashFeast', amount: 8, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 12, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'ashFeast', amount: 5, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 8, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
 });
 def({
   id: 'pass_the_flame',

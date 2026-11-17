@@ -24,18 +24,18 @@ describe.each([false, true])('回血与群攻卡牌调整，升级=%s', up => {
     expect(after.player.energy).toBe(3);
     expect(describeCard(cs.player.hand[0], null)).toBe(`消耗手牌中随机 1 张牌，获得 ${up ? 8 : 5} 点余烬。消耗。`);
   });
-  it('拾取抽1/2张并给2/3余烬；回响重复收益但本牌只消耗一次', () => {
+  it('拾取抽2张并给1/2余烬；回响重复收益但本牌只消耗一次', () => {
     const cs = battle('pick_up', up); cs.player.energy = 0;
     cs.player.draw = Array.from({length: 6}, (_, i) => card('strike', false, `draw-${i}`));
-    expect(describeCard(cs.player.hand[0], null)).toBe(`抽 ${up ? 2 : 1} 张牌，获得 ${up ? 3 : 2} 点余烬。消耗。`);
+    expect(describeCard(cs.player.hand[0], null)).toBe(`抽 2 张牌，获得 ${up ? 2 : 1} 点余烬。消耗。`);
     const once = playCard(cs, 'pick_up', null).state;
-    expect(once.player.hand).toHaveLength(up ? 2 : 1);
-    expect(once.player.ember).toBe(up ? 3 : 2);
+    expect(once.player.hand).toHaveLength(2);
+    expect(once.player.ember).toBe(up ? 2 : 1);
     expect(once.player.energy).toBe(0);
     cs.player.statuses.echo = 1;
     const twice = playCard(cs, 'pick_up', null).state;
-    expect(twice.player.hand).toHaveLength(up ? 4 : 2);
-    expect(twice.player.ember).toBe(up ? 6 : 4);
+    expect(twice.player.hand).toHaveLength(4);
+    expect(twice.player.ember).toBe(up ? 4 : 2);
     expect(twice.player.exhaust).toEqual([card('pick_up', up)]);
     cs.player.ember = 9998;
     expect(playCard(cs, 'pick_up', null).state.player.ember).toBe(9999);

@@ -9,10 +9,9 @@ import { chooseExhaust, exhaustPriority, playOptions } from './playOptions';
 
 const CHOSEN = [
   { id: 'sift_ash', count: 1, base: '消耗手牌中随机 1 张牌，抽 2 张牌。', up: '选择手牌中 1 张牌消耗，抽 3 张牌。' },
-  { id: 'ash_shell', count: 1, base: '消耗手牌中随机 1 张牌，获得 14 点格挡，获得 2 点余烬。消耗。', up: '选择手牌中 1 张牌消耗，获得 18 点格挡，获得 3 点余烬。消耗。' },
+  { id: 'ash_shell', count: 1, base: '消耗手牌中随机 1 张牌，获得 14 点格挡，获得 2 点余烬。消耗。', up: '选择手牌中 1 张牌消耗，获得 18 点格挡，获得 2 点余烬。消耗。' },
   { id: 'burial_veil', count: 2, base: '消耗手牌中随机 2 张牌，获得 13 点格挡，抽 1 张牌。', up: '选择手牌中 2 张牌消耗，获得 18 点格挡，抽 2 张牌。' },
   { id: 'ash_offering', count: 2, base: '消耗手牌中随机 2 张牌，获得 4 点余烬，抽 2 张牌。消耗。', up: '选择手牌中 2 张牌消耗，获得 5 点余烬，抽 3 张牌。消耗。' },
-  { id: 'phoenix_breath', count: 2, base: '消耗手牌中随机 2 张牌，回复 12 点生命。消耗。', up: '选择手牌中 2 张牌消耗，回复 16 点生命。消耗。' },
 ] as const;
 const ids = CHOSEN.map(c => c.id) as readonly string[];
 const card = (defId: string, uid = defId, upgraded = false): CardInstance => ({ uid, defId, upgraded });
@@ -32,7 +31,7 @@ const exhausted = (cs: CombatState) => cs.player.exhaust.map(c => c.uid).filter(
 const chooses = (effects: Effect[]) => effects.filter(e => e.kind === 'exhaustHand' && e.choose).length;
 
 describe('拾灰者：升级后选择消耗哪几张手牌', () => {
-  it('只有这五张牌的升级版启用选择，基础版和其他牌都保持随机', () => {
+  it('只有这四张牌的升级版启用选择，基础版和其他牌（含灰中复苏）都保持随机', () => {
     for (const def of CARD_LIST) for (const up of [false, true]) {
       if (def.type === 'curse' && up) continue;
       expect(chooses(viewDef(def.id, up).effects), `${def.id}/${up}`).toBe(up && ids.includes(def.id) ? 1 : 0);
@@ -94,10 +93,9 @@ describe('拾灰者：升级后选择消耗哪几张手牌', () => {
     expect(exhausted(res.state)).toEqual([]);
     const p = res.state.player;
     if (id === 'sift_ash') expect(p.hand).toHaveLength(3);
-    if (id === 'ash_shell') expect([p.block, p.ember]).toEqual([18, 3]);
+    if (id === 'ash_shell') expect([p.block, p.ember]).toEqual([18, 2]);
     if (id === 'burial_veil') expect([p.block, p.hand.length]).toEqual([18, 2]);
     if (id === 'ash_offering') expect([p.ember, p.hand.length]).toEqual([5, 3]);
-    if (id === 'phoenix_breath') expect(p.hp).toBe(56);
   });
 
   it.each(CHOSEN)('$id 基础版仍然随机：不需要选择，消耗的牌与随机数消耗和改动前一致', ({ id, count }) => {
@@ -133,12 +131,12 @@ describe('拾灰者：升级后选择消耗哪几张手牌', () => {
   });
 
   it('回响重放时没有手牌可选就跳过消耗，其余效果照常', () => {
-    const cs = battle('phoenix_breath', true, ['strike', 'defend']);
+    const cs = battle('ash_shell', true, ['strike']);
     cs.player.statuses.echo = 1;
-    const done = playCard(cs, 'src', null, { exhaust: [['h0', 'h1']] });
+    const done = playCard(cs, 'src', null, { exhaust: [['h0']] });
     expect(done.pending).toBeUndefined();
-    expect(exhausted(done.state)).toEqual(['h0', 'h1']);
-    expect(done.state.player.hp).toBe(72);
+    expect(exhausted(done.state)).toEqual(['h0']);
+    expect([done.state.player.block, done.state.player.ember]).toEqual([36, 4]);
   });
 
   it('消耗触发与随机消耗完全一样：灰烬盛宴、火种传递、灰中启示、骨灰坛和消耗计数', () => {

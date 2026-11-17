@@ -9,7 +9,7 @@ const creditSource = { attacks: 'attacks', exhausts: 'exhausted', healing: 'actu
 
 /** 消耗真实资源或本回合尚未兑换的计数；回响和回收不能重复兑换同一份收益。 */
 export function convertResource(p: PlayerCombat, target: Entity | null, effect: ResourceConversion): number {
-  const { resource, per, max } = effect;
+  const { resource, per, max = Infinity } = effect;
   if (per <= 0 || max <= 0 || p.hp <= 0) return 0;
   let available = 0;
   const credit = resource in creditSource;
@@ -49,7 +49,7 @@ export function conversionText(e: ResourceConversion): string {
     healing: `实际回复 ${e.per} 生命`, echoes: `完成 ${e.per} 次回响或镜像`,
   };
   if (e.resource in credits) {
-    return `本回合每${credits[e.resource as keyof typeof credits]}可兑换${e.reward === 'draw' ? '抽 1 张牌' : '1 点能量'}，本次最多 ${e.max}；已兑换部分不能重复计算`;
+    return `本回合每${credits[e.resource as keyof typeof credits]}可兑换${e.reward === 'draw' ? '抽 1 张牌' : '1 点能量'}${e.max === undefined ? '' : `，本次最多 ${e.max}`}；已兑换部分不能重复计算`;
   }
   const sources = {
     attacks: '本回合尚未兑换的攻击次数', exhausts: '本回合尚未兑换的消耗牌数',

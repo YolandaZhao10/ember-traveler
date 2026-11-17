@@ -60,12 +60,12 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
  });
  it('灰烬盛宴前两次消耗补牌，第三次只给格挡；下一回合重新可抽',()=>{
   let cs=use(battle(['ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast');cs.player.energy=5;
-  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(2);expect(cs.player.block).toBe(24);
+  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(2);expect(cs.player.block).toBe(15);
   cs=round(cs);cs.player.hand=[card('bone_ash')];cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(1);
  });
  it('两张消耗能力叠加抽牌量，但共享每回合两次窗口',()=>{
   let cs=use(use(battle(['ash_feast','ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast'),'ash_feast');cs.player.energy=5;
-  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(4);expect(cs.player.block).toBe(48);
+  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(4);expect(cs.player.block).toBe(30);
  });
  it('血契仅在首次实际卡牌失血补牌，重复失血继续力量收益但不无限抽牌',()=>{
   let cs=use(battle(['blood_pact','blood_edge','blood_edge']),'blood_pact');cs=use(cs,'blood_edge');cs=use(cs,'blood_edge');

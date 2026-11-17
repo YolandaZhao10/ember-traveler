@@ -68,7 +68,7 @@ export function cardValue(cs: CombatState, c: CardInstance, needBlock: number): 
         util += e.amount * 3;
         break;
       case 'convertResource':
-        if (e.resource === 'ember') util += Math.min(e.max, Math.floor(p.ember / e.per)) * (e.reward === 'draw' ? 2 : 3);
+        if (e.resource === 'ember') util += Math.min(e.max ?? Infinity, Math.floor(p.ember / e.per)) * (e.reward === 'draw' ? 2 : 3);
         break;
       case 'gainEmber':
         util += e.amount > 0 ? (e.amount + (v.charge?.ember ?? 0) * v.bonus) * 1.2 : 0;

@@ -100,7 +100,7 @@ export type Effect =
   | { kind: 'draw'; amount: number }
   | { kind: 'moveCard'; from: 'draw' | 'discard' | 'exhaust'; to: 'hand' | 'draw' | 'discard'; filter?: 'attack' | 'skill' | 'action' | 'exhaust'; sample?: number }
   | { kind: 'retainHand' }
-  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; max: number; reward: 'draw' | 'energy' }
+  | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; /** 单次兑换的上限；缺省表示没有上限。 */ max?: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
   | { kind: 'gainEmber'; amount: number; /** 本回合每次招牌动作计数额外获得的余烬及其上限 */ perSignature?: number; signatureMax?: number }
