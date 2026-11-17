@@ -29,7 +29,8 @@ const supports: Record<string, string[]> = {
 };
 function fight(cs: CombatState) {
  const startHp = cs.player.hp; let actions = 0, plays = 0, invalid = false;
- while (cs.outcome === 'ongoing' && cs.turn <= 50 && actions++ < 500) {
+ // 回合上限 100：叠甲慢打的牌组也要打出胜负，仍未结束才记为停滞。
+ while (cs.outcome === 'ongoing' && cs.turn <= 100 && actions++ < 1000) {
   const move = planMove(cs, { depth: 3, width: 3, engines: true });
   if (move) {
    if (move.uid.startsWith('candidate')) plays++;

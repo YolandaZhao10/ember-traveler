@@ -5,6 +5,7 @@ import { ENCOUNTERS, ENEMIES } from '../data/enemies';
 import { DEBT_COLLECTORS, debtCollectorId } from '../data/debtCollectors';
 import { RELIC_LIST, RELICS, relicPool } from '../data/relics';
 import { LOAN_AMOUNT, LOAN_REPAY } from '../engine/constants';
+import { encounterDifficulty } from '../engine/difficulty';
 import { availableNodes } from '../engine/map';
 import * as R from '../engine/run';
 import { loadRun, saveRun } from '../engine/save';
@@ -279,15 +280,21 @@ describe('借款与回退、随机数', () => {
     }
   });
 
-  it('讨债人的强度固定取本章首领倍率，与商店所在楼层无关', () => {
+  it('讨债人的强度随商店所在楼层变化：按该楼层的首领倍率计算，越靠后越强', () => {
     const early = R.debtFight(borrowAndReturn(0));
-    const boss = copy(start('LOAN-BOSS'));
-    boss.map.nodes[boss.map.startIds[0]].type = 'boss';
-    const bossFight = R.travelTo(boss, boss.map.startIds[0]);
-    expect(early.combat!.difficulty!.attackMultiplier).toBeGreaterThan(1);
-    expect(early.combat!.difficulty!.healthMultiplier).toBeGreaterThan(1);
-    expect(early.combat!.enemies[0].maxHp).toBeGreaterThan(69);
-    expect(bossFight.combat!.tier).toBe('boss');
+    expect(early.floor).toBe(1);
+    expect(early.combat!.difficulty).toEqual(encounterDifficulty(early.floor, 'boss', early.difficulty));
+    const lateDoor = borrowAndReturn(0);
+    lateDoor.floor = 17;
+    const late = R.debtFight(lateDoor);
+    expect(late.combat!.difficulty).toEqual(encounterDifficulty(17, 'boss', late.difficulty));
+    expect(late.combat!.enemies[0].maxHp).toBeGreaterThan(early.combat!.enemies[0].maxHp);
+    expect(late.combat!.difficulty!.attackMultiplier).toBeGreaterThan(early.combat!.difficulty!.attackMultiplier);
+  });
+
+  it('第二章讨债人的催告施加 1 层虚弱', () => {
+    const notice = DEBT_COLLECTORS[1].moves.find(m => m.id === 'notice')!;
+    expect(notice.actions).toEqual([{ kind: 'attack', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }]);
   });
 });
 

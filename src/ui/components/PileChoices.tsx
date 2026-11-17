@@ -58,6 +58,7 @@ export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfir
       <span>第 {page + 1} / {pageCount} 页 · 共 {cards.length} 张 · ← → 翻页</span>
       <button className="btn small ghost" disabled={busy || page === pageCount - 1} onClick={() => turnPage(page + 1)}>下一页 →</button>
     </div>}
+    {pageCount === 1 && cards.length > 6 && <p className="pile-choice-more">共 {cards.length} 张，放不下时可在下方区域上下滚动</p>}
     <div className="replay-choices cardgrid">
       {shown.map((card, index) => <button ref={card.uid === selectedUid ? selectedButton : undefined}
         className={`replay-choice ${card.uid === selectedUid || selectedUids?.includes(card.uid) ? 'selected' : ''}`} key={card.uid}

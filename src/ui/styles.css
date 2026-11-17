@@ -2408,7 +2408,10 @@ h3 {
 .intent.escape { color: #ffe59b; border-color: #d1a84b; background: #51401d; font-weight: 800; }
 
 /* 弃牌选择区域独立滚动，目标和确认操作始终留在弹窗内。 */
-.replay-choices.cardgrid { max-height: min(48vh, 440px); overflow-y: auto; padding: 10px; }
+/* 占满弹窗剩余高度（弹窗本身不超过 92vh），两行候选牌尽量完整显示；仍放不下时在区域内滚动，底部渐隐提示还有内容。 */
+.replay-choices.cardgrid { flex: 1 1 auto; min-height: 150px; overflow-y: auto; padding: 10px; scrollbar-gutter: stable; align-content: flex-start;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); padding-bottom: 22px; }
+.pile-choice-more { color: var(--gold); font-size: 12px; text-align: center; margin: 0; }
 .replay-targets { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0; }
 
 .replay-choice { display: flex; flex-direction: column; align-items: center; gap: 5px; background: transparent; padding: 4px; border: 2px solid transparent; border-radius: 12px; cursor: pointer; color: inherit; }

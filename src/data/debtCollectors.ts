@@ -16,12 +16,13 @@ interface CollectorNumbers {
 }
 
 /**
- * 讨债人：生命为该章首领的一半，前八回合平均伤害约为首领的 90%～110%（基础值，倍率与首领相同）。
+ * 讨债人：生命为该章首领的一半，前八回合平均伤害约为首领的 90%～110%（基础值）。
+ * 实战倍率按商店所在楼层的首领倍率计算：章末商店遇到的与首领同档，越早的商店越弱。
  * 只用攻击、多段、格挡、力量成长和减益；不转阶段、不塞牌、不召唤、不逃跑、不偷金币。
  */
 const NUMBERS: Record<ChapterId, CollectorNumbers> = {
   1: { hp: 69, notice: 8, weak: 1, compound: [5, 2], block: 8, strength: 1, enforce: 14 },
-  2: { hp: 116, notice: 9, frail: 1, compound: [4, 3], block: 12, strength: 1, enforce: 14 },
+  2: { hp: 116, notice: 9, weak: 1, compound: [4, 3], block: 12, strength: 1, enforce: 14 },
   3: { hp: 145, notice: 12, weak: 2, compound: [7, 2], block: 16, strength: 2, enforce: 18 },
   4: { hp: 215, notice: 14, weak: 1, frail: 1, compound: [6, 3], block: 20, strength: 2, enforce: 24 },
 };

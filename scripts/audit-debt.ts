@@ -9,7 +9,7 @@ import { planMove } from '../src/test/cardFloorBenchmark';
 import { buildScenario } from './buildScenarios';
 import type { ChapterId, CombatState } from '../src/engine/types';
 
-/** 各章讨债人与同章首领的并排对比：同一批构筑牌组、同样的首领倍率、相同种子。 */
+/** 各章讨债人与同章首领的并排对比：同一批构筑牌组、相同种子。讨债人强度随商店楼层变化，分别按章内第 2 层和章末楼层各测一组。 */
 const arg = (key: string) => { const i = process.argv.indexOf(key); return i < 0 ? undefined : process.argv[i + 1]; };
 const seeds = Number(arg('--seeds') ?? 40);
 const BOSSES: Record<ChapterId, string[]> = { 1: ['ash_sovereign', 'bell_heart'], 2: ['everburning_core'], 3: ['eclipse_archon'], 4: ['nightless_lord'] };
@@ -29,12 +29,13 @@ const rows = [];
 for (const chapter of [1, 2, 3, 4] as ChapterId[]) {
   const floor = CHAPTERS[chapter].startFloor + CHAPTERS[chapter].floors - 1;
   const difficulty = encounterDifficulty(floor, 'boss');
-  for (const [kind, enemies, tier] of [['collector', [debtCollectorId(chapter)], 'normal'], ...BOSSES[chapter].map(id => ['boss', [id], 'boss'])] as [string, string[], 'normal' | 'boss'][]) {
+  for (const [kind, enemies, tier] of [['collector-early', [debtCollectorId(chapter)], 'normal'], ['collector', [debtCollectorId(chapter)], 'normal'], ...BOSSES[chapter].map(id => ['boss', [id], 'boss'])] as [string, string[], 'normal' | 'boss'][]) {
     for (const build of BUILD_LOADOUTS) {
       // 第一章用六张普通牌的早期牌组，之后用完整的成型牌组；遗物随章节解锁。
       const stage = { id: enemies[0], floor, tier, enemies };
       const { ids, relics, hp, deck } = buildScenario(build, stage);
-      const results = Array.from({ length: seeds }, (_, seed) => fight(createCombat(enemies[0], enemies, tier, deck(ids), hp, hp, relics, makeRng(`DEBT-${seed}`, 'c'), 100, build.character, difficulty).state));
+      const scaling = kind === 'collector-early' ? encounterDifficulty(CHAPTERS[chapter].startFloor + 1, 'boss') : difficulty;
+      const results = Array.from({ length: seeds }, (_, seed) => fight(createCombat(enemies[0], enemies, tier, deck(ids), hp, hp, relics, makeRng(`DEBT-${seed}`, 'c'), 100, build.character, scaling).state));
       const mean = (k: 'hpLoss' | 'hpLossRatio' | 'turns') => results.reduce((s, r) => s + r[k], 0) / seeds;
       rows.push({ chapter, kind, enemy: enemies[0], route: build.route, seeds, wins: results.filter(r => r.won).length, stalled: results.filter(r => r.stalled).length, invalid: results.filter(r => r.invalid).length, hpLoss: mean('hpLoss'), hpLossRatio: mean('hpLossRatio'), turns: mean('turns') });
       console.log(JSON.stringify(rows.at(-1)));
