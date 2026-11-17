@@ -3,7 +3,7 @@ import { cardTransferEffect } from '../engine/cardTransfer';
 import { CARDS } from '../data/cards';
 import { CHARACTERS } from '../data/characters';
 import { viewCard } from '../engine/cards';
-import { aliveEnemies, canPlayCard, createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn } from '../engine/combat';
+import { aliveEnemies, canPlayCard, createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type PlayChoice } from '../engine/combat';
 import { encounterDifficulty } from '../engine/difficulty';
 import { makeRng } from '../engine/rng';
 import type { CardInstance, CharacterId, CombatState } from '../engine/types';
@@ -61,7 +61,8 @@ export interface CardFloorRow {
   control: FightSummary;
 }
 
-interface PlannedMove { uid: string; target: string | null; replayUid?: string }
+/** replayUid 原样传给 playCard：弃牌堆选牌是字符串，带「选择手牌消耗」时是 PlayChoice。 */
+interface PlannedMove { uid: string; target: string | null; replayUid?: string | PlayChoice }
 // 玩家生命跨战斗保留；优先保存生命，而不是为少打一回合接受大量额外损血。
 const HP_WEIGHT = 3;
 
@@ -129,7 +130,7 @@ export function planMove(cs: CombatState, options = { depth: 5, width: 6, engine
           const handUids = new Set(result.player.hand.map(c => c.uid));
           const known = new Set([...plan.known].filter(uid => uid !== card.uid && handUids.has(uid)));
           // 玩家自己选回手中的牌是已知牌，可以继续规划；普通未知抽牌仍隐藏。
-          if (cardTransferEffect(card)?.to === 'hand' && replayUid && handUids.has(replayUid)) known.add(replayUid);
+          if (cardTransferEffect(card)?.to === 'hand' && typeof replayUid === 'string' && handUids.has(replayUid)) known.add(replayUid);
           const state = hideUnknown(result, known);
           const score = turnValue(state, known, options.engines);
           const first = plan.first ?? { uid: card.uid, target, replayUid };

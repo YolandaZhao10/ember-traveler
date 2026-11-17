@@ -14,7 +14,7 @@ import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
 import { LOAN_ICON, loanText } from './Common';
 import { DiscardReplay } from './DiscardReplay';
-import { PileCardChoice } from './PileCardChoice';
+import { HandExhaustChoice, PileCardChoice } from './PileCardChoice';
 import { CardCatalog } from './CardCatalog';
 import { RelicCatalog } from './RelicCatalog';
 import { GameMenu } from './GameMenu';
@@ -45,6 +45,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
   if (!run) return null;
   switch (overlay.kind) {
     case 'cardTransfer': return <PileCardChoice cardUid={overlay.cardUid} />;
+    case 'exhaustChoice': return <HandExhaustChoice key={`${overlay.cardUid}-${overlay.request.group}`} cardUid={overlay.cardUid} targetId={overlay.targetId} replayUid={overlay.replayUid} exhaust={overlay.exhaust} request={overlay.request} />;
     case 'replay': return <DiscardReplay cardUid={overlay.cardUid} />;
     case 'history': return null;
     case 'help': return null;

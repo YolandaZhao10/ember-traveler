@@ -403,7 +403,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         const n = ctx && e.count === 'all'
           ? (e.filter === 'curse' ? ctx.player.hand.filter(c => viewCard(c).type === 'curse').length : Math.max(0, ctx.player.hand.length - 1))
           : null;
-        const segs: string[] = [`消耗${what}`];
+        const segs: string[] = [e.choose && e.count !== 'all' ? `选择手牌中 ${e.count} 张牌消耗` : `消耗${what}`];
         if (e.damagePerCard) segs.push(`每消耗一张造成 ${dmgText(e.damagePerCard, ctx)} 点伤害${n !== null ? `（当前 ${n} 张）` : ''}`);
         if (e.energyPerCard) segs.push(`每消耗一张获得 ${e.energyPerCard} 点能量`);
         parts.push(segs.join('，'));

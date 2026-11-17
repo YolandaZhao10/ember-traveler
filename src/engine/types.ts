@@ -107,7 +107,8 @@ export type Effect =
   | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean; /** 不随余烬变化的基础伤害，与每点余烬加成合并为一次命中 */ base?: number }
   | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
   | { kind: 'heal'; amount: number }
-  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number }
+  /** choose：由玩家在手牌里选择要消耗的牌（必须选满，手牌不足时选完为止）；缺省为随机。 */
+  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number; choose?: true }
   | { kind: 'damagePerBurn'; amount: number; aoe?: boolean }
   | { kind: 'reapplyBurn' }
   | { kind: 'spreadBurn' }

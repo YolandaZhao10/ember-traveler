@@ -6,9 +6,11 @@ import { Card } from './Card';
 const PAGE_SIZE = 10;
 
 /** 快捷键只作用于当前选牌窗口，不传到战斗手牌或结束回合。 */
-export function PileChoices({ cards, selectedUid, onPick, onConfirm, onCancel, canConfirm, busy }: {
+export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfirm, onCancel, canConfirm, busy }: {
   cards: CardInstance[];
   selectedUid: string | null;
+  /** 多选模式：已选中的全部牌；点选由调用方切换，翻页不清空。 */
+  selectedUids?: string[];
   onPick: (uid: string | null) => void;
   onConfirm: () => void;
   onCancel: () => void;
@@ -23,7 +25,7 @@ export function PileChoices({ cards, selectedUid, onPick, onConfirm, onCancel, c
   const turnPage = (next: number) => {
     if (next < 0 || next >= pageCount || next === page) return;
     setPage(next);
-    onPick(null);
+    if (!selectedUids) onPick(null);
   };
   useEffect(() => {
     selectedButton.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -58,8 +60,8 @@ export function PileChoices({ cards, selectedUid, onPick, onConfirm, onCancel, c
     </div>}
     <div className="replay-choices cardgrid">
       {shown.map((card, index) => <button ref={card.uid === selectedUid ? selectedButton : undefined}
-        className={`replay-choice ${card.uid === selectedUid ? 'selected' : ''}`} key={card.uid}
-        aria-label={`选择${viewCard(card).name}`} aria-pressed={card.uid === selectedUid} aria-keyshortcuts={index === 9 ? '0' : String(index + 1)}
+        className={`replay-choice ${card.uid === selectedUid || selectedUids?.includes(card.uid) ? 'selected' : ''}`} key={card.uid}
+        aria-label={`选择${viewCard(card).name}`} aria-pressed={card.uid === selectedUid || !!selectedUids?.includes(card.uid)} aria-keyshortcuts={index === 9 ? '0' : String(index + 1)}
         disabled={busy} onClick={() => onPick(card.uid)}>
         <kbd className="pile-choice-key" aria-hidden="true">{index === 9 ? '0' : index + 1}</kbd>
         <Card card={card} size="sm" presentation />

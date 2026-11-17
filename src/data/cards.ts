@@ -844,7 +844,7 @@ def({
   ],
   upgrade: {
     effects: [
-      { kind: 'exhaustHand', count: 2 },
+      { kind: 'exhaustHand', count: 2, choose: true },
       { kind: 'gainEmber', amount: 5 },
       { kind: 'draw', amount: 3 },
     ],

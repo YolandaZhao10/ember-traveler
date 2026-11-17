@@ -20,6 +20,8 @@ const charged: Condition = { kind: 'charged', value: 2 };
 const guarded: Condition = { kind: 'hasBlock' };
 const recover = (count: number): Effect => ({ kind: 'returnExhausted', count });
 const exhaust = (count: number | 'all'): Effect => ({ kind: 'exhaustHand', count });
+/** 升级后由玩家选择消耗哪几张。 */
+const chooseExhaust = (count: number): Effect => ({ kind: 'exhaustHand', count, choose: true });
 function make(type: CardDef['type'], id: string, name: string, archetype: Archetype, cost: number, effects: Effect[], upgraded: Effect[], options: Options = {}): Entry {
   const { upgradeCost, upgradeRequireEmber, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
   return { id, name, archetype, type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }), ...(upgradeRequireEmber === undefined ? {} : { requireEmber: upgradeRequireEmber }) } };
@@ -82,10 +84,10 @@ add('picker', 'common', [
   A('scalding_sweep', '灼灰横扫', 'cinder', 1, [hit(4, { aoe: true }), status('burn', 2, 'all')], [hit(6, { aoe: true }), status('burn', 2, 'all')], { target: 'all_enemies' }),
   S('coal_wrap', '裹炭', 'cinder', 1, [block(8), when({ kind: 'emberAtLeast', value: 4 }, ember(2))], [block(11), when({ kind: 'emberAtLeast', value: 4 }, ember(2))]),
   A('furnace_breath', '炉口吐息', 'cinder', 2, [when(burning, block(6)), hit(18), status('burn', 4, 'target')], [when(burning, block(8)), hit(24), status('burn', 4, 'target')]),
-  S('ash_shell', '灰壳', 'ash', 1, [exhaust(1), block(14), ember(2)], [exhaust(1), block(18), ember(3)], { exhaust: true }),
+  S('ash_shell', '灰壳', 'ash', 1, [exhaust(1), block(14), ember(2)], [chooseExhaust(1), block(18), ember(3)], { exhaust: true }),
   A('shard_throw', '残片投掷', 'ash', 0, [hit(6), when({ kind: 'emberAtLeast', value: 3 }, ember(-2), recover(1))], [hit(9), when({ kind: 'emberAtLeast', value: 3 }, ember(-2), recover(1))], { exhaust: true }),
   S('salvage_scraps', '捡拾残页', 'ash', 1, [recover(1), block(4)], [recover(1), block(7)]),
-  S('sift_ash', '筛灰', 'ash', 1, [exhaust(1), draw(2)], [exhaust(1), draw(3)]),
+  S('sift_ash', '筛灰', 'ash', 1, [exhaust(1), draw(2)], [chooseExhaust(1), draw(3)]),
   S('pocket_coals', '藏炭', 'ash', 0, [exhaust(1), ember(3)], [exhaust(1), ember(4)], { exhaust: true }),
   A('buried_knife', '埋灰短刃', 'ash', 1, [hit(14), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], [hit(19), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], { exhaust: true }),
 ]);
@@ -99,7 +101,7 @@ add('picker', 'uncommon', [
   P('coal_heart', '炉灰余温', 'cinder', 1, [status('pyre', 1)], [status('pyre', 2)]),
   S('ember_salvage', '烬中寻宝', 'ash', 1, [recover(2), ember(1)], [recover(3), ember(1)], { exhaust: true }),
   A('scrap_volley', '碎片齐射', 'ash', 1, [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }, hit(8, { aoe: true })], [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }, hit(12, { aoe: true })], { target: 'all_enemies', exhaust: true }),
-  S('burial_veil', '葬灰帷幕', 'ash', 1, [exhaust(2), block(13), draw(1)], [exhaust(2), block(18), draw(2)]),
+  S('burial_veil', '葬灰帷幕', 'ash', 1, [exhaust(2), block(13), draw(1)], [chooseExhaust(2), block(18), draw(2)]),
   S('reclaimed_spark', '回收火星', 'ash', 1, [recover(1), status('energyNext', 1)], [recover(1), status('energyNext', 2)], { exhaust: true }),
   A('ash_carver', '刻灰刀', 'ash', 1, [hit(9), recover(1)], [hit(13), recover(1)]),
   P('sheltering_ash', '积灰护甲', 'ash', 1, [status('ashFeast', 3), status('metallicize', 3)], [status('ashFeast', 4), status('metallicize', 4)]),
@@ -112,7 +114,7 @@ add('picker', 'rare', [
   P('undying_furnace', '不息炉膛', 'cinder', 2, [status('emberConduit', 6)], [status('emberConduit', 9)]),
   P('ash_reserve', '灰烬储备', 'ash', 1, [block(8), status('ashRecall', 8)], [block(12), status('ashRecall', 12)]),
   S('last_salvage', '终末打捞', 'ash', 1, [recover(3), block(10), status('energyNext', 1)], [recover(4), block(14), status('energyNext', 2)], { exhaust: true }),
-  S('phoenix_breath', '灰中复苏', 'ash', 1, [exhaust(2), { kind: 'heal', amount: 12 }], [exhaust(2), { kind: 'heal', amount: 16 }], { exhaust: true }),
+  S('phoenix_breath', '灰中复苏', 'ash', 1, [exhaust(2), { kind: 'heal', amount: 12 }], [chooseExhaust(2), { kind: 'heal', amount: 16 }], { exhaust: true }),
   A('ash_storm', '灰暴', 'ash', 2, [hit(16, { aoe: true }), exhaust(1), draw(2)], [hit(22, { aoe: true }), exhaust(1), draw(3)], { target: 'all_enemies', exhaust: true }),
   S('empty_the_satchel', '倾尽行囊', 'ash', 0, [{ kind: 'exhaustHand', count: 'all', energyPerCard: 1 }, draw(3)], [{ kind: 'exhaustHand', count: 'all', energyPerCard: 1 }, draw(4)], { exhaust: true }),
   A('embers_requiem', '残烬挽歌', 'ash', 2, [exhaust(1), hit(10, { times: 2 }), recover(2)], [exhaust(1), hit(13, { times: 2 }), recover(2)], { exhaust: true }),

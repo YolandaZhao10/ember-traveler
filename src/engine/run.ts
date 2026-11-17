@@ -10,7 +10,7 @@ import { EVENTS, EVENT_LIST } from '../data/events';
 import { RELICS, relicPool, relicAvailableTo } from '../data/relics';
 import { CHAPTER_RELICS } from '../data/chapterRelics';
 import { EVENT_RELICS, SHOP_RELICS } from '../data/specialRelics';
-import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type StepResult } from './combat';
+import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type ExhaustChoiceRequest, type PlayChoice, type StepResult } from './combat';
 import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
 import { ensureEncounterPlan, plannedEncounter } from './encounters';
@@ -197,19 +197,19 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   return run;
 }
 
-function applyCombatStep(input: RunState, step: StepResult): { run: RunState; events: CombatEvent[] } {
-  if (step.events.length === 0 && step.state === input.combat) return { run: input, events: [] };
+function applyCombatStep(input: RunState, step: StepResult): { run: RunState; events: CombatEvent[]; pending?: ExhaustChoiceRequest } {
+  if (step.events.length === 0 && step.state === input.combat) return { run: input, events: [], pending: step.pending };
   const run = clone(input);
   run.combat = step.state;
   run.gold = step.state.gold;
   // 讨债战斗用独立随机流，不推进其他战斗的种子。
   if (run.loan?.stage !== 'fight') run.rng.combat.s = step.state.rng.s;
   run.hp = step.state.player.hp;
-  return { run, events: step.events };
+  return { run, events: step.events, pending: step.pending };
 }
 
-export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null, replayUid?: string) {
-  if (!run.combat) return { run, events: [] as CombatEvent[] };
+export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null, replayUid?: string | PlayChoice) {
+  if (!run.combat) return { run, events: [] as CombatEvent[], pending: undefined as ExhaustChoiceRequest | undefined };
   const step = playCard(run.combat, cardUid, targetId, replayUid);
   const out = applyCombatStep(run, step);
   if (out.events.length) {

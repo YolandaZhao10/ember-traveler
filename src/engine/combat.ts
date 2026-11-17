@@ -44,7 +44,16 @@ function relicProc(cs: CombatState, relicId: string, ev: CombatEvent[]) {
 export interface StepResult {
   state: CombatState;
   events: CombatEvent[];
+  /** 出牌缺少一组「选择手牌消耗」时不提交任何结果，只说明第几组、要选几张、当时的手牌。 */
+  pending?: ExhaustChoiceRequest;
 }
+
+/** 第 group 组选择（0 为本体结算，之后每次重放各一组）：从 hand 里选 count 张。 */
+export interface ExhaustChoiceRequest { group: number; count: number; hand: CardInstance[] }
+/** 出牌时附带的选择。只传字符串等同于 replayUid，供弃牌堆选牌与牌堆取牌沿用。 */
+export interface PlayChoice { replayUid?: string; exhaust?: string[][] }
+class PendingExhaustChoice { constructor(readonly request: ExhaustChoiceRequest) {} }
+class InvalidExhaustChoice {}
 
 // ---------- 工具 ----------
 function clone<T>(x: T): T {
@@ -707,7 +716,22 @@ export function needsTarget(card: CardInstance): boolean {
   return viewCard(card).target === 'enemy';
 }
 
-export function playCard(input: CombatState, uid: string, targetId: string | null, replayUid?: string): StepResult {
+/**
+ * choice 传字符串时就是原来的 replayUid。带「选择手牌消耗」的牌还需要 exhaust：每次结算（本体与每次重放）各一组。
+ * 缺少某一组时返回 pending 且状态不变；某一组不合法（没选满、选了不在手牌里的牌、重复）时出牌无效。
+ */
+export function playCard(input: CombatState, uid: string, targetId: string | null, choice?: string | PlayChoice): StepResult {
+  const picked = typeof choice === 'string' ? { replayUid: choice } : choice ?? {};
+  try {
+    return playCardWith(input, uid, targetId, picked.replayUid, picked.exhaust ?? []);
+  } catch (error) {
+    if (error instanceof PendingExhaustChoice) return { state: input, events: [], pending: error.request };
+    if (error instanceof InvalidExhaustChoice) return { state: input, events: [] };
+    throw error;
+  }
+}
+
+function playCardWith(input: CombatState, uid: string, targetId: string | null, replayUid: string | undefined, exhaustChoices: string[][]): StepResult {
   const cs = clone(input);
   const ev: CombatEvent[] = [];
   const p = cs.player;
@@ -739,6 +763,8 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
   // 结算中的实体离开牌堆，不能被自己的抽牌洗回或作为消耗素材。
   if (replay) p.discard.splice(p.discard.findIndex(c => c.uid === replay.uid), 1);
   let replayed = false;
+  // 本体与每次重放依次取用一组「选择手牌消耗」。
+  const chosen = { groups: exhaustChoices, used: 0 };
   // 只计入打出本牌之前已生效的余音，新打出的能力不会计入自己。
   const activeTempos = ensurePowerInstances(p).filter(power => power.status === 'tempo');
   // “下一张”只消费打牌之前已有的回响，不能被本牌刚获得的回响重复自己。
@@ -847,7 +873,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
       playerLoseHp(cs, v.hpFallback, ev, true);
     }
     // 只记这张牌自身的效果；能力、遗物在出牌过程中带出的燃烧或临时力量不算。
-    const marks: PlayedMarks = { burn: false, tempStrength: false };
+    const marks: PlayedMarks = { burn: false, tempStrength: false, exhaustChoices: chosen };
     resolveEffects(cs, v.effects, target, ev, extraDamage, v, transfer, hpPaid, marks);
     if (marks.burn) addSignature(cs, ev, 'burnCard');
     if (marks.tempStrength) addSignature(cs, ev, 'tempStrengthCard');
@@ -932,7 +958,7 @@ export function playCard(input: CombatState, uid: string, targetId: string | nul
 
 type CardMoveResolution = { effect: CardTransfer; card: CardInstance; index: number; resolved: boolean };
 /** 一次出牌中，牌自身效果是否对敌人施加了燃烧、是否让自己获得了临时力量。 */
-type PlayedMarks = { burn: boolean; tempStrength: boolean };
+type PlayedMarks = { burn: boolean; tempStrength: boolean; exhaustChoices?: { groups: string[][]; used: number } };
 function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState | null, ev: CombatEvent[], extraDamage: number, view?: CardView, transfer?: CardMoveResolution, skipEmberCost = false, marks?: PlayedMarks) {
   const p = cs.player;
   const onEmberSpent = (amount: number) => {
@@ -1214,7 +1240,23 @@ function resolveEffects(cs: CombatState, effects: Effect[], target: EnemyState |
         const available = candidates?.length ?? p.hand.length;
         const n = e.count === 'all' ? available : Math.min(e.count, available);
         let exhausted = 0;
-        for (let i = 0; i < n; i++) {
+        // 由玩家选择：消耗的牌与触发和随机消耗走同一条路径，只是不掷随机数。没有出牌上下文时退回随机。
+        const chosen = e.choose && e.count !== 'all' && !candidates ? marks?.exhaustChoices : undefined;
+        if (chosen && n > 0) {
+          const group = chosen.groups[chosen.used];
+          if (!group) throw new PendingExhaustChoice({ group: chosen.used, count: n, hand: p.hand.map(c => ({ ...c })) });
+          if (group.length !== n || new Set(group).size !== n || group.some(id => !p.hand.some(c => c.uid === id))) throw new InvalidExhaustChoice();
+          chosen.used++;
+          for (const id of group) {
+            const at = p.hand.findIndex(c => c.uid === id);
+            // 前一张的消耗触发可能已把后一张移出手牌；不存在就跳过，不改选别的牌。
+            if (at < 0) continue;
+            const [c] = p.hand.splice(at, 1);
+            // 玩家自己选的牌，不按随机烧牌播放。
+            exhaustCard(cs, c, ev, false);
+            exhausted++;
+          }
+        } else for (let i = 0; i < n; i++) {
           if (!p.hand.length) break;
           let idx: number;
           if (candidates) {

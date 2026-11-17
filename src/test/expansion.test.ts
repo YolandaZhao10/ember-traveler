@@ -8,6 +8,7 @@ import { describeCard, viewCard } from '../engine/cards';
 import { createCombat, playCard } from '../engine/combat';
 import { EMBER_MAX } from '../engine/constants';
 import { makeRng } from '../engine/rng';
+import { playWithChoices } from './playOptions';
 import * as R from '../engine/run';
 import type { CardInstance, CharacterId } from '../engine/types';
 
@@ -113,7 +114,7 @@ describe('扩展卡池与遗物配额', () => {
     for (const def of [...EXTRA_CHARACTER_CARDS, ...EXTRA_SHARED_CARDS]) for (const up of [false, true]) {
       const cs = battle(def.id, up); const c = cs.player.hand[0]; const v = viewCard(c);
       if (def.id === 'oath_reenactment' || def.id === 'echo_recall') cs.player.discard = [{ uid: 'replay-target', defId: 'strike', upgraded: false }];
-      const result = playCard(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
+      const result = playWithChoices(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
       expect(result.events.some(e => e.type === 'cardPlayed'), def.id).toBe(true);
       expect(describeCard(c, null)).not.toMatch(/undefined|NaN/);
       expect(result.state.player.hp, def.id).toBeGreaterThan(0);
