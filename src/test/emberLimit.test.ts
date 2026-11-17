@@ -83,7 +83,7 @@ describe('余烬使用9999内部边界', () => {
 
   it.each([false, true])('高余烬爆发升级=%s：预览与实际伤害一致，并只消费一次全部资源', upgraded => {
     const cs = battle(['ember_burst']); cs.player.ember = 25; cs.player.hand[0].upgraded = upgraded;
-    const expected = 25 * (upgraded ? 8 : 6);
+    const expected = 25 * (upgraded ? 6 : 4);
     const before = structuredClone(cs);
     expect(preview(cs, 'ember_burst')).toContain(`当前 ${expected}`);
     expect(cs).toEqual(before);
@@ -95,9 +95,9 @@ describe('余烬使用9999内部边界', () => {
 
   it('9999余烬爆发与高额护盾仍得到有限的真实数值', () => {
     const cs = battle(['ember_burst']); cs.player.ember = EMBER_MAX;
-    expect(preview(cs, 'ember_burst')).toContain('当前 59994');
+    expect(preview(cs, 'ember_burst')).toContain('当前 39996');
     const result = play(cs, 'ember_burst');
-    expect(cs.enemies[0].hp - result.state.enemies[0].hp).toBe(59994);
+    expect(cs.enemies[0].hp - result.state.enemies[0].hp).toBe(39996);
     expect(result.state.player.ember).toBe(0);
     const shield = battle(['ash_shield']); shield.player.ember = 15;
     expect(preview(shield, 'ash_shield')).toContain('当前 45');

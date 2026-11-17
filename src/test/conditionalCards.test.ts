@@ -46,19 +46,22 @@ describe('条件牌的用途和收益',()=>{
     cs=round(cs);expect([...cs.player.hand,...cs.player.draw,...cs.player.discard]).toHaveLength(0);
     expect(describeCard({uid:'card',defId:'thorn_mail',upgraded:up},null)).toContain('消耗');
   });
-  it.each([false,true])('守夜只在下回合保留剩余盾，不能凭空造盾或变成永久固守，升级=%s',up=>{
+  it.each([false,true])('守夜：余烬 ≥ 3 时下回合开始获得 8/15 点格挡，只给一次，不再是保留格挡，升级=%s',up=>{
+    const next=up?15:8;
     let cs=battle('camp_guard',up);cs.player.ember=3;cs.player.block=10;
-    cs=playCard(cs,'card',null).state;expect(cs.player.block).toBe(up?19:16);
-    cs=round(cs);expect(cs.player.block).toBe(up?12:8);expect(cs.player.statuses.guardOnce??0).toBe(0);
+    cs=playCard(cs,'card',null).state;expect(cs.player.block).toBe(16);expect(cs.player.statuses.blockNext).toBe(next);
+    // 原有格挡照常清空，再获得守夜的格挡。
+    cs=round(cs);expect(cs.player.block).toBe(next);expect(cs.player.statuses.blockNext??0).toBe(0);expect(cs.player.statuses.guardOnce??0).toBe(0);
     cs=round(cs);expect(cs.player.block).toBe(0);
-    let spent=battle('camp_guard',up);spent.player.ember=3;spent=playCard(spent,'card',null).state;spent.player.block=0;expect(round(spent).player.block).toBe(0);
-    const cold=playCard(battle('camp_guard',up),'card',null).state;expect(cold.player.statuses.guardOnce??0).toBe(0);
+    // 本回合的格挡被打光也照样获得。
+    let spent=battle('camp_guard',up);spent.player.ember=3;spent=playCard(spent,'card',null).state;spent.player.block=0;expect(round(spent).player.block).toBe(next);
+    const cold=playCard(battle('camp_guard',up),'card',null).state;expect(cold.player.statuses.blockNext??0).toBe(0);expect(cold.player.block).toBe(6);
   });
-  it('守夜与架势相加但不超过已有格挡，固守时也消耗一次性准备',()=>{
+  it('守夜的格挡加在架势保留的格挡之上；固守时也照常获得',()=>{
     let cs=battle('camp_guard');cs.player.ember=3;cs.player.block=20;cs.player.statuses.guardReserve=4;
     cs=round(playCard(cs,'card',null).state);expect(cs.player.block).toBe(12);expect(round(cs).player.block).toBe(4);
     cs=battle('camp_guard');cs.player.ember=3;cs.player.statuses.barricade=1;cs=round(playCard(cs,'card',null).state);
-    expect(cs.player.block).toBe(6);expect(cs.player.statuses.guardOnce??0).toBe(0);
+    expect(cs.player.block).toBe(14);expect(cs.player.statuses.blockNext??0).toBe(0);
   });
   it.each([false,true])('扇火斩支付余烬换牌，回响必须再次支付；余烬不足则仅攻击，升级=%s',up=>{
     const cs=battle('fanning_strike',up);cs.player.statuses.echo=1;cs.player.ember=2;

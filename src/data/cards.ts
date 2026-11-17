@@ -366,20 +366,9 @@ def({
   archetype: 'ember',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'emberBurst', damagePer: 6 }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 8 }] },
+  effects: [{ kind: 'emberBurst', damagePer: 4 }],
+  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 6 }] },
   flavor: '所有积蓄，一息之间。',
-});
-def({
-  id: 'flame_breath',
-  name: '烈焰吐息',
-  type: 'attack',
-  rarity: 'uncommon',
-  archetype: 'ember',
-  cost: 1,
-  target: 'all_enemies',
-  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }] },
 });
 def({
   id: 'ash_shield',
@@ -430,10 +419,11 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'enemy',
-  retain: true,
-  charge: { damage: 3, max: 4 },
-  effects: [{ kind: 'damage', amount: 9 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 5 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 6 }] }] },
+  retainAtEmber: 5,
+  charge: { damage: 3, uncapped: true },
+  effects: [{ kind: 'damage', amount: 9 }],
+  // 按指定数值，升级后与基础版相同。
+  upgrade: { effects: [{ kind: 'damage', amount: 9 }] },
 });
 def({
   id: 'ember_dance',
@@ -463,7 +453,7 @@ def({
   cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'flameAura', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'flameAura', amount: 3, target: 'self' }] },
+  upgrade: { cost: 1 },
   flavor: '火光所及之处，灰烬低语。',
 });
 def({
@@ -515,7 +505,7 @@ def({
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -2 },
-      { kind: 'damage', amount: 24 },
+      { kind: 'damage', amount: 25 },
     ],
   },
 });
@@ -525,19 +515,10 @@ def({
   type: 'skill',
   rarity: 'common',
   archetype: 'ember',
-  cost: 0,
+  cost: 1,
   target: 'self',
-  exhaust: true,
-  effects: [
-    { kind: 'exhaustHand', count: 1 },
-    { kind: 'gainEmber', amount: 5 },
-  ],
-  upgrade: {
-    effects: [
-      { kind: 'exhaustHand', count: 1 },
-      { kind: 'gainEmber', amount: 8 },
-    ],
-  },
+  effects: [{ kind: 'exhaustHand', count: 1 }, { kind: 'gainEmber', amount: 5 }],
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 1, choose: true }, { kind: 'gainEmber', amount: 5 }] },
 });
 def({
   id: 'cinder_mend',
@@ -545,22 +526,13 @@ def({
   type: 'skill',
   rarity: 'rare',
   archetype: 'ember',
-  cost: 0,
+  cost: 1,
   target: 'self',
   exhaust: true,
   requireEmber: 4,
-  effects: [
-    { kind: 'gainEmber', amount: -4 },
-    { kind: 'heal', amount: 14 },
-    { kind: 'clearDebuffs' },
-  ],
-  upgrade: {
-    effects: [
-      { kind: 'gainEmber', amount: -4 },
-      { kind: 'heal', amount: 18 },
-      { kind: 'clearDebuffs' },
-    ],
-  },
+  effects: [{ kind: 'gainEmber', amount: -4 }, { kind: 'heal', amount: 15 }, { kind: 'clearDebuffs' }],
+  // 按指定数值，升级后与基础版相同。
+  upgrade: { effects: [{ kind: 'gainEmber', amount: -4 }, { kind: 'heal', amount: 15 }, { kind: 'clearDebuffs' }] },
 });
 
 // ---------- 拾灰者：焚烧 ----------
@@ -1418,6 +1390,9 @@ export const RETIRED_CARDS: Record<string, { name: string; replacement: string }
   add_fuel: { name: '添油', replacement: 'lingering_fire' },
   black_smoke: { name: '浓烟', replacement: 'smoke_cover' },
   reclaimed_spark: { name: '回收火星', replacement: 'salvage_scraps' },
+  // 通用底座牌：换成同为底座、稀有度不高于原牌的群体攻击牌。
+  flame_breath: { name: '烈焰吐息', replacement: 'sweeping_embers' },
+  final_conflagration: { name: '终夜焚天', replacement: 'lantern_procession' },
 };
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {

@@ -84,8 +84,7 @@ describe('偷钱与击杀返还', () => {
     let cs = steal(steal(combat(50, ['looter', 'ash_taxman']), 0), 1);
     cs = startPlayerTurn(cs).state;
     cs.enemies.forEach(e => { e.hp = 1; e.block = 0; });
-    cs.player.hand = [{ uid: 'aoe', defId: 'final_conflagration', upgraded: false }];
-    cs.player.ember = 1;
+    cs.player.hand = [{ uid: 'aoe', defId: 'sweeping_embers', upgraded: false }];
     const dead = playCard(cs, 'aoe', null).state;
     expect(dead.enemies.every(e => e.hp === 0)).toBe(true);
     expect(dead.gold).toBe(50);

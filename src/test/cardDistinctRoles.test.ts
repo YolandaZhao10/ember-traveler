@@ -133,7 +133,7 @@ describe('差异化卡牌的实际取舍', () => {
     expect(p.hand).toHaveLength(4); expect(p.discard[0].defId).toBe('regret'); expect(p.block).toBe(12);
     const mend = battle('cinder_mend'); mend.player.statuses.burn = 8;
     const cured = playCard(mend,'cinder_mend',null).state.player;
-    expect(cured.hp).toBe(54); expect(cured.block).toBe(0); expect(cured.statuses.burn).toBeUndefined();
+    expect(cured.hp).toBe(55); expect(cured.block).toBe(0); expect(cured.statuses.burn).toBeUndefined();
   });
   it('长明按实际消费触发，回响不双领，存档恢复保留本回合额度，下回合恢复', () => {
     let cs = battle('ember_blade'); cs.player.statuses = {spentEmberDraw:2,echo:1};

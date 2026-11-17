@@ -56,7 +56,8 @@ describe('能力牌独立叠加', () => {
   it('焰柱按每张余烬加成分别结算，数值型能力正常累加，格挡保留等规则不重复改变', () => {
     let cs = play(play(setup(), 'pillar_of_flame').state, 'pillar_of_flame', true).state;
     cs.player.ember = 4; cs = startPlayerTurn(endPlayerTurn(cs).state).state;
-    expect(cs.enemies[0].hp).toBe(9990); // 普通4 + 升级6
+    expect(cs.enemies[0].hp).toBe(9992); // 普通4 + 升级4：升级只降费，不再 +2 伤害
+    expect([CARDS.pillar_of_flame.cost, CARDS.pillar_of_flame.upgrade?.cost]).toEqual([2, 1]);
     expect(describeCard(card('pillar_of_flame'), null)).not.toContain('+1');
     cs = setup(); cs = play(play(cs, 'iron_will').state, 'iron_will').state;
     const amount = cs.player.statuses.metallicize!; expect(amount).toBeGreaterThan(3);
@@ -70,16 +71,6 @@ describe('能力牌独立叠加', () => {
     const legacy = JSON.parse(JSON.stringify(run)); legacy.version=10; delete legacy.combat.player.powerInstances;
     values.set('ember-traveler:save',JSON.stringify(legacy)); const restored=loadRun()!;
     expect(restored.version).toBe(R.SAVE_VERSION); expect(restored.combat!.player.powerInstances).toEqual([{ status:'tempo',amount:2,progress:0 }]);
-  });
-  it.each([false,true])('终夜焚天升级=%s：消耗全部余烬群攻并虚弱，不再提供格挡', upgraded => {
-    let cs=setup(); cs.enemies.push({...cs.enemies[0],id:'e1',statuses:{},flags:{}}); cs.player.ember=5;
-    const step=play(cs,'final_conflagration',upgraded); cs=step.state;
-    expect(cs.player.energy).toBe(98); expect(cs.player.ember).toBe(0); expect(cs.player.block).toBe(0);
-    for (const enemy of cs.enemies) { expect(enemy.hp).toBe(10000-5*(upgraded?5:4)); expect(enemy.statuses.weak).toBe(upgraded?2:1); }
-    const description=describeCard(card('final_conflagration',upgraded),null);
-    expect(description).toContain(`每点余烬 ${upgraded?5:4}`); expect(description).toContain(`${upgraded?2:1} 层虚弱`); expect(description).not.toContain('格挡');
-    cs=setup(); cs.player.ember=0; cs=play(cs,'final_conflagration',upgraded).state;
-    expect(cs.enemies[0].hp).toBe(10000); expect(cs.enemies[0].statuses.weak).toBe(upgraded?2:1);
   });
 
 });

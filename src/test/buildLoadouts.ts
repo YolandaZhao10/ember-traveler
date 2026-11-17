@@ -19,11 +19,11 @@ BUILD_LOADOUTS.forEach((loadout, i) => loadout.relics.push(chapterThreeRelics[i]
  */
 export const EMBER_LOADOUTS: ((typeof BUILD_LOADOUTS)[number] & { early: string[] })[] = [
  { route:'ember-traveler', character:'traveler',
-   cards:['stoke','torch','searing_strike','coal_tip','camp_guard','warm_cloak','heat_sink','spare_torch','flame_breath','ember_blade','forge','ember_burst'],
+   cards:['stoke','torch','searing_strike','coal_tip','camp_guard','warm_cloak','heat_sink','spare_torch','sweeping_embers','ember_blade','forge','ember_burst'],
    early:['stoke','torch','searing_strike','coal_tip','camp_guard','warm_cloak'],
    relics:['crowned_lantern','everburning_heart','charcoal_heart','ash_hourglass','ember_censer','rusted_plate','constellation_engine'] },
  { route:'ember-picker', character:'picker',
-   cards:['ignite','ember_gust','coal_credit','ember_sift','sweeping_embers','stoke','firestorm','rekindle_coals','charcoal_insight','flame_breath','smoldering_star','ember_burst'],
+   cards:['ignite','ember_gust','coal_credit','ember_sift','sweeping_embers','stoke','firestorm','rekindle_coals','charcoal_insight','sweeping_embers','smoldering_star','ember_burst'],
    early:['ignite','ember_gust','coal_credit','ember_sift','sweeping_embers','stoke'],
    relics:['crowned_lantern','foundry_core','coal_pouch','cinder_censer','ash_hourglass','bone_urn','starfire_seal'] },
  { route:'ember-oathbound', character:'oathbound',

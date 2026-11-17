@@ -70,7 +70,7 @@ describe('卡牌效果身份与升级边界', () => {
   it.each([false, true])('封存烈火兼有下回合能量，区别于干薪束（升级=%s）', up => {
     const result = play('sealed_flame', up);
     expect(result.player.ember).toBe(up ? 10 : 8);
-    expect(result.player.statuses.energyNext).toBe(up ? 2 : 1);
+    expect(result.player.statuses.energyNext).toBe(1);
     expect(result.player.exhaust.some(c => c.defId === 'sealed_flame')).toBe(true);
   });
 });

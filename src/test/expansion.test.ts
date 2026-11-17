@@ -74,15 +74,15 @@ describe('扩展卡池与遗物配额', () => {
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
-  it('通用牌普通24、罕见20、稀有20；初始和诅咒另计，底座牌与共鸣牌四角色都能获得，接口牌只给本角色', () => {
+  it('通用牌普通25、罕见17、稀有22；初始和诅咒另计，底座牌与共鸣牌四角色都能获得，接口牌只给本角色', () => {
     const shared = CARD_LIST.filter(c => !c.owner);
-    for (const [rarity, count] of [['common', 24], ['uncommon', 20], ['rare', 20]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
+    for (const [rarity, count] of [['common', 25], ['uncommon', 17], ['rare', 22]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
     expect(shared.filter(c => c.rarity === 'starter')).toHaveLength(3);
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner), c.name).toBe(!c.hook || c.hook === owner);
   });
   it('卡牌320张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(320); expect(EXTRA_CHARACTER_CARDS).toHaveLength(160); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
+    expect(CARD_LIST).toHaveLength(320); expect(EXTRA_CHARACTER_CARDS).toHaveLength(160); expect(EXTRA_SHARED_CARDS).toHaveLength(50);
     expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(320);
     expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(320);
     expect(RELIC_LIST).toHaveLength(208);

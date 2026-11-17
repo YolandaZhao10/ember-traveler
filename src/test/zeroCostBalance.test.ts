@@ -4,6 +4,7 @@ import { describeCard, viewCard, viewDef } from '../engine/cards';
 import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn } from '../engine/combat';
 import { makeRng } from '../engine/rng';
 import type { CombatState, Effect } from '../engine/types';
+import { playWithChoices } from './playOptions';
 
 const card = (defId: string, upgraded = false, uid = defId) => ({ defId, upgraded, uid });
 function battle(id: string, upgraded = false) {
@@ -171,7 +172,8 @@ describe('实付余烬的可重复零费过牌', () => {
       state = JSON.parse(JSON.stringify(state));
       state.player.discard = state.player.discard.filter(c => c.uid !== 'ember_sift');
       if (!state.player.hand.some(c => c.uid === 'ember_sift')) state.player.hand.push(card('ember_sift', upgraded));
-      const next = playCard(state, 'ember_sift', null).state;
+      // 升级版要选择弃哪张牌，按机器人的规则补上选择。
+      const next = playWithChoices(state, 'ember_sift', null).state;
       if (next === state) break;
       expect(next.player.discard.some(c => c.uid === 'ember_sift')).toBe(true);
       state = next; plays++;

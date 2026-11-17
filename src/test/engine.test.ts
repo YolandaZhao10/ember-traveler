@@ -34,8 +34,15 @@ describe('内容数量', () => {
     expect(EVENT_LIST.length).toBeGreaterThanOrEqual(6);
   });
   it('每张可升级卡都有可区分的升级版本', () => {
+    // 已审核例外：按指定数值调整后，这四张牌升级前后完全相同（数值待定，不自行补升级效果）。
+    // 灼热打击：伤害 9（9），其余规则基础与升级相同；余烬疗愈：回复 15（15）；炭中寻页、烬炉鼓风：取消上限后没有其他升级差异。
+    const sameAfterUpgrade = ['searing_strike', 'cinder_mend', 'coal_page_search', 'ember_bellows'];
     for (const c of CARD_LIST) {
       if (c.cost < 0 || c.type === 'status') continue;
+      if (sameAfterUpgrade.includes(c.id)) {
+        expect(describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost, c.id).toEqual(describeCard(card(c.id), null) + viewCard(card(c.id)).cost);
+        continue;
+      }
       const a = describeCard(card(c.id), null) + viewCard(card(c.id)).cost;
       const b = describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost;
       expect(b, c.id).not.toEqual(a);
@@ -158,7 +165,7 @@ describe('战斗基础', () => {
     s.enemies[0].hp = s.enemies[0].maxHp = 100;
     const hp = s.enemies[0].hp;
     s = playCard(s, handCard(s, 'ember_burst').uid, 'e0').state;
-    expect(hp - s.enemies[0].hp).toBe(72);
+    expect(hp - s.enemies[0].hp).toBe(48); // 12 点余烬 × 4
     expect(s.player.ember).toBe(0);
   });
 

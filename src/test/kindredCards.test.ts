@@ -53,11 +53,12 @@ describe('各角色的招牌动作计数', () => {
     let cs = battle('picker', ['pick_up', 'ember_gust', 'strike', 'defend']);
     cs = use(cs, 'pick_up-0');
     expect(signatureCount(cs.player)).toBe(1);
+    // 疾风余烬本牌不再消耗，只算被它消耗的那张手牌。
     cs = use(cs, 'ember_gust-1');
-    expect(signatureCount(cs.player)).toBe(3);
-    expect(cs.player.turnFlags.exhausted).toBe(3);
+    expect(signatureCount(cs.player)).toBe(2);
+    expect(cs.player.turnFlags.exhausted).toBe(2);
     const other = use(battle('traveler', ['ember_gust', 'strike']), 'ember_gust-0');
-    expect(other.player.turnFlags.exhausted).toBe(2);
+    expect(other.player.turnFlags.exhausted).toBe(1);
     expect(signatureCount(other.player)).toBe(0);
   });
 

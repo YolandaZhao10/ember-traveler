@@ -1,6 +1,6 @@
 import type { CardDef, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback' | 'kindred'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback' | 'kindred'> & { target?: CardDef['target']; upgradeCost?: number; upgradeRequireEmber?: number };
 type Entry = Omit<CardDef, 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -9,12 +9,14 @@ const ember = (amount: number): Effect => ({ kind: 'gainEmber', amount });
 const energy = (amount: number): Effect => ({ kind: 'energy', amount });
 const heal = (amount: number): Effect => ({ kind: 'heal', amount });
 const discard = (count: number): Effect => ({ kind: 'discardRandom', count });
+/** 升级后由玩家选择弃置哪几张。 */
+const chooseDiscard = (count: number): Effect => ({ kind: 'discardRandom', count, choose: true });
 const status = (status: StatusId, amount: number, target: 'self' | 'target' | 'all' = 'self'): Effect => ({ kind: 'status', status, amount, target });
 const when = (cond: Condition, ...then: Effect[]): Effect => ({ kind: 'conditional', cond, then });
 const coals = (value: number): Condition => ({ kind: 'emberAtLeast', value });
 function make(type: CardDef['type'], id: string, name: string, cost: number, effects: Effect[], upgraded: Effect[], options: Options = {}): Entry {
-  const { upgradeCost, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
-  return { id, name, archetype: 'ember', type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }) } };
+  const { upgradeCost, upgradeRequireEmber, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
+  return { id, name, archetype: 'ember', type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }), ...(upgradeRequireEmber === undefined ? {} : { requireEmber: upgradeRequireEmber }) } };
 }
 const A = (id: string, name: string, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('attack', id, name, cost, effects, up, opts);
 const S = (id: string, name: string, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('skill', id, name, cost, effects, up, opts);
@@ -27,9 +29,9 @@ function add(rarity: 'common' | 'uncommon' | 'rare', entries: Entry[]) {
 // 四角色共享：旅行补给、余烬积蓄与释放；强力恢复、爆发资源用消耗限制循环。
 add('common', [
   S('coal_credit', '燃烬借力', 0, [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1)], [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1), block(5)], { requireEmber: 2, exhaust: true }),
-  S('ember_sift', '烬中翻阅', 0, [ember(-2), draw(2), discard(1)], [ember(-2), draw(3), discard(1)], { requireEmber: 2 }),
+  S('ember_sift', '烬中翻阅', 0, [ember(-2), draw(2), discard(1)], [ember(-2), draw(2), chooseDiscard(1)], { requireEmber: 2 }),
   A('stone_throw', '投石', 0, [discard(1), hit(8), draw(1)], [discard(1), hit(11), draw(1)], { exhaust: true }),
-  S('camp_guard', '守夜', 1, [block(6), when(coals(3), status('guardOnce', 8))], [block(9), when(coals(3), status('guardOnce', 12))]),
+  S('camp_guard', '守夜', 1, [block(6), when(coals(3), status('blockNext', 8))], [block(6), when(coals(3), status('blockNext', 15))]),
   A('sweeping_embers', '扫火', 1, [hit(6, { aoe: true }), ember(1)], [hit(8, { aoe: true }), ember(1)], { target: 'all_enemies' }),
   A('coal_tip', '炭尖', 1, [hit(7), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(2))], [hit(10), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(3))]),
   S('shutter_lamp', '掩灯', 0, [block(3), when(coals(3), status('weak', 1, 'all'))], [block(5), when(coals(3), status('weak', 1, 'all'))], { exhaust: true }),
@@ -43,36 +45,37 @@ add('common', [
   S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))]),
   A('sling_volley', '连掷火石', 2, [hit(3, { times: 4 }), when(coals(5), status('energyNext', 1))], [hit(4, { times: 4 }), when(coals(5), status('energyNext', 2))]),
   A('sharpened_coal', '淬炭刃', 1, [hit(6), status('strength', 1)], [hit(9), status('strength', 1)], { exhaust: true }),
-  S('ember_wick', '余烬灯芯', 0, [ember(2)], [ember(3)], { retain: true, charge: { ember: 1, max: 4 }, exhaust: true }),
+  S('ember_wick', '余烬灯芯', 1, [ember(3)], [ember(4)], { retain: true, charge: { ember: 1, uncapped: true }, exhaust: true }),
+  S('enduring_warmth', '余温未散', 1, [heal(5), { kind: 'clearDebuffs', scope: 'all' }], [heal(7), { kind: 'clearDebuffs', scope: 'all' }], { exhaust: true }),
 ]);
 add('uncommon', [
-  S('coal_page_search', '炭中寻页', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'draw' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'draw' }], { requireEmber: 2, exhaust: true }),
+  S('coal_page_search', '炭中寻页', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, reward: 'draw', consumeAll: true }], [{ kind: 'convertResource', resource: 'ember', per: 2, reward: 'draw', consumeAll: true }], { requireEmber: 2, exhaust: true }),
   S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, hpFallback: 5, exhaust: true }),
-  A('firestorm', '火雨', 2, [ember(-2), hit(10, { aoe: true }), status('burn', 3, 'all')], [ember(-2), hit(14, { aoe: true }), status('burn', 4, 'all')], { target: 'all_enemies', requireEmber: 2 }),
+  S('firestorm', '火雨', 2, [ember(-2), status('burn', 7, 'all')], [ember(-2), status('burn', 10, 'all')], { target: 'all_enemies', requireEmber: 2 }),
   S('insulated_coat', '隔热外衣', 2, [block(18), ember(2), status('regen', 1)], [block(24), ember(3), status('regen', 2)], { exhaust: true }),
   A('heat_sink', '卸热', 1, [{ kind: 'emberBurst', damagePer: 2, blockPer: 2 }], [{ kind: 'emberBurst', damagePer: 3, blockPer: 2 }]),
   S('charcoal_insight', '炭火启示', 1, [ember(-2), draw(3)], [ember(-2), draw(4)], { requireEmber: 2, retain: true }),
-  S('rekindle_coals', '重拨余火', 1, [ember(-2), { kind: 'returnExhausted', count: 1 }, draw(1)], [ember(-2), { kind: 'returnExhausted', count: 1 }, draw(2)], { retain: true, requireEmber: 2 }),
+  S('rekindle_coals', '重拨余火', 1, [ember(-2), { kind: 'returnExhausted', count: 1, to: 'draw' }, draw(1)], [ember(-3), { kind: 'returnExhausted', count: 1, to: 'draw' }, draw(2)], { retain: true, requireEmber: 2, upgradeRequireEmber: 3 }),
   S('truce_smoke', '停战烟', 1, [status('weak', 2, 'all'), discard(1), draw(2)], [status('weak', 2, 'all'), discard(1), draw(3)]),
-  S('warding_lantern', '辟邪灯', 1, [block(9), when(coals(6), status('dexterity', 1), status('thorns', 1))], [block(12), when(coals(6), status('dexterity', 2), status('thorns', 1))]),
+  S('warding_lantern', '辟邪灯', 1, [block(10), when(coals(6), status('dexterity', 1), status('thorns', 1))], [block(10), when(coals(6), status('dexterity', 2), status('thorns', 1))], { exhaust: true }),
   A('spare_torch', '掷出火把', 1, [hit(8), ember(2), status('vulnerable', 1, 'target')], [hit(12), ember(3), status('vulnerable', 1, 'target')]),
   S('traveling_supplies', '随身药包', 0, [heal(4), draw(1)], [heal(6), draw(1)], { exhaust: true }),
-  S('emergency_stash', '翻找行囊', 0, [draw(3), discard(2), status('energyNext', 1)], [draw(4), discard(2), status('energyNext', 1)], { exhaust: true }),
-  S('enduring_warmth', '余温未散', 1, [heal(5), { kind: 'clearDebuffs' }], [heal(7), { kind: 'clearDebuffs' }], { exhaust: true }),
   S('quiet_burning_page', '静燃之页', 1, [block(7), when({ kind: 'charged', value: 2 }, draw(2))], [block(10), when({ kind: 'charged', value: 2 }, draw(2))], { retain: true, charge: { block: 3, max: 6 } }),
 ]);
 add('rare', [
-  S('ember_bellows', '烬炉鼓风', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'energy' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'energy' }], { requireEmber: 2, exhaust: true }),
+  S('ember_bellows', '烬炉鼓风', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, reward: 'energy' }], [{ kind: 'convertResource', resource: 'ember', per: 2, reward: 'energy' }], { requireEmber: 2, exhaust: true }),
   P('crown_of_sparks', '火星冠冕', 2, [status('sparkCrown', 4)], [status('sparkCrown', 6)]),
-  A('final_conflagration', '终夜焚天', 2, [{ kind: 'emberBurst', damagePer: 4, aoe: true }, { kind: 'status', status: 'weak', amount: 1, target: 'all' }], [{ kind: 'emberBurst', damagePer: 5, aoe: true }, { kind: 'status', status: 'weak', amount: 2, target: 'all' }], { target: 'all_enemies' }),
-  A('smoldering_star', '闷燃之星', 2, [hit(18), when(coals(8), status('burn', 8, 'target'), status('vulnerable', 2, 'target'))], [hit(22), when(coals(8), status('burn', 12, 'target'), status('vulnerable', 3, 'target'))]),
-  P('bonfire_shelter', '篝火避难所', 1, [status('emberBastion', 18)], [status('emberBastion', 24)]),
-  S('phoenix_respite', '涅槃之息', 1, [ember(-6), heal(10), status('regen', 4)], [ember(-6), heal(14), status('regen', 5)], { requireEmber: 6, exhaust: true }),
-  S('embers_to_dawn', '燃尽迎曦', 0, [ember(-5), energy(3), draw(2), status('strength', 2)], [ember(-5), energy(3), draw(3), status('strength', 3)], { requireEmber: 5, exhaust: true }),
+  S('smoldering_star', '闷燃之星', 2, [ember(-8), { kind: 'doubleStatus', status: 'burn' }], [ember(-8), { kind: 'doubleStatus', status: 'burn' }], { target: 'enemy', requireEmber: 8, upgradeCost: 1 }),
+  P('bonfire_shelter', '篝火避难所', 2, [status('emberBastion', 18)], [status('emberBastion', 18)], { upgradeCost: 1 }),
+  S('phoenix_respite', '涅槃之息', 1, [ember(-8), heal(10), status('regen', 4)], [ember(-8), heal(14), status('regen', 5)], { requireEmber: 8, exhaust: true }),
+  S('embers_to_dawn', '燃尽迎曦', 0, [ember(-5), energy(3), draw(3), status('strength', 2)], [ember(-5), energy(3), draw(4), status('strength', 3)], { requireEmber: 5, exhaust: true }),
   P('lasting_light', '长明灯', 1, [status('spentEmberDraw', 1)], [status('spentEmberDraw', 2)]),
-  A('lantern_procession', '百灯夜行', 2, [hit(14, { aoe: true }), ember(3), block(8)], [hit(18, { aoe: true }), ember(4), block(11)], { target: 'all_enemies' }),
+  A('lantern_procession', '百灯夜行', 2, [hit(14, { aoe: true }), ember(4), block(10)], [hit(18, { aoe: true }), ember(5), block(15)], { target: 'all_enemies' }),
   S('sunward_step', '向阳而行', 1, [block(12), { kind: 'discardRandom', count: 'all' }, draw(4)], [block(16), { kind: 'discardRandom', count: 'all' }, draw(5)], { exhaust: true }),
-  S('sealed_flame', '封存烈火', 0, [ember(5), status('energyNext', 1)], [ember(7), status('energyNext', 2)], { retain: true, exhaust: true }),
+  S('sealed_flame', '封存烈火', 0, [ember(5), status('energyNext', 1)], [ember(7), status('energyNext', 1)], { retain: true, exhaust: true }),
+  S('emergency_stash', '翻找行囊', 0, [draw(3), discard(2), status('energyNext', 1)], [draw(3), chooseDiscard(2), status('energyNext', 1)], { exhaust: true }),
+  P('guiding_firelight', '火光引路', 1, [status('emberDraw', 1)], [status('emberDraw', 2)]),
+  P('undying_kindling', '薪火不绝', 3, [status('emberEngine', 4)], [status('emberEngine', 3)]),
   A('twilight_flame', '暮火裁决', 2, [hit(20), status('weak', 2, 'target'), status('vulnerable', 2, 'target')], [hit(27), status('weak', 3, 'target'), status('vulnerable', 3, 'target')]),
 ]);
 
