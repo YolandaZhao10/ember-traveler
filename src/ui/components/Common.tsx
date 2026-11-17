@@ -2,7 +2,8 @@ import { RELICS } from '../../data/relics';
 import { STATUSES } from '../../data/statuses';
 import { statusEntries } from '../../engine/combat';
 import { statusDescription } from '../../engine/cards';
-import type { CharacterId, Intent, PowerInstance, Statuses } from '../../engine/types';
+import { LOAN_REPAY } from '../../engine/constants';
+import type { CharacterId, Intent, PowerInstance, RunState, Statuses } from '../../engine/types';
 import { openOverlay } from '../store';
 
 export function StatusChips({ statuses, ownerName, powers = [], character }: { statuses: Statuses; ownerName: string; powers?: PowerInstance[]; character?: CharacterId }) {
@@ -61,7 +62,33 @@ export function intentText(intent: Intent | null): { icon: string; text: string;
   }
 }
 
-export function RelicBar({ relics }: { relics: string[] }) {
+/** 「贷款」只是借款状态的显示，不在 run.relics 里：一个点亮的代表未了结，灰色的代表已结清。 */
+export const LOAN_ICON = '🧾';
+export const LOAN_GRAY_LIMIT = 3;
+export const loanText = (settled: boolean) => settled ? '已结清。' : `下次进商店时归还 ${LOAN_REPAY} 金币，或与讨债人一战。`;
+
+function LoanRelics({ loan }: { loan: RunState['loan'] }) {
+  if (!loan) return null;
+  const settled = Math.max(0, loan.settled);
+  const gray = (key: string, count?: number) => (
+    <button key={key} className="relic loan settled" title={`贷款：${loanText(true)}${count ? `（共 ${count} 笔）` : ''}`} aria-label={count ? `贷款，已结清 ${count} 笔` : '贷款，已结清'} onClick={() => openOverlay({ kind: 'loan', settled: true })}>
+      {LOAN_ICON}{count ? <small className="loan-count">×{count}</small> : null}
+    </button>
+  );
+  return (
+    <>
+      {/* 灰色的多了以后合并成一个带数量的图标，遗物栏不会被挤坏。 */}
+      {settled > LOAN_GRAY_LIMIT ? gray('loan-settled', settled) : Array.from({ length: settled }, (_, i) => gray(`loan-settled-${i}`))}
+      {loan.outstanding && (
+        <button className="relic loan" title={`贷款：${loanText(false)}`} aria-label="贷款，未结清" onClick={() => openOverlay({ kind: 'loan', settled: false })}>
+          {LOAN_ICON}
+        </button>
+      )}
+    </>
+  );
+}
+
+export function RelicBar({ relics, loan }: { relics: string[]; loan?: RunState['loan'] }) {
   return (
     <div className="relicbar">
       {relics.map((id) => {
@@ -73,6 +100,7 @@ export function RelicBar({ relics }: { relics: string[] }) {
           </button>
         );
       })}
+      <LoanRelics loan={loan} />
     </div>
   );
 }

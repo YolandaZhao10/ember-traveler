@@ -12,6 +12,7 @@ import { canUpgrade, sortedDeck } from '../../engine/run';
 import type { CardInstance, CombatState, EnemyState, EnemyAction } from '../../engine/types';
 import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
+import { LOAN_ICON, loanText } from './Common';
 import { DiscardReplay } from './DiscardReplay';
 import { PileCardChoice } from './PileCardChoice';
 import { CardCatalog } from './CardCatalog';
@@ -116,6 +117,13 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
         </Modal>
       );
     }
+    case 'loan':
+      return (
+        <Modal title={`${LOAN_ICON} 贷款`} onClose={closeOverlay}>
+          <p>{loanText(overlay.settled)}</p>
+          <p className="subtitle">借款凭据。没有任何战斗或旅程效果，不计入遗物数量。</p>
+        </Modal>
+      );
     case 'log': {
       const lines = run.combat?.log ?? [];
       return (

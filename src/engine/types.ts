@@ -446,6 +446,8 @@ export type Screen =
   | 'reward'
   | 'event'
   | 'shop'
+  /** 进店前了结借款：二选一，或金币不足时的迎战提示。 */
+  | 'debt'
   | 'rest'
   | 'chapter'
   | 'gameover'
@@ -541,6 +543,8 @@ export interface RunState {
   rest: RestState | null;
   /** 每章可用一次营火精简；与休息、锻造共用本次营火行动。 */
   campRefined?: boolean;
+  /** 商店借款。缺省表示从未借过；stage 仅在进店了结期间存在（choice：等待选择，fight：讨债战斗中）。 */
+  loan?: { outstanding: boolean; settled: number; stage?: 'choice' | 'fight' };
   usedEvents: string[];
   seenEncounters: string[];
   stats: RunStats;

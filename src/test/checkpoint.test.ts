@@ -120,7 +120,7 @@ describe('当前节点快速 SL', () => {
     expect(R.eventChoose(restored, 'absorb')).toEqual(choice);
   });
 
-  it('死亡后刷新恢复战斗，最终胜利后刷新保持通关', () => {
+  it('死亡后刷新仍是战败且不能回退重打，最终胜利后刷新保持通关', () => {
     memoryStorage();
     for (const outcome of ['lost', 'won'] as const) {
       const original = enter('boss', 'FINAL-SL', 4);
@@ -132,7 +132,8 @@ describe('当前节点快速 SL', () => {
       saveRun(ended);
       const loaded = loadRun()!;
       expect(loaded.screen).toBe(outcome === 'lost' ? 'gameover' : 'victory');
-      expect(R.resetCurrentNode(loaded)).toEqual(outcome === 'lost' ? original : reward);
+      if (outcome === 'lost') expect(R.resetCurrentNode(loaded)).toBe(loaded);
+      else expect(R.resetCurrentNode(loaded)).toEqual(reward);
     }
   });
 

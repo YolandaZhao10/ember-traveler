@@ -17,6 +17,7 @@
     "audit:final-enemies": "vite-node scripts/audit-final-enemies.ts",
     "audit:builds": "vite-node scripts/audit-builds.ts",
     "audit:signature": "vite-node scripts/audit-signature.ts",
+    "audit:debt": "vite-node scripts/audit-debt.ts",
     "audit:strategy": "vite-node scripts/audit-strategy.ts",
     "audit:card-rarity": "vite-node scripts/audit-card-rarity.ts",
     "audit:card-similarity": "vite-node scripts/audit-card-similarity.ts",

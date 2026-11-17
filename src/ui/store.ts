@@ -34,6 +34,7 @@ export type Overlay =
   | { kind: 'status'; status: StatusId; amount: number; ownerName: string; detail?: string }
   | { kind: 'ember' }
   | { kind: 'relic'; relicId: string }
+  | { kind: 'loan'; settled: boolean }
   | { kind: 'log' }
   | { kind: 'map' }
   | { kind: 'enemy'; enemyId: string }
@@ -520,6 +521,29 @@ export function shopRemove(uid: string) {
   closeOverlay();
 }
 export const shopLeave = simple(R.shopLeave, 'click');
+export function shopBorrow() {
+  if (!state.run) return;
+  const next = R.shopBorrow(state.run);
+  if (next === state.run) return;
+  sfx('gold');
+  setRun(next);
+}
+export function debtRepay() {
+  if (!state.run) return;
+  const next = R.debtRepay(state.run);
+  if (next === state.run) return;
+  sfx('gold');
+  setRun(next);
+}
+export function debtFight() {
+  if (!state.run || state.busy) return;
+  const next = R.debtFight(state.run);
+  if (next === state.run) return;
+  sfx('click');
+  set({ impacts: [], cardExits: [], fx: [] });
+  setRun(next);
+  banner('讨债战');
+}
 
 export const restHeal = simple(R.restHeal, 'heal');
 export const restLeave = simple(R.restLeave, 'click');

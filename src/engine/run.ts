@@ -4,6 +4,8 @@ import { CHARACTERS } from '../data/characters';
 import { difficultyPercent, normalizeDifficulty } from '../data/difficulty';
 import { CHAPTERS, CHAPTER_RECOVERY, FINAL_CHAPTER, nextChapter, TOTAL_FLOORS } from '../data/chapters';
 import { ENCOUNTERS, ENEMIES } from '../data/enemies';
+import { debtCollectorId } from '../data/debtCollectors';
+import { LOAN_AMOUNT, LOAN_REPAY } from './constants';
 import { EVENTS, EVENT_LIST } from '../data/events';
 import { RELICS, relicPool, relicAvailableTo } from '../data/relics';
 import { CHAPTER_RELICS } from '../data/chapterRelics';
@@ -132,8 +134,12 @@ export function travelTo(input: RunState, nodeId: string): RunState {
       startEvent(run);
       break;
     case 'shop':
+      // 货架先照常生成，再了结借款：有没有借款，进店看到的货架都一样。
       run.shop = generateShop(run);
-      run.screen = 'shop';
+      if (run.loan?.outstanding) {
+        run.loan.stage = 'choice';
+        run.screen = 'debt';
+      } else run.screen = 'shop';
       break;
     case 'rest':
       run.rest = { used: false, picking: false };
@@ -145,6 +151,8 @@ export function travelTo(input: RunState, nodeId: string): RunState {
 
 /** 回退节点或战后领奖阶段：包含牌组、奖励、统计、所有随机流，不能累积收益。 */
 export function resetCurrentNode(run: RunState): RunState {
+  // 战败即终局：任何战斗倒下后都不能回退重打。
+  if (run.screen === 'gameover') return run;
   const snapshot = ensureRewardCheckpoint(run).checkpoint;
   if (!snapshot || snapshot.chapter !== run.chapter || snapshot.currentNodeId !== run.currentNodeId) return run;
   return { ...clone(snapshot), elapsedMs: run.elapsedMs, checkpoint: clone(snapshot) };
@@ -194,7 +202,8 @@ function applyCombatStep(input: RunState, step: StepResult): { run: RunState; ev
   const run = clone(input);
   run.combat = step.state;
   run.gold = step.state.gold;
-  run.rng.combat.s = step.state.rng.s;
+  // 讨债战斗用独立随机流，不推进其他战斗的种子。
+  if (run.loan?.stage !== 'fight') run.rng.combat.s = step.state.rng.s;
   run.hp = step.state.player.hp;
   return { run, events: step.events };
 }
@@ -248,6 +257,7 @@ export function finishCombat(input: RunState): RunState {
   }
   const defeated = cs.enemies.filter(e => !e.flags.escaped);
   run.stats.enemiesKilled += defeated.length;
+  if (run.loan?.stage === 'fight') return settleDebtVictory(run, cs.player.selfHpLost);
   if (cs.tier === 'elite' && defeated.some(e => ENEMIES[e.defId].tier === 'elite')) run.stats.elitesKilled += 1;
   run.stats.floorsCleared += 1;
   if (!defeated.length) {
@@ -603,6 +613,63 @@ export function shopRemoveCard(input: RunState, cardUid: string): RunState {
   run.gold += relicJourneyBonus(run, 'remove', 'gold');
   return run;
 }
+// ---------- 商店借款 ----------
+/** 终章商店不放贷；有未了结的借款时不能再借。 */
+export function canBorrow(run: RunState): boolean {
+  return run.screen === 'shop' && !!run.shop && run.chapter !== FINAL_CHAPTER && !run.loan?.outstanding;
+}
+
+export function shopBorrow(input: RunState): RunState {
+  if (!canBorrow(input)) return input;
+  const run = clone(input);
+  run.gold += LOAN_AMOUNT;
+  run.loan = { outstanding: true, settled: run.loan?.settled ?? 0 };
+  return run;
+}
+
+function settleLoan(run: RunState) {
+  run.loan = { outstanding: false, settled: (run.loan?.settled ?? 0) + 1 };
+  run.screen = 'shop';
+}
+
+/** 归还后进店并更新回退点：不能回退改选，也不会重复扣款。 */
+export function debtRepay(input: RunState): RunState {
+  if (input.screen !== 'debt' || input.loan?.stage !== 'choice' || input.gold < LOAN_REPAY) return input;
+  const run = clone(input);
+  run.gold -= LOAN_REPAY;
+  settleLoan(run);
+  return recordCheckpoint(run);
+}
+
+/** 迎战讨债人。强度固定取本章首领所在楼层的首领倍率；按普通战斗结算遗物效果。 */
+export function debtFight(input: RunState): RunState {
+  if (input.screen !== 'debt' || input.loan?.stage !== 'choice') return input;
+  const run = clone(input);
+  const chapter = CHAPTERS[run.chapter];
+  const id = debtCollectorId(run.chapter);
+  // 独立随机流：不读写 rng.combat，也不记入已遇到的遭遇，其他节点的结果不变。
+  const rng = makeRng(run.seed, `debt:${run.loan!.settled}`);
+  const res = createCombat(id, [id], 'normal', run.deck, run.hp, run.maxHp, run.relics, rng, run.uidCounter, run.character,
+    encounterDifficulty(chapter.startFloor + chapter.floors - 1, 'boss', run.difficulty), run.gold);
+  run.loan!.stage = 'fight';
+  run.combat = res.state;
+  run.gold = res.state.gold;
+  run.screen = 'combat';
+  // 回退点落在开战时：进行中可以重来，但不能退回去改成归还。
+  return recordCheckpoint(run);
+}
+
+/** 讨债战胜利：没有金币、卡牌、遗物奖励；战后遗物效果按普通战斗结算，随后进入已生成的商店。 */
+function settleDebtVictory(run: RunState, selfHpLost: number): RunState {
+  if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + T.canteenHeal);
+  if (run.relics.includes('red_vial') && selfHpLost > 0) run.hp = Math.min(run.maxHp, run.hp + Math.floor(selfHpLost / 2));
+  applyJourneyHealth(run, 'victory', 'normal');
+  run.gold += (run.relics.includes('coin_purse') ? 5 : 0) + relicJourneyBonus(run, 'victory', 'gold', 'normal');
+  run.combat = null;
+  settleLoan(run);
+  return recordCheckpoint(run);
+}
+
 export function shopLeave(input: RunState): RunState {
   if (input.screen !== 'shop') return input;
   const run = clone(input);

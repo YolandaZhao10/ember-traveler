@@ -1,3 +1,7 @@
+/** 商店借款：借到的金币，以及下次进店时归还的金额。 */
+export const LOAN_AMOUNT = 200;
+export const LOAN_REPAY = 250;
+
 /** 战斗内资源边界；结算与卡牌预览必须使用同一个值。 */
 export const EMBER_MAX = 9999;
 export const BLOCK_MAX = 9999;
