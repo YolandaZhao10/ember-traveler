@@ -128,8 +128,8 @@ describe('战斗基础', () => {
     const cs = combatWith([card('thorn_mail'), card('thorn_mail'), card('thorn_mail'), card('defend'), card('defend')], ['looter'], ['thorn_crown']);
     let s = cs;
     s = playCard(s, handCard(s, 'thorn_mail').uid, null).state;
-    s = playCard(s, handCard(s, 'thorn_mail').uid, null).state; // 荆棘 3+2+2 = 7
-    expect(s.player.statuses.thorns).toBe(7);
+    s = playCard(s, handCard(s, 'thorn_mail').uid, null).state; // 荆棘 3+3+3 = 9
+    expect(s.player.statuses.thorns).toBe(9);
     s.enemies[0].hp = 10;
     s.enemies[0].moveId = 'flurry'; // 3 × 3
     s = endPlayerTurn(s).state;

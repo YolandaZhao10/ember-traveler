@@ -122,3 +122,50 @@ describe('旅人连击牌：条件降为「已打出 1 张攻击牌」', () => {
     for (const id of ['rhythm', 'swift_return', 'encircling_blades']) for (const up of [false, true]) expect(text(id, up), id).toContain('若本回合已打出 2 张以上攻击牌');
   });
 });
+
+describe('旅人壁垒牌：只加输出，不动叠甲', () => {
+  const guard = (id: string, up: boolean, blockNow: number, enemies = 1) => { const cs = battle(id, up, 0, enemies); cs.player.block = blockNow; return cs; };
+
+  it.each([false, true])('盾击：伤害为当前格挡 +4；升级先获得 3 点格挡再 +6，格挡不消耗（升级=%s）', up => {
+    expect(text('shield_bash', up)).toBe(up ? '获得 3 点格挡，造成等于当前格挡 +6的伤害。' : '造成等于当前格挡 +4的伤害。');
+    const naked = play(guard('shield_bash', up, 0), 'shield_bash');
+    expect([lost(naked), naked.player.block]).toEqual([up ? 9 : 4, up ? 3 : 0]);
+    const walled = play(guard('shield_bash', up, 20), 'shield_bash');
+    expect([lost(walled), walled.player.block]).toEqual([up ? 29 : 24, up ? 23 : 20]);
+  });
+
+  it.each([false, true])('反击：拥有格挡时追加 6/8 点伤害（升级=%s）', up => {
+    expect(text('riposte', up)).toBe(`造成 ${up ? 9 : 6} 点伤害，若拥有格挡：造成 ${up ? 8 : 6} 点伤害。`);
+    expect(lost(play(guard('riposte', up, 0), 'riposte'))).toBe(up ? 9 : 6);
+    expect(lost(play(guard('riposte', up, 5), 'riposte'))).toBe(up ? 17 : 12);
+  });
+
+  it.each([false, true])('盾缘：拥有格挡时获得 3/4 点临时荆棘（升级=%s）', up => {
+    expect(text('shield_edge', up)).toContain(`造成 ${up ? 9 : 6} 点伤害，若拥有格挡：获得 ${up ? 4 : 3} 点临时荆棘`);
+    expect(play(guard('shield_edge', up, 0), 'shield_edge').player.statuses.tempThorns ?? 0).toBe(0);
+    const walled = play(guard('shield_edge', up, 5), 'shield_edge');
+    expect([lost(walled), walled.player.statuses.tempThorns, walled.player.block]).toEqual([up ? 9 : 6, up ? 4 : 3, 5]);
+  });
+
+  it.each([false, true])('荆棘甲：格挡不变，荆棘 3/4，仍然消耗（升级=%s）', up => {
+    expect(text('thorn_mail', up)).toBe(`获得 ${up ? 10 : 7} 点格挡，获得 ${up ? 4 : 3} 层荆棘。消耗。`);
+    const after = play(guard('thorn_mail', up, 0), 'thorn_mail').player;
+    expect([after.block, after.statuses.thorns, after.exhaust.map(c => c.defId)]).toEqual([up ? 10 : 7, up ? 4 : 3, ['thorn_mail']]);
+  });
+
+  it.each([false, true])('碎盾：倍率固定为 3，升级只把费用降到 1（升级=%s）', up => {
+    expect(text('shield_shatter', up)).toBe('消耗所有格挡，对所有敌人造成等于当前格挡 × 3的伤害。');
+    expect(CARDS.shield_shatter.cost).toBe(2);
+    expect(CARDS.shield_shatter.upgrade).toEqual({ cost: 1 });
+    const after = play(guard('shield_shatter', up, 15, 2), 'shield_shatter');
+    expect([after.enemies.map(e => 1000 - e.hp), after.player.block, after.player.energy]).toEqual([[45, 45], 0, up ? 2 : 1]);
+  });
+
+  it('本轮不动的壁垒牌保持原样：铁壁、架盾、漫长守望', () => {
+    expect(CARDS.iron_wall.effects).toEqual([{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }]);
+    expect(CARDS.iron_wall.upgrade?.effects).toEqual([{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }]);
+    expect(CARDS.brace_line.effects.map(e => e.kind)).toEqual(['conditional', 'block']);
+    expect(CARDS.long_road.effects).toEqual([{ kind: 'status', status: 'patientGuard', amount: 8, target: 'self' }]);
+  });
+});
+

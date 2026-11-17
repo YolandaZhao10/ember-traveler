@@ -40,7 +40,7 @@ add('traveler', 'common', [
   A('frontier_sweep', '开路横斩', 'combo', 1, [hit(7, { aoe: true }), when(attacks(1), status('vulnerable', 1, 'all'))], [hit(10, { aoe: true }), when(attacks(1), status('vulnerable', 2, 'all'))], { target: 'all_enemies' }),
   S('steady_grip', '稳握', 'combo', 0, [block(4), when(cards(2), draw(1))], [block(7), when(cards(2), draw(1))], { exhaust: true }),
   S('measured_step', '量步', 'combo', 1, [draw(1), block(8)], [draw(1), block(11)]),
-  A('shield_edge', '盾缘', 'bulwark', 1, [hit(6), when(guarded, status('tempThorns', 2))], [hit(9), when(guarded, status('tempThorns', 3))]),
+  A('shield_edge', '盾缘', 'bulwark', 1, [hit(6), when(guarded, status('tempThorns', 3))], [hit(9), when(guarded, status('tempThorns', 4))]),
   S('brace_line', '架盾', 'bulwark', 1, [when(guarded, status('metallicize', 1)), block(7)], [when(guarded, status('metallicize', 2)), block(10)]),
   S('ember_patrol', '提灯巡守', 'bulwark', 1, [block(9), when(cards(2), status('energyNext', 1))], [block(12), when(cards(2), status('energyNext', 1))]),
   S('rally_step', '整步', 'bulwark', 0, [block(3), when(attacks(1), ember(1))], [block(5), when(attacks(1), ember(1))]),

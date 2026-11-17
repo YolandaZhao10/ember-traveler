@@ -22,7 +22,7 @@ describe('条件牌的用途和收益',()=>{
   it.each([false,true])('盾缘提供临时反伤，交锋提供即时防护，基础/升级=%s',up=>{
     const before=battle('shield_edge',up);before.player.block=10;
     const after=playCard(before,'card','e0').state;
-    expect(after.enemies[0].hp).toBe(1000-(up?9:6));expect(after.player.block).toBe(10);expect(after.player.statuses.tempThorns).toBe(up?3:2);
+    expect(after.enemies[0].hp).toBe(1000-(up?9:6));expect(after.player.block).toBe(10);expect(after.player.statuses.tempThorns).toBe(up?4:3);
     const naked=playCard(battle('shield_edge',up),'card','e0').state;expect(naked.player.statuses.tempThorns??0).toBe(0);
     const cross=playCard(battle('cross_guard',up),'card','e0').state;expect(cross.player.block).toBe(up?8:6);expect(cross.player.statuses.thorns??0).toBe(0);
     expect(describeCard(before.player.hand[0],null)).toContain('荆棘');
@@ -30,19 +30,19 @@ describe('条件牌的用途和收益',()=>{
   it.each([false,true])('临时荆棘支持本轮回响叠加，跨回合清空且不扣遗物的永久荆棘，升级=%s',up=>{
     let cs=battle('shield_edge',up);cs.player.block=30;cs.player.statuses={thorns:3,echo:1};
     cs=playCard(cs,'card','e0').state;
-    expect(cs.player.statuses.tempThorns).toBe(up?6:4);expect(cs.player.statuses.thorns).toBe(3);
+    expect(cs.player.statuses.tempThorns).toBe(up?8:6);expect(cs.player.statuses.thorns).toBe(3);
     cs=JSON.parse(JSON.stringify(cs));
     cs=endPlayerTurn(cs).state;cs.enemies[0].moveId='cleave';cs.enemies[0].block=0;
     const before=cs.enemies[0].hp, step=enemyAct(cs,'e0');
     expect(step.events.filter(e=>e.type==='damage'&&e.source==='thorns')).toHaveLength(1);
-    expect(before-step.state.enemies[0].hp).toBe(3+(up?6:4));
+    expect(before-step.state.enemies[0].hp).toBe(3+(up?8:6));
     cs=startPlayerTurn(step.state).state;
     expect(cs.player.statuses.tempThorns??0).toBe(0);expect(cs.player.statuses.thorns).toBe(3);
   });
   it.each([false,true])('荆棘甲打出后消耗，洗牌不会再次抽回；回响也只移除一个实体，升级=%s',up=>{
     let cs=battle('thorn_mail',up);cs.player.statuses.echo=1;
     cs=playCard(cs,'card',null).state;
-    expect(cs.player.statuses.thorns).toBe(up?6:4);expect(cs.player.exhaust.map(c=>c.uid)).toEqual(['card']);
+    expect(cs.player.statuses.thorns).toBe(up?8:6);expect(cs.player.exhaust.map(c=>c.uid)).toEqual(['card']);
     cs=round(cs);expect([...cs.player.hand,...cs.player.draw,...cs.player.discard]).toHaveLength(0);
     expect(describeCard({uid:'card',defId:'thorn_mail',upgraded:up},null)).toContain('消耗');
   });

@@ -241,11 +241,11 @@ def({
   owner: 'traveler',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damageByBlock' }],
+  effects: [{ kind: 'damageByBlock', bonus: 4 }],
   upgrade: {
     effects: [
       { kind: 'block', amount: 3 },
-      { kind: 'damageByBlock' },
+      { kind: 'damageByBlock', bonus: 6 },
     ],
   },
   flavor: '盾不只用来挡。',
@@ -260,8 +260,8 @@ def({
   cost: 1,
   target: 'self',
   exhaust: true,
-  effects: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 4, target: 'self' }] },
 });
 def({
   id: 'iron_wall',
@@ -286,12 +286,12 @@ def({
   target: 'enemy',
   effects: [
     { kind: 'damage', amount: 6 },
-    { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 4 }] },
+    { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 6 }] },
   ],
   upgrade: {
     effects: [
       { kind: 'damage', amount: 9 },
-      { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 5 }] },
+      { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 8 }] },
     ],
   },
 });
@@ -329,8 +329,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damageByBlock', aoe: true, mult: 2, consume: true }],
-  upgrade: { effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }] },
+  effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }],
+  upgrade: { cost: 1 },
   flavor: '让他们尝尝城墙的重量。',
 });
 def({

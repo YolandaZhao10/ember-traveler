@@ -38,7 +38,8 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   const before=battle(['shield_bash','shield_shatter']);before.player.block=20;
   const bash=use(before,'shield_bash'),shatter=use(before,'shield_shatter');
   expect(bash.player.block).toBe(20);expect(shatter.player.block).toBe(0);
-  expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(2*(before.enemies[0].hp-bash.enemies[0].hp));
+  // 盾击：格挡 20 +4；碎盾：格挡 20 × 3。
+  expect(before.enemies[0].hp-bash.enemies[0].hp).toBe(24);expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(60);
  });
  it('铺火后添油翻倍并防护，引爆会花掉后续持续伤害',()=>{
   let cs=battle(['light_up','add_fuel','detonate']);cs=use(cs,'light_up');cs=use(cs,'add_fuel');
