@@ -35,7 +35,9 @@ describe('零费资源牌的真实消耗边界', () => {
     const before = battle(id, upgraded);
     before.player.statuses.ashFeast = 2;
     if (id === 'burn_pages') before.player.hand.push(card('strike', false, 'fuel'));
-    const { state: after, events } = use(before, id);
+    // 升级后的焚书由玩家选择消耗哪张手牌。
+    const chosen = id === 'burn_pages' && upgraded ? playCard(before, id, null, { exhaust: [['fuel']] }) : null;
+    const { state: after, events } = chosen ?? use(before, id);
     expect(after.player.exhaust.filter(c => c.uid === id)).toHaveLength(1);
     expect([...after.player.hand, ...after.player.draw, ...after.player.discard].some(c => c.uid === id)).toBe(false);
     expect(after.player.turnFlags.exhausted).toBe(id === 'burn_pages' ? 2 : 1);
@@ -182,7 +184,8 @@ describe('实付余烬的可重复零费过牌', () => {
 });
 
 describe('零费升级能力仍是一次部署，不伪装成消耗', () => {
-  it.each(['forge', 'everburning', 'blood_pact', 'mirror'])('%s 打出后从所有牌堆移出，不额外触发消耗遗物或能力', id => {
+  // 不灭之火升级后改为 1 费，不再属于零费升级能力。
+  it.each(['forge', 'blood_pact', 'mirror'])('%s 打出后从所有牌堆移出，不额外触发消耗遗物或能力', id => {
     const cs = battle(id, true);
     cs.relics = ['bone_urn', 'foundry_core'];
     cs.player.statuses.ashFeast = 2; cs.player.statuses.echo = 1;

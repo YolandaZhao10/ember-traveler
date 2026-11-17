@@ -50,15 +50,16 @@ describe('专属卡牌的不同用途', () => {
     }
   });
 
-  it.each([false, true])('藏炭把随机一张剩余手牌转为余烬，不再附赠格挡（升级=%s）', up => {
+  it.each([false, true])('藏炭把一张剩余手牌转为 3 点余烬（基础随机，升级自选），不再附赠格挡（升级=%s）', up => {
     const cs = battle('pocket_coals', up);
     cs.player.hand.push(card('strike', 'candidate-a'), card('defend', 'candidate-b'));
-    const result = play(cs, 'pocket_coals');
+    const result = up ? playCard(cs, 'pocket_coals', null, { exhaust: [['candidate-b']] }).state : play(cs, 'pocket_coals');
     expect(result.player.hand).toHaveLength(1);
     expect(result.player.exhaust).toHaveLength(2);
     expect(result.player.exhaust.filter(c => c.uid.startsWith('candidate-'))).toHaveLength(1);
+    if (up) expect(result.player.exhaust.map(c => c.uid)).toContain('candidate-b');
     expect(result.player.exhaust.map(c => c.defId)).toContain('pocket_coals');
-    expect(result.player.ember).toBe(up ? 4 : 3);
+    expect(result.player.ember).toBe(3);
     expect(result.player.block).toBe(0);
     expect(result.player.energy).toBe(3);
   });
@@ -79,7 +80,7 @@ describe('专属卡牌的不同用途', () => {
     expect(describeCard(card('flashover', 'preview', up), null)).toContain('燃烧');
   });
 
-  it.each([false, true])('白热清除目标燃烧换取有上限余烬和手牌，不再复制引爆伤害（升级=%s）', up => {
+  it.each([false, true])('白热清除目标燃烧换取余烬（不设上限）、能量和手牌，不再复制引爆伤害（升级=%s）', up => {
     for (const layers of [0, 3, 12]) {
       const cs = battle('white_hot', up, 2);
       cs.player.ember = 1;
@@ -89,9 +90,10 @@ describe('专属卡牌的不同用途', () => {
       expect(result.enemies[0].statuses.burn ?? 0).toBe(0);
       expect(result.enemies[1].statuses.burn).toBe(4);
       expect(result.enemies.map(e => e.hp)).toEqual([1000, 1000]);
-      expect(result.player.ember).toBe(1 + Math.min(layers, up ? 14 : 10));
-      expect(result.player.hand).toHaveLength(up ? 3 : 2);
-      expect(result.player.energy).toBe(3);
+      expect(result.player.ember).toBe(1 + layers);
+      expect(result.player.hand).toHaveLength(3);
+      // 每 3（2）层燃烧换 1 点能量，不足一份不给。
+      expect(result.player.energy).toBe(2 + Math.floor(layers / (up ? 2 : 3)));
       expect(result.player.exhaust.map(c => c.defId)).toEqual(['white_hot']);
     }
   });
@@ -102,22 +104,23 @@ describe('专属卡牌的不同用途', () => {
     cs.enemies[0].statuses.burn = 9;
     const result = play(cs, 'white_hot', 'e0');
     expect(result.player.ember).toBe(9);
-    expect(result.player.energy).toBe(4);
-    expect(result.player.hand).toHaveLength(4);
+    expect(result.player.energy).toBe(5);
+    expect(result.player.hand).toHaveLength(6);
     expect(result.enemies[0].hp).toBe(1000);
     expect(result.enemies[0].statuses.burn ?? 0).toBe(0);
     expect(result.player.exhaust.map(c => c.defId)).toEqual(['white_hot']);
   });
 
-  it.each([false, true])('隔火带根据选中目标的燃烧提供有上限格挡，不再点燃所有敌人（升级=%s）', up => {
+  it.each([false, true])('隔火带是 3 费稀有牌：按选中目标的燃烧层数（升级 × 2）获得格挡，没有上限，自己不施加燃烧（升级=%s）', up => {
+    expect([CARDS.firebreak.rarity, CARDS.firebreak.cost]).toEqual(['rare', 3]);
     for (const initialBurn of [1, 30]) {
       const cs = battle('firebreak', up, 2);
       cs.enemies[0].statuses.burn = initialBurn;
       const result = play(cs, 'firebreak', 'e0');
-      expect(result.player.energy).toBe(2);
-      expect(result.enemies[0].statuses.burn).toBe(initialBurn + (up ? 4 : 3));
+      expect(result.player.energy).toBe(0);
+      expect(result.enemies[0].statuses.burn).toBe(initialBurn);
       expect(result.enemies[1].statuses.burn ?? 0).toBe(0);
-      expect(result.player.block).toBe(initialBurn === 1 ? (up ? 10 : 8) : (up ? 24 : 18));
+      expect(result.player.block).toBe(initialBurn * (up ? 2 : 1));
     }
   });
 

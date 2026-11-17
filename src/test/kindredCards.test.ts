@@ -62,21 +62,20 @@ describe('各角色的招牌动作计数', () => {
   });
 
   it('拾灰者：每打出一张以自身效果对敌人施加燃烧的牌也计 1 次，按牌而不按层数；能力带出的燃烧不算', () => {
-    let cs = battle('picker', ['light_up', 'ignite', 'add_fuel', 'strike']);
+    let cs = battle('picker', ['light_up', 'ignite', 'borrow_flame', 'strike']);
     cs = use(cs, 'light_up-0');
     expect(cs.enemies[0].statuses.burn).toBe(3);
-    expect(signatureCount(cs.player)).toBe(1);
+    // 点燃现在带消耗：施加燃烧计 1 次，本牌被消耗再计 1 次。
+    expect(signatureCount(cs.player)).toBe(2);
     cs = use(cs, 'strike-3');
-    expect(signatureCount(cs.player)).toBe(1);
+    expect(signatureCount(cs.player)).toBe(2);
     // 回响重放是又一次出牌，再计一次。
     cs.player.statuses.echo = 1;
     cs = use(cs, 'ignite-1');
-    expect(signatureCount(cs.player)).toBe(3);
-    // 添油让已有燃烧翻倍算施加燃烧，本牌消耗另计。
-    cs = use(cs, 'add_fuel-2');
+    expect(signatureCount(cs.player)).toBe(4);
+    // 借火鼓风只消耗目标的燃烧，没有施加燃烧：只算本牌自身的消耗。
+    cs = use(cs, 'borrow_flame-2');
     expect(signatureCount(cs.player)).toBe(5);
-    // 目标没有燃烧时添油没有施加任何燃烧，只算自身消耗。
-    expect(signatureCount(use(battle('picker', ['add_fuel']), 'add_fuel-0').player)).toBe(1);
     // 炉膛导流在出牌过程中给敌人上了燃烧，但不是这张牌自身的效果。
     const conduit = battle('picker', ['ember_exchange']);
     conduit.player.ember = 3; conduit.player.statuses.emberConduit = 6;

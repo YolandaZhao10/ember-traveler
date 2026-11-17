@@ -13,7 +13,7 @@ const current={...CARDS};const seeds=Number(arg('--seeds')??8);
 const cases:Record<string,string[]>={
  vanguard_oath:['quick_stab','twin_blades','rhythm','measured_step','brace_line','raise_shield','lantern_poke'],
  long_road:['raise_shield','shield_bash','iron_will','hold_fast','riposte','brace_line','measured_step'],
- cremation:['light_up','wildfire','scorch_mark','detonate','add_fuel','heat_wave','everburning'],
+ cremation:['light_up','wildfire','scorch_mark','detonate','lingering_fire','heat_wave','everburning'],
  undying_furnace:['stoke','tinder_bundle','ember_exchange','charcoal_insight','white_hot','light_up','ember_burst'],
  ash_reserve:['bone_ash','burn_pages','ration_bite','salvage_scraps','buried_knife','tinder_bundle','ash_offering'],
  crimson_covenant:['blood_edge','ember_pulse','blood_rite','blood_watch','leech_bite','blood_sip','scarlet_harvest'],

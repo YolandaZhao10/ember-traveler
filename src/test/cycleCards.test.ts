@@ -81,8 +81,9 @@ describe('牌堆选择事务', () => {
     const attack = fixture('blade_recall');
     expect(cardTransferChoices(attack, attack.player.hand[0]).map(c => c.uid)).toEqual(['strike']);
     const fuel = fixture('cinder_salvage');
-    expect(cardTransferChoices(fuel, fuel.player.hand[0]).map(c => c.uid)).toEqual(['borrow_flame']);
-    expect(use(fuel, 'cinder_salvage', 'vein_cutter')).toBe(fuel);
+    // 拾薪归炉改为从消耗区选牌移入弃牌堆：只能选消耗区里的牌，弃牌堆里的不算。
+    expect(cardTransferChoices(fuel, fuel.player.hand[0]).map(c => c.uid)).toEqual(['vein_cutter']);
+    expect(use(fuel, 'cinder_salvage', 'borrow_flame')).toBe(fuel);
     fuel.player.discard = CYCLE_CARDS.filter(c => cardTransferEffect(card(c.id))).map(c => card(c.id));
     expect(discardReplayChoices(fuel)).toEqual([]);
   });
@@ -146,14 +147,19 @@ describe('四角色资源牌实际联动', () => {
     // 战途补给 1 费、没有上限：本回合 3 张攻击牌各抽 1 张。
     expect([cs.player.hand.length, cs.player.energy]).toEqual([3, 1]); expect(cs.player.exhaust.some(c => c.uid === 'trail_supply')).toBe(true);
   });
-  it('拾灰者回收未用的借火鼓风，补燃烧后真实消耗燃烧换费', () => {
+  it('拾灰者把消耗掉的借火鼓风放回弃牌堆，补燃烧后真实消耗燃烧换费', () => {
     let cs = fixture('cinder_salvage', true);
+    cs.player.exhaust = cs.player.discard.splice(cs.player.discard.findIndex(c => c.uid === 'borrow_flame'), 1);
     cs = use(cs, 'cinder_salvage', 'borrow_flame');
     expect(cs.enemies[0].statuses.burn).toBe(4);
+    expect(cs.player.discard.some(c => c.uid === 'borrow_flame')).toBe(true);
+    // 之后抽到它：这里直接放回手牌。
+    cs.player.hand.push(...cs.player.discard.splice(cs.player.discard.findIndex(c => c.uid === 'borrow_flame'), 1));
     cs = use(cs, 'borrow_flame');
     expect(cs.player.energy).toBe(3); expect(cs.enemies[0].statuses.burn ?? 0).toBe(0);
     expect(cs.player.exhaust.some(c => c.uid === 'borrow_flame')).toBe(true);
-    expect(cardTransferChoices(cs, card('cinder_salvage'))).toEqual([]);
+    // 用掉的借火鼓风又进了消耗区，可以再被拾薪归炉放回弃牌堆。
+    expect(cardTransferChoices(cs, card('cinder_salvage')).map(c => c.uid)).toEqual(['borrow_flame']);
   });
   it('血线牵引触发失血抽牌、血甲和盟约，接回血与回脉忆战；资源受代价与消耗限制', () => {
     let cs = fixture('blood_tether'); cs.player.hand.push(card('pulse_memory'));

@@ -115,8 +115,9 @@ function chargeShape(charge: { damage?: number; block?: number; ember?: number; 
  * 盾击 / 持盾冲锋：持盾冲锋去掉易伤后是「先获得格挡，再按格挡打出伤害」，与盾击升级版同形。
  * 拢火 / 干薪束：新牌拢火只获得余烬，与共享牌干薪束只差数值、费用和消耗。
  * 燃料交换 / 剔灯：新牌剔灯用余烬换能量，与共享牌燃料交换只差数值、消耗和生命代付。
+ * 灼灰横扫 / 燎原：灼灰横扫去掉伤害、燎原改为单体后，两张都只施加燃烧，只差单体与群体。
  */
-export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals', 'iron_wall/raise_shield', 'shield_bash/shield_rush', 'gather_embers/tinder_bundle', 'ember_exchange/trim_lamp']);
+export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals', 'iron_wall/raise_shield', 'shield_bash/shield_rush', 'gather_embers/tinder_bundle', 'ember_exchange/trim_lamp', 'scalding_sweep/wildfire']);
 
 /** 数值、费用、段数、单体/群体和保留/消耗不能作为唯一特色。 */
 export function cardDesign(id: string, upgraded: boolean): string {

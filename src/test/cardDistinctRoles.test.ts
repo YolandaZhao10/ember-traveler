@@ -37,7 +37,7 @@ describe('差异化卡牌的实际取舍', () => {
     const expected = up ? 115 : 78;
     expect(result.events.filter(e => e.type === 'damage').map(e => e.type === 'damage' ? e.amount : 0)).toEqual([expected, expected]);
     expect(result.state.player.exhaust).toHaveLength(31);
-    expect(result.state.player.energy).toBe(9);
+    expect(result.state.player.energy).toBe(8); // 骨灰改为 2 费
   });
   it.each([false,true])('碎骨返能和威吓斩控制需要力量达标（升级=%s）', up => {
     for (const strength of [2,3]) {

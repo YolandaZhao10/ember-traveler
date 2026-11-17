@@ -2,7 +2,7 @@ import type { CardDef, Effect } from '../engine/types';
 
 const block = (amount: number): Effect => ({ kind: 'block', amount });
 const lose = (amount: number): Effect => ({ kind: 'loseHp', amount });
-const move = (from: 'draw' | 'discard' | 'exhaust', to: 'hand' | 'draw' | 'discard', options: Partial<Extract<Effect, { kind: 'moveCard' }>> = {}): Effect => ({ kind: 'moveCard', from, to, ...options });
+const move = (from: 'draw' | 'discard' | 'exhaust', to: 'hand' | 'draw' | 'discard' | 'exhaust', options: Partial<Extract<Effect, { kind: 'moveCard' }>> = {}): Effect => ({ kind: 'moveCard', from, to, ...options });
 const status = (status: 'energyNext' | 'echo' | 'burn', amount: number, target: 'self' | 'all' = 'self'): Effect => ({ kind: 'status', status, amount, target });
 /** 与蓄能同一规则，卡面直接写「下回合获得 N 点能量」。 */
 const energyNextTurn = (amount: number): Effect => ({ kind: 'status', status: 'energyNext', amount, target: 'self', plain: true });
@@ -16,11 +16,11 @@ export const CYCLE_CARDS: CardDef[] = [
     effects: [block(6), move('discard', 'draw', { filter: 'skill' }), energyNextTurn(1)],
     upgrade: { effects: [block(9), move('discard', 'draw', { filter: 'skill' }), energyNextTurn(1)] } },
   { id: 'ash_sifting', name: '灰中分拣', owner: 'picker', archetype: 'ash', type: 'skill', rarity: 'uncommon', cost: 1, target: 'self',
-    effects: [move('draw', 'discard', { sample: 3 }), { kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 1 }],
-    upgrade: { effects: [move('draw', 'discard', { sample: 3 }), { kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 3 }] } },
+    effects: [move('draw', 'exhaust', { sample: 3 }), { kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 1 }],
+    upgrade: { effects: [move('draw', 'exhaust', { sample: 3 }), { kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 3 }] } },
   { id: 'cinder_salvage', name: '拾薪归炉', owner: 'picker', archetype: 'cinder', type: 'skill', rarity: 'uncommon', cost: 1, target: 'self',
-    effects: [move('discard', 'hand', { filter: 'exhaust' }), status('burn', 3, 'all')],
-    upgrade: { effects: [move('discard', 'hand', { filter: 'exhaust' }), status('burn', 4, 'all')] } },
+    effects: [move('exhaust', 'discard'), status('burn', 3, 'all')],
+    upgrade: { effects: [move('exhaust', 'discard'), status('burn', 4, 'all')] } },
   { id: 'blood_tether', name: '血线牵引', owner: 'oathbound', archetype: 'blood', type: 'skill', rarity: 'uncommon', cost: 0, target: 'self', exhaust: true,
     effects: [lose(3), move('discard', 'hand', { filter: 'action' })],
     upgrade: { effects: [lose(2), move('discard', 'hand', { filter: 'action' })] } },

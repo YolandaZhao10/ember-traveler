@@ -118,10 +118,14 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);expect(cs.player.hand.filter(c=>c.defId==='ration_bite')).toHaveLength(1);
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);
  });
- it('火葬死亡传播不会在同一死者上重复触发',()=>{
-  let cs=use(battle(),'cremation',up);cs.enemies[0].statuses.burn=7;cs.enemies[0].hp=1;
-  cs=use(cs,'strike');expect(cs.enemies[1].statuses.burn).toBe((up?21:14)+7);
-  cs=use(cs,'defend',false,null);expect(cs.enemies[1].statuses.burn).toBe((up?21:14)+7);
+ it('火葬立即结算一次燃烧，死者把剩余燃烧传给其他敌人，只传一次',()=>{
+  const n=up?21:14;
+  let cs=battle();cs.enemies[0].hp=5;
+  cs=use(cs,'cremation',up);
+  // 第一个敌人被这次结算烧死，剩余 n-1 层传给第二个；第二个自己的 n 层结算后剩 n-1。
+  expect(cs.enemies[0].hp).toBe(0);expect(cs.enemies[1].statuses.burn).toBe((n-1)*2);
+  expect(cs.player.statuses.burningRelay??0).toBe(0);
+  cs=use(cs,'defend',false,null);expect(cs.enemies[1].statuses.burn).toBe((n-1)*2);
  });
  it('寂静序曲按蓄力触发一次；活页秘典按实际回响计数，不按普通出牌计数',()=>{
   let cs=use(use(battle(),'silent_prelude',up),'living_manuscript',up);

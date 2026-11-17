@@ -24,7 +24,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('旧火重燃与逐敌燃烧记录', () => {
   it.each([false, true])('升级=%s：保留跨回合，按累计施加，支付一次费用后消耗', up => {
-    let cs = use(battle(), 'tend_coals');
+    let cs = use(battle(), 'tend_coals', 'e0', true);
     cs.player.hand = [card(ID, up)];
     expect(viewCard(cs.player.hand[0])).toMatchObject({ cost: up ? 1 : 2, retain: true, exhaust: true, rarity: 'uncommon' });
     expect(CARDS[ID].owner).toBe('picker');
@@ -45,20 +45,20 @@ describe('旧火重燃与逐敌燃烧记录', () => {
     expect(cs).toEqual(before);
   });
 
-  it('群体、翻倍与传播分别记账，燃烧伤害和衰减不当作新增层数', () => {
-    let cs = use(battle(), 'wildfire'); // 4 / 4
-    cs = use(cs, 'tend_coals'); // 8 / 4
-    cs = use(cs, 'add_fuel'); // 16 / 4
-    cs = use(cs, 'flashover'); // 22 / 26
-    expect(cs.enemies.map(e => e.burnApplied)).toEqual([22, 26]);
+  it('群体与传播分别记账，燃烧伤害和衰减不当作新增层数', () => {
+    let cs = use(battle(), 'scalding_sweep'); // 3 / 3
+    cs = use(cs, 'tend_coals', 'e0', true); // 7 / 3
+    cs = use(cs, 'wildfire'); // 11 / 3
+    cs = use(cs, 'flashover'); // 17 / 20
+    expect(cs.enemies.map(e => e.burnApplied)).toEqual([17, 20]);
     cs = use(cs, 'detonate');
     expect(cs.enemies[0].statuses.burn).toBeUndefined();
-    expect(cs.enemies[0].burnApplied).toBe(22);
+    expect(cs.enemies[0].burnApplied).toBe(17);
     cs = use(cs, ID);
-    expect(cs.enemies.map(e => [e.statuses.burn, e.burnApplied])).toEqual([[22, 44], [26, 26]]);
+    expect(cs.enemies.map(e => [e.statuses.burn, e.burnApplied])).toEqual([[17, 34], [20, 20]]);
     cs = endPlayerTurn(cs).state;
     for (const e of cs.enemies) cs = enemyAct(cs, e.id).state;
-    expect(cs.enemies.map(e => [e.statuses.burn, e.burnApplied])).toEqual([[21, 44], [25, 26]]);
+    expect(cs.enemies.map(e => [e.statuses.burn, e.burnApplied])).toEqual([[16, 34], [19, 20]]);
   });
 
   it('开场遗物、能力和余烬触发的燃烧也计入；新战斗重新计数', () => {
@@ -76,7 +76,7 @@ describe('旧火重燃与逐敌燃烧记录', () => {
   });
 
   it('首领净化燃烧不会清除历史，清空或转换燃烧后仍能重燃', () => {
-    let cs = use(battle(['ash_sovereign']), 'tend_coals');
+    let cs = use(battle(['ash_sovereign']), 'tend_coals', 'e0', true);
     cs.enemies[0].moveId = 'awaken';
     cs = enemyAct(endPlayerTurn(cs).state, 'e0').state;
     expect(cs.enemies[0].statuses.burn).toBeUndefined();
@@ -91,7 +91,7 @@ describe('旧火重燃与逐敌燃烧记录', () => {
   });
 
   it('回响按每次实际结算时的累计值重放，本牌施加也记账，只扣一次费/消耗一个实体', () => {
-    const cs = use(battle(), 'tend_coals');
+    const cs = use(battle(), 'tend_coals', 'e0', true);
     cs.player.hand = [card(ID)]; cs.player.energy = 3; cs.player.statuses.echo = 1;
     const result = playCard(cs, ID, 'e0');
     expect(result.events.filter(e => e.type === 'status' && e.status === 'burn').map(e => e.type === 'status' ? e.amount : 0)).toEqual([4, 8]);
@@ -124,7 +124,7 @@ describe('旧火重燃与逐敌燃烧记录', () => {
 
   it.each([false, true])('存档与SL都保留各自累计量；旧存档=%s只以现存燃烧接续、不重掷随机', legacy => {
     let run = newRun('BURN-SAVE', 'picker'); run = travelTo(run, run.map.startIds[0]);
-    run.combat = use(battle(), 'tend_coals');
+    run.combat = use(battle(), 'tend_coals', 'e0', true);
     run.checkpoint = structuredClone({ ...run, checkpoint: undefined });
     run.combat = use(run.combat, 'detonate');
     const rng = structuredClone(run.combat.rng);

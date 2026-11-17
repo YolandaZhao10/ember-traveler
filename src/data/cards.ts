@@ -573,6 +573,7 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'enemy',
+  exhaust: true,
   effects: [{ kind: 'damage', amount: 7 }, { kind: 'status', status: 'burn', amount: 3, target: 'target' }],
   upgrade: { effects: [{ kind: 'damage', amount: 10 }, { kind: 'status', status: 'burn', amount: 4, target: 'target' }] },
   flavor: '先让它烧起来。',
@@ -585,9 +586,9 @@ def({
   archetype: 'cinder',
   owner: 'picker',
   cost: 1,
-  target: 'all_enemies',
-  effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'all' }] },
+  target: 'enemy',
+  effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'target' }],
+  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'target' }] },
 });
 def({
   id: 'scorch_mark',
@@ -616,24 +617,11 @@ def({
   rarity: 'uncommon',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'consumeBurn', damagePer: 3 }],
-  upgrade: { effects: [{ kind: 'consumeBurn', damagePer: 4 }] },
+  effects: [{ kind: 'consumeBurn', damagePer: 2 }],
+  upgrade: { effects: [{ kind: 'consumeBurn', damagePer: 3 }] },
   flavor: '火焰越旺，炸得越响。',
-});
-def({
-  id: 'add_fuel',
-  name: '添油',
-  type: 'skill',
-  rarity: 'uncommon',
-  archetype: 'cinder',
-  owner: 'picker',
-  cost: 1,
-  target: 'enemy',
-  exhaust: true,
-  effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 18 }],
-  upgrade: { effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 24 }] },
 });
 def({
   id: 'lingering_fire',
@@ -642,7 +630,7 @@ def({
   rarity: 'common',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
   effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'target' }, { kind: 'block', amount: 7 }],
   upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'target' }, { kind: 'block', amount: 10 }] },
@@ -656,20 +644,21 @@ def({
   owner: 'picker',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damagePerBurn', amount: 3, aoe: true }, { kind: 'status', status: 'weak', amount: 1, target: 'all' }],
-  upgrade: { effects: [{ kind: 'damagePerBurn', amount: 4, aoe: true }, { kind: 'status', status: 'weak', amount: 2, target: 'all' }] },
+  effects: [{ kind: 'damagePerBurn', amount: 4, aoe: true }],
+  upgrade: { effects: [{ kind: 'damagePerBurn', amount: 5, aoe: true }] },
 });
 def({
   id: 'cremation',
   name: '火葬',
-  type: 'power',
+  type: 'skill',
   rarity: 'rare',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 2,
-  target: 'self',
-  effects: [{ kind: 'status', status: 'burningRelay', amount: 4, target: 'self' }, { kind: 'status', status: 'burn', amount: 14, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'burningRelay', amount: 6, target: 'self' }, { kind: 'status', status: 'burn', amount: 21, target: 'all' }] },
+  cost: 3,
+  target: 'all_enemies',
+  exhaust: true,
+  effects: [{ kind: 'status', status: 'burn', amount: 14, target: 'all' }, { kind: 'burnTick', aoe: true, relay: true }],
+  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 21, target: 'all' }, { kind: 'burnTick', aoe: true, relay: true }] },
   flavor: '灰烬城的葬礼只有一种形式。',
 });
 def({
@@ -679,10 +668,10 @@ def({
   rarity: 'rare',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'everburn', amount: 1, target: 'self' }],
-  upgrade: { cost: 0 },
+  upgrade: { cost: 1 },
 });
 def({
   id: 'ember_tongue',
@@ -734,21 +723,16 @@ def({
   target: 'self',
   exhaust: true,
   effects: [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }],
-  upgrade: {
-    effects: [
-      { kind: 'exhaustHand', count: 1, energyPerCard: 1 },
-      { kind: 'draw', amount: 1 },
-    ],
-  },
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 1, energyPerCard: 1, choose: true }] },
 });
 def({
   id: 'bone_ash',
   name: '骨灰',
   type: 'attack',
-  rarity: 'common',
+  rarity: 'uncommon',
   archetype: 'ash',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
   exhaust: true,
   effects: [{ kind: 'damage', amount: 18, perExhaustedCard: 2 }],
@@ -788,7 +772,7 @@ def({
   cost: 2,
   target: 'enemy',
   effects: [{ kind: 'exhaustHand', count: 'all', damagePerCard: 9 }],
-  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', damagePerCard: 12 }] },
+  upgrade: { cost: 1 },
   flavor: '什么都不留下。',
 });
 def({
@@ -812,8 +796,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'exhaustHand', count: 'all', filter: 'curse' }, { kind: 'block', amount: 9 }],
-  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', filter: 'curse' }, { kind: 'block', amount: 13 }] },
+  effects: [{ kind: 'exhaustHand', count: 'all', filter: 'junk' }, { kind: 'block', amount: 9 }],
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', filter: 'junk' }, { kind: 'block', amount: 13 }] },
 });
 def({
   id: 'ash_offering',
@@ -1430,6 +1414,10 @@ export const RETIRED_CARDS: Record<string, { name: string; replacement: string }
   swift_return: { name: '回身刺', replacement: 'quick_stab' },
   spin_kick: { name: '回旋踢', replacement: 'lantern_poke' },
   hooking_cut: { name: '钩刃', replacement: 'twin_blades' },
+  // 拾灰者：添油、浓烟换成焚烧牌，回收火星换成灰烬牌。
+  add_fuel: { name: '添油', replacement: 'lingering_fire' },
+  black_smoke: { name: '浓烟', replacement: 'smoke_cover' },
+  reclaimed_spark: { name: '回收火星', replacement: 'salvage_scraps' },
 };
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {

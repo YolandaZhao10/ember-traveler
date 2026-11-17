@@ -17,7 +17,7 @@ if (![seeds, depth].every(n => Number.isInteger(n) && n > 0) || !Number.isIntege
 const synergy: Record<string, string[]> = {
   combo: ['quick_stab','twin_blades','chain_slash','lantern_poke','haste','trail_supply','blade_recall','tempo','war_drum','vanguard_oath','iron_will','thousand_cuts'],
   bulwark: ['raise_shield','shield_bash','iron_wall','hold_fast','iron_will','iron_rebuke','shield_rotation','unburden_armor','long_road','vigil','bulwark_counter','raise_shield'],
-  cinder: ['light_up','coal_heart','add_fuel','lingering_fire','heat_wave','cremation','everburning','borrow_flame','cinder_salvage','white_hot','choking_embers','ash_shield'],
+  cinder: ['light_up','coal_heart','lingering_fire','lingering_fire','heat_wave','cremation','everburning','borrow_flame','cinder_salvage','white_hot','choking_embers','ash_shield'],
   ash: ['burn_pages','bone_ash','ash_feast','pass_the_flame','ash_return','dust_to_dust','ash_feast','ash_reserve','ash_sifting','ash_index','bone_ash','ash_return'],
   blood: ['blood_rite','leech_bite','blood_pact','numb','crimson_mail','crimson_covenant','blood_watch','vein_cutter','pulse_memory','oath_reenactment','leech_bite','oath_judgement'],
   might: ['frenzy','frenzy','hammer_rain','overpower','demon_heart','mountain_splitter','borrow_fury','iron_blooded','war_avatar','scar_hold','leech_bite','numb'],

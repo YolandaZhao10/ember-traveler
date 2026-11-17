@@ -263,16 +263,17 @@ describe('战斗基础', () => {
       expect(s.enemies[0].statuses.burn).toBe(1);
     });
 
-    it('添油翻倍、引爆移除燃烧并按层数伤害、灼痕条件加伤', () => {
-      let s = pickerCombat([card('add_fuel'), card('detonate'), card('scorch_mark'), card('strike'), card('strike')], ['rubble_golem']);
-      s = playCard(s, handCard(s, 'add_fuel').uid, 'e0').state;
-      expect(s.enemies[0].statuses.burn).toBe(4);
+    it('拨炭叠加燃烧、引爆移除燃烧并按层数伤害、灼痕条件加伤', () => {
+      let s = pickerCombat([card('tend_coals'), card('detonate'), card('scorch_mark'), card('strike'), card('strike')], ['rubble_golem']);
+      s = playCard(s, handCard(s, 'tend_coals').uid, 'e0').state;
+      expect(s.enemies[0].statuses.burn).toBe(5); // 拾灰者的铃 2 + 拨炭 3
       let hp = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'scorch_mark').uid, 'e0').state;
       expect(hp - s.enemies[0].hp).toBe(10); // 6 + 4
       hp = s.enemies[0].hp;
+      s.player.energy = 2; // 引爆改为 2 费
       s = playCard(s, handCard(s, 'detonate').uid, 'e0').state;
-      expect(hp - s.enemies[0].hp).toBe(12); // 4 × 3
+      expect(hp - s.enemies[0].hp).toBe(10); // 5 × 2
       expect(s.enemies[0].statuses.burn).toBeUndefined();
     });
 

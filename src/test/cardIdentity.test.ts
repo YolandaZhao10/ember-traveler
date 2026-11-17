@@ -45,10 +45,11 @@ describe('卡牌效果身份与升级边界', () => {
     const ready = battle('ember_patrol', up); ready.player.cardsPlayedThisTurn = 2;
     expect(playCard(ready, 'ember_patrol', null).state.player.statuses.energyNext).toBe(1);
   });
-  it.each([false, true])('火葬与猩红护甲有立即收益，区别于升级后的低稀有度能力（升级=%s）', up => {
+  it.each([false, true])('火葬（现为技能：点燃后立即结算一次）与猩红护甲有立即收益，区别于升级后的低稀有度能力（升级=%s）', up => {
     const fire = play('cremation', up); const armor = play('crimson_mail', up);
-    expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 21 : 14, up ? 21 : 14]);
-    expect(fire.player.statuses.burningRelay).toBe(up ? 6 : 4);
+    // 施加 14/21 层后立即结算一次：各失去等量生命，燃烧减 1 层。
+    expect(fire.enemies.map(e => e.statuses.burn)).toEqual([up ? 20 : 13, up ? 20 : 13]);
+    expect(fire.player.statuses.burningRelay ?? 0).toBe(0);
     expect(armor.player.block).toBe(up ? 17 : 12); expect(armor.player.statuses.recoveryArmor).toBe(up ? 30 : 20);
     expect(play('coal_heart', true).enemies[0].statuses.burn ?? 0).toBe(0);
     expect(play('blood_watch', true).player.block).toBe(0);
