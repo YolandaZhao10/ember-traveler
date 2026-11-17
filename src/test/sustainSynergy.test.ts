@@ -32,8 +32,9 @@ describe('重放的资源与实体边界',()=>{
   cs=use(cs,'cinder_mend',true,null);expect(cs.player.hp).toBe(56);expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(2);
  });
  it('镜像额外攻击也不能透支固定余烬费用',()=>{
-  let cs=battle();cs.player.statuses.mirror=2;cs.player.ember=viewDef('ember_blade').requireEmber;
-  cs=use(cs,'ember_blade');expect(cs.player.attacksPlayedThisTurn).toBe(1);expect(cs.player.ember).toBe(0);
+  // 火雨没有生命代付：余烬只够一次时，两次镜像重放都被跳过。
+  let cs=battle();cs.player.statuses.mirror=2;cs.player.ember=viewDef('firestorm').requireEmber;
+  cs=use(cs,'firestorm');expect(cs.player.attacksPlayedThisTurn).toBe(1);expect(cs.player.ember).toBe(0);expect(cs.player.hp).toBe(20);
  });
  it.each(['vein_cutter','scarlet_harvest','blood_rite','cinder_mend'])('血誓重演对%s执行一次实体消耗，不能自抽或留在弃牌堆',id=>{
   let cs=battle();cs.player.draw=[];cs.player.discard=[card(id,true,'selected')];cs.player.statuses.echo=1;cs.player.ember=8;
@@ -112,7 +113,7 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  });
  it('灰烬储备仅第二次消耗回收一次，不能每次消耗取回自己',()=>{
   let cs=use(battle(),'ash_reserve',up);expect(cs.player.block).toBe(up?12:8);cs.player.block=0;cs=use(cs,'ration_bite');expect(cs.player.hand.some(c=>c.defId==='ration_bite')).toBe(false);
-  cs=use(cs,'ember_exchange'); // 余烬不足：不会执行，不应计数。
+  cs=use(cs,'cinder_mend'); // 余烬不足：不会执行，不应计数。
   expect(cs.player.turnFlags.ashRecall).toBe(1);
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);expect(cs.player.hand.filter(c=>c.defId==='ration_bite')).toHaveLength(1);
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);
@@ -153,10 +154,11 @@ it('多张盟约叠加也不能把同一笔卖血变成净治疗，能量每回�
  for(let i=0;i<6;i++)cs=use(cs,'ember_pulse');
  expect(cs.player.hp).toBe(hp-8);expect(cs.player.energy).toBe(energy+1);
 });
-it.each(['coal_credit','ember_sift'])('%s普通转换牌无余烬不能打出，回响不能透支，打后消耗',id=>{
+it.each([['coal_credit',true],['ember_sift',false]] as const)('%s普通转换牌无余烬不能打出，回响不能透支，打后消耗=%s',(id,exhausts)=>{
  let cs=battle();cs.player.hand=[card(id)];expect(playCard(cs,id,null).state).toBe(cs);
  cs.player.statuses.echo=1;cs.player.ember=2;
- cs=playCard(cs,id,null).state;expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(1);expect(cs.player.exhaust.some(c=>c.defId===id)).toBe(true);
+ cs=playCard(cs,id,null).state;expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(1);
+ expect(cs.player.exhaust.some(c=>c.defId===id)).toBe(exhausts);expect(cs.player.discard.some(c=>c.defId===id)).toBe(!exhausts);
 });
 it.each(['ember_blade','ember_burst'])('%s的牌面伤害包含消费余烬触发的临时力量且预览不改状态',id=>{
  const cs=battle();cs.player.ember=8;cs.player.statuses.sparkCrown=4;cs.relics=['war_horn'];cs.player.hand=[card(id)];

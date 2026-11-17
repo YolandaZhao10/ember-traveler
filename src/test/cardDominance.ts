@@ -15,10 +15,12 @@ function payoff(effects: Effect[]): Payoff | null {
     }
     let key: string, amount: number;
     if (effect.kind === 'damage') {
-      if ((effect.times ?? 1) !== 1 || effect.lifesteal || effect.strengthMult || effect.perHandCard || effect.perExhaustedCard) return null;
+      if ((effect.times ?? 1) !== 1 || effect.lifesteal || effect.strengthMult || effect.perHandCard || effect.perExhaustedCard || effect.perSignature) return null;
       key = effect.aoe ? 'damageAll' : 'damage'; amount = effect.amount;
       // 分开的两次攻击有两次力量、反伤等结算，不等价于单次数字相加。
       if (result.values[key] !== undefined) return null;
+    } else if (effect.kind === 'gainEmber' && effect.perSignature) {
+      return null;
     } else if (['block', 'draw', 'energy', 'gainEmber'].includes(effect.kind) && 'amount' in effect) {
       key = effect.kind; amount = effect.amount;
     } else return null;

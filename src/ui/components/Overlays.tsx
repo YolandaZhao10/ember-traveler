@@ -6,14 +6,15 @@ import { CHARACTERS } from '../../data/characters';
 import { CHAPTERS } from '../../data/chapters';
 import { STATUSES } from '../../data/statuses';
 import { enemyDamageGuard, enemyIntent, enemyMoveActions, enemyMoveName, previewEnemyAttack } from '../../engine/combat';
-import { calcBlock, describeCard } from '../../engine/cards';
+import { calcBlock, describeCard, statusDescription } from '../../engine/cards';
 import { scaleEnemyValue } from '../../engine/difficulty';
 import { canUpgrade, sortedDeck } from '../../engine/run';
 import type { CardInstance, CombatState, EnemyState, EnemyAction } from '../../engine/types';
 import { closeOverlay, openOverlay, useGame, type Overlay } from '../store';
 import { Card } from './Card';
+import { LOAN_ICON, loanText } from './Common';
 import { DiscardReplay } from './DiscardReplay';
-import { PileCardChoice } from './PileCardChoice';
+import { HandExhaustChoice, PileCardChoice } from './PileCardChoice';
 import { CardCatalog } from './CardCatalog';
 import { RelicCatalog } from './RelicCatalog';
 import { GameMenu } from './GameMenu';
@@ -44,6 +45,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
   if (!run) return null;
   switch (overlay.kind) {
     case 'cardTransfer': return <PileCardChoice cardUid={overlay.cardUid} />;
+    case 'exhaustChoice': return <HandExhaustChoice key={`${overlay.cardUid}-${overlay.request.group}`} cardUid={overlay.cardUid} targetId={overlay.targetId} replayUid={overlay.replayUid} exhaust={overlay.exhaust} request={overlay.request} />;
     case 'replay': return <DiscardReplay cardUid={overlay.cardUid} />;
     case 'history': return null;
     case 'help': return null;
@@ -96,7 +98,7 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
       const def = STATUSES[overlay.status];
       return (
         <Modal title={`${def.name} · ${overlay.ownerName}`} onClose={closeOverlay}>
-          <p>{def.description(overlay.amount)}</p>
+          <p>{statusDescription(overlay.status, overlay.amount, run.character)}</p>
           {overlay.detail && <p>{overlay.detail}</p>}
           <p className="subtitle">
             {def.kind === 'debuff' ? '负面状态' : def.kind === 'buff' ? '增益状态' : '持续能力'}
@@ -116,6 +118,13 @@ function OverlayBody({ overlay }: { overlay: Overlay }) {
         </Modal>
       );
     }
+    case 'loan':
+      return (
+        <Modal title={`${LOAN_ICON} 贷款`} onClose={closeOverlay}>
+          <p>{loanText(overlay.settled)}</p>
+          <p className="subtitle">借款凭据。没有任何战斗或旅程效果，不计入遗物数量。</p>
+        </Modal>
+      );
     case 'log': {
       const lines = run.combat?.log ?? [];
       return (

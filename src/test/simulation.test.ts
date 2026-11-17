@@ -6,7 +6,8 @@ import { aliveEnemies, canPlayCard } from '../engine/combat';
 import { availableNodes } from '../engine/map';
 import { makeRng, nextFloat, pick } from '../engine/rng';
 import * as R from '../engine/run';
-import type { RunState } from '../engine/types';
+import { CHARACTER_LIST } from '../data/characters';
+import type { CharacterId, RunState } from '../engine/types';
 
 /**
  * 无头模拟：一个简单的机器人从开局一直玩到死亡或通关，
@@ -42,9 +43,9 @@ function botCombat(run: RunState, rng: { s: number }): RunState {
   return R.finishCombat(run);
 }
 
-export function playRun(seed: string): RunState {
+export function playRun(seed: string, character: CharacterId = 'traveler'): RunState {
   const rng = makeRng(seed, 'bot');
-  let run = R.newRun(seed);
+  let run = R.newRun(seed, character);
   let steps = 0;
   while (run.screen !== 'gameover' && run.screen !== 'victory' && steps++ < 2000) {
     // 模拟刷新：序列化再反序列化
@@ -143,6 +144,19 @@ describe('完整一局模拟', () => {
     // 机器人很笨，不要求高胜率；但也不能完全打不到后期
     expect(floors / 30).toBeGreaterThan(3);
     console.log(`bot 胜率 ${wins}/30，平均到达层数 ${(floors / 30).toFixed(1)}`);
+  });
+
+  it('四角色各 30 个种子都能走完，并按角色输出胜率与到达层数', () => {
+    for (const { id } of CHARACTER_LIST) {
+      let wins = 0, floors = 0;
+      for (let i = 0; i < 30; i++) {
+        const run = playRun(`sim-${i}`, id);
+        expect(['gameover', 'victory']).toContain(run.screen);
+        if (run.screen === 'victory') wins++;
+        floors += run.floor;
+      }
+      console.log(`bot[${id}] 胜率 ${wins}/30，平均到达层数 ${(floors / 30).toFixed(1)}`);
+    }
   });
 
   it('同一种子结果可复现', () => {

@@ -92,8 +92,8 @@ describe('战斗基础', () => {
   });
 
   it('费用、目标与余烬需求被校验', () => {
-    const cs = combatWith([card('ember_blade'), card('iron_wall'), card('iron_wall'), card('ashes'), card('strike')], ['tomb_puppet']);
-    expect(canPlayCard(cs, handCard(cs, 'ember_blade')).ok).toBe(false); // 余烬 0 < 2
+    const cs = combatWith([card('firestorm'), card('iron_wall'), card('iron_wall'), card('ashes'), card('strike')], ['tomb_puppet']);
+    expect(canPlayCard(cs, handCard(cs, 'firestorm')).ok).toBe(false); // 余烬 0 < 2，且不能用生命代付
     expect(canPlayCard(cs, handCard(cs, 'ashes')).ok).toBe(false);
     let s = playCard(cs, handCard(cs, 'iron_wall').uid, null).state;
     expect(s.player.energy).toBe(1);
@@ -128,8 +128,8 @@ describe('战斗基础', () => {
     const cs = combatWith([card('thorn_mail'), card('thorn_mail'), card('thorn_mail'), card('defend'), card('defend')], ['looter'], ['thorn_crown']);
     let s = cs;
     s = playCard(s, handCard(s, 'thorn_mail').uid, null).state;
-    s = playCard(s, handCard(s, 'thorn_mail').uid, null).state; // 荆棘 3+2+2 = 7
-    expect(s.player.statuses.thorns).toBe(7);
+    s = playCard(s, handCard(s, 'thorn_mail').uid, null).state; // 荆棘 3+3+3 = 9
+    expect(s.player.statuses.thorns).toBe(9);
     s.enemies[0].hp = 10;
     s.enemies[0].moveId = 'flurry'; // 3 × 3
     s = endPlayerTurn(s).state;

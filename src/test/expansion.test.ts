@@ -8,6 +8,7 @@ import { describeCard, viewCard } from '../engine/cards';
 import { createCombat, playCard } from '../engine/combat';
 import { EMBER_MAX } from '../engine/constants';
 import { makeRng } from '../engine/rng';
+import { playWithChoices } from './playOptions';
 import * as R from '../engine/run';
 import type { CardInstance, CharacterId } from '../engine/types';
 
@@ -67,22 +68,22 @@ describe('扩展卡池与遗物配额', () => {
   });
   it.each(characters)('%s 专属牌配额含资源牌、循环牌与血誓重演，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    const expected = { traveler: [20, 22, 15], picker: [20, 23, 15], oathbound: [22, 22, 15], scholar: [21, 23, 15] };
+    const expected = { traveler: [20, 24, 13], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
     expect(['common', 'uncommon', 'rare'].map(rarity => cards.filter(c => c.rarity === rarity).length)).toEqual(expected[owner]);
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
-  it('通用牌普通22、罕见18、稀有16；初始和诅咒另计，四角色都能获得', () => {
+  it('通用牌普通24、罕见20、稀有20；初始和诅咒另计，四角色都能获得', () => {
     const shared = CARD_LIST.filter(c => !c.owner);
-    for (const [rarity, count] of [['common', 20], ['uncommon', 18], ['rare', 15]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count + (rarity === 'uncommon' ? 1 : 2));
+    for (const [rarity, count] of [['common', 24], ['uncommon', 20], ['rare', 20]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
     expect(shared.filter(c => c.rarity === 'starter')).toHaveLength(3);
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
     for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
   });
-  it('卡牌312张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(312); expect(EXTRA_CHARACTER_CARDS).toHaveLength(156); expect(EXTRA_SHARED_CARDS).toHaveLength(43);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(312);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(312);
+  it('卡牌324张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(324); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(324);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(324);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);
@@ -94,7 +95,8 @@ describe('扩展卡池与遗物配额', () => {
   it.each(characters)('%s 普通、精英、商店及首领奖励过滤正确，所有专属牌均能生成', character => {
     const run = R.newRun(`POOL-${character}`, character);
     const seen = new Set<string>();
-    for (let i = 0; i < 800; i++) {
+    // 通用稀有池扩大后，固定种子下需要更多抽样才能覆盖每一张牌。
+    for (let i = 0; i < 1600; i++) {
       const tier = (['normal', 'elite', 'shop', 'boss'] as const)[i % 4];
       run.floor = Math.floor(i / 4) % 40;
       const reward = R.generateCardChoices(run, tier, 3);
@@ -112,7 +114,7 @@ describe('扩展卡池与遗物配额', () => {
     for (const def of [...EXTRA_CHARACTER_CARDS, ...EXTRA_SHARED_CARDS]) for (const up of [false, true]) {
       const cs = battle(def.id, up); const c = cs.player.hand[0]; const v = viewCard(c);
       if (def.id === 'oath_reenactment' || def.id === 'echo_recall') cs.player.discard = [{ uid: 'replay-target', defId: 'strike', upgraded: false }];
-      const result = playCard(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
+      const result = playWithChoices(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
       expect(result.events.some(e => e.type === 'cardPlayed'), def.id).toBe(true);
       expect(describeCard(c, null)).not.toMatch(/undefined|NaN/);
       expect(result.state.player.hp, def.id).toBeGreaterThan(0);

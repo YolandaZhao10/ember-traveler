@@ -4,11 +4,13 @@ import { CHARACTERS } from '../data/characters';
 import { difficultyPercent, normalizeDifficulty } from '../data/difficulty';
 import { CHAPTERS, CHAPTER_RECOVERY, FINAL_CHAPTER, nextChapter, TOTAL_FLOORS } from '../data/chapters';
 import { ENCOUNTERS, ENEMIES } from '../data/enemies';
+import { debtCollectorId } from '../data/debtCollectors';
+import { LOAN_AMOUNT, LOAN_REPAY } from './constants';
 import { EVENTS, EVENT_LIST } from '../data/events';
 import { RELICS, relicPool, relicAvailableTo } from '../data/relics';
 import { CHAPTER_RELICS } from '../data/chapterRelics';
 import { EVENT_RELICS, SHOP_RELICS } from '../data/specialRelics';
-import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type StepResult } from './combat';
+import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn, type ExhaustChoiceRequest, type PlayChoice, type StepResult } from './combat';
 import { availableNodes, generateMap, validateMap } from './map';
 import { encounterDifficulty, rarityBias } from './difficulty';
 import { ensureEncounterPlan, plannedEncounter } from './encounters';
@@ -132,8 +134,12 @@ export function travelTo(input: RunState, nodeId: string): RunState {
       startEvent(run);
       break;
     case 'shop':
+      // 货架先照常生成，再了结借款：有没有借款，进店看到的货架都一样。
       run.shop = generateShop(run);
-      run.screen = 'shop';
+      if (run.loan?.outstanding) {
+        run.loan.stage = 'choice';
+        run.screen = 'debt';
+      } else run.screen = 'shop';
       break;
     case 'rest':
       run.rest = { used: false, picking: false };
@@ -145,6 +151,8 @@ export function travelTo(input: RunState, nodeId: string): RunState {
 
 /** 回退节点或战后领奖阶段：包含牌组、奖励、统计、所有随机流，不能累积收益。 */
 export function resetCurrentNode(run: RunState): RunState {
+  // 战败即终局：任何战斗倒下后都不能回退重打。
+  if (run.screen === 'gameover') return run;
   const snapshot = ensureRewardCheckpoint(run).checkpoint;
   if (!snapshot || snapshot.chapter !== run.chapter || snapshot.currentNodeId !== run.currentNodeId) return run;
   return { ...clone(snapshot), elapsedMs: run.elapsedMs, checkpoint: clone(snapshot) };
@@ -189,18 +197,19 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   return run;
 }
 
-function applyCombatStep(input: RunState, step: StepResult): { run: RunState; events: CombatEvent[] } {
-  if (step.events.length === 0 && step.state === input.combat) return { run: input, events: [] };
+function applyCombatStep(input: RunState, step: StepResult): { run: RunState; events: CombatEvent[]; pending?: ExhaustChoiceRequest } {
+  if (step.events.length === 0 && step.state === input.combat) return { run: input, events: [], pending: step.pending };
   const run = clone(input);
   run.combat = step.state;
   run.gold = step.state.gold;
-  run.rng.combat.s = step.state.rng.s;
+  // 讨债战斗用独立随机流，不推进其他战斗的种子。
+  if (run.loan?.stage !== 'fight') run.rng.combat.s = step.state.rng.s;
   run.hp = step.state.player.hp;
-  return { run, events: step.events };
+  return { run, events: step.events, pending: step.pending };
 }
 
-export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null, replayUid?: string) {
-  if (!run.combat) return { run, events: [] as CombatEvent[] };
+export function combatPlayCard(run: RunState, cardUid: string, targetId: string | null, replayUid?: string | PlayChoice) {
+  if (!run.combat) return { run, events: [] as CombatEvent[], pending: undefined as ExhaustChoiceRequest | undefined };
   const step = playCard(run.combat, cardUid, targetId, replayUid);
   const out = applyCombatStep(run, step);
   if (out.events.length) {
@@ -248,6 +257,7 @@ export function finishCombat(input: RunState): RunState {
   }
   const defeated = cs.enemies.filter(e => !e.flags.escaped);
   run.stats.enemiesKilled += defeated.length;
+  if (run.loan?.stage === 'fight') return settleDebtVictory(run, cs.player.selfHpLost);
   if (cs.tier === 'elite' && defeated.some(e => ENEMIES[e.defId].tier === 'elite')) run.stats.elitesKilled += 1;
   run.stats.floorsCleared += 1;
   if (!defeated.length) {
@@ -374,12 +384,42 @@ export function cardRarityWeights(floor: number, tier: CardRewardTier, level: Di
   return weights;
 }
 
-/** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的75%权重。 */
-function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState): CardDef[] {
+/** 每个奖励槽抽共享池的概率；牌组里已有足够多共享牌时提高。 */
+export const SHARED_REWARD_CHANCE = 0.25;
+export const SHARED_REWARD_CHANCE_INVESTED = 0.35;
+export const SHARED_INVESTED_AT = 3;
+
+/** 只数会出现在奖励里的共享牌：打击、防御、引火等初始牌与诅咒不算。 */
+export function sharedRewardChance(deck: CardInstance[]): number {
+  const picked = deck.filter(c => {
+    const d = CARDS[c.defId];
+    return !!d && !d.owner && (d.rarity === 'common' || d.rarity === 'uncommon' || d.rarity === 'rare');
+  }).length;
+  return picked >= SHARED_INVESTED_AT ? SHARED_REWARD_CHANCE_INVESTED : SHARED_REWARD_CHANCE;
+}
+
+/** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的来源权重。固定消耗一次随机数。 */
+function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState, deck: CardInstance[]): CardDef[] {
   const shared = pool.filter(c => !c.owner), owned = pool.filter(c => c.owner === character);
   if (!shared.length) return owned;
   if (!owned.length) return shared;
-  return chance(rng, .25) ? shared : owned;
+  return chance(rng, sharedRewardChance(deck)) ? shared : owned;
+}
+
+/**
+ * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现，其他角色的接口牌更少。
+ * 专属牌恒为 1；旅人暂不加权，全部为 1。
+ */
+export function sharedRewardWeight(card: CardDef, character: CharacterId): number {
+  if (card.owner || character === 'traveler') return 1;
+  if (card.kindred || card.hook === character) return 1.5;
+  return card.hook ? 0.75 : 1;
+}
+
+/** 与均匀抽取同样只消耗一次随机数；权重全为 1 时结果与原先的均匀抽取完全相同。 */
+function pickRewardCard(rng: RngState, cards: CardDef[], character: CharacterId): CardDef {
+  const weighted = cards.map(item => ({ item, weight: sharedRewardWeight(item, character) }));
+  return weighted.every(w => w.weight === 1) ? pick(rng, cards) : weightedPick(rng, weighted);
 }
 
 export function generateCardChoices(run: RunState, tier: CardRewardTier, n: number): CardInstance[] {
@@ -390,9 +430,11 @@ export function generateCardChoices(run: RunState, tier: CardRewardTier, n: numb
     const r = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map((k) => ({ item: k, weight: weights[k] })));
     const pool = CARD_LIST.filter((c) => c.rarity === r && !chosen.includes(c.id) && (tier === 'boss' ? c.owner === run.character : cardAvailableTo(c, run.character)));
     if (!pool.length) continue;
-    const sourced = tier === 'normal' || tier === 'elite' ? rewardOwnerPool(pool, run.character, run.rng.reward) : pool;
+    // 来源比例与共享池加权只用于普通和精英奖励；首领与商店沿用原规则。
+    const battle = tier === 'normal' || tier === 'elite';
+    const sourced = battle ? rewardOwnerPool(pool, run.character, run.rng.reward, run.deck) : pool;
     const choices = n === 3 && tier !== 'shop' ? distinctRewardPool(sourced, chosen.map(id => CARDS[id])) : sourced;
-    chosen.push(pick(run.rng.reward, choices).id);
+    chosen.push((battle ? pickRewardCard(run.rng.reward, choices, run.character) : pick(run.rng.reward, choices)).id);
   }
   return chosen.map((id) => makeCard(run, id));
 }
@@ -571,6 +613,63 @@ export function shopRemoveCard(input: RunState, cardUid: string): RunState {
   run.gold += relicJourneyBonus(run, 'remove', 'gold');
   return run;
 }
+// ---------- 商店借款 ----------
+/** 终章商店不放贷；有未了结的借款时不能再借。 */
+export function canBorrow(run: RunState): boolean {
+  return run.screen === 'shop' && !!run.shop && run.chapter !== FINAL_CHAPTER && !run.loan?.outstanding;
+}
+
+export function shopBorrow(input: RunState): RunState {
+  if (!canBorrow(input)) return input;
+  const run = clone(input);
+  run.gold += LOAN_AMOUNT;
+  run.loan = { outstanding: true, settled: run.loan?.settled ?? 0 };
+  return run;
+}
+
+function settleLoan(run: RunState) {
+  run.loan = { outstanding: false, settled: (run.loan?.settled ?? 0) + 1 };
+  run.screen = 'shop';
+}
+
+/** 归还后进店并更新回退点：不能回退改选，也不会重复扣款。 */
+export function debtRepay(input: RunState): RunState {
+  if (input.screen !== 'debt' || input.loan?.stage !== 'choice' || input.gold < LOAN_REPAY) return input;
+  const run = clone(input);
+  run.gold -= LOAN_REPAY;
+  settleLoan(run);
+  return recordCheckpoint(run);
+}
+
+/** 迎战讨债人。强度固定取本章首领所在楼层的首领倍率；按普通战斗结算遗物效果。 */
+export function debtFight(input: RunState): RunState {
+  if (input.screen !== 'debt' || input.loan?.stage !== 'choice') return input;
+  const run = clone(input);
+  const chapter = CHAPTERS[run.chapter];
+  const id = debtCollectorId(run.chapter);
+  // 独立随机流：不读写 rng.combat，也不记入已遇到的遭遇，其他节点的结果不变。
+  const rng = makeRng(run.seed, `debt:${run.loan!.settled}`);
+  const res = createCombat(id, [id], 'normal', run.deck, run.hp, run.maxHp, run.relics, rng, run.uidCounter, run.character,
+    encounterDifficulty(chapter.startFloor + chapter.floors - 1, 'boss', run.difficulty), run.gold);
+  run.loan!.stage = 'fight';
+  run.combat = res.state;
+  run.gold = res.state.gold;
+  run.screen = 'combat';
+  // 回退点落在开战时：进行中可以重来，但不能退回去改成归还。
+  return recordCheckpoint(run);
+}
+
+/** 讨债战胜利：没有金币、卡牌、遗物奖励；战后遗物效果按普通战斗结算，随后进入已生成的商店。 */
+function settleDebtVictory(run: RunState, selfHpLost: number): RunState {
+  if (run.relics.includes('canteen')) run.hp = Math.min(run.maxHp, run.hp + T.canteenHeal);
+  if (run.relics.includes('red_vial') && selfHpLost > 0) run.hp = Math.min(run.maxHp, run.hp + Math.floor(selfHpLost / 2));
+  applyJourneyHealth(run, 'victory', 'normal');
+  run.gold += (run.relics.includes('coin_purse') ? 5 : 0) + relicJourneyBonus(run, 'victory', 'gold', 'normal');
+  run.combat = null;
+  settleLoan(run);
+  return recordCheckpoint(run);
+}
+
 export function shopLeave(input: RunState): RunState {
   if (input.screen !== 'shop') return input;
   const run = clone(input);
@@ -831,7 +930,7 @@ function applyOutcomes(run: RunState, outcomes: EventOutcome[], texts: string[])
           const weights = cardRarityWeights(run.floor, 'normal', run.difficulty.cardRarity);
           const rarity = o.rarity ?? weightedPick(run.rng.event, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
           const pool = CARD_LIST.filter(c => cardAvailableTo(c, run.character) && c.rarity === rarity);
-          defId = pick(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event)).id;
+          defId = pickRewardCard(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event, run.deck), run.character).id;
         }
         run.deck.push(makeCard(run, defId));
         texts.push(`获得卡牌「${CARDS[defId].name}」。`);

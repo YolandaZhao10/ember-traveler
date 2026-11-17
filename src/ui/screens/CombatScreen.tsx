@@ -124,7 +124,7 @@ export function CombatScreen() {
             </CombatFigure>
             <div className="ename">{CHARACTERS[run.character].name}</div>
             <HpBar hp={p.hp} maxHp={p.maxHp} block={p.block} />
-            <StatusChips statuses={p.statuses} powers={p.powerInstances} ownerName={CHARACTERS[run.character].name} />
+            <StatusChips statuses={p.statuses} powers={p.powerInstances} ownerName={CHARACTERS[run.character].name} character={run.character} />
           </div>
           <div className="player-hud">
             <div className="orb energy" title="能量：每回合恢复">

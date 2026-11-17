@@ -1,6 +1,7 @@
 import { CARD_LIST, CARDS } from '../data/cards';
 import { describeCard, viewCard } from '../engine/cards';
-import { canPlayCard, createCombat, playCard } from '../engine/combat';
+import { canPlayCard, createCombat } from '../engine/combat';
+import { playWithChoices } from './playOptions';
 import { makeRng } from '../engine/rng';
 import { cardTransferChoices, cardTransferEffect } from '../engine/cardTransfer';
 import type { CombatState } from '../engine/types';
@@ -39,7 +40,7 @@ export function rarityFixture(id: string, upgraded = false, context: RarityConte
 export function rarityProbe(id: string, upgraded: boolean, context: RarityContext) {
   const before = rarityFixture(id, upgraded, context), candidate = before.player.hand[0];
   const view = viewCard(candidate), allowed = canPlayCard(before, candidate).ok;
-  const result = playCard(before, candidate.uid, view.target === 'enemy' || id === 'oath_reenactment' ? 'e0' : null, cardTransferChoices(before, candidate)[0]?.uid ?? 'discard-target');
+  const result = playWithChoices(before, candidate.uid, view.target === 'enemy' || id === 'oath_reenactment' ? 'e0' : null, cardTransferChoices(before, candidate)[0]?.uid ?? 'discard-target');
   const after = result.state;
   return {
     id, upgraded, context, allowed, played: after !== before,

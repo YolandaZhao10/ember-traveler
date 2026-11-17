@@ -12,15 +12,17 @@ function battle(id: string, up: boolean) {
 }
 
 describe.each([false, true])('回血与群攻卡牌调整，升级=%s', up => {
-  it('疾风余烬改用弃牌换余烬，与拾取的抽牌用途分开', () => {
+  it('疾风余烬消耗手牌中随机 1 张换余烬，与拾取的抽牌用途分开', () => {
     const cs = battle('ember_gust', up);
     cs.player.hand.push(card('strike', false, 'fuel'));
     const after = playCard(cs, 'ember_gust', null).state;
-    expect(after.player.ember).toBe(up ? 6 : 4);
-    expect(after.player.discard.map(c => c.uid)).toEqual(['fuel']);
+    expect(after.player.ember).toBe(up ? 8 : 5);
+    expect(after.player.discard).toHaveLength(0);
     expect(after.player.hand).toHaveLength(0);
-    expect(after.player.exhaust).toEqual([card('ember_gust', up)]);
+    expect(after.player.exhaust.map(c => c.uid)).toEqual(['fuel', 'ember_gust']);
+    expect(after.player.turnFlags.exhausted).toBe(2);
     expect(after.player.energy).toBe(3);
+    expect(describeCard(cs.player.hand[0], null)).toBe(`消耗手牌中随机 1 张牌，获得 ${up ? 8 : 5} 点余烬。消耗。`);
   });
   it('拾取抽1/2张并给2/3余烬；回响重复收益但本牌只消耗一次', () => {
     const cs = battle('pick_up', up); cs.player.energy = 0;

@@ -16,11 +16,13 @@ function unfilteredChoices(run: RunState, tier: R.CardRewardTier, n: number): Ca
     const rarity = weightedPick(run.rng.reward, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
     let pool = CARD_LIST.filter(card => card.rarity === rarity && !selected.some(c => c.id === card.id)
       && (tier === 'boss' ? card.owner === run.character : cardAvailableTo(card, run.character)));
-    if (tier === 'normal' || tier === 'elite') {
-      const shared = chance(run.rng.reward, .25);
+    const battle = tier === 'normal' || tier === 'elite';
+    if (battle) {
+      const shared = chance(run.rng.reward, R.sharedRewardChance(run.deck));
       pool = pool.filter(c => shared ? !c.owner : c.owner === run.character);
     }
-    if (pool.length) selected.push(pick(run.rng.reward, pool));
+    const weighted = pool.map(item => ({ item, weight: battle ? R.sharedRewardWeight(item, run.character) : 1 }));
+    if (pool.length) selected.push(weighted.every(w => w.weight === 1) ? pick(run.rng.reward, pool) : weightedPick(run.rng.reward, weighted));
   }
   return selected;
 }

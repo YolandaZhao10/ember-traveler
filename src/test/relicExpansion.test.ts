@@ -27,8 +27,8 @@ describe('新增21个遗物的真实触发', () => {
     cs.player.statuses.echo = 1;
     cs = play(cs, 'quick_stab'); expect(cs.player.block).toBe(3);
     cs = play(cs, 'quick_stab'); expect(cs.player.block).toBe(3);
-    cs = play(cs, 'defend'); expect(cs.player.block).toBe(11); expect(cs.player.ember).toBe(3);
-    cs = play(cs, 'defend'); expect(cs.player.block).toBe(16); expect(cs.player.ember).toBe(3);
+    cs = play(cs, 'defend'); expect(cs.player.block).toBe(11); expect(cs.player.ember).toBe(4); // 首张疾刺的回响已满足「已打出 1 张攻击牌」
+    cs = play(cs, 'defend'); expect(cs.player.block).toBe(16); expect(cs.player.ember).toBe(4);
   });
   it('炭灰袋与灵种每回合仅第一次消耗触发，窑芯需要至少两张', () => {
     let cs = battle(['coal_pouch', 'phoenix_ash', 'kiln_spark'], ['pick_up', 'bone_ash']);

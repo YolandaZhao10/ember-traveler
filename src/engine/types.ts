@@ -64,7 +64,7 @@ export type StatusId =
   | 'vanguardCycle' | 'patientGuard' | 'drawNext'
   | 'emberConduit' | 'ashRecall' | 'burningRelay' | 'sparkCrown'
   | 'chargedEcho' | 'repriseStudy' | 'retainedWard' | 'emberBastion'
-  | 'arcaneWard';
+  | 'arcaneWard' | 'emberOath' | 'kindredVow';
 
 export type Condition =
   | { kind: 'strengthAtLeast'; value: number }
@@ -76,10 +76,12 @@ export type Condition =
   | { kind: 'lostHpThisTurn' }
   | { kind: 'charged'; value: number }
   | { kind: 'exhaustedThisTurn' }
-  | { kind: 'hasEcho' };
+  | { kind: 'hasEcho' }
+  /** 本回合招牌动作计数达到 value；具体动作由角色定义 */
+  | { kind: 'signatureThisTurnAtLeast'; value: number };
 
 export type Effect =
-  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number }
+  | { kind: 'damage'; amount: number; times?: number; aoe?: boolean; strengthMult?: number; lifesteal?: boolean; lifestealCap?: number; perHandCard?: number; perExhaustedCard?: number; exhaustBonusMax?: number; /** 本回合每次招牌动作计数的加伤及其上限 */ perSignature?: number; signatureMax?: number }
   | { kind: 'damagePerHpLost'; mult: number }
   | { kind: 'loseHp'; amount: number }
   | { kind: 'takeDamage'; amount: number }
@@ -101,11 +103,12 @@ export type Effect =
   | { kind: 'convertResource'; resource: 'attacks' | 'block' | 'exhausts' | 'burn' | 'healing' | 'tempStrength' | 'echoes' | 'charge' | 'ember'; per: number; max: number; reward: 'draw' | 'energy' }
   | { kind: 'chargeHand'; amount: number }
   | { kind: 'energy'; amount: number }
-  | { kind: 'gainEmber'; amount: number }
-  | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean }
+  | { kind: 'gainEmber'; amount: number; /** 本回合每次招牌动作计数额外获得的余烬及其上限 */ perSignature?: number; signatureMax?: number }
+  | { kind: 'emberBurst'; damagePer?: number; blockPer?: number; aoe?: boolean; /** 不随余烬变化的基础伤害，与每点余烬加成合并为一次命中 */ base?: number }
   | { kind: 'status'; status: StatusId; amount: number; target: 'target' | 'all' | 'self' }
   | { kind: 'heal'; amount: number }
-  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number }
+  /** choose：由玩家在手牌里选择要消耗的牌（必须选满，手牌不足时选完为止）；缺省为随机。 */
+  | { kind: 'exhaustHand'; count: number | 'all'; filter?: 'curse'; damagePerCard?: number; energyPerCard?: number; choose?: true }
   | { kind: 'damagePerBurn'; amount: number; aoe?: boolean }
   | { kind: 'reapplyBurn' }
   | { kind: 'spreadBurn' }
@@ -115,7 +118,8 @@ export type Effect =
   | { kind: 'doubleStatus'; status: StatusId; target?: 'self' }
   | { kind: 'replayDiscard' }
   | { kind: 'returnExhausted'; count: number; selection?: 'highestCost' }
-  | { kind: 'conditional'; cond: Condition; then: Effect[] };
+  /** else 在条件不满足时结算；oncePerTurn 为回合内计数键：then 每回合只生效一次，之后改走 else */
+  | { kind: 'conditional'; cond: Condition; then: Effect[]; else?: Effect[]; oncePerTurn?: string };
 
 export interface CardDef {
   id: string;
@@ -125,6 +129,8 @@ export interface CardDef {
   archetype: Archetype;
   /** 专属角色；省略表示所有角色可用 */
   owner?: CharacterId;
+  /** 仅共享牌：主接口角色。奖励从共享池抽牌时，本角色的接口牌更常出现。 */
+  hook?: CharacterId;
   cost: number;
   target: TargetMode;
   effects: Effect[];
@@ -135,9 +141,13 @@ export interface CardDef {
   ethereal?: boolean;
   /** 回合结束时保留在手牌 */
   retain?: boolean;
-  /** 每保留一回合，伤害 / 格挡增加 */
-  charge?: { damage?: number; block?: number };
+  /** 每保留一回合，伤害 / 格挡 / 获得的余烬增加；max 为低于全局上限的单牌蓄力上限 */
+  charge?: { damage?: number; block?: number; ember?: number; max?: number };
   requireEmber?: number;
+  /** 共鸣牌：效果按当前角色的招牌动作计数结算，奖励加权时一并提高 */
+  kindred?: boolean;
+  /** 余烬不足 requireEmber 时仍可打出：改为失去这么多生命，并跳过本次余烬消耗。 */
+  hpFallback?: number;
   flavor?: string;
   upgrade: {
     name?: string;
@@ -437,6 +447,8 @@ export type Screen =
   | 'reward'
   | 'event'
   | 'shop'
+  /** 进店前了结借款：二选一，或金币不足时的迎战提示。 */
+  | 'debt'
   | 'rest'
   | 'chapter'
   | 'gameover'
@@ -532,6 +544,8 @@ export interface RunState {
   rest: RestState | null;
   /** 每章可用一次营火精简；与休息、锻造共用本次营火行动。 */
   campRefined?: boolean;
+  /** 商店借款。缺省表示从未借过；stage 仅在进店了结期间存在（choice：等待选择，fight：讨债战斗中）。 */
+  loan?: { outstanding: boolean; settled: number; stage?: 'choice' | 'fight' };
   usedEvents: string[];
   seenEncounters: string[];
   stats: RunStats;

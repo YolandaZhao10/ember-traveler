@@ -76,7 +76,7 @@ describe('弃牌重放的事务与联动', () => {
   it('失血与余烬费用照常支付，不能无视余烬门槛', () => {
     const cs = fixture(); cs.player.discard = [card('blood_edge')];
     expect(replay(cs, 'blood_edge').state.player.hp).toBe(cs.player.hp - 2);
-    const emberCard = Object.values(CARDS).find(c => c.requireEmber && c.type === 'attack')!;
+    const emberCard = Object.values(CARDS).find(c => c.requireEmber && !c.hpFallback && c.type === 'attack')!;
     cs.player.discard = [card(emberCard.id)]; cs.player.ember = 0;
     expect(replay(cs, emberCard.id).state).toBe(cs);
     cs.player.ember = emberCard.requireEmber!;
@@ -130,7 +130,7 @@ describe('弃牌重放的事务与联动', () => {
   });
   it('回响的第二次重放仍检查余烬费用，不能透支', () => {
     const cs = fixture();
-    const paid = Object.values(CARDS).find(c => c.requireEmber && c.type === 'attack')!;
+    const paid = Object.values(CARDS).find(c => c.requireEmber && !c.hpFallback && c.type === 'attack')!;
     cs.player.discard = [card(paid.id)]; cs.player.ember = paid.requireEmber!; cs.player.statuses.echo = 1;
     const after = replay(cs, paid.id).state;
     expect(after.player.ember).toBe(0);

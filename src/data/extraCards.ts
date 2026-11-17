@@ -1,6 +1,6 @@
 import type { Archetype, CardDef, CharacterId, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback'> & { target?: CardDef['target']; upgradeCost?: number; upgradeRequireEmber?: number };
 type Entry = Omit<CardDef, 'owner' | 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -20,9 +20,11 @@ const charged: Condition = { kind: 'charged', value: 2 };
 const guarded: Condition = { kind: 'hasBlock' };
 const recover = (count: number): Effect => ({ kind: 'returnExhausted', count });
 const exhaust = (count: number | 'all'): Effect => ({ kind: 'exhaustHand', count });
+/** 升级后由玩家选择消耗哪几张。 */
+const chooseExhaust = (count: number): Effect => ({ kind: 'exhaustHand', count, choose: true });
 function make(type: CardDef['type'], id: string, name: string, archetype: Archetype, cost: number, effects: Effect[], upgraded: Effect[], options: Options = {}): Entry {
-  const { upgradeCost, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
-  return { id, name, archetype, type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }) } };
+  const { upgradeCost, upgradeRequireEmber, target = type === 'attack' ? 'enemy' : 'self', ...flags } = options;
+  return { id, name, archetype, type, cost, target, effects, ...flags, upgrade: { effects: upgraded, ...(upgradeCost === undefined ? {} : { cost: upgradeCost }), ...(upgradeRequireEmber === undefined ? {} : { requireEmber: upgradeRequireEmber }) } };
 }
 const A = (id: string, name: string, route: Archetype, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('attack', id, name, route, cost, effects, up, opts);
 const S = (id: string, name: string, route: Archetype, cost: number, effects: Effect[], up: Effect[], opts?: Options) => make('skill', id, name, route, cost, effects, up, opts);
@@ -37,32 +39,32 @@ add('traveler', 'common', [
   A('cross_guard', '交锋', 'combo', 1, [hit(7), block(6)], [hit(10), block(8)]),
   A('pommel_jab', '柄击', 'combo', 1, [hit(7), status('weak', 1, 'target')], [hit(10), status('weak', 1, 'target')]),
   A('trail_cut', '踏痕斩', 'combo', 1, [hit(8), when(guarded, ember(2))], [hit(11), when(guarded, ember(2))]),
-  A('frontier_sweep', '开路横斩', 'combo', 1, [hit(7, { aoe: true }), when(attacks(2), status('vulnerable', 1, 'all'))], [hit(10, { aoe: true }), when(attacks(2), status('vulnerable', 2, 'all'))], { target: 'all_enemies' }),
+  A('frontier_sweep', '开路横斩', 'combo', 1, [hit(7, { aoe: true }), when(attacks(1), status('vulnerable', 1, 'all'))], [hit(10, { aoe: true }), when(attacks(1), status('vulnerable', 2, 'all'))], { target: 'all_enemies' }),
   S('steady_grip', '稳握', 'combo', 0, [block(4), when(cards(2), draw(1))], [block(7), when(cards(2), draw(1))], { exhaust: true }),
   S('measured_step', '量步', 'combo', 1, [draw(1), block(8)], [draw(1), block(11)]),
-  A('shield_edge', '盾缘', 'bulwark', 1, [hit(6), when(guarded, status('tempThorns', 2))], [hit(9), when(guarded, status('tempThorns', 3))]),
+  A('shield_edge', '盾缘', 'bulwark', 1, [hit(6), when(guarded, status('tempThorns', 3))], [hit(9), when(guarded, status('tempThorns', 4))]),
   S('brace_line', '架盾', 'bulwark', 1, [when(guarded, status('metallicize', 1)), block(7)], [when(guarded, status('metallicize', 2)), block(10)]),
   S('ember_patrol', '提灯巡守', 'bulwark', 1, [block(9), when(cards(2), status('energyNext', 1))], [block(12), when(cards(2), status('energyNext', 1))]),
   S('rally_step', '整步', 'bulwark', 0, [block(3), when(attacks(1), ember(1))], [block(5), when(attacks(1), ember(1))]),
-  A('lantern_poke', '灯火突刺', 'combo', 1, [hit(6), ember(1), when(attacks(2), draw(1))], [hit(9), ember(1), when(attacks(2), draw(1))]),
+  A('lantern_poke', '灯火突刺', 'combo', 1, [hit(7), ember(1), when(attacks(1), draw(1))], [hit(10), ember(1), when(attacks(1), draw(1))]),
 ]);
 add('traveler', 'uncommon', [
-  S('pursuit_step', '追风步', 'combo', 0, [draw(1), when(cards(2), strength(2))], [draw(2), when(cards(2), strength(3))], { exhaust: true }),
+  S('pursuit_step', '追风步', 'combo', 0, [draw(1), when(cards(2), strength(3))], [draw(2), when(cards(2), strength(4))], { exhaust: true }),
   A('hooking_cut', '钩刃', 'combo', 1, [hit(4, { times: 2 }), status('vulnerable', 1, 'target')], [hit(6, { times: 2 }), status('vulnerable', 1, 'target')]),
   A('blade_rain', '碎刃雨', 'combo', 2, [hit(6, { times: 2, aoe: true }), status('weak', 1, 'all'), when(cards(3), draw(1))], [hit(8, { times: 2, aoe: true }), status('weak', 2, 'all'), when(cards(3), draw(2))], { target: 'all_enemies' }),
-  S('marching_rhythm', '行军拍', 'combo', 1, [draw(2), when(attacks(2), status('energyNext', 1))], [draw(3), when(attacks(2), status('energyNext', 1))]),
+  S('marching_rhythm', '行军拍', 'combo', 1, [draw(2), block(4), when(attacks(1), status('energyNext', 1))], [draw(3), block(4), when(attacks(1), status('energyNext', 1))]),
   A('swift_return', '回身刺', 'combo', 0, [hit(5), when(attacks(2), block(4))], [hit(7), when(attacks(2), block(6))]),
   S('ember_plate', '余烬锻甲', 'bulwark', 1, [ember(-2), block(12), draw(1)], [ember(-2), block(16), draw(1)], { requireEmber: 2 }),
   S('iron_escort', '铁卫护送', 'bulwark', 2, [block(14), status('weak', 1, 'all'), draw(1)], [block(18), status('weak', 1, 'all'), draw(2)]),
   A('shield_rush', '持盾冲锋', 'bulwark', 2, [block(10), { kind: 'damageByBlock', bonus: 3 }, status('vulnerable', 1, 'target')], [block(14), { kind: 'damageByBlock', bonus: 3 }, status('vulnerable', 2, 'target')]),
   P('road_armor', '旅途重甲', 'bulwark', 2, [block(5), status('dexterity', 2)], [block(8), status('dexterity', 2)]),
   S('thorn_stance', '刺盾姿态', 'bulwark', 1, [status('thorns', 1), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], [status('thorns', 2), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], { exhaust: true }),
-  A('guard_breaker', '破阵刃', 'combo', 2, [hit(12), status('weak', 2, 'target'), when(attacks(2), status('vulnerable', 2, 'target'))], [hit(17), status('weak', 2, 'target'), when(attacks(2), status('vulnerable', 3, 'target'))]),
+  A('guard_breaker', '破阵刃', 'combo', 2, [hit(12), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 2, 'target'))], [hit(17), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 3, 'target'))]),
+  A('lantern_flurry', '引灯连斩', 'combo', 0, [ember(-2), hit(3, { times: 2 }), draw(1)], [ember(-2), hit(4, { times: 2 }), draw(1)], { requireEmber: 2 }),
 ]);
 add('traveler', 'rare', [
-  A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 2))], { target: 'all_enemies' }),
-  A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(2), hit(12))], [hit(26), when(attacks(2), hit(16))]),
-  S('unbroken_stride', '不息步伐', 'combo', 0, [draw(2), when(attacks(3), status('echo', 1))], [draw(3), when(attacks(3), status('echo', 1))], { exhaust: true }),
+  A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 2))], { target: 'all_enemies' }),
+  A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(1), hit(10))], [hit(26), when(attacks(1), hit(13))]),
   P('vanguard_oath', '先锋誓言', 'combo', 2, [status('vanguardCycle', 8)], [status('vanguardCycle', 12)]),
   A('encircling_blades', '环刃', 'combo', 1, [hit(3, { times: 4 }), when(attacks(2), status('energyNext', 1))], [hit(4, { times: 4 }), when(attacks(2), status('energyNext', 2))]),
   P('steadfast_guard', '不动阵地', 'bulwark', 2, [status('metallicize', 6), status('thorns', 4)], [status('metallicize', 8), status('thorns', 5)]),
@@ -70,7 +72,7 @@ add('traveler', 'rare', [
   A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock', bonus: 6, mult: 2 }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 10, mult: 2 }, status('weak', 3, 'target')]),
   S('lantern_shelter', '灯下庇护', 'bulwark', 1, [ember(-3), { kind: 'clearDebuffs' }, block(20)], [ember(-3), { kind: 'clearDebuffs' }, block(28)], { requireEmber: 3, retain: true }),
   P('long_road', '漫长守望', 'bulwark', 2, [status('patientGuard', 8)], [status('patientGuard', 11)]),
-  A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(2), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(2), status('energyNext', 2))], { target: 'all_enemies' }),
+  A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(1), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(1), status('energyNext', 2))], { target: 'all_enemies' }),
 ]);
 
 // 拾灰者：点火、控场与消耗回收；高收益治疗和资源牌均限制重复使用。
@@ -82,10 +84,10 @@ add('picker', 'common', [
   A('scalding_sweep', '灼灰横扫', 'cinder', 1, [hit(4, { aoe: true }), status('burn', 2, 'all')], [hit(6, { aoe: true }), status('burn', 2, 'all')], { target: 'all_enemies' }),
   S('coal_wrap', '裹炭', 'cinder', 1, [block(8), when({ kind: 'emberAtLeast', value: 4 }, ember(2))], [block(11), when({ kind: 'emberAtLeast', value: 4 }, ember(2))]),
   A('furnace_breath', '炉口吐息', 'cinder', 2, [when(burning, block(6)), hit(18), status('burn', 4, 'target')], [when(burning, block(8)), hit(24), status('burn', 4, 'target')]),
-  S('ash_shell', '灰壳', 'ash', 1, [exhaust(1), block(14), ember(2)], [exhaust(1), block(18), ember(3)], { exhaust: true }),
+  S('ash_shell', '灰壳', 'ash', 1, [exhaust(1), block(14), ember(2)], [chooseExhaust(1), block(18), ember(3)], { exhaust: true }),
   A('shard_throw', '残片投掷', 'ash', 0, [hit(6), when({ kind: 'emberAtLeast', value: 3 }, ember(-2), recover(1))], [hit(9), when({ kind: 'emberAtLeast', value: 3 }, ember(-2), recover(1))], { exhaust: true }),
   S('salvage_scraps', '捡拾残页', 'ash', 1, [recover(1), block(4)], [recover(1), block(7)]),
-  S('sift_ash', '筛灰', 'ash', 1, [exhaust(1), draw(2)], [exhaust(1), draw(3)]),
+  S('sift_ash', '筛灰', 'ash', 1, [exhaust(1), draw(2)], [chooseExhaust(1), draw(3)]),
   S('pocket_coals', '藏炭', 'ash', 0, [exhaust(1), ember(3)], [exhaust(1), ember(4)], { exhaust: true }),
   A('buried_knife', '埋灰短刃', 'ash', 1, [hit(14), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], [hit(19), when({ kind: 'exhaustedThisTurn' }, { kind: 'returnExhausted', count: 1, selection: 'highestCost' })], { exhaust: true }),
 ]);
@@ -99,7 +101,7 @@ add('picker', 'uncommon', [
   P('coal_heart', '炉灰余温', 'cinder', 1, [status('pyre', 1)], [status('pyre', 2)]),
   S('ember_salvage', '烬中寻宝', 'ash', 1, [recover(2), ember(1)], [recover(3), ember(1)], { exhaust: true }),
   A('scrap_volley', '碎片齐射', 'ash', 1, [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }, hit(8, { aoe: true })], [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }, hit(12, { aoe: true })], { target: 'all_enemies', exhaust: true }),
-  S('burial_veil', '葬灰帷幕', 'ash', 1, [exhaust(2), block(13), draw(1)], [exhaust(2), block(18), draw(2)]),
+  S('burial_veil', '葬灰帷幕', 'ash', 1, [exhaust(2), block(13), draw(1)], [chooseExhaust(2), block(18), draw(2)]),
   S('reclaimed_spark', '回收火星', 'ash', 1, [recover(1), status('energyNext', 1)], [recover(1), status('energyNext', 2)], { exhaust: true }),
   A('ash_carver', '刻灰刀', 'ash', 1, [hit(9), recover(1)], [hit(13), recover(1)]),
   P('sheltering_ash', '积灰护甲', 'ash', 1, [status('ashFeast', 3), status('metallicize', 3)], [status('ashFeast', 4), status('metallicize', 4)]),
@@ -112,7 +114,7 @@ add('picker', 'rare', [
   P('undying_furnace', '不息炉膛', 'cinder', 2, [status('emberConduit', 6)], [status('emberConduit', 9)]),
   P('ash_reserve', '灰烬储备', 'ash', 1, [block(8), status('ashRecall', 8)], [block(12), status('ashRecall', 12)]),
   S('last_salvage', '终末打捞', 'ash', 1, [recover(3), block(10), status('energyNext', 1)], [recover(4), block(14), status('energyNext', 2)], { exhaust: true }),
-  S('phoenix_breath', '灰中复苏', 'ash', 1, [exhaust(2), { kind: 'heal', amount: 12 }], [exhaust(2), { kind: 'heal', amount: 16 }], { exhaust: true }),
+  S('phoenix_breath', '灰中复苏', 'ash', 1, [exhaust(2), { kind: 'heal', amount: 12 }], [chooseExhaust(2), { kind: 'heal', amount: 16 }], { exhaust: true }),
   A('ash_storm', '灰暴', 'ash', 2, [hit(16, { aoe: true }), exhaust(1), draw(2)], [hit(22, { aoe: true }), exhaust(1), draw(3)], { target: 'all_enemies', exhaust: true }),
   S('empty_the_satchel', '倾尽行囊', 'ash', 0, [{ kind: 'exhaustHand', count: 'all', energyPerCard: 1 }, draw(3)], [{ kind: 'exhaustHand', count: 'all', energyPerCard: 1 }, draw(4)], { exhaust: true }),
   A('embers_requiem', '残烬挽歌', 'ash', 2, [exhaust(1), hit(10, { times: 2 }), recover(2)], [exhaust(1), hit(13, { times: 2 }), recover(2)], { exhaust: true }),
@@ -212,6 +214,24 @@ add('scholar', 'rare', [
   S('sealed_sanctuary', '封印圣所', 'focus', 2, [block(22), status('regen', 3)], [block(28), status('regen', 4)], { retain: true, exhaust: true }),
 ]);
 
+
+// 余烬接口：血誓者以失血换余烬、余烬不足时用生命代付；学者把余烬花在回响与蓄力上。
+add('oathbound', 'common', [
+  S('blood_kindling', '血燃', 'blood', 1, [block(7), when(wounded, ember(3))], [block(10), when(wounded, ember(4))]),
+]);
+add('oathbound', 'uncommon', [
+  P('ember_blood_oath', '烬血誓约', 'blood', 1, [status('emberOath', 2)], [status('emberOath', 3)]),
+  A('molten_blood_strike', '熔血重击', 'might', 2, [ember(-3), hit(16), strength(3)], [ember(-3), hit(21), strength(4)], { requireEmber: 3, hpFallback: 5 }),
+]);
+add('scholar', 'common', [
+  S('ember_annotation', '烬文注释', 'echo', 0, [ember(-2), status('echo', 1)], [ember(-1), status('echo', 1)], { requireEmber: 2, upgradeRequireEmber: 1, exhaust: true }),
+]);
+add('scholar', 'uncommon', [
+  S('ember_gradation', '余烬刻度', 'focus', 1, [ember(-3), block(8), { kind: 'chargeHand', amount: 1 }], [ember(-3), block(12), { kind: 'chargeHand', amount: 1 }], { requireEmber: 3 }),
+]);
+add('scholar', 'rare', [
+  A('burning_final_draft', '燃页终稿', 'focus', 2, [{ kind: 'emberBurst', base: 10, damagePer: 3 }], [{ kind: 'emberBurst', base: 14, damagePer: 4 }], { retain: true, charge: { damage: 3 } }),
+]);
 
 // 角色资源转换：真实支付护甲/燃烧/临时力量/蓄力，或核销本回合计数。
 // 计数兑换不改变连击等原有触发，且不会因回响、重放或回收重复核销。

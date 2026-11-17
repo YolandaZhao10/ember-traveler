@@ -1,6 +1,6 @@
 import type { CardDef, Condition, Effect, StatusId } from '../engine/types';
 
-type Options = Pick<CardDef, 'exhaust' | 'retain' | 'requireEmber'> & { target?: CardDef['target']; upgradeCost?: number };
+type Options = Pick<CardDef, 'exhaust' | 'retain' | 'charge' | 'requireEmber' | 'hpFallback' | 'kindred'> & { target?: CardDef['target']; upgradeCost?: number };
 type Entry = Omit<CardDef, 'rarity'>;
 const hit = (amount: number, extra: Partial<Extract<Effect, { kind: 'damage' }>> = {}): Effect => ({ kind: 'damage', amount, ...extra });
 const block = (amount: number): Effect => ({ kind: 'block', amount });
@@ -27,38 +27,39 @@ function add(rarity: 'common' | 'uncommon' | 'rare', entries: Entry[]) {
 // 四角色共享：旅行补给、余烬积蓄与释放；强力恢复、爆发资源用消耗限制循环。
 add('common', [
   S('coal_credit', '燃烬借力', 0, [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1)], [ember(-2), { kind: 'exhaustHand', count: 1 }, energy(1), block(5)], { requireEmber: 2, exhaust: true }),
-  S('ember_sift', '烬中翻阅', 0, [ember(-2), draw(2), discard(1)], [ember(-2), draw(3), discard(1)], { requireEmber: 2, exhaust: true }),
+  S('ember_sift', '烬中翻阅', 0, [ember(-2), draw(2), discard(1)], [ember(-2), draw(3), discard(1)], { requireEmber: 2 }),
   A('stone_throw', '投石', 0, [discard(1), hit(8), draw(1)], [discard(1), hit(11), draw(1)], { exhaust: true }),
   S('camp_guard', '守夜', 1, [block(6), when(coals(3), status('guardOnce', 8))], [block(9), when(coals(3), status('guardOnce', 12))]),
   A('sweeping_embers', '扫火', 1, [hit(6, { aoe: true }), ember(1)], [hit(8, { aoe: true }), ember(1)], { target: 'all_enemies' }),
-  A('coal_tip', '炭尖', 1, [hit(7), when({ kind: 'targetBurning' }, ember(2))], [hit(10), when({ kind: 'targetBurning' }, ember(3))]),
+  A('coal_tip', '炭尖', 1, [hit(7), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(2))], [hit(10), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(3))]),
   S('shutter_lamp', '掩灯', 0, [block(3), when(coals(3), status('weak', 1, 'all'))], [block(5), when(coals(3), status('weak', 1, 'all'))], { exhaust: true }),
   S('tinder_bundle', '干薪束', 0, [ember(3)], [ember(5)], { exhaust: true }),
   S('field_notes', '行旅札记', 1, [draw(2), discard(1), ember(1)], [draw(3), discard(1), ember(2)]),
-  S('spark_lure', '诱火', 1, [status('burn', 3, 'target'), status('weak', 1, 'target')], [status('burn', 4, 'target'), status('weak', 1, 'target')], { target: 'enemy' }),
   A('lantern_flash', '灯闪', 1, [hit(6), status('vulnerable', 1, 'target'), when(coals(3), block(4))], [hit(9), status('vulnerable', 1, 'target'), when(coals(3), block(6))]),
-  S('warm_cloak', '炽边斗篷', 1, [block(6), when(coals(3), status('burn', 2, 'all'))], [block(9), when(coals(3), status('burn', 3, 'all'))]),
+  S('warm_cloak', '炽边斗篷', 1, [block(6), when(coals(3), block(4))], [block(9), when(coals(3), block(6))]),
   A('fanning_strike', '扇火斩', 1, [hit(8), when(coals(2), ember(-2), discard(1), draw(2))], [hit(11), when(coals(2), ember(-2), discard(1), draw(3))]),
   S('ration_bite', '一口干粮', 0, [discard(1), heal(6)], [discard(1), heal(8)], { exhaust: true }),
   S('banked_spark', '守住火种', 1, [block(7), when(coals(4), status('energyNext', 1))], [block(10), when(coals(4), status('energyNext', 1))], { retain: true }),
   S('steady_breath', '匀息', 0, [block(2), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))], [block(4), when({ kind: 'cardsThisTurnAtLeast', value: 2 }, ember(1))]),
   A('sling_volley', '连掷火石', 2, [hit(3, { times: 4 }), when(coals(5), status('energyNext', 1))], [hit(4, { times: 4 }), when(coals(5), status('energyNext', 2))]),
+  A('sharpened_coal', '淬炭刃', 1, [hit(6), status('strength', 1)], [hit(9), status('strength', 1)], { exhaust: true }),
+  S('ember_wick', '余烬灯芯', 0, [ember(2)], [ember(3)], { retain: true, charge: { ember: 1, max: 4 }, exhaust: true }),
 ]);
 add('uncommon', [
   S('coal_page_search', '炭中寻页', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'draw' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'draw' }], { requireEmber: 2, exhaust: true }),
-  S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, exhaust: true }),
+  S('ember_exchange', '燃料交换', 0, [ember(-3), energy(2)], [ember(-3), energy(2), draw(1)], { requireEmber: 3, hpFallback: 5, exhaust: true }),
   A('firestorm', '火雨', 2, [ember(-2), hit(10, { aoe: true }), status('burn', 3, 'all')], [ember(-2), hit(14, { aoe: true }), status('burn', 4, 'all')], { target: 'all_enemies', requireEmber: 2 }),
   S('insulated_coat', '隔热外衣', 2, [block(18), ember(2), status('regen', 1)], [block(24), ember(3), status('regen', 2)], { exhaust: true }),
   A('heat_sink', '卸热', 1, [{ kind: 'emberBurst', damagePer: 2, blockPer: 2 }], [{ kind: 'emberBurst', damagePer: 3, blockPer: 2 }]),
-  S('charcoal_insight', '炭火启示', 1, [ember(-2), draw(3)], [ember(-2), draw(4)], { requireEmber: 2 }),
+  S('charcoal_insight', '炭火启示', 1, [ember(-2), draw(3)], [ember(-2), draw(4)], { requireEmber: 2, retain: true }),
   S('rekindle_coals', '重拨余火', 1, [ember(-2), { kind: 'returnExhausted', count: 1 }, draw(1)], [ember(-2), { kind: 'returnExhausted', count: 1 }, draw(2)], { retain: true, requireEmber: 2 }),
   S('truce_smoke', '停战烟', 1, [status('weak', 2, 'all'), discard(1), draw(2)], [status('weak', 2, 'all'), discard(1), draw(3)]),
   S('warding_lantern', '辟邪灯', 1, [block(9), when(coals(6), status('dexterity', 1), status('thorns', 1))], [block(12), when(coals(6), status('dexterity', 2), status('thorns', 1))]),
-  A('spare_torch', '掷出火把', 1, [hit(9), ember(2), status('burn', 3, 'target')], [hit(14), ember(3), status('burn', 4, 'target')], { exhaust: true }),
+  A('spare_torch', '掷出火把', 1, [hit(8), ember(2), status('vulnerable', 1, 'target')], [hit(12), ember(3), status('vulnerable', 1, 'target')]),
   S('traveling_supplies', '随身药包', 0, [heal(4), draw(1)], [heal(6), draw(1)], { exhaust: true }),
   S('emergency_stash', '翻找行囊', 0, [draw(3), discard(2), status('energyNext', 1)], [draw(4), discard(2), status('energyNext', 1)], { exhaust: true }),
   S('enduring_warmth', '余温未散', 1, [heal(5), { kind: 'clearDebuffs' }], [heal(7), { kind: 'clearDebuffs' }], { exhaust: true }),
-  A('sharpened_coal', '淬炭刃', 1, [hit(8), status('strength', 1)], [hit(12), status('strength', 1)], { exhaust: true }),
+  S('quiet_burning_page', '静燃之页', 1, [block(7), when({ kind: 'charged', value: 2 }, draw(2))], [block(10), when({ kind: 'charged', value: 2 }, draw(2))], { retain: true, charge: { block: 3, max: 6 } }),
 ]);
 add('rare', [
   S('ember_bellows', '烬炉鼓风', 0, [{ kind: 'convertResource', resource: 'ember', per: 2, max: 3, reward: 'energy' }], [{ kind: 'convertResource', resource: 'ember', per: 2, max: 4, reward: 'energy' }], { requireEmber: 2, exhaust: true }),
@@ -73,4 +74,21 @@ add('rare', [
   S('sunward_step', '向阳而行', 1, [block(12), { kind: 'discardRandom', count: 'all' }, draw(4)], [block(16), { kind: 'discardRandom', count: 'all' }, draw(5)], { exhaust: true }),
   S('sealed_flame', '封存烈火', 0, [ember(5), status('energyNext', 1)], [ember(7), status('energyNext', 2)], { retain: true, exhaust: true }),
   A('twilight_flame', '暮火裁决', 2, [hit(20), status('weak', 2, 'target'), status('vulnerable', 2, 'target')], [hit(27), status('weak', 3, 'target'), status('vulnerable', 3, 'target')]),
+]);
+
+// 共鸣牌：按当前角色本回合的招牌动作次数结算（定义见 characters.ts），四个角色各有自己的触发方式。
+// 给能量的分支与旅途誓火每回合各只生效一次，回响、镜像或取回后再次打出也不例外。
+const kin = (value: number): Condition => ({ kind: 'signatureThisTurnAtLeast', value });
+add('common', [
+  A('kindred_spark', '火种共鸣', 1, [hit(5, { perSignature: 3, signatureMax: 12 })], [hit(8, { perSignature: 3, signatureMax: 12 })], { kindred: true }),
+]);
+add('uncommon', [
+  S('kindred_afterglow', '同源余火', 1, [block(6), { kind: 'gainEmber', amount: 0, perSignature: 1, signatureMax: 4 }], [block(9), { kind: 'gainEmber', amount: 0, perSignature: 1, signatureMax: 4 }], { kindred: true }),
+]);
+add('rare', [
+  S('kindred_refrain', '余烬回声', 0,
+    [{ kind: 'conditional', cond: kin(3), then: [energy(2)], else: [ember(2)], oncePerTurn: 'kindredRefrain' }],
+    [{ kind: 'conditional', cond: kin(2), then: [energy(2)], else: [ember(2)], oncePerTurn: 'kindredRefrain' }], { exhaust: true, kindred: true }),
+  P('kindred_vow', '旅途誓火', 1, [status('kindredVow', 1)], [status('kindredVow', 1)], { upgradeCost: 0, kindred: true }),
+  A('kindred_dawn', '黎明前夜', 2, [hit(12, { aoe: true }), when(kin(4), hit(12, { aoe: true }), ember(3))], [hit(16, { aoe: true }), when(kin(4), hit(12, { aoe: true }), ember(3))], { target: 'all_enemies', kindred: true }),
 ]);

@@ -105,6 +105,8 @@ const repeatBudgets: Record<string, { damage?: number[]; block?: number[]; ember
   whisper_needle: { damage: [2, 4], ember: 1 },
   steady_breath: { block: [2, 4], ember: 1 },
 };
+// 已审核例外：可重复零费牌附带过牌，但每次必须实付登记数量的余烬，余烬不足不能打出。
+const paidRepeatExceptions: Record<string, number> = { ember_sift: 2, lantern_flurry: 2 };
 function resourceEffect(effect: Effect): boolean {
   if (effect.kind === 'conditional') return effect.then.some(resourceEffect);
   return ['draw', 'energy', 'heal', 'returnExhausted', 'exhaustHand'].includes(effect.kind)
@@ -117,9 +119,14 @@ describe('可重复零费牌的收益预算', () => {
     for (const def of CARD_LIST) for (const upgraded of [false, true]) {
       const v = viewDef(def.id, upgraded);
       if (v.cost !== 0 || v.exhaust || v.type === 'power') continue;
-      if (!repeatBudgets[v.id]) unchecked.push(v.name);
+      const paid = paidRepeatExceptions[v.id];
+      if (!repeatBudgets[v.id] && !paid) unchecked.push(v.name);
       expect(v.charge, v.name).toBeUndefined();
-      expect(v.effects.some(resourceEffect), v.name).toBe(false);
+      if (paid) {
+        expect(v.requireEmber, v.name).toBeGreaterThanOrEqual(paid);
+        expect(v.effects[0], v.name).toEqual({ kind: 'gainEmber', amount: -paid });
+        expect(v.effects.some(e => ['energy', 'heal', 'returnExhausted', 'exhaustHand'].includes(e.kind)), v.name).toBe(false);
+      } else expect(v.effects.some(resourceEffect), v.name).toBe(false);
     }
     expect(unchecked, '新增可重复零费牌须先审查收益及组合，再登记预算').toEqual([]);
   });
@@ -144,6 +151,28 @@ describe('可重复零费牌的收益预算', () => {
     expect(after.player.exhaust).toHaveLength(0);
     expect(after.player.cardsPlayedThisTurn).toBe(id === 'whisper_needle' ? 4 : 3);
     if (['crimson_step', 'ember_pulse'].includes(id)) expect(after.player.hp).toBe(98);
+  });
+});
+
+describe('实付余烬的可重复零费过牌', () => {
+  it.each([false, true])('烬中翻阅升级=%s：每次实付 2 余烬后进弃牌堆，即使每次都重新抽回，也会被余烬耗尽而停下', upgraded => {
+    let state = battle('ember_sift', upgraded);
+    state.player.ember = 5;
+    let plays = 0;
+    for (let i = 0; i < 20; i++) {
+      // 模拟最理想的循环：把刚打出的这张牌立刻放回手里。
+      state = JSON.parse(JSON.stringify(state));
+      state.player.discard = state.player.discard.filter(c => c.uid !== 'ember_sift');
+      if (!state.player.hand.some(c => c.uid === 'ember_sift')) state.player.hand.push(card('ember_sift', upgraded));
+      const next = playCard(state, 'ember_sift', null).state;
+      if (next === state) break;
+      expect(next.player.discard.some(c => c.uid === 'ember_sift')).toBe(true);
+      state = next; plays++;
+    }
+    expect(plays).toBe(2);
+    expect(state.player.ember).toBe(1);
+    expect(state.player.energy).toBe(0);
+    expect(state.player.exhaust).toHaveLength(0);
   });
 });
 

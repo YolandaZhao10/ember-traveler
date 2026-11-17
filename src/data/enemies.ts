@@ -1,4 +1,5 @@
 import type { EnemyDef, EnemyAiContext, EncounterDef } from '../engine/types';
+import { DEBT_COLLECTORS } from './debtCollectors';
 import { chance, pick } from '../engine/rng';
 import { CHAPTER_TWO_ENCOUNTERS, CHAPTER_TWO_ENEMIES } from './enemies2';
 import { CHAPTER_THREE_ENCOUNTERS, CHAPTER_THREE_ENEMIES } from './enemies3';
@@ -457,7 +458,8 @@ def({
 });
 
 // ---------- 遭遇 ----------
-[...CHAPTER_TWO_ENEMIES, ...CHAPTER_THREE_ENEMIES, ...CHAPTER_FOUR_ENEMIES, ...EXTRA_ENEMIES].forEach(def);
+// 讨债人只由商店借款的了结流程生成，不进任何遭遇池。
+[...CHAPTER_TWO_ENEMIES, ...CHAPTER_THREE_ENEMIES, ...CHAPTER_FOUR_ENEMIES, ...EXTRA_ENEMIES, ...DEBT_COLLECTORS].forEach(def);
 export const ENCOUNTERS: EncounterDef[] = [
   ...CHAPTER_TWO_ENCOUNTERS, ...CHAPTER_THREE_ENCOUNTERS, ...CHAPTER_FOUR_ENCOUNTERS,
   ...EXTRA_ENCOUNTERS,

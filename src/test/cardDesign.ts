@@ -101,10 +101,17 @@ export function effectDesign(effects: Effect[], mode: Mode = 'design'): string {
   return JSON.stringify(normalizeEffects(effects, mode));
 }
 
-function chargeShape(charge: { damage?: number; block?: number } | undefined, mode: Mode): unknown {
-  const active = Object.fromEntries(Object.entries(charge ?? {}).filter(([, n]) => n !== undefined && n !== 0));
+function chargeShape(charge: { damage?: number; block?: number; ember?: number; max?: number } | undefined, mode: Mode): unknown {
+  // 单牌蓄力上限只是数值，不构成近似设计上的差异；精确机制仍保留。
+  const active = Object.fromEntries(Object.entries(charge ?? {}).filter(([key, n]) => n !== undefined && n !== 0 && (mode === 'exact' || key !== 'max')));
   return Object.keys(active).length ? shape(active, mode) : null;
 }
+
+/**
+ * 已人工审核、允许保留的同设计牌对（两个 ID 按字典序以 / 连接）。
+ * 疾风余烬 / 藏炭：共享牌改为消耗手牌换余烬以提供消耗接口，藏炭后续单独重做。
+ */
+export const REVIEWED_DESIGN_PAIRS = new Set(['ember_gust/pocket_coals']);
 
 /** 数值、费用、段数、单体/群体和保留/消耗不能作为唯一特色。 */
 export function cardDesign(id: string, upgraded: boolean): string {
@@ -112,11 +119,17 @@ export function cardDesign(id: string, upgraded: boolean): string {
   return JSON.stringify([normalizeEffects(v.effects, 'design'), normalizeEffects(v.handEndEffects, 'design'), chargeShape(v.charge, 'design')]);
 }
 
+/** 完全同效审查用的键：只看实际结算的效果与蓄力成长，忽略费用、保留、消耗、目标与角色。 */
+export function effectIdentity(id: string, upgraded: boolean): string {
+  const v = viewDef(id, upgraded);
+  return effectDesign(v.effects, 'exact') + effectDesign(v.handEndEffects, 'exact') + JSON.stringify(chargeShape(v.charge, 'exact'));
+}
+
 /** 精确效果审查：仍忽略名称、费用、稀有度，但保留实际数值与结算机制。 */
 export function cardMechanics(id: string, upgraded: boolean): string {
   const v = viewDef(id, upgraded);
   return JSON.stringify([
     v.type, normalizeEffects(v.effects, 'exact'), normalizeEffects(v.handEndEffects, 'exact'),
-    v.target, v.exhaust, v.ethereal, v.retain, chargeShape(v.charge, 'exact'), v.requireEmber,
+    v.target, v.exhaust, v.ethereal, v.retain, chargeShape(v.charge, 'exact'), v.requireEmber, v.hpFallback,
   ]);
 }

@@ -12,6 +12,7 @@ import { MapScreen } from './screens/MapScreen';
 import { RestScreen } from './screens/RestScreen';
 import { RewardScreen } from './screens/RewardScreen';
 import { ShopScreen } from './screens/ShopScreen';
+import { DebtScreen } from './screens/DebtScreen';
 import { TitleScreen } from './screens/TitleScreen';
 import { getState, openOverlay, quickReset, toggleSound, useGame } from './store';
 
@@ -43,7 +44,7 @@ export function App() {
             <span className="chapter-badge" title={CHAPTERS[run.chapter].name}>{CHAPTERS[run.chapter].label}</span> 第 {run.floor + 1} 层{run.currentNodeId ? ` · ${nodeTypeName(run.map.nodes[run.currentNodeId].type)}` : ''}
           </span>
           <span className="stat journey-time" title="本局前台游玩用时；首页、后台与结算暂停，快速 SL 不回退">用时 {formatJourneyTime(run.elapsedMs)}</span>
-          <RelicBar relics={run.relics} />
+          <RelicBar relics={run.relics} loan={run.loan} />
           <span className="spacer" />
           <button className="iconbtn" onClick={() => openOverlay({ kind: 'map' })} title="查看当前位置和路线">地图</button>
           <button className="iconbtn" onClick={() => openOverlay({ kind: 'pile', pile: 'deck' })}>
@@ -68,6 +69,7 @@ export function App() {
       {screen === 'reward' && <RewardScreen />}
       {screen === 'event' && <EventScreen />}
       {screen === 'shop' && <ShopScreen />}
+      {screen === 'debt' && <DebtScreen />}
       {screen === 'rest' && <RestScreen />}
       {screen === 'chapter' && <ChapterScreen />}
       {screen === 'gameover' && <EndScreen victory={false} />}

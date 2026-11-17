@@ -93,8 +93,8 @@ def({
   owner: 'traveler',
   cost: 0,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 3 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 5 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
+  effects: [{ kind: 'damage', amount: 3 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
+  upgrade: { effects: [{ kind: 'damage', amount: 5 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
 });
 def({
   id: 'twin_blades',
@@ -170,8 +170,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damagePerAttack', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 16 }] }],
-  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 24 }] }] },
+  effects: [{ kind: 'damagePerAttack', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'block', amount: 12 }] }],
+  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'block', amount: 16 }] }] },
   flavor: '每一刀都为下一刀铺路。',
 });
 def({
@@ -190,7 +190,7 @@ def({
   id: 'war_drum',
   name: '战鼓',
   type: 'power',
-  rarity: 'rare',
+  rarity: 'uncommon',
   archetype: 'combo',
   owner: 'traveler',
   cost: 1,
@@ -241,11 +241,11 @@ def({
   owner: 'traveler',
   cost: 1,
   target: 'enemy',
-  effects: [{ kind: 'damageByBlock' }],
+  effects: [{ kind: 'damageByBlock', bonus: 4 }],
   upgrade: {
     effects: [
       { kind: 'block', amount: 3 },
-      { kind: 'damageByBlock' },
+      { kind: 'damageByBlock', bonus: 6 },
     ],
   },
   flavor: '盾不只用来挡。',
@@ -260,8 +260,8 @@ def({
   cost: 1,
   target: 'self',
   exhaust: true,
-  effects: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }],
+  upgrade: { effects: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'thorns', amount: 4, target: 'self' }] },
 });
 def({
   id: 'iron_wall',
@@ -286,12 +286,12 @@ def({
   target: 'enemy',
   effects: [
     { kind: 'damage', amount: 6 },
-    { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 4 }] },
+    { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 6 }] },
   ],
   upgrade: {
     effects: [
       { kind: 'damage', amount: 9 },
-      { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 5 }] },
+      { kind: 'conditional', cond: { kind: 'hasBlock' }, then: [{ kind: 'damage', amount: 8 }] },
     ],
   },
 });
@@ -329,8 +329,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damageByBlock', aoe: true, mult: 2, consume: true }],
-  upgrade: { effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }] },
+  effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }],
+  upgrade: { cost: 1 },
   flavor: '让他们尝尝城墙的重量。',
 });
 def({
@@ -390,8 +390,8 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'all_enemies',
-  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'burn', amount: 3, target: 'all' }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'burn', amount: 4, target: 'all' }] },
+  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }],
+  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }] },
 });
 def({
   id: 'ash_shield',
@@ -442,6 +442,8 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'enemy',
+  retain: true,
+  charge: { damage: 3, max: 4 },
   effects: [{ kind: 'damage', amount: 9 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 5 }] }],
   upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 6 }] }] },
 });
@@ -517,6 +519,7 @@ def({
   cost: 1,
   target: 'enemy',
   requireEmber: 2,
+  hpFallback: 4,
   effects: [
     { kind: 'gainEmber', amount: -2 },
     { kind: 'damage', amount: 18 },
@@ -538,13 +541,13 @@ def({
   target: 'self',
   exhaust: true,
   effects: [
-    { kind: 'discardRandom', count: 1 },
-    { kind: 'gainEmber', amount: 4 },
+    { kind: 'exhaustHand', count: 1 },
+    { kind: 'gainEmber', amount: 5 },
   ],
   upgrade: {
     effects: [
-      { kind: 'discardRandom', count: 1 },
-      { kind: 'gainEmber', amount: 6 },
+      { kind: 'exhaustHand', count: 1 },
+      { kind: 'gainEmber', amount: 8 },
     ],
   },
 });
@@ -841,7 +844,7 @@ def({
   ],
   upgrade: {
     effects: [
-      { kind: 'exhaustHand', count: 2 },
+      { kind: 'exhaustHand', count: 2, choose: true },
       { kind: 'gainEmber', amount: 5 },
       { kind: 'draw', amount: 3 },
     ],
@@ -1409,7 +1412,33 @@ EXTRA_CHARACTER_CARDS.forEach(def);
 EXTRA_SHARED_CARDS.forEach(def);
 EXTRA_CURSES.forEach(def);
 CYCLE_CARDS.forEach(def);
+
+/**
+ * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对；
+ * 只影响从共享池抽奖励时的权重，不限制其他角色获得。
+ */
+const SHARED_HOOKS: Record<CharacterId, string[]> = {
+  // 投石、守夜、匀息、辟邪灯、卸热、掷出火把、熔炉、篝火避难所
+  traveler: ['stone_throw', 'camp_guard', 'steady_breath', 'warding_lantern', 'heat_sink', 'spare_torch', 'forge', 'bonfire_shelter'],
+  // 燃烧、燃烬借力、疾风余烬、火雨、重拨余火、闷燃之星、余烬拾遗
+  picker: ['ignite', 'coal_credit', 'ember_gust', 'firestorm', 'rekindle_coals', 'smoldering_star', 'ember_retrieval'],
+  // 一口干粮、连掷火石、灰烬之刃、燃料交换、隔热外衣、淬炭刃、余烬疗愈、火星冠冕、涅槃之息
+  oathbound: ['ration_bite', 'sling_volley', 'ember_blade', 'ember_exchange', 'insulated_coat', 'sharpened_coal', 'cinder_mend', 'crown_of_sparks', 'phoenix_respite'],
+  // 守住火种、灼热打击、炭火启示、翻找行囊、封存烈火、暮火裁决、余烬灯芯、静燃之页
+  scholar: ['banked_spark', 'searing_strike', 'charcoal_insight', 'emergency_stash', 'sealed_flame', 'twilight_flame', 'ember_wick', 'quiet_burning_page'],
+};
+for (const [character, ids] of Object.entries(SHARED_HOOKS) as [CharacterId, string[]][]) for (const id of ids) {
+  const card = CARDS[id];
+  if (!card || card.owner || card.hook) throw new Error(`接口牌登记有误：${id}`);
+  card.hook = character;
+}
 export const CARD_LIST: CardDef[] = Object.values(CARDS);
+
+/** 已从游戏移除的牌。旧存档读档时换成 replacement（保留升级）；历史记录只读，用 name 显示。 */
+export const RETIRED_CARDS: Record<string, { name: string; replacement: string }> = {
+  spark_lure: { name: '诱火', replacement: 'ignite' },
+  unbroken_stride: { name: '不息步伐', replacement: 'haste' },
+};
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {
   return CARD_LIST.filter((c) => c.rarity === r);

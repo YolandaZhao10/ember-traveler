@@ -3,7 +3,10 @@ import { CHAPTERS } from '../../data/chapters';
 import { RELICS } from '../../data/relics';
 import { CHARACTERS } from '../../data/characters';
 import { Card } from '../components/Card';
-import { openOverlay, shopBuyCard, shopBuyRelic, shopLeave, shopRemove, useGame } from '../store';
+import { canBorrow } from '../../engine/run';
+import { FINAL_CHAPTER } from '../../data/chapters';
+import { LOAN_AMOUNT, LOAN_REPAY } from '../../engine/constants';
+import { openOverlay, shopBorrow, shopBuyCard, shopBuyRelic, shopLeave, shopRemove, useGame } from '../store';
 
 export function ShopScreen() {
   const { run } = useGame();
@@ -82,6 +85,18 @@ export function ShopScreen() {
             {s.removeUsed ? '已使用' : <span className={`price ${run.gold < s.removePrice ? 'poor' : ''}`}>🪙 {s.removePrice}</span>}
           </button>
         </div>
+        {run.chapter !== FINAL_CHAPTER && (
+          <div className="relicitem panel shop-service shop-loan">
+            <span style={{ fontSize: 28 }}>🧾</span>
+            <div className="txt">
+              <b>借款</b>
+              立刻获得 {LOAN_AMOUNT} 金币。下次进商店时归还 {LOAN_REPAY}，或与讨债人一战。
+            </div>
+            <button className="btn small" disabled={!canBorrow(run)} onClick={() => shopBorrow()}>
+              {run.loan?.outstanding ? '已借款' : <span className="price">借 🪙 {LOAN_AMOUNT}</span>}
+            </button>
+          </div>
+        )}
         <button className="btn primary" onClick={() => shopLeave()}>
           离开商店
         </button>

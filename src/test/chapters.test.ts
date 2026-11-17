@@ -92,7 +92,7 @@ describe('前三章连续旅程', () => {
     expect(R.resetCurrentNode(invalid)).toBe(invalid);
   });
 
-  it('第二章第40层领取奖励后进入章间整备，SL回到领奖而死亡SL重打', () => {
+  it('第二章第40层领取奖励后进入章间整备，SL回到领奖，死亡后不能SL重打', () => {
     const start = boss(2);
     expect(start.floor).toBe(39);
     expect(start.combat!.enemies[0].defId).toBe('everburning_core');
@@ -106,7 +106,7 @@ describe('前三章连续旅程', () => {
     dead.combat!.outcome = 'lost'; dead.combat!.player.hp = 0;
     const lost = R.finishCombat(dead);
     expect(lost.screen).toBe('gameover');
-    expect(R.resetCurrentNode(lost)).toEqual(start);
+    expect(R.resetCurrentNode(lost)).toBe(lost);
   });
 
   it('每层都有对应章节的遭遇池，第二章普通战不会混入第一章敌人', () => {

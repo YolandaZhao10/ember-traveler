@@ -7,7 +7,7 @@ import { clearSave, loadRun, loadSettings, saveRun, saveSettings, visualPreferen
 import type { CardInstance, CharacterId, CombatEvent, RunDifficulty, RunState, StatusId } from '../engine/types';
 import { setSoundEnabled, sfx } from './sound';
 import { STATUSES } from '../data/statuses';
-import { canPlayCard, needsDiscardReplay } from '../engine/combat';
+import { canPlayCard, needsDiscardReplay, type ExhaustChoiceRequest, type PlayChoice } from '../engine/combat';
 import { cardTransferEffect } from '../engine/cardTransfer';
 import { viewCard } from '../engine/cards';
 import { impactCues, type ImpactItem } from './combatFx';
@@ -24,6 +24,7 @@ export interface FxItem {
 
 export type Overlay =
   | { kind: 'cardTransfer'; cardUid: string }
+  | { kind: 'exhaustChoice'; cardUid: string; targetId: string | null; replayUid?: string; exhaust: string[][]; request: ExhaustChoiceRequest }
   | { kind: 'replay'; cardUid: string }
   | { kind: 'history' }
   | { kind: 'help' }
@@ -34,6 +35,7 @@ export type Overlay =
   | { kind: 'status'; status: StatusId; amount: number; ownerName: string; detail?: string }
   | { kind: 'ember' }
   | { kind: 'relic'; relicId: string }
+  | { kind: 'loan'; settled: boolean }
   | { kind: 'log' }
   | { kind: 'map' }
   | { kind: 'enemy'; enemyId: string }
@@ -360,7 +362,8 @@ export function selectCard(uid: string | null) {
   if (uid) sfx('click');
 }
 
-export async function playSelected(targetId: string | null, replayUid?: string) {
+export async function playSelected(targetId: string | null, choice?: string | PlayChoice) {
+  const replayUid = typeof choice === 'string' ? choice : choice?.replayUid;
   const uid = state.selectedCard;
   const run = state.run;
   if (!uid || !run || !run.combat || state.busy) return;
@@ -372,7 +375,12 @@ export async function playSelected(targetId: string | null, replayUid?: string) 
     openOverlay({ kind: needsDiscardReplay(card) ? 'replay' : 'cardTransfer', cardUid: uid });
     return;
   }
-  const res = R.combatPlayCard(run, uid, targetId, replayUid);
+  const res = R.combatPlayCard(run, uid, targetId, choice);
+  if (res.pending) {
+    // 还缺一组「选择手牌消耗」：此时没有提交任何结果，选完后带着全部选择重新出牌。
+    openOverlay({ kind: 'exhaustChoice', cardUid: uid, targetId, replayUid, exhaust: typeof choice === 'object' ? choice.exhaust ?? [] : [], request: res.pending });
+    return;
+  }
   if (res.run === run) {
     toast('无法打出');
     return;
@@ -392,9 +400,9 @@ export async function playSelected(targetId: string | null, replayUid?: string) 
   await afterStep();
 }
 
-export async function playCardDirect(uid: string, targetId: string | null, replayUid?: string) {
+export async function playCardDirect(uid: string, targetId: string | null, choice?: string | PlayChoice) {
   set({ selectedCard: uid });
-  await playSelected(targetId, replayUid);
+  await playSelected(targetId, choice);
 }
 
 async function afterStep() {
@@ -520,6 +528,29 @@ export function shopRemove(uid: string) {
   closeOverlay();
 }
 export const shopLeave = simple(R.shopLeave, 'click');
+export function shopBorrow() {
+  if (!state.run) return;
+  const next = R.shopBorrow(state.run);
+  if (next === state.run) return;
+  sfx('gold');
+  setRun(next);
+}
+export function debtRepay() {
+  if (!state.run) return;
+  const next = R.debtRepay(state.run);
+  if (next === state.run) return;
+  sfx('gold');
+  setRun(next);
+}
+export function debtFight() {
+  if (!state.run || state.busy) return;
+  const next = R.debtFight(state.run);
+  if (next === state.run) return;
+  sfx('click');
+  set({ impacts: [], cardExits: [], fx: [] });
+  setRun(next);
+  banner('讨债战');
+}
 
 export const restHeal = simple(R.restHeal, 'heal');
 export const restLeave = simple(R.restLeave, 'click');

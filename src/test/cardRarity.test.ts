@@ -19,13 +19,13 @@ describe('全卡表基础/升级效果审查', () => {
    expect(probe.allowed).toBe(def.cost >= 0);
    expect(probe.played).toBe(probe.allowed);expect(probe.invalid).toBe(false);
    use(before);expect(JSON.stringify(before)).toBe(saved);
-   if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(false);}
+   if(viewDef(id,up).requireEmber>0){before.player.ember=0;expect(canPlayCard(before,before.player.hand[0]).ok).toBe(viewDef(id,up).hpFallback>0);}
   }
  });
  it('角色配额包含资源、循环与重放牌，通用池含四张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   const expected: Record<string, number[]> = { shared: [22, 19, 17], traveler: [20, 22, 15], picker: [20, 23, 15], oathbound: [22, 22, 15], scholar: [21, 23, 15] };
+   const expected: Record<string, number[]> = { shared: [24, 20, 20], traveler: [20, 24, 13], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
    expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual(expected[owner ?? 'shared']);
   }
  });
@@ -34,7 +34,7 @@ describe('全卡表基础/升级效果审查', () => {
 describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s）', up=>{
  it('长夜终灯用连击换爆发，环刃用四段与蓄能区别于普通双刃',()=>{
   const last=setup('last_lantern',up);last.player.attacksPlayedThisTurn=2;
-  expect(hit(last)).toBe(up?42:32);
+  expect(hit(last)).toBe(up?39:30);
   expect(hit(last)).toBeGreaterThan(hit(setup('twin_blades',up))*2);
   const ring=setup('encircling_blades',up);ring.player.attacksPlayedThisTurn=2;
   expect(hit(ring)).toBe(up?16:12);

@@ -9,6 +9,8 @@ import { ENEMIES } from '../data/enemies';
 import { ensureEncounterPlan } from './encounters';
 import { BLOCK_MAX, clampCharge } from './constants';
 import { appliedBurn } from './burnHistory';
+import { CARDS, RETIRED_CARDS } from '../data/cards';
+import type { CardInstance } from './types';
 
 type Snapshot = NonNullable<RunState['checkpoint']>;
 
@@ -90,6 +92,23 @@ function migrateLayout(input: Snapshot): Snapshot {
   return run;
 }
 
+/**
+ * 已移除的牌换成指定替代牌并保留升级与实体标识；无法识别的牌直接丢弃。
+ * 覆盖牌组、战斗牌堆、待领奖励与商店货架，主存档和回退点同样处理；不消耗随机流。
+ */
+function retireCards(snapshot: Snapshot) {
+  const keep = (card: CardInstance): CardInstance[] => {
+    if (CARDS[card.defId]) return [card];
+    const retired = RETIRED_CARDS[card.defId];
+    return retired && CARDS[retired.replacement] ? [{ ...card, defId: retired.replacement }] : [];
+  };
+  snapshot.deck = snapshot.deck.flatMap(keep);
+  if (snapshot.reward) snapshot.reward.cards = snapshot.reward.cards.flatMap(keep);
+  if (snapshot.shop) snapshot.shop.cards = snapshot.shop.cards.flatMap(item => keep(item.card).map(card => ({ ...item, card })));
+  const p = snapshot.combat?.player;
+  if (p) for (const pile of ['hand', 'draw', 'discard', 'exhaust'] as const) p[pile] = p[pile].flatMap(keep);
+}
+
 const KEY = 'ember-traveler:save';
 const SETTINGS_KEY = 'ember-traveler:settings';
 
@@ -146,6 +165,7 @@ export function loadRun(): RunState | null {
     if (!raw) return null;
     const run = JSON.parse(raw) as RunState;
     for (const snapshot of [run, run.checkpoint]) {
+      if (snapshot) retireCards(snapshot);
       if (!snapshot?.combat) continue;
       for (const entity of [snapshot.combat.player, ...snapshot.combat.enemies]) entity.block = Math.min(BLOCK_MAX, Math.max(0, entity.block));
       const p = snapshot.combat.player;

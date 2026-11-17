@@ -44,21 +44,9 @@ describe('专属卡牌的不同用途', () => {
       const result = play(cs, 'pursuit_step');
       expect(result.player.hand).toHaveLength(up ? 2 : 1);
       expect(result.player.energy).toBe(3);
-      expect(result.player.statuses.strength ?? 0).toBe(previous === 2 ? (up ? 3 : 2) : 0);
+      expect(result.player.statuses.strength ?? 0).toBe(previous === 2 ? (up ? 4 : 3) : 0);
       expect(result.player.exhaust.map(c => c.defId)).toContain('pursuit_step');
       expect(endPlayerTurn(result).state.player.statuses.strength ?? 0).toBe(0);
-    }
-  });
-
-  it.each([false, true])('不息步伐在三次攻击后准备下一张牌的回响，不重复自己或返还能量（升级=%s）', up => {
-    for (const previous of [2, 3]) {
-      const cs = battle('unbroken_stride', up);
-      cs.player.attacksPlayedThisTurn = previous;
-      const result = play(cs, 'unbroken_stride');
-      expect(result.player.hand).toHaveLength(up ? 3 : 2);
-      expect(result.player.statuses.echo ?? 0).toBe(previous === 3 ? 1 : 0);
-      expect(result.player.energy).toBe(3);
-      expect(result.player.exhaust.map(c => c.defId)).toContain('unbroken_stride');
     }
   });
 
@@ -159,11 +147,11 @@ describe('专属卡牌的不同用途', () => {
     cs.player.cardsPlayedThisTurn = 2;
     cs.player.hand.push(card('unshaken'));
     cs = play(cs, 'pursuit_step');
-    expect(cs.player.statuses.strength).toBe(3);
+    expect(cs.player.statuses.strength).toBe(4);
     cs.player.statuses.weak = 2;
     cs = play(cs, 'unshaken');
     expect(cs.player.statuses.weak ?? 0).toBe(0);
-    expect(cs.player.statuses.strengthDown).toBe(3);
+    expect(cs.player.statuses.strengthDown).toBe(4);
     expect(endPlayerTurn(cs).state.player.statuses.strength ?? 0).toBe(0);
   });
 

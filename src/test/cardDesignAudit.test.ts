@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CARD_LIST } from '../data/cards';
-import { cardDesign, cardMechanics, effectDesign } from './cardDesign';
+import { cardDesign, cardMechanics, effectIdentity, REVIEWED_DESIGN_PAIRS } from './cardDesign';
 import { viewDef } from '../engine/cards';
 import type { Effect } from '../engine/types';
 
@@ -9,8 +9,7 @@ describe('卡牌近似设计回归审查', () => {
     const seen = new Map<string, string>();
     const conflicts = new Set<string>();
     for (const c of CARD_LIST.filter(c => !['starter', 'curse', 'status'].includes(c.rarity))) for (const up of [false, true]) {
-      const v = viewDef(c.id, up);
-      const key = effectDesign(v.effects, 'exact') + effectDesign(v.handEndEffects, 'exact');
+      const key = effectIdentity(c.id, up);
       const previous = seen.get(key);
       if (previous && previous !== c.id) conflicts.add(`${previous} / ${c.id}${up ? '+' : ''}`);
       seen.set(key, c.id);
@@ -45,7 +44,7 @@ describe('卡牌近似设计回归审查', () => {
     }
     const conflicts = new Set<string>();
     for (const group of groups.values()) for (const a of group) for (const b of group) {
-      if (a.id < b.id) conflicts.add(`${a.name} / ${b.name}`);
+      if (a.id < b.id && !REVIEWED_DESIGN_PAIRS.has(`${a.id}/${b.id}`)) conflicts.add(`${a.name} / ${b.name}`);
     }
     expect([...conflicts], '同卡池出现只改表面参数的设计，请调整真实条件、资源代价或机制').toEqual([]);
   });

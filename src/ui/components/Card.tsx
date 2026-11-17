@@ -1,5 +1,6 @@
 import { archetypeName, cardTypeName, describeCard, rarityName, viewCard, type DescribeContext } from '../../engine/cards';
-import type { CardInstance } from '../../engine/types';
+import type { CardInstance, CharacterId } from '../../engine/types';
+import { getState } from '../store';
 import { CardArt } from './CardArt';
 import { useCardStyle } from '../art';
 
@@ -7,6 +8,8 @@ interface Props {
   card: CardInstance;
   size?: 'sm' | 'md' | 'lg';
   ctx?: DescribeContext | null;
+  /** 卡面按哪个角色的招牌动作措辞；缺省取当前旅程的角色，null 强制使用通用说法（图鉴总览等）。 */
+  character?: CharacterId | null;
   energy?: number;
   unplayable?: boolean;
   showFlavor?: boolean;
@@ -20,10 +23,10 @@ function renderDesc(text: string) {
   return parts.map((p, i) => (/^\d+$/.test(p) ? <span key={i} className="hl">{p}</span> : <span key={i}>{p}</span>));
 }
 
-export function Card({ card, size = 'md', ctx = null, energy, unplayable, showFlavor, presentation, onClick }: Props) {
+export function Card({ card, size = 'md', ctx = null, character, energy, unplayable, showFlavor, presentation, onClick }: Props) {
   const cardStyle = useCardStyle();
   const v = viewCard(card);
-  const desc = describeCard(card, ctx);
+  const desc = describeCard(card, ctx, character === undefined ? getState().run?.character ?? null : character);
   const notEnough = energy !== undefined && v.cost > energy;
   const cls = ['card', v.type, `rarity-${v.rarity}`, size, desc.length > (size === 'sm' ? 35 : 70) ? 'long-description' : '', v.upgraded ? 'upgraded' : '', unplayable ? 'unplayable' : ''].join(' ');
   return (
