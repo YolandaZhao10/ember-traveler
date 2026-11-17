@@ -47,10 +47,10 @@ export function HandExhaustChoice({ cardUid, targetId, replayUid, exhaust, reque
   };
   const confirm = () => { if (full && !busy) void playCardDirect(cardUid, targetId, { replayUid, exhaust: [...exhaust, picked] }); };
   const names = picked.map(uid => viewCard(request.hand.find(c => c.uid === uid)!).name).join('、');
-  return <Modal title={`${viewCard(source).name} · 选择 ${request.count} 张牌${verb}（已选 ${picked.length}/${request.count}）`} onClose={cancel} wide>
+  return <Modal title={`${viewCard(source).name} · 选择 ${request.count} 张牌${verb}（已选 ${picked.length}/${request.count}）`} onClose={revealed ? undefined : closeOverlay} wide>
     <p className="subtitle">{describeCard(source, null, run?.character)}</p>
     <p className="subtitle">{request.group > 0 ? `第 ${request.group + 1} 次结算（重放）：从此时的手牌里重新选择。` : `确认时支付 ${viewCard(source).cost} 能量。`}必须选满 {request.count} 张；再点一次已选的牌可以取消选中。{revealed ? '已经抽到新牌，不能取消出牌。' : ''}</p>
-    <PileChoices cards={request.hand} selectedUid={focus} selectedUids={picked} onPick={toggle} onConfirm={confirm} onCancel={cancel} canConfirm={full} busy={busy} />
+    <PileChoices cards={request.hand} selectedUid={focus} selectedUids={picked} onPick={toggle} onConfirm={confirm} onCancel={cancel} canConfirm={full} busy={busy} cancellable={!revealed} />
     <div className="upgrade-actions">
       {!revealed && <button className="btn ghost" aria-keyshortcuts="Escape" onClick={closeOverlay}>取消 Esc</button>}
       <button className="btn primary" aria-keyshortcuts="Enter" disabled={!full || busy} onClick={confirm}>{full ? `${verb}「${names}」` : `还需选择 ${request.count - picked.length} 张`} · Enter</button>

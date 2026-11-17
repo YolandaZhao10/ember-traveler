@@ -6,7 +6,7 @@ import { Card } from './Card';
 const PAGE_SIZE = 10;
 
 /** 快捷键只作用于当前选牌窗口，不传到战斗手牌或结束回合。 */
-export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfirm, onCancel, canConfirm, busy }: {
+export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfirm, onCancel, canConfirm, busy, cancellable = true }: {
   cards: CardInstance[];
   selectedUid: string | null;
   /** 多选模式：已选中的全部牌；点选由调用方切换，翻页不清空。 */
@@ -14,6 +14,8 @@ export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfir
   onPick: (uid: string | null) => void;
   onConfirm: () => void;
   onCancel: () => void;
+  /** 为 false 时不提示 Esc 取消（调用方的 onCancel 也应是空操作）。 */
+  cancellable?: boolean;
   canConfirm: boolean;
   busy: boolean;
 }) {
@@ -52,7 +54,7 @@ export function PileChoices({ cards, selectedUid, selectedUids, onPick, onConfir
     return () => window.removeEventListener('keydown', onKey, true);
   }, [shown, page, pageCount, busy, canConfirm, onPick, onConfirm, onCancel]);
   return <>
-    <p className="pile-choice-help"><kbd>1–9</kbd> / <kbd>0</kbd> 选择本页卡牌 · <kbd>Enter</kbd> 确认 · <kbd>Esc</kbd> 取消</p>
+    <p className="pile-choice-help"><kbd>1–9</kbd> / <kbd>0</kbd> 选择本页卡牌 · <kbd>Enter</kbd> 确认{cancellable && <> · <kbd>Esc</kbd> 取消</>}</p>
     {pageCount > 1 && <div className="pile-choice-pages" aria-label="候选牌翻页">
       <button className="btn small ghost" disabled={busy || page === 0} onClick={() => turnPage(page - 1)}>← 上一页</button>
       <span>第 {page + 1} / {pageCount} 页 · 共 {cards.length} 张 · ← → 翻页</span>
