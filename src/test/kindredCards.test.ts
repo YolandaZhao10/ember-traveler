@@ -53,30 +53,30 @@ describe('各角色的招牌动作计数', () => {
     let cs = battle('picker', ['pick_up', 'ember_gust', 'strike', 'defend']);
     cs = use(cs, 'pick_up-0');
     expect(signatureCount(cs.player)).toBe(1);
+    // 疾风余烬本牌不再消耗，只算被它消耗的那张手牌。
     cs = use(cs, 'ember_gust-1');
-    expect(signatureCount(cs.player)).toBe(3);
-    expect(cs.player.turnFlags.exhausted).toBe(3);
+    expect(signatureCount(cs.player)).toBe(2);
+    expect(cs.player.turnFlags.exhausted).toBe(2);
     const other = use(battle('traveler', ['ember_gust', 'strike']), 'ember_gust-0');
-    expect(other.player.turnFlags.exhausted).toBe(2);
+    expect(other.player.turnFlags.exhausted).toBe(1);
     expect(signatureCount(other.player)).toBe(0);
   });
 
   it('拾灰者：每打出一张以自身效果对敌人施加燃烧的牌也计 1 次，按牌而不按层数；能力带出的燃烧不算', () => {
-    let cs = battle('picker', ['light_up', 'ignite', 'add_fuel', 'strike']);
+    let cs = battle('picker', ['light_up', 'ignite', 'borrow_flame', 'strike']);
     cs = use(cs, 'light_up-0');
     expect(cs.enemies[0].statuses.burn).toBe(3);
-    expect(signatureCount(cs.player)).toBe(1);
+    // 点燃现在带消耗：施加燃烧计 1 次，本牌被消耗再计 1 次。
+    expect(signatureCount(cs.player)).toBe(2);
     cs = use(cs, 'strike-3');
-    expect(signatureCount(cs.player)).toBe(1);
+    expect(signatureCount(cs.player)).toBe(2);
     // 回响重放是又一次出牌，再计一次。
     cs.player.statuses.echo = 1;
     cs = use(cs, 'ignite-1');
-    expect(signatureCount(cs.player)).toBe(3);
-    // 添油让已有燃烧翻倍算施加燃烧，本牌消耗另计。
-    cs = use(cs, 'add_fuel-2');
+    expect(signatureCount(cs.player)).toBe(4);
+    // 借火鼓风只消耗目标的燃烧，没有施加燃烧：只算本牌自身的消耗。
+    cs = use(cs, 'borrow_flame-2');
     expect(signatureCount(cs.player)).toBe(5);
-    // 目标没有燃烧时添油没有施加任何燃烧，只算自身消耗。
-    expect(signatureCount(use(battle('picker', ['add_fuel']), 'add_fuel-0').player)).toBe(1);
     // 炉膛导流在出牌过程中给敌人上了燃烧，但不是这张牌自身的效果。
     const conduit = battle('picker', ['ember_exchange']);
     conduit.player.ember = 3; conduit.player.statuses.emberConduit = 6;
@@ -275,8 +275,8 @@ describe('给能量的效果每回合各只生效一次', () => {
     let stacked = withCount(battle('picker', ['pick_up', 'pick_up']), 2);
     stacked.player.statuses.kindredVow = 2;
     stacked = use(stacked, 'pick_up-0');
-    // 拾取自身抽 1 张，再加旅途誓火的 2 张。
-    expect([stacked.player.energy, stacked.player.hand.length]).toEqual([11, 4]);
+    // 拾取自身抽 2 张，再加旅途誓火的 2 张。
+    expect([stacked.player.energy, stacked.player.hand.length]).toEqual([11, 5]);
     stacked = use(stacked, 'pick_up-1');
     expect(stacked.player.energy).toBe(11);
   });
@@ -284,7 +284,7 @@ describe('给能量的效果每回合各只生效一次', () => {
 
 describe('指定组合不会无限出牌：旅人的战鼓 + 鼓手之心 + 旅途誓火 + 余烬回声', () => {
   it('四个回能来源一回合合计最多 5 点能量；带大量零费攻击和余音连打十回合，每回合出牌数都有限', () => {
-    const ids = ['war_drum', 'kindred_vow', 'tempo', 'kindred_refrain', 'kindred_refrain', 'raise_shield', 'raise_shield', ...Array(10).fill('quick_stab'), 'spin_kick', 'spin_kick'];
+    const ids = ['war_drum', 'kindred_vow', 'tempo', 'kindred_refrain', 'kindred_refrain', 'raise_shield', 'raise_shield', ...Array(10).fill('quick_stab'), 'echo_blade', 'echo_blade'];
     const deck = ids.map((id, i) => card(id, false, `deck-${i}`));
     let cs = createCombat('kindred-loop', ['tomb_puppet'], 'normal', deck, 500, 500, ['drummer_heart'], makeRng('KINDRED-LOOP', 'c'), 100, 'traveler').state;
     cs.enemies[0].hp = cs.enemies[0].maxHp = 100000;

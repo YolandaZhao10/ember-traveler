@@ -5,6 +5,7 @@ import { ENCOUNTERS, ENEMIES } from '../data/enemies';
 import { DEBT_COLLECTORS, debtCollectorId } from '../data/debtCollectors';
 import { RELIC_LIST, RELICS, relicPool } from '../data/relics';
 import { LOAN_AMOUNT, LOAN_REPAY } from '../engine/constants';
+import { encounterDifficulty } from '../engine/difficulty';
 import { availableNodes } from '../engine/map';
 import * as R from '../engine/run';
 import { loadRun, saveRun } from '../engine/save';
@@ -279,15 +280,28 @@ describe('借款与回退、随机数', () => {
     }
   });
 
-  it('讨债人的强度固定取本章首领倍率，与商店所在楼层无关', () => {
+  it('讨债人的强度以章末首领倍率为底，随商店所在楼层往上加，不会比原来弱', () => {
+    const chapterEnd = encounterDifficulty(19, 'boss');
     const early = R.debtFight(borrowAndReturn(0));
-    const boss = copy(start('LOAN-BOSS'));
-    boss.map.nodes[boss.map.startIds[0]].type = 'boss';
-    const bossFight = R.travelTo(boss, boss.map.startIds[0]);
-    expect(early.combat!.difficulty!.attackMultiplier).toBeGreaterThan(1);
-    expect(early.combat!.difficulty!.healthMultiplier).toBeGreaterThan(1);
-    expect(early.combat!.enemies[0].maxHp).toBeGreaterThan(69);
-    expect(bossFight.combat!.tier).toBe('boss');
+    expect(early.floor).toBe(1);
+    const d = early.combat!.difficulty!;
+    expect(d.healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 0.02 * 1.1, 6);
+    expect(d.attackMultiplier).toBeCloseTo(chapterEnd.attackMultiplier + 0.012 * 1.08, 6);
+    expect(d.blockMultiplier).toBeGreaterThan(chapterEnd.blockMultiplier);
+    const at = (floor: number, chapter: 1 | 2 | 3 | 4 = 1) => R.debtCollectorDifficulty({ chapter, floor, difficulty: early.difficulty });
+    expect(at(0).healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier, 6);
+    expect(at(0).attackMultiplier).toBeCloseTo(chapterEnd.attackMultiplier, 6);
+    for (let floor = 1; floor < 20; floor++) expect(at(floor).healthMultiplier).toBeGreaterThan(at(floor - 1).healthMultiplier);
+    expect(at(19).healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 19 * 0.02 * 1.1, 6);
+    // 终章的商店同样以终章首领倍率为底。
+    expect(at(62, 4).healthMultiplier).toBeCloseTo(encounterDifficulty(64, 'boss').healthMultiplier + 2 * 0.02 * 1.1, 6);
+    const lateDoor = borrowAndReturn(0); lateDoor.floor = 17;
+    expect(R.debtFight(lateDoor).combat!.enemies[0].maxHp).toBeGreaterThan(early.combat!.enemies[0].maxHp);
+  });
+
+  it('第二章讨债人的催告施加 1 层虚弱', () => {
+    const notice = DEBT_COLLECTORS[1].moves.find(m => m.id === 'notice')!;
+    expect(notice.actions).toEqual([{ kind: 'attack', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }]);
   });
 });
 

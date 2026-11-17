@@ -31,13 +31,14 @@ describe.each([false, true])('止血护势与余温未散，升级=%s', up => {
     expect(after.player.turnFlags.actualHealing).toBe(1);
     expect(after.player.statuses.echo ?? 0).toBe(0);
   });
-  it('余温未散转为回血净化并消耗，不再与新牌共享格挡回血效果', () => {
+  it('余温未散回血并清除自身的所有效果（增益也一并清除），消耗；不再与新牌共享格挡回血效果', () => {
     const cs = battle('enduring_warmth', up);
     cs.player.statuses = { weak: 2, vulnerable: 2, frail: 2, burn: 3, strength: 6, strengthDown: 2 };
     const after = playCard(cs, 'enduring_warmth', null).state;
     expect(after.player.hp).toBe(up ? 47 : 45); expect(after.player.block).toBe(0);
-    expect(after.player.statuses).toEqual({ strength: 6, strengthDown: 2 });
+    expect(after.player.statuses).toEqual({});
     expect(after.player.exhaust).toEqual(cs.player.hand);
-    expect(endPlayerTurn(after).state.player.statuses.strength).toBe(4);
+    // 临时力量和它的归还标记一起清掉，回合结束不会变成负力量。
+    expect(endPlayerTurn(after).state.player.statuses.strength ?? 0).toBe(0);
   });
 });

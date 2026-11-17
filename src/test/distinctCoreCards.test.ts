@@ -41,7 +41,7 @@ describe('基础与通用卡牌的不同用途', () => {
     expect(result.player.hand.map(c => c.defId)).toEqual(up ? ['demon_heart', 'heavy_blow'] : ['demon_heart']);
     expect(result.player.exhaust.map(c => c.defId)).toEqual(up ? ['strike', 'stone_throw'] : ['strike', 'stone_throw', 'heavy_blow']);
     expect(result.player.energy).toBe(2);
-    expect(describeCard(card('ash_return', up), null)).toContain('按费用从高到低');
+    expect(describeCard(card('ash_return', up), null)).toContain(`从消耗区取回 ${up ? 2 : 1} 张费用最高的牌`);
   });
   it.each([false, true])('尘归尘只消耗诅咒，无诅咒时也不误伤有用牌（升级=%s）', up => {
     for (const cursed of [false, true]) {
@@ -78,24 +78,30 @@ describe('基础与通用卡牌的不同用途', () => {
     expect(result.player.discard.map(c => c.defId)).toEqual(['defend', 'truce_smoke']);
     expect(result.player.block).toBe(0);
   });
-  it.each([false, true])('重拨余火消耗余烬回收牌，资源不足不可打出（升级=%s）', up => {
+  it.each([false, true])('重拨余火消耗 2/3 点余烬，把消耗区随机 1 张牌放入抽牌堆，再抽 1/2 张；资源不足不可打出（升级=%s）', up => {
     const cs = battle('rekindle_coals', up); cs.player.exhaust = [card('tinder_bundle')];
     expect(playCard(cs, 'rekindle_coals', null).state).toEqual(cs);
+    cs.player.ember = 2;
+    if (up) expect(playCard(cs, 'rekindle_coals', null).state).toEqual(cs);
     cs.player.ember = 3;
+    const drawBefore = cs.player.draw.length, handBefore = cs.player.hand.length - 1;
     const result = playCard(cs, 'rekindle_coals', null).state;
-    expect(result.player.ember).toBe(1);
+    expect(result.player.ember).toBe(up ? 0 : 1);
     expect(result.player.energy).toBe(2);
-    expect(result.player.hand.map(c => c.defId)).toContain('tinder_bundle');
-    expect(result.player.hand).toHaveLength(up ? 3 : 2);
+    // 取回的牌进抽牌堆（随机位置），不直接进手牌；随后的抽牌可能刚好抽到它。
+    expect([...result.player.hand, ...result.player.draw].filter(c => c.defId === 'tinder_bundle')).toHaveLength(1);
+    expect(result.player.hand).toHaveLength(handBefore + (up ? 2 : 1));
+    expect(result.player.draw).toHaveLength(drawBefore + 1 - (up ? 2 : 1));
     expect(result.player.exhaust).toHaveLength(0);
   });
   it.each([false, true])('篝火避难所每回合支付余烬维持防御（升级=%s）', up => {
     const cs = battle('bonfire_shelter', up); cs.player.ember = 5;
     const result = playCard(cs, 'bonfire_shelter', null).state;
-    expect(result.player.ember).toBe(5); expect(result.player.energy).toBe(2);
-    expect(result.player.block).toBe(0); expect(result.player.statuses.emberBastion).toBe(up ? 24 : 18);
+    // 2 费，升级后 1 费；格挡固定 18。
+    expect(result.player.ember).toBe(5); expect(result.player.energy).toBe(up ? 2 : 1);
+    expect(result.player.block).toBe(0); expect(result.player.statuses.emberBastion).toBe(18);
     const ended = endPlayerTurn(result).state;
-    expect(ended.player.block).toBe(up ? 24 : 18); expect(ended.player.ember).toBe(2);
+    expect(ended.player.block).toBe(18); expect(ended.player.ember).toBe(2);
     expect(ended.player.hp).toBe(30); expect(result.player.discard).toHaveLength(0);
   });
 });

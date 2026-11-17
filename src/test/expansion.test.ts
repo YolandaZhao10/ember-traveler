@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { cardTransferChoices, cardTransferEffect } from '../engine/cardTransfer';
 import { CARD_LIST, CARDS, cardAvailableTo } from '../data/cards';
 import { EXTRA_CHARACTER_CARDS } from '../data/extraCards';
 import { EXTRA_SHARED_CARDS } from '../data/sharedCards';
@@ -68,22 +69,22 @@ describe('扩展卡池与遗物配额', () => {
   });
   it.each(characters)('%s 专属牌配额含资源牌、循环牌与血誓重演，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    const expected = { traveler: [20, 24, 13], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
+    const expected = { traveler: [21, 21, 14], picker: [17, 22, 16], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
     expect(['common', 'uncommon', 'rare'].map(rarity => cards.filter(c => c.rarity === rarity).length)).toEqual(expected[owner]);
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);
   });
-  it('通用牌普通24、罕见20、稀有20；初始和诅咒另计，四角色都能获得', () => {
+  it('通用牌普通25、罕见17、稀有22；初始和诅咒另计，底座牌与共鸣牌四角色都能获得，接口牌只给本角色', () => {
     const shared = CARD_LIST.filter(c => !c.owner);
-    for (const [rarity, count] of [['common', 24], ['uncommon', 20], ['rare', 20]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
+    for (const [rarity, count] of [['common', 25], ['uncommon', 17], ['rare', 22]] as const) expect(shared.filter(c => c.rarity === rarity)).toHaveLength(count);
     expect(shared.filter(c => c.rarity === 'starter')).toHaveLength(3);
     expect(shared.filter(c => c.rarity === 'curse')).toHaveLength(7);
-    for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner)).toBe(true);
+    for (const c of shared) for (const owner of characters) expect(cardAvailableTo(c, owner), c.name).toBe(!c.hook || c.hook === owner);
   });
-  it('卡牌324张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
-    expect(CARD_LIST).toHaveLength(324); expect(EXTRA_CHARACTER_CARDS).toHaveLength(162); expect(EXTRA_SHARED_CARDS).toHaveLength(49);
-    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(324);
-    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(324);
+  it('卡牌320张且名称唯一，常规遗物三档各45个，另有12个专属和4个初始', () => {
+    expect(CARD_LIST).toHaveLength(320); expect(EXTRA_CHARACTER_CARDS).toHaveLength(160); expect(EXTRA_SHARED_CARDS).toHaveLength(50);
+    expect(new Set(CARD_LIST.map(c => c.id)).size).toBe(320);
+    expect(new Set(CARD_LIST.map(c => c.name)).size).toBe(320);
     expect(RELIC_LIST).toHaveLength(208);
     for (const rarity of ['common', 'uncommon', 'rare']) {
       expect(RELIC_LIST.filter(r => r.rarity === rarity && !r.owner && !r.chapter && !r.source)).toHaveLength(45);
@@ -114,7 +115,9 @@ describe('扩展卡池与遗物配额', () => {
     for (const def of [...EXTRA_CHARACTER_CARDS, ...EXTRA_SHARED_CARDS]) for (const up of [false, true]) {
       const cs = battle(def.id, up); const c = cs.player.hand[0]; const v = viewCard(c);
       if (def.id === 'oath_reenactment' || def.id === 'echo_recall') cs.player.discard = [{ uid: 'replay-target', defId: 'strike', upgraded: false }];
-      const result = playWithChoices(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, 'replay-target');
+      // 牌堆选牌的牌（例如升级后的捡拾残页）取第一张可选的牌。
+      const picked = cardTransferEffect(c) ? cardTransferChoices(cs, c)[0]?.uid : 'replay-target';
+      const result = playWithChoices(cs, c.uid, v.target === 'enemy' || def.id === 'oath_reenactment' ? 'e0' : null, picked);
       expect(result.events.some(e => e.type === 'cardPlayed'), def.id).toBe(true);
       expect(describeCard(c, null)).not.toMatch(/undefined|NaN/);
       expect(result.state.player.hp, def.id).toBeGreaterThan(0);

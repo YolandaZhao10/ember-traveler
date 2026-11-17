@@ -1,6 +1,7 @@
 import type { PlayerCombat, PowerInstance } from './types';
 
-export const INDEPENDENT_POWERS = ['tempo', 'flameAura', 'mirror'] as const;
+export const INDEPENDENT_POWERS = ['tempo', 'flameAura', 'mirror', 'emberEngine'] as const;
+export const isIndependentPower = (status: string): status is typeof INDEPENDENT_POWERS[number] => (INDEPENDENT_POWERS as readonly string[]).includes(status);
 
 /** 旧版只存总层数，缺少逐张来源；将缺失的总量恢复为一个能力实例。 */
 export function ensurePowerInstances(player: PlayerCombat): PowerInstance[] {

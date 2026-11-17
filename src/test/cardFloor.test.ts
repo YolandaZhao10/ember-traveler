@@ -78,7 +78,8 @@ describe('基础打击、防御的实际收益下限', () => {
     }
   });
 
-  it.each(['coal_lance', 'iron_rebuke'])('%s 无铺垫时仍能攻击，但不应超过两张同级打击', id => {
+  // 铁壁回敬去掉固定加成后，没有格挡时不造成伤害，不再属于这条下限；它的收益见下面「配合一张防御」的测试。
+  it.each(['coal_lance'])('%s 无铺垫时仍能攻击，但不应超过两张同级打击', id => {
     for (const up of upgrades) {
       const base = measure('strike', up);
       const candidate = measure(id, up);
@@ -171,7 +172,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
     }
   });
 
-  it('铁壁回敬配合一张防御：攻击与虚弱减伤之和足以支付两费，格挡不被消费', () => {
+  it('铁壁回敬配合一张防御：伤害为格挡的两倍并带来虚弱减伤，格挡不被消费；去掉固定加成后不再保证抵得上两张打击', () => {
     for (const up of upgrades) {
       const prepare = (id: string) => {
         let cs = battle(id, up);
@@ -192,7 +193,7 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
       const savedHp = returned.player.hp - unweakened.player.hp;
       const twoStrikes = control.enemies[0].hp - attacked.enemies[0].hp;
       expect(savedHp).toBeGreaterThan(0);
-      expect(damage + savedHp).toBeGreaterThanOrEqual(twoStrikes);
+      expect(damage).toBe(before.player.block * 2);
       // 已先花一费准备格挡；稀有牌按双倍格挡转伤，增益仍受这一份准备资源约束。
       expect(damage + savedHp).toBeLessThanOrEqual(twoStrikes + before.player.block + 5);
     }
@@ -216,22 +217,20 @@ describe('轻量构筑条件带来优势，而非只抬高面板', () => {
 });
 
 describe('延迟、群体和功能收益不能仅按单段数字判断', () => {
-  it('燎原只花一费，在三次敌人行动内对每个目标至少兑现一次打击的伤害', () => {
+  it('燎原只花一费，只点燃选中的目标，在三次敌人行动内至少兑现一次打击的伤害', () => {
     for (const up of upgrades) {
       const before = battle('wildfire', up, 2);
       let cs = use(before, 'wildfire');
       expect(before.player.energy - cs.player.energy).toBe(1);
       const base = measure('strike', up).damage;
       for (let i = 0; i < 3; i++) cs = round(cs);
-      for (const [index, enemy] of cs.enemies.entries()) {
-        const damage = before.enemies[index].hp - enemy.hp;
-        expect(damage).toBeGreaterThanOrEqual(base);
-        expect(damage).toBeLessThanOrEqual(base * 2);
-      }
-      expect(cs.enemies.reduce((sum, e) => sum + (1000 - e.hp), 0)).toBeGreaterThanOrEqual(base * 2);
+      const damage = before.enemies[0].hp - cs.enemies[0].hp;
+      expect(damage).toBeGreaterThanOrEqual(base);
+      expect(damage).toBeLessThanOrEqual(base * 2);
+      // 不再波及其他敌人。
+      expect(cs.enemies[1].hp).toBe(before.enemies[1].hp);
     }
   });
-
   it('荆棘甲提高即时防护，反伤仍需要敌人实际攻击', () => {
     for (const up of upgrades) {
       const armor = measure('thorn_mail', up);

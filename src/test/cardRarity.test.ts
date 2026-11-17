@@ -25,7 +25,7 @@ describe('全卡表基础/升级效果审查', () => {
  it('角色配额包含资源、循环与重放牌，通用池含四张转换牌与一张消耗区回收牌',()=>{
   for(const owner of [undefined,'traveler','picker','oathbound','scholar']) {
    const pool=CARD_LIST.filter(c=>c.owner===owner);
-   const expected: Record<string, number[]> = { shared: [24, 20, 20], traveler: [20, 24, 13], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
+   const expected: Record<string, number[]> = { shared: [25, 17, 22], traveler: [21, 21, 14], picker: [17, 22, 16], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
    expect(['common','uncommon','rare'].map(r=>pool.filter(c=>c.rarity===r).length)).toEqual(expected[owner ?? 'shared']);
   }
  });
@@ -44,27 +44,27 @@ describe.each([false,true])('稀有牌的实际费用与成型收益（升级=%s
  });
  it('铁壁回敬消耗两能量换双倍格挡伤害和虚弱，不能消费格挡或超过合理倍数',()=>{
   const cs=setup('iron_rebuke',up);cs.player.block=13;
-  const after=use(cs);expect(after.enemies[0].hp).toBe(10000-26-(up?10:6));
+  const after=use(cs);expect(after.enemies[0].hp).toBe(10000-26);
   expect(after.player.block).toBe(13);expect(after.player.energy).toBe(1);
-  expect(after.enemies[0].statuses.weak).toBe(up?3:2);
+  expect(after.enemies[0].statuses.weak).toBe(up?4:2);
   expect(describeCard(cs.player.hand[0],null)).toContain('格挡 × 2');
  });
  it('送葬火炬的两费燃烧结算不低于两次同级引爆倍率，并重新点火',()=>{
   const rare=setup('funeral_pyre',up),uncommon=setup('detonate',up);
   rare.enemies[0].statuses.burn=uncommon.enemies[0].statuses.burn=6;
   const after=use(rare);expect(hit(rare)).toBeGreaterThanOrEqual(hit(uncommon)*2);
-  expect(after.enemies[0].statuses.burn).toBe(up?7:5);
-  expect(after.player.energy).toBe(1);
+  expect(after.enemies[0].statuses.burn).toBe(5);
+  expect(after.player.energy).toBe(up?2:1);
  });
- it('白热转换燃烧并返还费用，消耗后不能成为免费反复抽牌',()=>{
+ it('白热转换燃烧：余烬不设上限，每 3（2）层燃烧返还 1 点能量，消耗后不能成为免费反复抽牌',()=>{
   const cs=setup('white_hot',up);cs.player.ember=0;cs.enemies[0].statuses.burn=20;
-  const after=use(cs);expect(after.player.ember).toBe(up?14:10);
-  expect(after.player.energy).toBe(3);expect(after.enemies[0].statuses.burn??0).toBe(0);
+  const after=use(cs);expect(after.player.ember).toBe(20);
+  expect(after.player.energy).toBe(2+(up?10:6));expect(after.enemies[0].statuses.burn??0).toBe(0);
   expect(after.player.exhaust.some(c=>c.defId==='white_hot')).toBe(true);
  });
  it('不动阵地保留持续格挡与荆棘收益',()=>{
   let guard=use(setup('steadfast_guard',up));
-  expect(guard.player.statuses.thorns).toBe(up?5:4);
+  expect(guard.player.statuses.thorns).toBe(up?2:1);
   guard=endPlayerTurn(guard).state;expect(guard.player.block).toBe(up?8:6);
  });
  it('恒久护印给予更大的单次防护和蓄能；普通调息保持可循环优势',()=>{

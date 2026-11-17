@@ -37,7 +37,7 @@ describe('差异化卡牌的实际取舍', () => {
     const expected = up ? 115 : 78;
     expect(result.events.filter(e => e.type === 'damage').map(e => e.type === 'damage' ? e.amount : 0)).toEqual([expected, expected]);
     expect(result.state.player.exhaust).toHaveLength(31);
-    expect(result.state.player.energy).toBe(9);
+    expect(result.state.player.energy).toBe(8); // 骨灰改为 2 费
   });
   it.each([false,true])('碎骨返能和威吓斩控制需要力量达标（升级=%s）', up => {
     for (const strength of [2,3]) {
@@ -133,7 +133,7 @@ describe('差异化卡牌的实际取舍', () => {
     expect(p.hand).toHaveLength(4); expect(p.discard[0].defId).toBe('regret'); expect(p.block).toBe(12);
     const mend = battle('cinder_mend'); mend.player.statuses.burn = 8;
     const cured = playCard(mend,'cinder_mend',null).state.player;
-    expect(cured.hp).toBe(54); expect(cured.block).toBe(0); expect(cured.statuses.burn).toBeUndefined();
+    expect(cured.hp).toBe(55); expect(cured.block).toBe(0); expect(cured.statuses.burn).toBeUndefined();
   });
   it('长明按实际消费触发，回响不双领，存档恢复保留本回合额度，下回合恢复', () => {
     let cs = battle('ember_blade'); cs.player.statuses = {spentEmberDraw:2,echo:1};

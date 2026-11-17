@@ -12,30 +12,31 @@ function battle(id: string, up: boolean) {
 }
 
 describe.each([false, true])('回血与群攻卡牌调整，升级=%s', up => {
-  it('疾风余烬消耗手牌中随机 1 张换余烬，与拾取的抽牌用途分开', () => {
+  it('疾风余烬 1 费，消耗手牌中 1 张（基础随机，升级自选）换 5 点余烬，本牌不再消耗；与拾取的抽牌用途分开', () => {
     const cs = battle('ember_gust', up);
     cs.player.hand.push(card('strike', false, 'fuel'));
-    const after = playCard(cs, 'ember_gust', null).state;
-    expect(after.player.ember).toBe(up ? 8 : 5);
-    expect(after.player.discard).toHaveLength(0);
+    const energy = cs.player.energy;
+    const after = playCard(cs, 'ember_gust', null, up ? { exhaust: [['fuel']] } : undefined).state;
+    expect(after.player.ember).toBe(5);
+    expect(after.player.energy).toBe(energy - 1);
+    expect(after.player.discard.map(c => c.uid)).toEqual(['ember_gust']);
     expect(after.player.hand).toHaveLength(0);
-    expect(after.player.exhaust.map(c => c.uid)).toEqual(['fuel', 'ember_gust']);
-    expect(after.player.turnFlags.exhausted).toBe(2);
-    expect(after.player.energy).toBe(3);
-    expect(describeCard(cs.player.hand[0], null)).toBe(`消耗手牌中随机 1 张牌，获得 ${up ? 8 : 5} 点余烬。消耗。`);
+    expect(after.player.exhaust.map(c => c.uid)).toEqual(['fuel']);
+    expect(after.player.turnFlags.exhausted).toBe(1);
+    expect(describeCard(cs.player.hand[0], null)).toBe(up ? '选择手牌中 1 张牌消耗，获得 5 点余烬。' : '消耗手牌中随机 1 张牌，获得 5 点余烬。');
   });
-  it('拾取抽1/2张并给2/3余烬；回响重复收益但本牌只消耗一次', () => {
+  it('拾取抽2张并给1/2余烬；回响重复收益但本牌只消耗一次', () => {
     const cs = battle('pick_up', up); cs.player.energy = 0;
     cs.player.draw = Array.from({length: 6}, (_, i) => card('strike', false, `draw-${i}`));
-    expect(describeCard(cs.player.hand[0], null)).toBe(`抽 ${up ? 2 : 1} 张牌，获得 ${up ? 3 : 2} 点余烬。消耗。`);
+    expect(describeCard(cs.player.hand[0], null)).toBe(`抽 2 张牌，获得 ${up ? 2 : 1} 点余烬。消耗。`);
     const once = playCard(cs, 'pick_up', null).state;
-    expect(once.player.hand).toHaveLength(up ? 2 : 1);
-    expect(once.player.ember).toBe(up ? 3 : 2);
+    expect(once.player.hand).toHaveLength(2);
+    expect(once.player.ember).toBe(up ? 2 : 1);
     expect(once.player.energy).toBe(0);
     cs.player.statuses.echo = 1;
     const twice = playCard(cs, 'pick_up', null).state;
-    expect(twice.player.hand).toHaveLength(up ? 4 : 2);
-    expect(twice.player.ember).toBe(up ? 6 : 4);
+    expect(twice.player.hand).toHaveLength(4);
+    expect(twice.player.ember).toBe(up ? 4 : 2);
     expect(twice.player.exhaust).toEqual([card('pick_up', up)]);
     cs.player.ember = 9998;
     expect(playCard(cs, 'pick_up', null).state.player.ember).toBe(9999);

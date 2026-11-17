@@ -38,11 +38,11 @@ describe.each([false, true])('循环卡基础/升级=%s', up => {
   });
   it('选择技能置顶后下一次抽牌优先获得，费用按原卡支付', () => {
     let cs = fixture('shield_rotation', up);
-    cs.player.hand.push(card('spin_kick'));
+    cs.player.hand.push(card('echo_blade'));
     cs = use(cs, 'shield_rotation', 'defend');
     expect(cs.player.draw[cs.player.draw.length - 1]?.uid).toBe('defend');
     expect(cs.player.statuses.energyNext).toBe(1);
-    cs = use(cs, 'spin_kick');
+    cs = use(cs, 'echo_blade');
     expect(cs.player.hand.some(c => c.uid === 'defend')).toBe(true);
     expect(cs.player.cardsPlayedThisTurn).toBe(2);
   });
@@ -81,8 +81,9 @@ describe('牌堆选择事务', () => {
     const attack = fixture('blade_recall');
     expect(cardTransferChoices(attack, attack.player.hand[0]).map(c => c.uid)).toEqual(['strike']);
     const fuel = fixture('cinder_salvage');
-    expect(cardTransferChoices(fuel, fuel.player.hand[0]).map(c => c.uid)).toEqual(['borrow_flame']);
-    expect(use(fuel, 'cinder_salvage', 'vein_cutter')).toBe(fuel);
+    // 拾薪归炉改为从消耗区选牌移入弃牌堆：只能选消耗区里的牌，弃牌堆里的不算。
+    expect(cardTransferChoices(fuel, fuel.player.hand[0]).map(c => c.uid)).toEqual(['vein_cutter']);
+    expect(use(fuel, 'cinder_salvage', 'borrow_flame')).toBe(fuel);
     fuel.player.discard = CYCLE_CARDS.filter(c => cardTransferEffect(card(c.id))).map(c => card(c.id));
     expect(discardReplayChoices(fuel)).toEqual([]);
   });
@@ -110,11 +111,12 @@ describe('牌堆选择事务', () => {
     cs.player.exhaust = ['ember_retrieval', 'shard_throw', 'ember_salvage', 'rekindle_coals'].map(id => card(id, true, `ex-${id}`));
     expect(cardTransferChoices(cs, cs.player.hand[0])).toEqual([]);
     for (const c of cs.player.exhaust) expect(use(cs, 'ember_retrieval', c.uid)).toBe(cs);
-    expect(describeCard(cs.player.hand[0], null)).toContain('不能选择带消耗区回收效果');
+    // 卡面已简化；规则没变，仍然不能选带消耗区回收效果的牌。
+    expect(describeCard(cs.player.hand[0], null)).toBe('从消耗区选择 1 张牌加入手牌。消耗。');
   });
   it('保留当前手牌一回合；之后新抽的牌正常弃置，刷新后仍保留，下回合不永久保留', () => {
-    let cs = fixture('scar_hold'); cs.player.hand.push(card('defend'), card('spin_kick'));
-    cs = use(cs, 'scar_hold'); cs = use(cs, 'spin_kick');
+    let cs = fixture('scar_hold'); cs.player.hand.push(card('defend'), card('echo_blade'));
+    cs = use(cs, 'scar_hold'); cs = use(cs, 'echo_blade');
     const drawn = cs.player.hand.find(c => c.uid !== 'defend')!;
     cs = endPlayerTurn(JSON.parse(JSON.stringify(cs))).state;
     expect(cs.player.hand.map(c => c.uid)).toEqual(['defend']);
@@ -142,16 +144,22 @@ describe('四角色资源牌实际联动', () => {
     cs = use(cs, 'blade_recall', 'strike'); cs = use(cs, 'strike');
     expect(cs.player.energy).toBe(2); expect(cs.player.attacksPlayedThisTurn).toBe(3);
     cs = use(cs, 'trail_supply');
-    expect(cs.player.hand).toHaveLength(2); expect(cs.player.exhaust.some(c => c.uid === 'trail_supply')).toBe(true);
+    // 战途补给 1 费、没有上限：本回合 3 张攻击牌各抽 1 张。
+    expect([cs.player.hand.length, cs.player.energy]).toEqual([3, 1]); expect(cs.player.exhaust.some(c => c.uid === 'trail_supply')).toBe(true);
   });
-  it('拾灰者回收未用的借火鼓风，补燃烧后真实消耗燃烧换费', () => {
+  it('拾灰者把消耗掉的借火鼓风放回弃牌堆，补燃烧后真实消耗燃烧换费', () => {
     let cs = fixture('cinder_salvage', true);
+    cs.player.exhaust = cs.player.discard.splice(cs.player.discard.findIndex(c => c.uid === 'borrow_flame'), 1);
     cs = use(cs, 'cinder_salvage', 'borrow_flame');
     expect(cs.enemies[0].statuses.burn).toBe(4);
+    expect(cs.player.discard.some(c => c.uid === 'borrow_flame')).toBe(true);
+    // 之后抽到它：这里直接放回手牌。
+    cs.player.hand.push(...cs.player.discard.splice(cs.player.discard.findIndex(c => c.uid === 'borrow_flame'), 1));
     cs = use(cs, 'borrow_flame');
     expect(cs.player.energy).toBe(3); expect(cs.enemies[0].statuses.burn ?? 0).toBe(0);
     expect(cs.player.exhaust.some(c => c.uid === 'borrow_flame')).toBe(true);
-    expect(cardTransferChoices(cs, card('cinder_salvage'))).toEqual([]);
+    // 用掉的借火鼓风又进了消耗区，可以再被拾薪归炉放回弃牌堆。
+    expect(cardTransferChoices(cs, card('cinder_salvage')).map(c => c.uid)).toEqual(['borrow_flame']);
   });
   it('血线牵引触发失血抽牌、血甲和盟约，接回血与回脉忆战；资源受代价与消耗限制', () => {
     let cs = fixture('blood_tether'); cs.player.hand.push(card('pulse_memory'));
@@ -180,13 +188,13 @@ describe('四角色资源牌实际联动', () => {
   it('回收与抽牌攻击可以形成小循环，但每次消耗能量，零能量会停止', () => {
     let cs = fixture('blood_tether');
     cs.player.hand = [card('blade_recall', false, 'recall-a')];
-    cs.player.discard = [card('spin_kick')]; cs.player.draw = [];
+    cs.player.discard = [card('echo_blade')]; cs.player.draw = [];
     cs.player.energy = 3;
-    cs = use(cs, 'recall-a', 'spin_kick'); cs = use(cs, 'spin_kick');
-    // 回旋踢抽回刚弃置的整备，实体守恒；第二轮仍需支付能量。
+    cs = use(cs, 'recall-a', 'echo_blade'); cs = use(cs, 'echo_blade');
+    // 回声刃抽回刚弃置的整备，实体守恒；第二轮仍需支付能量。
     expect(cs.player.hand.some(c => c.uid === 'recall-a')).toBe(true);
-    cs = use(cs, 'recall-a', 'spin_kick');
+    cs = use(cs, 'recall-a', 'echo_blade');
     expect(cs.player.energy).toBe(0); expect(canPlayCard(cs, cs.player.hand[0]).ok).toBe(false);
-    expect(uids(cs)).toEqual(['spin_kick', 'recall-a', 'vein_cutter'].sort());
+    expect(uids(cs)).toEqual(['echo_blade', 'recall-a', 'vein_cutter'].sort());
   });
 });

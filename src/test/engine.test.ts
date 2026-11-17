@@ -34,8 +34,15 @@ describe('内容数量', () => {
     expect(EVENT_LIST.length).toBeGreaterThanOrEqual(6);
   });
   it('每张可升级卡都有可区分的升级版本', () => {
+    // 已审核例外：按指定数值调整后，这四张牌升级前后完全相同（数值待定，不自行补升级效果）。
+    // 灼热打击：伤害 9（9），其余规则基础与升级相同；余烬疗愈：回复 15（15）；炭中寻页、烬炉鼓风：取消上限后没有其他升级差异。
+    const sameAfterUpgrade = ['searing_strike', 'cinder_mend', 'coal_page_search', 'ember_bellows'];
     for (const c of CARD_LIST) {
       if (c.cost < 0 || c.type === 'status') continue;
+      if (sameAfterUpgrade.includes(c.id)) {
+        expect(describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost, c.id).toEqual(describeCard(card(c.id), null) + viewCard(card(c.id)).cost);
+        continue;
+      }
       const a = describeCard(card(c.id), null) + viewCard(card(c.id)).cost;
       const b = describeCard(card(c.id, true), null) + viewCard(card(c.id, true)).cost;
       expect(b, c.id).not.toEqual(a);
@@ -158,7 +165,7 @@ describe('战斗基础', () => {
     s.enemies[0].hp = s.enemies[0].maxHp = 100;
     const hp = s.enemies[0].hp;
     s = playCard(s, handCard(s, 'ember_burst').uid, 'e0').state;
-    expect(hp - s.enemies[0].hp).toBe(72);
+    expect(hp - s.enemies[0].hp).toBe(48); // 12 点余烬 × 4
     expect(s.player.ember).toBe(0);
   });
 
@@ -263,16 +270,17 @@ describe('战斗基础', () => {
       expect(s.enemies[0].statuses.burn).toBe(1);
     });
 
-    it('添油翻倍、引爆移除燃烧并按层数伤害、灼痕条件加伤', () => {
-      let s = pickerCombat([card('add_fuel'), card('detonate'), card('scorch_mark'), card('strike'), card('strike')], ['rubble_golem']);
-      s = playCard(s, handCard(s, 'add_fuel').uid, 'e0').state;
-      expect(s.enemies[0].statuses.burn).toBe(4);
+    it('拨炭叠加燃烧、引爆移除燃烧并按层数伤害、灼痕条件加伤', () => {
+      let s = pickerCombat([card('tend_coals'), card('detonate'), card('scorch_mark'), card('strike'), card('strike')], ['rubble_golem']);
+      s = playCard(s, handCard(s, 'tend_coals').uid, 'e0').state;
+      expect(s.enemies[0].statuses.burn).toBe(5); // 拾灰者的铃 2 + 拨炭 3
       let hp = s.enemies[0].hp;
       s = playCard(s, handCard(s, 'scorch_mark').uid, 'e0').state;
       expect(hp - s.enemies[0].hp).toBe(10); // 6 + 4
       hp = s.enemies[0].hp;
+      s.player.energy = 2; // 引爆改为 2 费
       s = playCard(s, handCard(s, 'detonate').uid, 'e0').state;
-      expect(hp - s.enemies[0].hp).toBe(12); // 4 × 3
+      expect(hp - s.enemies[0].hp).toBe(10); // 5 × 2
       expect(s.enemies[0].statuses.burn).toBeUndefined();
     });
 
@@ -287,7 +295,7 @@ describe('战斗基础', () => {
       const energy = s.player.energy;
       s = playCard(s, handCard(s, 'burn_pages').uid, null).state;
       expect(s.player.exhaust.length).toBe(2); // 目标手牌与焚书自身各消耗一次
-      expect(s.player.block).toBe(16); // 两次灰烬盛宴
+      expect(s.player.block).toBe(10); // 两次灰烬盛宴
       expect(enemyHp - s.enemies[0].hp).toBe(24); // 两次火种传递
       expect(s.player.energy).toBe(energy + 1);
       // 焚书本身消耗、另消耗一张、骨灰坛只抽一张 → 手牌 -1 -1 +1

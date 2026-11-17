@@ -76,14 +76,14 @@ describe('奖励抽共享池的概率', () => {
 });
 
 describe('共享池内的加权', () => {
-  it('权重：本角色接口牌与共鸣牌 1.5，其他角色接口牌 0.75，其余 1；专属牌恒为 1；旅人全部为 1', () => {
+  it('权重：本角色接口牌与共鸣牌 1.5，其余 1；专属牌恒为 1；旅人全部为 1', () => {
     const weight = (id: string, character: CharacterId) => R.sharedRewardWeight(CARDS[id], character);
-    expect([weight('ignite', 'picker'), weight('kindred_spark', 'picker'), weight('stone_throw', 'picker'), weight('stoke', 'picker'), weight('light_up', 'picker')]).toEqual([1.5, 1.5, 0.75, 1, 1]);
-    expect([weight('ember_blade', 'oathbound'), weight('ember_blade', 'scholar'), weight('searing_strike', 'scholar'), weight('kindred_dawn', 'scholar')]).toEqual([1.5, 0.75, 1.5, 1.5]);
+    expect([weight('ignite', 'picker'), weight('kindred_spark', 'picker'), weight('stone_throw', 'picker'), weight('stoke', 'picker'), weight('light_up', 'picker')]).toEqual([1.5, 1.5, 1, 1, 1]);
+    expect([weight('ember_blade', 'oathbound'), weight('ember_blade', 'scholar'), weight('searing_strike', 'scholar'), weight('kindred_dawn', 'scholar')]).toEqual([1.5, 1, 1.5, 1.5]);
     for (const c of CARD_LIST) expect(R.sharedRewardWeight(c, 'traveler'), c.name).toBe(1);
   });
 
-  it.each(['picker', 'oathbound', 'scholar'] as const)('%s：抽到的共享牌里，本角色接口牌与共鸣牌的单张出现率约为普通共享牌的 1.5 倍，其他角色接口牌约 0.75 倍', character => {
+  it.each(['picker', 'oathbound', 'scholar'] as const)('%s：抽到的共享牌里，本角色接口牌与共鸣牌的单张出现率约为普通共享牌的 1.5 倍，其他角色的接口牌不出现', character => {
     const run = R.newRun(`WEIGHT-${character}`, character);
     run.floor = 30;
     const seen = new Map<string, number>();
@@ -96,14 +96,14 @@ describe('共享池内的加权', () => {
       const pool = CARD_LIST.filter(c => !c.owner && c.rarity === rarity);
       const mean = (cards: CardDef[]) => cards.reduce((n, c) => n + (seen.get(c.id) ?? 0), 0) / cards.length;
       const favored = mean(pool.filter(c => c.kindred || c.hook === character));
-      const others = mean(pool.filter(c => c.hook && c.hook !== character));
       const neutral = mean(pool.filter(c => !c.hook && !c.kindred));
       expect(favored / neutral, `${rarity} 本角色`).toBeGreaterThan(1.3);
       expect(favored / neutral, `${rarity} 本角色`).toBeLessThan(1.7);
-      expect(others / neutral, `${rarity} 其他角色`).toBeGreaterThan(0.62);
-      expect(others / neutral, `${rarity} 其他角色`).toBeLessThan(0.88);
     }
-    for (const c of CARD_LIST.filter(c => !c.owner && rewardRarities.includes(c.rarity))) expect(seen.get(c.id) ?? 0, c.name).toBeGreaterThan(0);
+    for (const c of CARD_LIST.filter(c => !c.owner && rewardRarities.includes(c.rarity))) {
+      if (c.hook && c.hook !== character) expect(seen.get(c.id) ?? 0, c.name).toBe(0);
+      else expect(seen.get(c.id) ?? 0, c.name).toBeGreaterThan(0);
+    }
   });
 
   it('旅人暂不加权：共享牌不足 3 张时，奖励与改版前的均匀抽取逐张相同', () => {

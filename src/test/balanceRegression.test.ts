@@ -92,14 +92,14 @@ describe('平衡边界回归', () => {
     expect(result.state.player.exhaust).toEqual([card('oath_reenactment', up)]);
     expect(result.state.player.discard).toEqual([card('leech_bite', up)]);
   });
-  it.each([false, true])('同费余烬爆发的单体伤害高于终夜焚天，群攻保留虚弱特色（升级=%s）', up => {
-    const single = battle('ember_burst', up), aoe = battle('final_conflagration', up);
-    single.player.ember = aoe.player.ember = 10;
-    const a = playCard(single, 'ember_burst', 'e0').state, b = playCard(aoe, 'final_conflagration', null).state;
-    expect(a.enemies[0].hp).toBeLessThan(b.enemies[0].hp);
-    expect(a.player.ember).toBe(0); expect(b.player.ember).toBe(0);
-    expect(b.enemies[0].statuses.weak).toBe(up ? 2 : 1);
-    expect(CARDS.ember_burst.cost).toBe(CARDS.final_conflagration.cost);
+  it.each([false, true])('余烬爆发消耗全部余烬，每点 4/6 点伤害（终夜焚天已删除）（升级=%s）', up => {
+    const single = battle('ember_burst', up);
+    single.player.ember = 10;
+    const hp = single.enemies[0].hp;
+    const a = playCard(single, 'ember_burst', 'e0').state;
+    expect(hp - a.enemies[0].hp).toBe(up ? 60 : 40);
+    expect(a.player.ember).toBe(0);
+    expect(CARDS.final_conflagration).toBeUndefined();
   });
   it('执事长持续半血时不会每隔一回合治疗', () => {
     let cs = createCombat('deacon', ['ash_deacon'], 'normal', [], 1000, 1000, [], makeRng('deacon', 'c'), 0).state;

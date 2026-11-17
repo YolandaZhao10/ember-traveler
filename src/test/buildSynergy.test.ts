@@ -18,7 +18,8 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   cs=use(cs,'war_drum');cs=use(cs,'quick_stab');cs.player.statuses.echo=1;
   cs=use(cs,'twin_blades');expect(cs.player.attacksPlayedThisTurn).toBe(3);expect(cs.player.energy).toBe(2);
   cs=use(cs,'quick_stab');expect(cs.player.energy).toBe(2);
-  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(50);expect(cs.player.energy).toBe(0);
+  // 战鼓不再逐张加伤：千刃 6 点 × 5 段。
+  const hp=cs.enemies[0].hp;cs=use(cs,'thousand_cuts');expect(hp-cs.enemies[0].hp).toBe(30);expect(cs.player.energy).toBe(0);
  });
  it('续势不在第六次攻击重复返能，叠加两张只提高第三次返能',()=>{
   let cs=battle(['war_drum','war_drum',...Array(6).fill('quick_stab')]);cs=use(use(cs,'war_drum'),'war_drum');
@@ -38,34 +39,23 @@ describe('流派按动作运转，不依靠无条件数值',()=>{
   const before=battle(['shield_bash','shield_shatter']);before.player.block=20;
   const bash=use(before,'shield_bash'),shatter=use(before,'shield_shatter');
   expect(bash.player.block).toBe(20);expect(shatter.player.block).toBe(0);
-  // 盾击：格挡 20 +4；碎盾：格挡 20 × 3。
-  expect(before.enemies[0].hp-bash.enemies[0].hp).toBe(24);expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(60);
+  // 盾击：格挡 20 +4；碎盾：格挡 20 × 2。
+  expect(before.enemies[0].hp-bash.enemies[0].hp).toBe(24);expect(before.enemies[0].hp-shatter.enemies[0].hp).toBe(40);
  });
- it('铺火后添油翻倍并防护，引爆会花掉后续持续伤害',()=>{
-  let cs=battle(['light_up','add_fuel','detonate']);cs=use(cs,'light_up');cs=use(cs,'add_fuel');
-  expect(cs.enemies[0].statuses.burn).toBe(6);expect(cs.player.block).toBe(12);
-  const hp=cs.enemies[0].hp;cs=use(cs,'detonate');expect(hp-cs.enemies[0].hp).toBe(18);expect(cs.enemies[0].statuses.burn??0).toBe(0);
- });
- it.each([false,true])('添油升级=%s：回响翻倍两次但实体只消耗一次，不能直接洗回',upgraded=>{
-  let cs=battle(['add_fuel']);cs.player.hand[0].upgraded=upgraded;
-  expect(describeCard(cs.player.hand[0],null)).toContain('消耗');
-  cs.enemies[0].statuses.burn=3;cs.player.statuses.echo=1;
-  cs=use(cs,'add_fuel');
-  expect(cs.enemies[0].statuses.burn).toBe(12);
-  expect(cs.player.block).toBe(upgraded?36:30);
-  expect(cs.player.energy).toBe(2);
-  expect(cs.player.exhaust.map(c=>c.defId)).toEqual(['add_fuel']);
-  cs=round(cs);
-  expect([...cs.player.hand,...cs.player.draw,...cs.player.discard].some(c=>c.defId==='add_fuel')).toBe(false);
+ it('铺火后引爆会花掉后续持续伤害',()=>{
+  let cs=battle(['light_up','wildfire','detonate']);cs=use(cs,'light_up');cs=use(cs,'wildfire');
+  expect(cs.enemies[0].statuses.burn).toBe(7);
+  // 引爆 2 费，每层 2 点。
+  const hp=cs.enemies[0].hp;cs.player.energy=2;cs=use(cs,'detonate');expect(hp-cs.enemies[0].hp).toBe(14);expect(cs.enemies[0].statuses.burn??0).toBe(0);expect(cs.player.energy).toBe(0);
  });
  it('灰烬盛宴前两次消耗补牌，第三次只给格挡；下一回合重新可抽',()=>{
-  let cs=use(battle(['ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast');cs.player.energy=5;
-  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(2);expect(cs.player.block).toBe(24);
+  let cs=use(battle(['ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast');cs.player.energy=6;
+  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(2);expect(cs.player.block).toBe(15);
   cs=round(cs);cs.player.hand=[card('bone_ash')];cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(1);
  });
  it('两张消耗能力叠加抽牌量，但共享每回合两次窗口',()=>{
-  let cs=use(use(battle(['ash_feast','ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast'),'ash_feast');cs.player.energy=5;
-  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(4);expect(cs.player.block).toBe(48);
+  let cs=use(use(battle(['ash_feast','ash_feast','bone_ash','bone_ash','bone_ash']),'ash_feast'),'ash_feast');cs.player.energy=6;
+  for(let i=0;i<3;i++)cs=use(cs,'bone_ash');expect(cs.player.hand).toHaveLength(4);expect(cs.player.block).toBe(30);
  });
  it('血契仅在首次实际卡牌失血补牌，重复失血继续力量收益但不无限抽牌',()=>{
   let cs=use(battle(['blood_pact','blood_edge','blood_edge']),'blood_pact');cs=use(cs,'blood_edge');cs=use(cs,'blood_edge');

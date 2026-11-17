@@ -121,18 +121,6 @@ def({
   upgrade: { effects: [{ kind: 'damage', amount: 11 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'tempStrength', amount: 3 }] }] },
 });
 def({
-  id: 'spin_kick',
-  name: '回旋踢',
-  type: 'attack',
-  rarity: 'uncommon',
-  archetype: 'combo',
-  owner: 'traveler',
-  cost: 1,
-  target: 'enemy',
-  effects: [{ kind: 'damage', amount: 9 }, { kind: 'draw', amount: 1 }],
-  upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'draw', amount: 1 }] },
-});
-def({
   id: 'rhythm',
   exhaust: true,
   name: '节奏',
@@ -149,7 +137,7 @@ def({
   id: 'haste',
   name: '急速',
   type: 'skill',
-  rarity: 'uncommon',
+  rarity: 'rare',
   archetype: 'combo',
   owner: 'traveler',
   cost: 0,
@@ -181,10 +169,10 @@ def({
   rarity: 'uncommon',
   archetype: 'combo',
   owner: 'traveler',
-  cost: 1,
+  cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'tempo', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'tempo', amount: 2, target: 'self' }] },
+  upgrade: { cost: 1 },
 });
 def({
   id: 'war_drum',
@@ -195,8 +183,8 @@ def({
   owner: 'traveler',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'crescendo', amount: 1, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'crescendo', amount: 2, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 6, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 8, target: 'self' }] },
 });
 def({
   id: 'trip',
@@ -272,8 +260,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'self',
-  effects: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }],
-  upgrade: { effects: [{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }] },
+  effects: [{ kind: 'block', amount: 16 }],
+  upgrade: { effects: [{ kind: 'block', amount: 22 }] },
 });
 def({
   id: 'riposte',
@@ -302,10 +290,10 @@ def({
   rarity: 'rare',
   archetype: 'bulwark',
   owner: 'traveler',
-  cost: 2,
+  cost: 3,
   target: 'self',
   effects: [{ kind: 'status', status: 'barricade', amount: 1, target: 'self' }],
-  upgrade: { cost: 1 },
+  upgrade: { cost: 2 },
   flavor: '城墙不会在清晨倒塌。',
 });
 def({
@@ -329,8 +317,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }],
-  upgrade: { cost: 1 },
+  effects: [{ kind: 'damageByBlock', aoe: true, mult: 2, consume: true }],
+  upgrade: { effects: [{ kind: 'damageByBlock', aoe: true, mult: 3, consume: true }] },
   flavor: '让他们尝尝城墙的重量。',
 });
 def({
@@ -378,20 +366,9 @@ def({
   archetype: 'ember',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'emberBurst', damagePer: 6 }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 8 }] },
+  effects: [{ kind: 'emberBurst', damagePer: 4 }],
+  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 6 }] },
   flavor: '所有积蓄，一息之间。',
-});
-def({
-  id: 'flame_breath',
-  name: '烈焰吐息',
-  type: 'attack',
-  rarity: 'uncommon',
-  archetype: 'ember',
-  cost: 1,
-  target: 'all_enemies',
-  effects: [{ kind: 'emberBurst', damagePer: 2, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }],
-  upgrade: { effects: [{ kind: 'emberBurst', damagePer: 3, aoe: true }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'all' }] },
 });
 def({
   id: 'ash_shield',
@@ -442,10 +419,11 @@ def({
   archetype: 'ember',
   cost: 1,
   target: 'enemy',
-  retain: true,
-  charge: { damage: 3, max: 4 },
-  effects: [{ kind: 'damage', amount: 9 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 5 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 12 }, { kind: 'conditional', cond: { kind: 'emberAtLeast', value: 5 }, then: [{ kind: 'damage', amount: 6 }] }] },
+  retainAtEmber: 5,
+  charge: { damage: 3, uncapped: true },
+  effects: [{ kind: 'damage', amount: 9 }],
+  // 按指定数值，升级后与基础版相同。
+  upgrade: { effects: [{ kind: 'damage', amount: 9 }] },
 });
 def({
   id: 'ember_dance',
@@ -475,7 +453,7 @@ def({
   cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'flameAura', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'flameAura', amount: 3, target: 'self' }] },
+  upgrade: { cost: 1 },
   flavor: '火光所及之处，灰烬低语。',
 });
 def({
@@ -527,7 +505,7 @@ def({
   upgrade: {
     effects: [
       { kind: 'gainEmber', amount: -2 },
-      { kind: 'damage', amount: 24 },
+      { kind: 'damage', amount: 25 },
     ],
   },
 });
@@ -537,19 +515,10 @@ def({
   type: 'skill',
   rarity: 'common',
   archetype: 'ember',
-  cost: 0,
+  cost: 1,
   target: 'self',
-  exhaust: true,
-  effects: [
-    { kind: 'exhaustHand', count: 1 },
-    { kind: 'gainEmber', amount: 5 },
-  ],
-  upgrade: {
-    effects: [
-      { kind: 'exhaustHand', count: 1 },
-      { kind: 'gainEmber', amount: 8 },
-    ],
-  },
+  effects: [{ kind: 'exhaustHand', count: 1 }, { kind: 'gainEmber', amount: 5 }],
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 1, choose: true }, { kind: 'gainEmber', amount: 5 }] },
 });
 def({
   id: 'cinder_mend',
@@ -557,22 +526,13 @@ def({
   type: 'skill',
   rarity: 'rare',
   archetype: 'ember',
-  cost: 0,
+  cost: 1,
   target: 'self',
   exhaust: true,
   requireEmber: 4,
-  effects: [
-    { kind: 'gainEmber', amount: -4 },
-    { kind: 'heal', amount: 14 },
-    { kind: 'clearDebuffs' },
-  ],
-  upgrade: {
-    effects: [
-      { kind: 'gainEmber', amount: -4 },
-      { kind: 'heal', amount: 18 },
-      { kind: 'clearDebuffs' },
-    ],
-  },
+  effects: [{ kind: 'gainEmber', amount: -4 }, { kind: 'heal', amount: 15 }, { kind: 'clearDebuffs' }],
+  // 按指定数值，升级后与基础版相同。
+  upgrade: { effects: [{ kind: 'gainEmber', amount: -4 }, { kind: 'heal', amount: 15 }, { kind: 'clearDebuffs' }] },
 });
 
 // ---------- 拾灰者：焚烧 ----------
@@ -585,6 +545,7 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'enemy',
+  exhaust: true,
   effects: [{ kind: 'damage', amount: 7 }, { kind: 'status', status: 'burn', amount: 3, target: 'target' }],
   upgrade: { effects: [{ kind: 'damage', amount: 10 }, { kind: 'status', status: 'burn', amount: 4, target: 'target' }] },
   flavor: '先让它烧起来。',
@@ -597,9 +558,9 @@ def({
   archetype: 'cinder',
   owner: 'picker',
   cost: 1,
-  target: 'all_enemies',
-  effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'all' }] },
+  target: 'enemy',
+  effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'target' }],
+  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'target' }] },
 });
 def({
   id: 'scorch_mark',
@@ -628,24 +589,11 @@ def({
   rarity: 'uncommon',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'consumeBurn', damagePer: 3 }],
-  upgrade: { effects: [{ kind: 'consumeBurn', damagePer: 4 }] },
+  effects: [{ kind: 'consumeBurn', damagePer: 2 }],
+  upgrade: { effects: [{ kind: 'consumeBurn', damagePer: 3 }] },
   flavor: '火焰越旺，炸得越响。',
-});
-def({
-  id: 'add_fuel',
-  name: '添油',
-  type: 'skill',
-  rarity: 'uncommon',
-  archetype: 'cinder',
-  owner: 'picker',
-  cost: 1,
-  target: 'enemy',
-  exhaust: true,
-  effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 18 }],
-  upgrade: { effects: [{ kind: 'doubleStatus', status: 'burn' }, { kind: 'blockPerBurn', amount: 2, max: 24 }] },
 });
 def({
   id: 'lingering_fire',
@@ -654,7 +602,7 @@ def({
   rarity: 'common',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
   effects: [{ kind: 'status', status: 'burn', amount: 4, target: 'target' }, { kind: 'block', amount: 7 }],
   upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 6, target: 'target' }, { kind: 'block', amount: 10 }] },
@@ -668,20 +616,21 @@ def({
   owner: 'picker',
   cost: 2,
   target: 'all_enemies',
-  effects: [{ kind: 'damagePerBurn', amount: 3, aoe: true }, { kind: 'status', status: 'weak', amount: 1, target: 'all' }],
-  upgrade: { effects: [{ kind: 'damagePerBurn', amount: 4, aoe: true }, { kind: 'status', status: 'weak', amount: 2, target: 'all' }] },
+  effects: [{ kind: 'damagePerBurn', amount: 4, aoe: true }],
+  upgrade: { effects: [{ kind: 'damagePerBurn', amount: 5, aoe: true }] },
 });
 def({
   id: 'cremation',
   name: '火葬',
-  type: 'power',
+  type: 'skill',
   rarity: 'rare',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 2,
-  target: 'self',
-  effects: [{ kind: 'status', status: 'burningRelay', amount: 4, target: 'self' }, { kind: 'status', status: 'burn', amount: 14, target: 'all' }],
-  upgrade: { effects: [{ kind: 'status', status: 'burningRelay', amount: 6, target: 'self' }, { kind: 'status', status: 'burn', amount: 21, target: 'all' }] },
+  cost: 3,
+  target: 'all_enemies',
+  exhaust: true,
+  effects: [{ kind: 'status', status: 'burn', amount: 14, target: 'all' }, { kind: 'burnTick', aoe: true, relay: true }],
+  upgrade: { effects: [{ kind: 'status', status: 'burn', amount: 21, target: 'all' }, { kind: 'burnTick', aoe: true, relay: true }] },
   flavor: '灰烬城的葬礼只有一种形式。',
 });
 def({
@@ -691,10 +640,10 @@ def({
   rarity: 'rare',
   archetype: 'cinder',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'self',
   effects: [{ kind: 'status', status: 'everburn', amount: 1, target: 'self' }],
-  upgrade: { cost: 0 },
+  upgrade: { cost: 1 },
 });
 def({
   id: 'ember_tongue',
@@ -731,8 +680,8 @@ def({
   cost: 0,
   target: 'self',
   exhaust: true,
-  effects: [{ kind: 'draw', amount: 1 }, { kind: 'gainEmber', amount: 2 }],
-  upgrade: { effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 3 }] },
+  effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 1 }],
+  upgrade: { effects: [{ kind: 'draw', amount: 2 }, { kind: 'gainEmber', amount: 2 }] },
   flavor: '别人不要的，我要。',
 });
 def({
@@ -746,21 +695,16 @@ def({
   target: 'self',
   exhaust: true,
   effects: [{ kind: 'exhaustHand', count: 1, energyPerCard: 1 }],
-  upgrade: {
-    effects: [
-      { kind: 'exhaustHand', count: 1, energyPerCard: 1 },
-      { kind: 'draw', amount: 1 },
-    ],
-  },
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 1, energyPerCard: 1, choose: true }] },
 });
 def({
   id: 'bone_ash',
   name: '骨灰',
   type: 'attack',
-  rarity: 'common',
+  rarity: 'uncommon',
   archetype: 'ash',
   owner: 'picker',
-  cost: 1,
+  cost: 2,
   target: 'enemy',
   exhaust: true,
   effects: [{ kind: 'damage', amount: 18, perExhaustedCard: 2 }],
@@ -775,8 +719,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'status', status: 'ashFeast', amount: 8, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
-  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 12, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
+  effects: [{ kind: 'status', status: 'ashFeast', amount: 5, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }],
+  upgrade: { effects: [{ kind: 'status', status: 'ashFeast', amount: 8, target: 'self' }, { kind: 'status', status: 'ashInsight', amount: 1, target: 'self' }] },
 });
 def({
   id: 'pass_the_flame',
@@ -800,7 +744,7 @@ def({
   cost: 2,
   target: 'enemy',
   effects: [{ kind: 'exhaustHand', count: 'all', damagePerCard: 9 }],
-  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', damagePerCard: 12 }] },
+  upgrade: { cost: 1 },
   flavor: '什么都不留下。',
 });
 def({
@@ -824,8 +768,8 @@ def({
   owner: 'picker',
   cost: 1,
   target: 'self',
-  effects: [{ kind: 'exhaustHand', count: 'all', filter: 'curse' }, { kind: 'block', amount: 9 }],
-  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', filter: 'curse' }, { kind: 'block', amount: 13 }] },
+  effects: [{ kind: 'exhaustHand', count: 'all', filter: 'junk' }, { kind: 'block', amount: 9 }],
+  upgrade: { effects: [{ kind: 'exhaustHand', count: 'all', filter: 'junk' }, { kind: 'block', amount: 13 }] },
 });
 def({
   id: 'ash_offering',
@@ -1414,8 +1358,8 @@ EXTRA_CURSES.forEach(def);
 CYCLE_CARDS.forEach(def);
 
 /**
- * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对；
- * 只影响从共享池抽奖励时的权重，不限制其他角色获得。
+ * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对。
+ * 接口牌只发给登记的角色：奖励、商店与事件的随机给牌都不会把它给其他角色（见 cardAvailableTo）。
  */
 const SHARED_HOOKS: Record<CharacterId, string[]> = {
   // 投石、守夜、匀息、辟邪灯、卸热、掷出火把、熔炉、篝火避难所
@@ -1438,12 +1382,28 @@ export const CARD_LIST: CardDef[] = Object.values(CARDS);
 export const RETIRED_CARDS: Record<string, { name: string; replacement: string }> = {
   spark_lure: { name: '诱火', replacement: 'ignite' },
   unbroken_stride: { name: '不息步伐', replacement: 'haste' },
+  // 旅人连击：换成同流派、稀有度不高于原牌的现有牌。
+  swift_return: { name: '回身刺', replacement: 'quick_stab' },
+  spin_kick: { name: '回旋踢', replacement: 'lantern_poke' },
+  hooking_cut: { name: '钩刃', replacement: 'twin_blades' },
+  // 拾灰者：添油、浓烟换成焚烧牌，回收火星换成灰烬牌。
+  add_fuel: { name: '添油', replacement: 'lingering_fire' },
+  black_smoke: { name: '浓烟', replacement: 'smoke_cover' },
+  reclaimed_spark: { name: '回收火星', replacement: 'salvage_scraps' },
+  // 通用底座牌：换成同为底座、稀有度不高于原牌的群体攻击牌。
+  flame_breath: { name: '烈焰吐息', replacement: 'sweeping_embers' },
+  final_conflagration: { name: '终夜焚天', replacement: 'lantern_procession' },
 };
 
 export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {
   return CARD_LIST.filter((c) => c.rarity === r);
 }
 
+/**
+ * 这名角色能否从奖励、商店、事件随机拿到这张牌。专属牌只给本人；通用牌里，底座牌与共鸣牌人人可得，
+ * 接口牌只给登记的角色。只管发牌：旧存档牌组里已有的其他角色接口牌照常可用。
+ */
 export function cardAvailableTo(c: CardDef, character: CharacterId): boolean {
-  return !c.owner || c.owner === character;
+  if (c.owner) return c.owner === character;
+  return !c.hook || c.hook === character;
 }

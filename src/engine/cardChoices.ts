@@ -15,6 +15,7 @@ function effectRole(effect: Effect): CardRole | null {
     case 'consumeTempStrength':
     case 'consumeVulnerable':
     case 'spreadBurn':
+    case 'burnTick':
     case 'removeBlock':
       return 'offense';
     case 'block':

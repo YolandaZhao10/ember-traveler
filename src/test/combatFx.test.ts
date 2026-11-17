@@ -25,8 +25,7 @@ describe('命中特效与实际结算一致', () => {
   });
 
   it('群攻逐个反馈全部活着的敌人，首击同时发生', () => {
-    const cs = scene('flame_breath');
-    cs.player.ember = 5;
+    const cs = scene('sweeping_embers');
     const { events } = playCard(cs, 'attack', null);
     const cues = impactCues(events);
     expect(new Set(cues.map((cue) => cue.targetId))).toEqual(new Set(['e0', 'e1', 'e2']));

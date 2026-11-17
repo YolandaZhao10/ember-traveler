@@ -230,7 +230,7 @@ describe('优先取回高费用消耗牌', () => {
     withCards([{ kind: 'returnExhausted', count: 3, selection: 'highestCost' }], cs => {
       cs.player.exhaust = [instance(HIGH, 'up-high', true), instance(MID, 'first-mid'), instance(PLAIN, 'up-low', true), instance(HIGH, 'base-high'), instance(MID, 'second-mid')];
       const rngBefore = { ...cs.rng };
-      expect(text(cs)).toContain('按费用从高到低取回 3 张牌到手牌（同费按消耗顺序）');
+      expect(text(cs)).toContain('从消耗区取回 3 张费用最高的牌');
       const result = playCard(cs, SOURCE, null).state;
       expect(result.player.hand.map(c => c.uid)).toEqual(['base-high', 'first-mid', 'second-mid']);
       expect(result.player.exhaust.map(c => c.uid)).toEqual(['up-high', 'up-low', SOURCE]);
@@ -265,7 +265,7 @@ describe('优先取回高费用消耗牌', () => {
       cs.player.exhaust = [instance(HIGH, 'high'), instance(PLAIN, 'low'), instance(MID, 'mid')];
       const expectedRng = { ...cs.rng }, remaining = [...cs.player.exhaust], expected: CardInstance[] = [];
       for (let i = 0; i < 2; i++) expected.push(...remaining.splice(nextInt(expectedRng, 0, remaining.length - 1), 1));
-      expect(text(cs)).toContain('从消耗区随机取回 2 张牌到手牌');
+      expect(text(cs)).toContain('从消耗区随机取回 2 张牌');
       const result = playCard(cs, SOURCE, null).state;
       expect(result.player.hand).toEqual(expected);
       expect(result.player.exhaust).toEqual(remaining);

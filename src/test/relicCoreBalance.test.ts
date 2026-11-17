@@ -38,8 +38,8 @@ describe('核心遗物适度削弱与机制差异', () => {
     const preview = describeCard(cs.player.hand[0], { player: cs.player, target: cs.enemies[0], relics: cs.relics, isFirstAttack: true, crescendoBonus: 0 });
     const hp = cs.enemies[0].hp;
     cs = playCard(cs, 'ember_burst-0', 'e0').state;
-    expect(hp - cs.enemies[0].hp).toBe(12); // 2 余烬 × 6，原保底3余烬会造成18。
-    expect(preview).toContain('12'); expect(cs.player.ember).toBe(0);
+    expect(hp - cs.enemies[0].hp).toBe(8); // 2 余烬 × 4，原保底 3 余烬会造成 12。
+    expect(preview).toContain('当前 8'); expect(cs.player.ember).toBe(0);
   });
 
   it('旅人水壶每胜回复不超过一张基础防御，结算重入和奖励SL不重复治疗', () => {
@@ -71,9 +71,9 @@ describe('核心遗物适度削弱与机制差异', () => {
     expect(cs.player.statuses.echo ?? 0).toBe(0);
     expect(battle(['echo_stone']).player.statuses.echo).toBe(1);
     cs = playCard(cs, 'war_drum-0', null).state;
-    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.crescendo).toBe(1);
+    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.comboFlow).toBe(1);
     cs = playCard(cs, 'war_drum-1', null).state;
-    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.crescendo).toBe(2);
+    expect(cs.player.statuses.echo).toBe(1); expect(cs.player.statuses.comboFlow).toBe(2);
     cs = next(cs); cs.player.hand = [card('war_drum', 'again')];
     cs = playCard(cs, 'again', null).state;
     expect(cs.player.statuses.echo).toBe(2);

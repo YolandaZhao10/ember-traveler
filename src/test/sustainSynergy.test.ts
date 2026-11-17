@@ -23,18 +23,18 @@ describe('重放的资源与实体边界',()=>{
  it.each([false,true])('余烬只够一次治疗时回响跳过额外收益（升级=%s）',up=>{
   let cs=battle();cs.player.statuses.echo=1;cs.player.ember=4;
   cs=use(cs,'cinder_mend',up,null);
-  expect(cs.player.hp).toBe(20+(up?18:14));expect(cs.player.ember).toBe(0);
+  expect(cs.player.hp).toBe(20+15);expect(cs.player.ember).toBe(0);
   expect(cs.player.cardsPlayedThisTurn).toBe(1);expect(cs.player.exhaust).toHaveLength(1);
   expect(cs.player.statuses.echo??0).toBe(0);
  });
  it('充足余烬允许有限的双次治疗，费用和出牌次数准确',()=>{
   let cs=battle();cs.player.statuses.echo=1;cs.player.ember=8;
-  cs=use(cs,'cinder_mend',true,null);expect(cs.player.hp).toBe(56);expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(2);
+  cs=use(cs,'cinder_mend',true,null);expect(cs.player.hp).toBe(50);expect(cs.player.ember).toBe(0);expect(cs.player.cardsPlayedThisTurn).toBe(2);
  });
  it('镜像额外攻击也不能透支固定余烬费用',()=>{
-  // 火雨没有生命代付：余烬只够一次时，两次镜像重放都被跳过。
-  let cs=battle();cs.player.statuses.mirror=2;cs.player.ember=viewDef('firestorm').requireEmber;
-  cs=use(cs,'firestorm');expect(cs.player.attacksPlayedThisTurn).toBe(1);expect(cs.player.ember).toBe(0);expect(cs.player.hp).toBe(20);
+  // 引灯连斩没有生命代付：余烬只够一次时，两次镜像重放都被跳过。（火雨已改为技能，不再触发镜像。）
+  let cs=battle();cs.player.statuses.mirror=2;cs.player.ember=viewDef('lantern_flurry').requireEmber;
+  cs=use(cs,'lantern_flurry');expect(cs.player.attacksPlayedThisTurn).toBe(1);expect(cs.player.ember).toBe(0);expect(cs.player.hp).toBe(20);
  });
  it.each(['vein_cutter','scarlet_harvest','blood_rite','cinder_mend'])('血誓重演对%s执行一次实体消耗，不能自抽或留在弃牌堆',id=>{
   let cs=battle();cs.player.draw=[];cs.player.discard=[card(id,true,'selected')];cs.player.statuses.echo=1;cs.player.ember=8;
@@ -55,9 +55,10 @@ describe('重放的资源与实体边界',()=>{
  it('重放牌不能选择另一张重放牌；重复回收必须实际支付费用',()=>{
   let cs=battle();cs.player.hand=[card('oath_reenactment',true)];cs.player.discard=[card('oath_reenactment',true,'other')];
   expect(playCard(cs,'oath_reenactment',null,'other').state).toBe(cs);
-  cs=battle();cs.player.exhaust=[card('cinder_mend',true)];cs.player.ember=6;cs.player.energy=1;
-  cs=use(cs,'rekindle_coals',true,null);expect(cs.player.energy).toBe(0);expect(cs.player.ember).toBe(4);
-  cs=playCard(cs,'cinder_mend',null).state;expect(cs.player.hp).toBe(38);expect(cs.player.ember).toBe(0);
+  // 重拨余火升级后消耗 3 点余烬，把牌放进抽牌堆再抽 2 张；抽牌堆只有它时必然抽到。余烬疗愈 1 费。
+  cs=battle();cs.player.draw=[];cs.player.discard=[];cs.player.exhaust=[card('cinder_mend',true)];cs.player.ember=7;cs.player.energy=2;
+  cs=use(cs,'rekindle_coals',true,null);expect(cs.player.energy).toBe(1);expect(cs.player.ember).toBe(4);
+  cs=playCard(cs,'cinder_mend',null).state;expect(cs.player.hp).toBe(35);expect(cs.player.ember).toBe(0);
   cs.player.hand.push(card('rekindle_coals',true));expect(playCard(cs,'rekindle_coals',null).state).toBe(cs);
  });
 });
@@ -118,10 +119,14 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);expect(cs.player.hand.filter(c=>c.defId==='ration_bite')).toHaveLength(1);
   cs=use(cs,'ration_bite');expect(cs.player.block).toBe(up?12:8);
  });
- it('火葬死亡传播不会在同一死者上重复触发',()=>{
-  let cs=use(battle(),'cremation',up);cs.enemies[0].statuses.burn=7;cs.enemies[0].hp=1;
-  cs=use(cs,'strike');expect(cs.enemies[1].statuses.burn).toBe((up?21:14)+7);
-  cs=use(cs,'defend',false,null);expect(cs.enemies[1].statuses.burn).toBe((up?21:14)+7);
+ it('火葬立即结算一次燃烧，死者把剩余燃烧传给其他敌人，只传一次',()=>{
+  const n=up?21:14;
+  let cs=battle();cs.enemies[0].hp=5;
+  cs=use(cs,'cremation',up);
+  // 第一个敌人被这次结算烧死，剩余 n-1 层传给第二个；第二个自己的 n 层结算后剩 n-1。
+  expect(cs.enemies[0].hp).toBe(0);expect(cs.enemies[1].statuses.burn).toBe((n-1)*2);
+  expect(cs.player.statuses.burningRelay??0).toBe(0);
+  cs=use(cs,'defend',false,null);expect(cs.enemies[1].statuses.burn).toBe((n-1)*2);
  });
  it('寂静序曲按蓄力触发一次；活页秘典按实际回响计数，不按普通出牌计数',()=>{
   let cs=use(use(battle(),'silent_prelude',up),'living_manuscript',up);
@@ -133,7 +138,7 @@ describe.each([false,true])('能力用途与有限资源联动（升级=%s）',u
  it('星界庇护用掉真实蓄力换防御；篝火避难所持续消耗燃料',()=>{
   let cs=use(battle(),'astral_shelter',up);cs.player.hand=[{...card('charged_blade'),bonus:2}];cs=endPlayerTurn(cs).state;
   expect(cs.player.block).toBe(up?9:6);expect(cs.player.statuses.thorns).toBe(1);expect(cs.player.hand[0].bonus).toBe(2);
-  cs=use(battle(),'bonfire_shelter',up);cs.player.ember=5;cs=endPlayerTurn(cs).state;expect(cs.player.ember).toBe(2);expect(cs.player.block).toBe(up?24:18);
+  cs=use(battle(),'bonfire_shelter',up);cs.player.ember=5;cs=endPlayerTurn(cs).state;expect(cs.player.ember).toBe(2);expect(cs.player.block).toBe(18);
   cs=next(cs);expect(cs.player.ember).toBe(2);expect(cs.player.block).toBe(0);
  });
 });

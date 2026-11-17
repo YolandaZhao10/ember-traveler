@@ -55,16 +55,6 @@ describe.each([false, true])('阶段一：共享牌不再依赖燃烧，升级=%
     expect(high.enemies.every(e => !e.statuses.burn)).toBe(true);
   });
 
-  it('烈焰吐息消耗全部余烬群伤后施加全体易伤，易伤不放大本次伤害', () => {
-    const cs = battle(['flame_breath'], up); cs.player.ember = 4;
-    const after = use(cs, 'flame_breath-0');
-    for (const e of after.enemies) {
-      expect(1000 - e.hp).toBe(4 * (up ? 3 : 2));
-      expect(e.statuses.vulnerable).toBe(1);
-      expect(e.statuses.burn ?? 0).toBe(0);
-    }
-    expect(after.player.ember).toBe(0);
-  });
 
   it('掷出火把造成伤害、给余烬并施加易伤，打出后进入弃牌堆', () => {
     const after = use(battle(['spare_torch'], up), 'spare_torch-0');
@@ -232,49 +222,62 @@ describe('阶段二：余烬不足时用生命代付', () => {
 });
 
 describe('阶段二：蓄力增加余烬与单牌蓄力上限', () => {
-  it.each([false, true])('余烬灯芯升级=%s：每保留一回合多给 1 点余烬，最多 4 层', up => {
+  it.each([false, true])('余烬灯芯升级=%s：1 费，获得 3/4 点余烬，每保留一回合多给 1 点，不再有蓄力上限', up => {
     let cs = battle(['ember_wick'], up, 1); cs.player.hp = cs.player.maxHp = 1000;
-    expect(describeCard(cs.player.hand[0], null)).toBe(`获得 ${up ? 3 : 2} 点余烬。保留。每保留一回合获得的余烬 +1，最多蓄力 4 层。消耗。`);
-    expect(use(cs, 'ember_wick-0').player.ember).toBe(up ? 3 : 2);
-    for (let turn = 1; turn <= 6; turn++) {
+    expect(describeCard(cs.player.hand[0], null)).toBe(`获得 ${up ? 4 : 3} 点余烬。保留。每保留一回合获得的余烬 +1。消耗。`);
+    const cold = use(cs, 'ember_wick-0');
+    expect([cold.player.ember, cold.player.energy]).toEqual([up ? 4 : 3, 2]);
+    // 超过全局上限 10 层后继续成长。
+    for (let turn = 1; turn <= 12; turn++) {
       cs = round(cs);
-      expect(cs.player.hand.find(c => c.uid === 'ember_wick-0')!.bonus).toBe(Math.min(4, turn));
+      expect(cs.player.hand.find(c => c.uid === 'ember_wick-0')!.bonus).toBe(turn);
     }
     const text = describeCard(cs.player.hand.find(c => c.uid === 'ember_wick-0')!, ctxOf(cs));
-    expect(text).toContain(`获得 ${up ? 7 : 6} 点余烬`);
-    expect(text).toContain('（已蓄力 4/4）');
+    expect(text).toContain(`获得 ${(up ? 4 : 3) + 12} 点余烬`);
+    expect(text).toContain('（已蓄力 12 层）');
     const before = cs.player.ember;
     const after = use(cs, 'ember_wick-0');
-    expect(after.player.ember - before).toBe(up ? 7 : 6);
+    expect(after.player.ember - before).toBe((up ? 4 : 3) + 12);
     expect(after.player.exhaust.map(c => c.defId)).toEqual(['ember_wick']);
   });
 
-  it('立即蓄力、凝神与星图都不能突破单牌上限；灰烬沙漏对整张牌只多给 1 点', () => {
-    let cs = battle(['ember_wick', 'future_memory'], false, 1, 'scholar');
+  it('立即蓄力、凝神与星图都不能突破单牌上限（静燃之页 6 层）；灰烬沙漏对整张余烬灯芯只多给 1 点', () => {
+    let cs = battle(['quiet_burning_page', 'future_memory', 'ember_wick'], false, 1, 'scholar');
     cs.player.hp = cs.player.maxHp = 1000;
-    cs.player.hand[0].bonus = 3; cs.player.hand[1].upgraded = true;
+    cs.player.hand[0].bonus = 5; cs.player.hand[1].upgraded = true; cs.player.hand[2].bonus = 3;
     cs = use(cs, 'future_memory-1');
-    expect(cs.player.hand.find(c => c.uid === 'ember_wick-0')!.bonus).toBe(4);
+    expect(cs.player.hand.find(c => c.uid === 'quiet_burning_page-0')!.bonus).toBe(6);
+    // 余烬灯芯不设上限：3 层加立即蓄力 3 层。
+    expect(cs.player.hand.find(c => c.uid === 'ember_wick-2')!.bonus).toBe(6);
     cs.relics = ['star_chart', 'ash_hourglass']; cs.player.statuses.chargeMaster = 1;
     cs = round(cs);
-    expect(cs.player.hand.find(c => c.uid === 'ember_wick-0')!.bonus).toBe(4);
+    expect(cs.player.hand.find(c => c.uid === 'quiet_burning_page-0')!.bonus).toBe(6);
+    expect(cs.player.hand.find(c => c.uid === 'ember_wick-2')!.bonus).toBe(9);
     const before = cs.player.ember;
-    cs = use(cs, 'ember_wick-0');
-    expect(cs.player.ember - before).toBe(2 + 4 + 1);
+    cs = use(cs, 'ember_wick-2');
+    expect(cs.player.ember - before).toBe(3 + 9 + 1);
   });
 
-  it.each([false, true])('灼热打击升级=%s：保留后每层 +3 伤害，最多 4 层；余烬加伤不随蓄力变化', up => {
+  it.each([false, true])('灼热打击升级=%s：只有余烬 ≥ 5 时才保留，每保留一回合伤害 +3，不设上限；不再有余烬加伤', up => {
     let cs = battle(['searing_strike'], up, 1); cs.player.hp = cs.player.maxHp = 1000;
-    expect(describeCard(cs.player.hand[0], null)).toBe(`造成 ${up ? 12 : 9} 点伤害，若余烬 ≥ 5：造成 ${up ? 6 : 5} 点伤害。保留。每保留一回合伤害 +3，最多蓄力 4 层。`);
-    for (let turn = 0; turn < 6; turn++) cs = round(cs);
-    expect(cs.player.hand.find(c => c.uid === 'searing_strike-0')!.bonus).toBe(4);
-    // 旧存档里超出上限的层数同样按 4 层结算。
-    cs.player.hand.find(c => c.uid === 'searing_strike-0')!.bonus = 9;
-    expect(viewCard(cs.player.hand.find(c => c.uid === 'searing_strike-0')!).bonus).toBe(4);
+    expect(describeCard(cs.player.hand[0], null)).toBe('造成 9 点伤害。余烬 ≥ 5 时保留。每保留一回合伤害 +3。');
+    // 余烬不足 5 点：回合结束时进弃牌堆，不保留也不蓄力。
+    const dropped = battle(['searing_strike'], up, 1); dropped.player.ember = 4;
+    const ended = endPlayerTurn(dropped).state;
+    expect([ended.player.hand, ended.player.discard.map(c => c.defId)]).toEqual([[], ['searing_strike']]);
+    for (let turn = 1; turn <= 12; turn++) {
+      cs.player.ember = 5;
+      cs = round(cs);
+      expect(cs.player.hand.find(c => c.uid === 'searing_strike-0')!.bonus).toBe(turn);
+    }
+    expect(viewCard(cs.player.hand.find(c => c.uid === 'searing_strike-0')!).bonus).toBe(12);
     cs.player.ember = 5; cs.player.statuses = {}; cs.enemies[0].block = 0; cs.enemies[0].statuses = {};
     const hp = cs.enemies[0].hp;
     const after = use(cs, 'searing_strike-0');
-    expect(hp - after.enemies[0].hp).toBe((up ? 12 : 9) + 12 + (up ? 6 : 5));
+    expect(hp - after.enemies[0].hp).toBe(9 + 36);
+    // 蓄力后余烬掉到 5 以下：这回合结束时照样弃掉。
+    cs.player.ember = 4;
+    expect(endPlayerTurn(cs).state.player.hand.some(c => c.uid === 'searing_strike-0')).toBe(false);
   });
 
   it.each([false, true])('静燃之页升级=%s：格挡随蓄力成长到 6 层为止，蓄力不足 2 层不抽牌', up => {
@@ -337,11 +340,11 @@ describe('阶段二：血誓者与学者的余烬接口牌', () => {
   });
 
   it.each([false, true])('余烬刻度升级=%s：消耗 3 余烬获得格挡，手中蓄力牌各蓄力 1 回合且不超过各自上限', up => {
-    const cs = battle(['ember_gradation', 'ember_wick', 'charged_blade', 'defend'], false, 1, 'scholar');
-    cs.player.hand[0].upgraded = up; cs.player.hand[1].bonus = 4; cs.player.ember = 3;
+    const cs = battle(['ember_gradation', 'quiet_burning_page', 'charged_blade', 'defend'], false, 1, 'scholar');
+    cs.player.hand[0].upgraded = up; cs.player.hand[1].bonus = 6; cs.player.ember = 3;
     const after = use(cs, 'ember_gradation-0');
     expect([after.player.ember, after.player.block]).toEqual([0, up ? 12 : 8]);
-    expect(after.player.hand.map(c => c.bonus ?? 0)).toEqual([4, 1, 0]);
+    expect(after.player.hand.map(c => c.bonus ?? 0)).toEqual([6, 1, 0]);
     cs.player.ember = 2;
     expect(canPlayCard(cs, cs.player.hand[0]).ok).toBe(false);
   });

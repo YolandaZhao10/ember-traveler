@@ -1,7 +1,7 @@
 import { convertResource, conversionText, temporaryStrength } from './resourceConversion';
 import { appliedBurn, recordBurn } from './burnHistory';
 import { RELIC_TUNING as T } from '../data/relicBalance';
-import { EMBER_MAX, CHARGE_MAX, clampCharge } from './constants';
+import { EMBER_MAX, chargeLimit, clampCharge } from './constants';
 import { CARDS } from '../data/cards';
 import { STATUSES } from '../data/statuses';
 import { kindredVowText, signatureCount, signatureEachText, signatureReachedText } from './signature';
@@ -21,8 +21,12 @@ export interface CardView {
   exhaust: boolean;
   ethereal: boolean;
   retain: boolean;
-  charge?: { damage?: number; block?: number; ember?: number; max?: number };
+  /** 条件保留所需的余烬；0 表示没有条件保留 */
+  retainAtEmber: number;
+  charge?: { damage?: number; block?: number; ember?: number; max?: number; uncapped?: true };
   requireEmber: number;
+  /** 卡面是否省略「需要 N 点余烬」 */
+  hideRequireText: boolean;
   /** 余烬不足时代付的生命；0 表示不能代付 */
   hpFallback: number;
   flavor?: string;
@@ -48,18 +52,25 @@ export function viewCard(card: CardInstance): CardView {
     exhaust: u.exhaust ?? d.exhaust ?? false,
     ethereal: d.ethereal ?? false,
     retain: d.retain ?? false,
+    retainAtEmber: d.retainAtEmber ?? 0,
     charge: d.charge,
     requireEmber: u.requireEmber ?? d.requireEmber ?? 0,
+    hideRequireText: d.hideRequireText ?? false,
     hpFallback: d.hpFallback ?? 0,
     flavor: d.flavor,
     upgraded: card.upgraded,
-    bonus: clampCharge(card.bonus ?? 0, d.charge?.max),
+    bonus: clampCharge(card.bonus ?? 0, chargeLimit(d.charge)),
   };
 }
 
-/** 这张牌实际能达到的蓄力层数上限。 */
+/** 这张牌实际能达到的蓄力层数上限；不设上限的牌返回 Infinity。 */
 export function chargeCap(view: Pick<CardView, 'charge'>): number {
-  return clampCharge(CHARGE_MAX, view.charge?.max);
+  return chargeLimit(view.charge);
+}
+
+/** 回合结束时这张牌是否留在手里：固定保留，或余烬达到条件保留的门槛。 */
+export function retainsAtTurnEnd(view: Pick<CardView, 'retain' | 'retainAtEmber'>, ember: number): boolean {
+  return view.retain || (view.retainAtEmber > 0 && ember >= view.retainAtEmber);
 }
 
 /** 余烬不足且可用生命代付时，本次结算改为失去生命并跳过余烬消耗。 */
@@ -267,9 +278,14 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`余烬翻倍${ctx ? `（${ctx.player.ember} → ${Math.min(EMBER_MAX, ctx.player.ember * 2)}）` : ''}`);
         break;
       case 'discardRandom':
-        parts.push(e.count === 'all' ? '弃置所有手牌' : `随机弃置 ${e.count} 张手牌`);
+        parts.push(e.count === 'all' ? '弃置所有手牌' : e.choose ? `选择 ${e.count} 张手牌弃置` : `随机弃置 ${e.count} 张手牌`);
         break;
       case 'clearDebuffs':
+        if (e.scope === 'all') {
+          parts.push('清除自身的所有效果（增益与能力也一并清除）');
+          if (ctx) ctx.player.statuses = {};
+          break;
+        }
         parts.push('清除自身的虚弱、易伤、脆弱与燃烧');
         if (ctx) for (const status of ['weak', 'vulnerable', 'frail', 'burn'] as const) delete ctx.player.statuses[status];
         break;
@@ -309,7 +325,7 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         break;
       case 'blockPerBurn': {
         const current = ctx?.target ? (ctx.target.hp > 0 ? blockText(Math.min((ctx.target.statuses.burn ?? 0) * e.amount, e.max ?? Infinity), ctx) : '0') : null;
-        parts.push(`获得等于目标燃烧层数 × ${e.amount} 的基础格挡${e.max === undefined ? '' : `（基础上限 ${e.max}）`}${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
+        parts.push(`获得等于目标燃烧层数${e.amount === 1 ? '' : ` × ${e.amount} `}的基础格挡${e.max === undefined ? '' : `（基础上限 ${e.max}）`}${current !== null ? `（当前 ${current} 点格挡）` : ''}`);
         break;
       }
       case 'blockPerHand':
@@ -331,9 +347,12 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(conversionText(e) + (earned === null ? '' : `（当前 ${earned}）`));
         break;
       }
-      case 'draw':
-        parts.push(`抽 ${e.amount} 张牌`);
+      case 'draw': {
+        // 紧跟在按次数抽牌的兑换后面时写成「另抽」，避免读成同一句的重复。
+        const before = effects[effects.indexOf(e) - 1];
+        parts.push(`${before?.kind === 'convertResource' && before.reward === 'draw' ? '另抽' : '抽'} ${e.amount} 张牌`);
         break;
+      }
       case 'chargeHand':
         parts.push(`手中所有蓄力牌立即蓄力 ${e.amount} 回合`);
         break;
@@ -379,7 +398,14 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'status': {
         const name = STATUSES[e.status].name;
         const tgt = e.target === 'self' ? '' : e.target === 'all' ? '对所有敌人' : '对目标';
-        if ((STATUSES[e.status].kind === 'power' || e.status === 'guardOnce' || e.status === 'tempThorns') && e.target === 'self') {
+        if (e.status === 'comboBlock' && e.target === 'self' && effects.some(x => x.kind === 'status' && x.status === 'comboFlow')) {
+          // 已并入续势那一句。
+        } else if (e.status === 'comboFlow' && e.target === 'self') {
+          const guard = effects.find((x): x is Extract<Effect, { kind: 'status' }> => x.kind === 'status' && x.status === 'comboBlock');
+          parts.push(`每回合打出第 3 张攻击牌后，获得 ${e.amount} 点能量${guard ? `和 ${guard.amount} 点格挡` : ''}。回响与镜像重放也计数`);
+        } else if (e.status === 'energyNext' && e.target === 'self' && e.plain) {
+          parts.push(`下回合获得 ${e.amount} 点能量`);
+        } else if ((STATUSES[e.status].kind === 'power' || ['guardOnce', 'tempThorns', 'blockNext', 'barricadeOnce'].includes(e.status)) && e.target === 'self') {
           parts.push(statusDescription(e.status, e.amount, character).replace(/。$/, ''));
         } else if (e.target === 'self') {
           parts.push(`获得 ${e.amount} 层${name}${e.status === 'regen' ? '（回合末治疗后减少1层）' : ''}`);
@@ -397,11 +423,12 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         parts.push(`回复 ${e.amount} 点生命`);
         break;
       case 'exhaustHand': {
-        const what = e.filter === 'curse'
-          ? (e.count === 'all' ? '手牌中的所有诅咒牌' : `手牌中随机 ${e.count} 张诅咒牌`)
+        const junk = e.filter === 'junk' ? '诅咒牌和状态牌' : '诅咒牌';
+        const what = e.filter
+          ? (e.count === 'all' ? `手牌中的所有${junk}` : `手牌中随机 ${e.count} 张${junk}`)
           : (e.count === 'all' ? '手牌中的所有牌' : `手牌中随机 ${e.count} 张牌`);
         const n = ctx && e.count === 'all'
-          ? (e.filter === 'curse' ? ctx.player.hand.filter(c => viewCard(c).type === 'curse').length : Math.max(0, ctx.player.hand.length - 1))
+          ? (e.filter ? ctx.player.hand.filter(c => viewCard(c).type === 'curse' || (e.filter === 'junk' && viewCard(c).type === 'status')).length : Math.max(0, ctx.player.hand.length - 1))
           : null;
         const segs: string[] = [e.choose && e.count !== 'all' ? `选择手牌中 ${e.count} 张牌消耗` : `消耗${what}`];
         if (e.damagePerCard) segs.push(`每消耗一张造成 ${dmgText(e.damagePerCard, ctx)} 点伤害${n !== null ? `（当前 ${n} 张）` : ''}`);
@@ -431,16 +458,19 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
         let current: number | null = null;
         if (ctx?.target) {
           const layers = ctx.target.hp > 0 ? (ctx.target.statuses.burn ?? 0) : 0;
-          const base = Math.min(layers * e.amount, e.max);
+          const base = Math.min(layers * e.amount, e.max ?? Infinity);
           current = layers > 0 && base > 0
             ? Math.max(0, Math.min(EMBER_MAX - ctx.player.ember, base + (ctx.relics.includes('ash_hourglass') ? 1 : 0)))
             : 0;
           if (layers > 0) delete ctx.target.statuses.burn;
           ctx.player.ember += current;
         }
-        parts.push(`消耗目标所有燃烧：每层获得 ${e.amount} 点余烬（基础上限 ${e.max} 点）${current !== null ? `（当前获得 ${current} 点余烬）` : ''}`);
+        parts.push(`消耗目标所有燃烧：每层获得 ${e.amount} 点余烬${e.max === undefined ? '' : `（基础上限 ${e.max} 点）`}${current !== null ? `（当前获得 ${current} 点余烬）` : ''}${e.energyPer ? `，每 ${e.energyPer} 层获得 1 点能量` : ''}`);
         break;
       }
+      case 'burnTick':
+        parts.push(`立即结算一次${e.aoe ? '所有敌人的' : '目标的'}燃烧伤害${e.relay ? '；若有敌人因此死亡，将其剩余燃烧施加给其他所有敌人' : ''}`);
+        break;
       case 'consumeTempStrength': {
         let current = '';
         if (ctx) {
@@ -472,17 +502,16 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
       case 'moveCard': {
         const source = e.from === 'draw' ? '抽牌堆' : e.from === 'exhaust' ? '消耗区' : '弃牌堆';
         const filter = e.filter === 'action' ? '攻击或技能' : e.filter === 'attack' ? '攻击牌' : e.filter === 'skill' ? '技能牌' : e.filter === 'exhaust' ? '带消耗的牌' : '牌';
-        const destination = e.to === 'hand' ? '手牌' : e.to === 'draw' ? '抽牌堆顶' : '弃牌堆';
-        parts.push(`${e.sample ? `从${source}随机查看最多 ${e.sample} 张${filter}，` : `从${source}`}选择 1 张${e.sample ? '' : filter}移入${destination}（${e.from === 'exhaust' ? '不能选择带消耗区回收效果的牌；' : ''}回响不重复移动）`);
+        const action = e.to === 'hand' ? '加入手牌' : e.to === 'draw' ? '放到抽牌堆顶' : e.to === 'exhaust' ? '消耗' : '移入弃牌堆';
+        parts.push(`${e.sample ? `从${source}随机 ${e.sample} 张${filter}中` : `从${source}`}选择 1 张${e.sample ? '' : filter}${action}`);
         break;
       }
       case 'retainHand':
         parts.push('本回合结束时保留当前手牌（之后新抽到的牌不保留）');
         break;
       case 'returnExhausted':
-        parts.push(e.selection === 'highestCost'
-          ? `从消耗区按费用从高到低取回 ${e.count} 张牌到手牌（同费按消耗顺序）`
-          : `从消耗区随机取回 ${e.count} 张牌到手牌`);
+        parts.push(e.to === 'draw' ? `将消耗区随机 ${e.count} 张牌放入抽牌堆`
+          : e.selection === 'highestCost' ? `从消耗区取回 ${e.count} 张费用最高的牌` : `从消耗区随机取回 ${e.count} 张牌`);
         break;
       case 'conditional':
         // 分号明确结束条件范围，后面的无条件效果不能被误读为也需要条件。
@@ -494,12 +523,15 @@ export function describeEffects(effects: Effect[], ctx: DescribeContext | null, 
   if (view) {
     const tail: string[] = [];
     if (view.hpFallback) tail.unshift(`余烬不足时改为失去 ${view.hpFallback} 点生命`);
-    else if (view.requireEmber) tail.unshift(`需要 ${view.requireEmber} 点余烬`);
+    else if (view.requireEmber && !view.hideRequireText) tail.unshift(`需要 ${view.requireEmber} 点余烬`);
     if (view.retain) tail.push('保留');
+    else if (view.retainAtEmber) tail.push(`余烬 ≥ ${view.retainAtEmber} 时保留`);
     if (view.charge) {
       const seg = [view.charge.damage ? `伤害 +${view.charge.damage}` : '', view.charge.block ? `格挡 +${view.charge.block}` : '', view.charge.ember ? `获得的余烬 +${view.charge.ember}` : ''].filter(Boolean).join('、');
       const cap = chargeCap(view);
-      tail.push(`每保留一回合${seg}，最多蓄力 ${cap} 层${view.bonus ? `（已蓄力 ${view.bonus}/${cap}）` : ''}`);
+      tail.push(Number.isFinite(cap)
+        ? `每保留一回合${seg}，最多蓄力 ${cap} 层${view.bonus ? `（已蓄力 ${view.bonus}/${cap}）` : ''}`
+        : `每保留一回合${seg}${view.bonus ? `（已蓄力 ${view.bonus} 层）` : ''}`);
     }
     if (view.exhaust) tail.push('消耗');
     if (view.cost < 0) tail.push('无法打出');

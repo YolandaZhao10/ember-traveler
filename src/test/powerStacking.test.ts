@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createCombat, playCard, endPlayerTurn, startPlayerTurn } from '../engine/combat';
+import { CARDS } from '../data/cards';
 import { describeCard } from '../engine/cards';
 import { makeRng } from '../engine/rng';
 import { loadRun, saveRun } from '../engine/save';
@@ -29,18 +30,19 @@ describe('能力牌独立叠加', () => {
     cs = play(cs, 'defend').state; step = play(cs, 'defend');
     expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]); cs = step.state;
     step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
-    expect(step.state.player.energy).toBe(93); // 7张1费牌，没有旧版余音的隐含能量。
+    expect(step.state.player.energy).toBe(91); // 5张1费牌加两张2费余音，没有旧版余音的隐含能量。
   });
-  it('普通/升级余音分别抽1/2张，回响重放额外计牌，跨回合保留进度', () => {
+  it('普通与升级余音都抽1张（升级只降费），回响重放额外计牌，跨回合保留进度', () => {
     let cs = play(play(setup(), 'tempo').state, 'tempo', true).state;
     cs.player.statuses.echo = 1; cs = play(cs, 'defend').state;
     expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([0, 2]);
     cs = startPlayerTurn(endPlayerTurn(cs).state).state;
     expect(cs.player.powerInstances?.map(p => p.progress)).toEqual([0, 2]); cs.player.energy = 100; cs.player.hand = [];
-    let step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 2 }]);
+    let step = play(cs, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
     step = play(step.state, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toHaveLength(0);
     step = play(step.state, 'defend'); expect(step.events.filter(e => e.type === 'draw')).toEqual([{ type: 'draw', count: 1 }]);
-    expect(describeCard(card('tempo'), null)).toContain('抽 1 张牌'); expect(describeCard(card('tempo', true), null)).toContain('抽 2 张牌');
+    expect(describeCard(card('tempo'), null)).toContain('抽 1 张牌'); expect(describeCard(card('tempo', true), null)).toContain('抽 1 张牌');
+    expect([CARDS.tempo.cost, CARDS.tempo.upgrade?.cost]).toEqual([2, 1]);
   });
   it('两张镜像和回响分别重放，之后本回合不再重复，新打出的镜像仍可触发', () => {
     let cs = play(play(setup(), 'mirror').state, 'mirror').state; cs.player.statuses.echo = 1;
@@ -54,7 +56,8 @@ describe('能力牌独立叠加', () => {
   it('焰柱按每张余烬加成分别结算，数值型能力正常累加，格挡保留等规则不重复改变', () => {
     let cs = play(play(setup(), 'pillar_of_flame').state, 'pillar_of_flame', true).state;
     cs.player.ember = 4; cs = startPlayerTurn(endPlayerTurn(cs).state).state;
-    expect(cs.enemies[0].hp).toBe(9990); // 普通4 + 升级6
+    expect(cs.enemies[0].hp).toBe(9992); // 普通4 + 升级4：升级只降费，不再 +2 伤害
+    expect([CARDS.pillar_of_flame.cost, CARDS.pillar_of_flame.upgrade?.cost]).toEqual([2, 1]);
     expect(describeCard(card('pillar_of_flame'), null)).not.toContain('+1');
     cs = setup(); cs = play(play(cs, 'iron_will').state, 'iron_will').state;
     const amount = cs.player.statuses.metallicize!; expect(amount).toBeGreaterThan(3);
@@ -67,17 +70,7 @@ describe('能力牌独立叠加', () => {
     expect(R.resetCurrentNode(loadRun()!).combat!.player.powerInstances).toEqual([]);
     const legacy = JSON.parse(JSON.stringify(run)); legacy.version=10; delete legacy.combat.player.powerInstances;
     values.set('ember-traveler:save',JSON.stringify(legacy)); const restored=loadRun()!;
-    expect(restored.version).toBe(R.SAVE_VERSION); expect(restored.combat!.player.powerInstances).toEqual([{ status:'tempo',amount:3,progress:0 }]);
-  });
-  it.each([false,true])('终夜焚天升级=%s：消耗全部余烬群攻并虚弱，不再提供格挡', upgraded => {
-    let cs=setup(); cs.enemies.push({...cs.enemies[0],id:'e1',statuses:{},flags:{}}); cs.player.ember=5;
-    const step=play(cs,'final_conflagration',upgraded); cs=step.state;
-    expect(cs.player.energy).toBe(98); expect(cs.player.ember).toBe(0); expect(cs.player.block).toBe(0);
-    for (const enemy of cs.enemies) { expect(enemy.hp).toBe(10000-5*(upgraded?5:4)); expect(enemy.statuses.weak).toBe(upgraded?2:1); }
-    const description=describeCard(card('final_conflagration',upgraded),null);
-    expect(description).toContain(`每点余烬 ${upgraded?5:4}`); expect(description).toContain(`${upgraded?2:1} 层虚弱`); expect(description).not.toContain('格挡');
-    cs=setup(); cs.player.ember=0; cs=play(cs,'final_conflagration',upgraded).state;
-    expect(cs.enemies[0].hp).toBe(10000); expect(cs.enemies[0].statuses.weak).toBe(upgraded?2:1);
+    expect(restored.version).toBe(R.SAVE_VERSION); expect(restored.combat!.player.powerInstances).toEqual([{ status:'tempo',amount:2,progress:0 }]);
   });
 
 });

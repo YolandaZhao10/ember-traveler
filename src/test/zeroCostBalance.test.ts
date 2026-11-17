@@ -4,6 +4,7 @@ import { describeCard, viewCard, viewDef } from '../engine/cards';
 import { createCombat, endPlayerTurn, enemyAct, playCard, startPlayerTurn } from '../engine/combat';
 import { makeRng } from '../engine/rng';
 import type { CombatState, Effect } from '../engine/types';
+import { playWithChoices } from './playOptions';
 
 const card = (defId: string, upgraded = false, uid = defId) => ({ defId, upgraded, uid });
 function battle(id: string, upgraded = false) {
@@ -35,7 +36,9 @@ describe('零费资源牌的真实消耗边界', () => {
     const before = battle(id, upgraded);
     before.player.statuses.ashFeast = 2;
     if (id === 'burn_pages') before.player.hand.push(card('strike', false, 'fuel'));
-    const { state: after, events } = use(before, id);
+    // 升级后的焚书由玩家选择消耗哪张手牌。
+    const chosen = id === 'burn_pages' && upgraded ? playCard(before, id, null, { exhaust: [['fuel']] }) : null;
+    const { state: after, events } = chosen ?? use(before, id);
     expect(after.player.exhaust.filter(c => c.uid === id)).toHaveLength(1);
     expect([...after.player.hand, ...after.player.draw, ...after.player.discard].some(c => c.uid === id)).toBe(false);
     expect(after.player.turnFlags.exhausted).toBe(id === 'burn_pages' ? 2 : 1);
@@ -98,7 +101,6 @@ describe('零费资源牌的真实消耗边界', () => {
 const repeatBudgets: Record<string, { damage?: number[]; block?: number[]; ember?: number | number[]; strength?: number[] }> = {
   quick_stab: { damage: [3, 5], ember: 1 },
   rally_step: { block: [3, 5], ember: 1 },
-  swift_return: { damage: [5, 7], block: [4, 6] },
   charred_dart: { damage: [3, 5], block: [2, 3] },
   crimson_step: { block: [6, 8] },
   ember_pulse: { ember: [2, 3] },
@@ -106,7 +108,9 @@ const repeatBudgets: Record<string, { damage?: number[]; block?: number[]; ember
   steady_breath: { block: [2, 4], ember: 1 },
 };
 // 已审核例外：可重复零费牌附带过牌，但每次必须实付登记数量的余烬，余烬不足不能打出。
-const paidRepeatExceptions: Record<string, number> = { ember_sift: 2, lantern_flurry: 2 };
+const paidRepeatExceptions: Record<string, number> = { ember_sift: 2, lantern_flurry: 4 };
+// 已审核例外：不消耗的零费回能牌。每次必须实付登记数量的余烬换能量，除此之外不带任何效果；余烬不足不能打出。
+const paidEnergyExceptions: Record<string, number> = { trim_lamp: 4 };
 function resourceEffect(effect: Effect): boolean {
   if (effect.kind === 'conditional') return effect.then.some(resourceEffect);
   return ['draw', 'energy', 'heal', 'returnExhausted', 'exhaustHand'].includes(effect.kind)
@@ -119,10 +123,14 @@ describe('可重复零费牌的收益预算', () => {
     for (const def of CARD_LIST) for (const upgraded of [false, true]) {
       const v = viewDef(def.id, upgraded);
       if (v.cost !== 0 || v.exhaust || v.type === 'power') continue;
-      const paid = paidRepeatExceptions[v.id];
-      if (!repeatBudgets[v.id] && !paid) unchecked.push(v.name);
+      const paid = paidRepeatExceptions[v.id], paidEnergy = paidEnergyExceptions[v.id];
+      if (!repeatBudgets[v.id] && !paid && !paidEnergy) unchecked.push(v.name);
       expect(v.charge, v.name).toBeUndefined();
-      if (paid) {
+      if (paidEnergy) {
+        expect(v.requireEmber, v.name).toBeGreaterThanOrEqual(paidEnergy);
+        expect(v.effects.map(e => e.kind), v.name).toEqual(['gainEmber', 'energy']);
+        expect(v.effects[0], v.name).toEqual({ kind: 'gainEmber', amount: -paidEnergy });
+      } else if (paid) {
         expect(v.requireEmber, v.name).toBeGreaterThanOrEqual(paid);
         expect(v.effects[0], v.name).toEqual({ kind: 'gainEmber', amount: -paid });
         expect(v.effects.some(e => ['energy', 'heal', 'returnExhausted', 'exhaustHand'].includes(e.kind)), v.name).toBe(false);
@@ -164,7 +172,8 @@ describe('实付余烬的可重复零费过牌', () => {
       state = JSON.parse(JSON.stringify(state));
       state.player.discard = state.player.discard.filter(c => c.uid !== 'ember_sift');
       if (!state.player.hand.some(c => c.uid === 'ember_sift')) state.player.hand.push(card('ember_sift', upgraded));
-      const next = playCard(state, 'ember_sift', null).state;
+      // 升级版要选择弃哪张牌，按机器人的规则补上选择。
+      const next = playWithChoices(state, 'ember_sift', null).state;
       if (next === state) break;
       expect(next.player.discard.some(c => c.uid === 'ember_sift')).toBe(true);
       state = next; plays++;
@@ -177,7 +186,8 @@ describe('实付余烬的可重复零费过牌', () => {
 });
 
 describe('零费升级能力仍是一次部署，不伪装成消耗', () => {
-  it.each(['forge', 'everburning', 'blood_pact', 'mirror'])('%s 打出后从所有牌堆移出，不额外触发消耗遗物或能力', id => {
+  // 不灭之火升级后改为 1 费，不再属于零费升级能力。
+  it.each(['forge', 'blood_pact', 'mirror'])('%s 打出后从所有牌堆移出，不额外触发消耗遗物或能力', id => {
     const cs = battle(id, true);
     cs.relics = ['bone_urn', 'foundry_core'];
     cs.player.statuses.ashFeast = 2; cs.player.statuses.echo = 1;

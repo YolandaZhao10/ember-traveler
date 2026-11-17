@@ -407,13 +407,12 @@ function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState,
 }
 
 /**
- * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现，其他角色的接口牌更少。
+ * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现。其他角色的接口牌不在池里（见 cardAvailableTo）。
  * 专属牌恒为 1；旅人暂不加权，全部为 1。
  */
 export function sharedRewardWeight(card: CardDef, character: CharacterId): number {
   if (card.owner || character === 'traveler') return 1;
-  if (card.kindred || card.hook === character) return 1.5;
-  return card.hook ? 0.75 : 1;
+  return card.kindred || card.hook === character ? 1.5 : 1;
 }
 
 /** 与均匀抽取同样只消耗一次随机数；权重全为 1 时结果与原先的均匀抽取完全相同。 */
@@ -641,16 +640,33 @@ export function debtRepay(input: RunState): RunState {
   return recordCheckpoint(run);
 }
 
-/** 迎战讨债人。强度固定取本章首领所在楼层的首领倍率；按普通战斗结算遗物效果。 */
+/**
+ * 讨债人的强度：以本章章末首领的倍率为底，章内每深入一层再按首领的逐层步长往上加。
+ * 所以任何商店遇到的都不弱于章末首领的倍率，越靠后越强。
+ */
+export function debtCollectorDifficulty(run: Pick<RunState, 'chapter' | 'floor' | 'difficulty'>) {
+  const chapter = CHAPTERS[run.chapter];
+  const base = encounterDifficulty(chapter.startFloor + chapter.floors - 1, 'boss', run.difficulty);
+  const start = encounterDifficulty(chapter.startFloor, 'boss', run.difficulty);
+  const here = encounterDifficulty(Math.max(chapter.startFloor, run.floor), 'boss', run.difficulty);
+  return {
+    ...base,
+    floor: here.floor,
+    healthMultiplier: base.healthMultiplier + here.healthMultiplier - start.healthMultiplier,
+    attackMultiplier: base.attackMultiplier + here.attackMultiplier - start.attackMultiplier,
+    blockMultiplier: base.blockMultiplier + here.blockMultiplier - start.blockMultiplier,
+  };
+}
+
+/** 迎战讨债人；按普通战斗结算遗物效果。 */
 export function debtFight(input: RunState): RunState {
   if (input.screen !== 'debt' || input.loan?.stage !== 'choice') return input;
   const run = clone(input);
-  const chapter = CHAPTERS[run.chapter];
   const id = debtCollectorId(run.chapter);
   // 独立随机流：不读写 rng.combat，也不记入已遇到的遭遇，其他节点的结果不变。
   const rng = makeRng(run.seed, `debt:${run.loan!.settled}`);
   const res = createCombat(id, [id], 'normal', run.deck, run.hp, run.maxHp, run.relics, rng, run.uidCounter, run.character,
-    encounterDifficulty(chapter.startFloor + chapter.floors - 1, 'boss', run.difficulty), run.gold);
+    debtCollectorDifficulty(run), run.gold);
   run.loan!.stage = 'fight';
   run.combat = res.state;
   run.gold = res.state.gold;

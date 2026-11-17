@@ -33,11 +33,11 @@ const lost = (cs: CombatState, i = 0) => 1000 - cs.enemies[i].hp;
 const CONDITION = '若本回合已打出 1 张以上攻击牌';
 
 describe('旅人连击牌：条件降为「已打出 1 张攻击牌」', () => {
-  it('战鼓降为罕见，效果与卡面不变', () => {
+  it('战鼓是罕见的 1 费能力；后来去掉了逐张加伤，只留第 3 张攻击牌后的能量与格挡', () => {
     expect(CARDS.war_drum.rarity).toBe('uncommon');
     expect(CARDS.war_drum.cost).toBe(1);
-    expect(CARDS.war_drum.effects).toEqual([{ kind: 'status', status: 'crescendo', amount: 1, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }]);
-    expect(CARDS.war_drum.upgrade?.effects).toEqual([{ kind: 'status', status: 'crescendo', amount: 2, target: 'self' }, { kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }]);
+    expect(CARDS.war_drum.effects).toEqual([{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 6, target: 'self' }]);
+    expect(CARDS.war_drum.upgrade?.effects).toEqual([{ kind: 'status', status: 'comboFlow', amount: 1, target: 'self' }, { kind: 'status', status: 'comboBlock', amount: 8, target: 'self' }]);
   });
 
   it.each([false, true])('疾刺：首张不给余烬，第二张攻击牌起给 1 点（升级=%s）', up => {
@@ -82,12 +82,13 @@ describe('旅人连击牌：条件降为「已打出 1 张攻击牌」', () => {
     expect([second.hand.length, second.block, second.statuses.energyNext]).toEqual([up ? 3 : 2, 4, 1]);
   });
 
-  it.each([false, true])('追风步：条件仍是已打出 2 张牌，临时力量 3/4（升级=%s）', up => {
-    expect(text('pursuit_step', up)).toBe(`抽 ${up ? 2 : 1} 张牌，若本回合已打出 2 张以上卡牌：获得 ${up ? 4 : 3} 点力量，回合结束时失去。消耗。`);
+  it.each([false, true])('追风步：条件仍是已打出 2 张牌，抽 2/3 张，临时力量固定 3（升级=%s）', up => {
+    expect(text('pursuit_step', up)).toBe(`抽 ${up ? 3 : 2} 张牌，若本回合已打出 2 张以上卡牌：获得 3 点力量，回合结束时失去。消耗。`);
     const one = battle('pursuit_step', up, 0); one.player.cardsPlayedThisTurn = 1;
     expect(play(one, 'pursuit_step').player.statuses.strength ?? 0).toBe(0);
     const two = battle('pursuit_step', up, 0); two.player.cardsPlayedThisTurn = 2;
-    expect(play(two, 'pursuit_step').player.statuses.strength).toBe(up ? 4 : 3);
+    const played = play(two, 'pursuit_step');
+    expect([played.player.statuses.strength, played.player.hand.length]).toEqual([3, up ? 3 : 2]);
   });
 
   it.each([false, true])('千刃：已出 1 张攻击牌时打两段并获得 12/16 点格挡，首张出则只有一段（升级=%s）', up => {
@@ -120,8 +121,8 @@ describe('旅人连击牌：条件降为「已打出 1 张攻击牌」', () => {
     expect([second.enemies.map(e => 1000 - e.hp), second.player.ember, second.player.statuses.energyNext]).toEqual([[up ? 16 : 12, up ? 16 : 12], up ? 4 : 3, 2]);
   });
 
-  it('本轮不动的牌保持原条件：节奏、回身刺、环刃仍要求已打出 2 张攻击牌', () => {
-    for (const id of ['rhythm', 'swift_return', 'encircling_blades']) for (const up of [false, true]) expect(text(id, up), id).toContain('若本回合已打出 2 张以上攻击牌');
+  it('没动的牌保持原条件：节奏、环刃仍要求已打出 2 张攻击牌', () => {
+    for (const id of ['rhythm', 'encircling_blades']) for (const up of [false, true]) expect(text(id, up), id).toContain('若本回合已打出 2 张以上攻击牌');
   });
 });
 
@@ -155,17 +156,15 @@ describe('旅人壁垒牌：只加输出，不动叠甲', () => {
     expect([after.block, after.statuses.thorns, after.exhaust.map(c => c.defId)]).toEqual([up ? 10 : 7, up ? 4 : 3, ['thorn_mail']]);
   });
 
-  it.each([false, true])('碎盾：倍率固定为 3，升级只把费用降到 1（升级=%s）', up => {
-    expect(text('shield_shatter', up)).toBe('消耗所有格挡，对所有敌人造成等于当前格挡 × 3的伤害。');
+  it.each([false, true])('碎盾：费用固定为 2，倍率 2，升级后 3（升级=%s）', up => {
+    expect(text('shield_shatter', up)).toBe(`消耗所有格挡，对所有敌人造成等于当前格挡 × ${up ? 3 : 2}的伤害。`);
     expect(CARDS.shield_shatter.cost).toBe(2);
-    expect(CARDS.shield_shatter.upgrade).toEqual({ cost: 1 });
+    expect(CARDS.shield_shatter.upgrade?.cost).toBeUndefined();
     const after = play(guard('shield_shatter', up, 15, 2), 'shield_shatter');
-    expect([after.enemies.map(e => 1000 - e.hp), after.player.block, after.player.energy]).toEqual([[45, 45], 0, up ? 2 : 1]);
+    expect([after.enemies.map(e => 1000 - e.hp), after.player.block, after.player.energy]).toEqual([up ? [45, 45] : [30, 30], 0, 1]);
   });
 
-  it('本轮不动的壁垒牌保持原样：铁壁、架盾、漫长守望', () => {
-    expect(CARDS.iron_wall.effects).toEqual([{ kind: 'block', amount: 16 }, { kind: 'status', status: 'metallicize', amount: 4, target: 'self' }]);
-    expect(CARDS.iron_wall.upgrade?.effects).toEqual([{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }]);
+  it('没动的壁垒牌保持原样：架盾、漫长守望', () => {
     expect(CARDS.brace_line.effects.map(e => e.kind)).toEqual(['conditional', 'block']);
     expect(CARDS.long_road.effects).toEqual([{ kind: 'status', status: 'patientGuard', amount: 8, target: 'self' }]);
   });
@@ -175,22 +174,22 @@ describe('旅人新牌：引灯连斩', () => {
   it('旅人专属的 0 费罕见连击攻击牌，不消耗、不保留、不能以生命代付', () => {
     const def = CARDS.lantern_flurry;
     expect([def.name, def.owner, def.archetype, def.rarity, def.type, def.cost, def.target]).toEqual(['引灯连斩', 'traveler', 'combo', 'uncommon', 'attack', 0, 'enemy']);
-    expect([def.requireEmber, def.exhaust, def.retain, def.hpFallback, def.charge]).toEqual([2, undefined, undefined, undefined, undefined]);
+    expect([def.requireEmber, def.exhaust, def.retain, def.hpFallback, def.charge]).toEqual([4, undefined, undefined, undefined, undefined]);
     expect(def.upgrade?.cost).toBeUndefined();
   });
 
-  it.each([false, true])('消耗 2 点余烬，造成 3/4 点伤害 × 2，抽 1 张牌，进入弃牌堆（升级=%s）', up => {
-    expect(text('lantern_flurry', up)).toBe(`消耗 2 点余烬，造成 ${up ? 4 : 3} 点伤害 × 2，抽 1 张牌。需要 2 点余烬。`);
-    const cs = battle('lantern_flurry', up, 0); cs.player.ember = 3; cs.player.energy = 0;
+  it.each([false, true])('消耗 4 点余烬，造成 3/4 点伤害 × 3，抽 1 张牌，进入弃牌堆（升级=%s）', up => {
+    expect(text('lantern_flurry', up)).toBe(`消耗 4 点余烬，造成 ${up ? 4 : 3} 点伤害 × 3，抽 1 张牌。需要 4 点余烬。`);
+    const cs = battle('lantern_flurry', up, 0); cs.player.ember = 5; cs.player.energy = 0;
     const after = play(cs, 'lantern_flurry');
-    expect([lost(after), after.player.ember, after.player.energy, after.player.attacksPlayedThisTurn]).toEqual([up ? 8 : 6, 1, 0, 1]);
+    expect([lost(after), after.player.ember, after.player.energy, after.player.attacksPlayedThisTurn]).toEqual([up ? 12 : 9, 1, 0, 1]);
     expect(after.player.hand.map(c => c.defId)).toEqual(['defend']);
     expect(after.player.discard.map(c => c.defId)).toEqual(['lantern_flurry']);
     expect(after.player.exhaust).toEqual([]);
   });
 
-  it.each([false, true])('余烬不足 2 点时不能打出，也不会改为失去生命（升级=%s）', up => {
-    for (const ember of [0, 1]) {
+  it.each([false, true])('余烬不足 4 点时不能打出，也不会改为失去生命（升级=%s）', up => {
+    for (const ember of [0, 3]) {
       const cs = battle('lantern_flurry', up, 0); cs.player.ember = ember;
       expect(canPlayCard(cs, cs.player.hand[0]).ok).toBe(false);
       expect(playCard(cs, 'lantern_flurry', cs.enemies[0].id).state).toBe(cs);
@@ -204,12 +203,12 @@ describe('旅人新牌：引灯连斩', () => {
     expect(after.player.discard.map(c => c.defId)).toContain('lantern_flurry');
   });
 
-  it('每次都要实付 2 点余烬：4 点余烬只够连打两张', () => {
+  it('每次都要实付 4 点余烬：8 点余烬只够连打两张', () => {
     let cs = battle('lantern_flurry', false, 0);
     cs.player.hand = [card('lantern_flurry', 'a'), card('lantern_flurry', 'b'), card('lantern_flurry', 'c')];
-    cs.player.ember = 4;
+    cs.player.ember = 8;
     for (const uid of ['a', 'b']) cs = playCard(cs, uid, cs.enemies[0].id).state;
-    expect([lost(cs), cs.player.ember]).toEqual([12, 0]);
+    expect([lost(cs), cs.player.ember]).toEqual([18, 0]);
     expect(canPlayCard(cs, cs.player.hand.find(c => c.uid === 'c')!).ok).toBe(false);
   });
 });

@@ -27,7 +27,8 @@ it('每角色各新增一张抽牌和一张加费罕见专属，基础与升级�
   }
 });
 describe.each([false, true])('角色资源转换（升级=%s）', up => {
-  it.each(ids)('%s高资源也遵守单次上限，升级收益与卡面一致', id => {
+  // 灰中索引、战途补给、借火鼓风已取消单次上限，另在各自的调整测试里覆盖。
+  it.each(ids.filter(id => !['ash_index', 'trail_supply', 'borrow_flame'].includes(id)))('%s高资源也遵守单次上限，升级收益与卡面一致', id => {
     let cs = battle();
     cs.player.attacksPlayedThisTurn = 100; cs.player.block = 100;
     Object.assign(cs.player.turnFlags, { exhausted: 100, actualHealing: 100, resolvedCopies: 100 });
@@ -35,7 +36,7 @@ describe.each([false, true])('角色资源转换（升级=%s）', up => {
     cs.enemies[0].statuses.burn = 100;
     cs.player.hand = [{ ...card('charged_blade', false, 'charge'), bonus: 100 }];
     const effect = viewDef(id, up).effects[0];
-    if (effect.kind !== 'convertResource') throw new Error('资源牌缺少转换效果');
+    if (effect.kind !== 'convertResource' || effect.max === undefined) throw new Error('资源牌缺少带上限的转换效果');
     const before = JSON.stringify(cs), c = card(id, up);
     expect(describeCard(c, { player: cs.player, target: cs.enemies[0], relics: [], isFirstAttack: false, crescendoBonus: 0 })).toContain(`当前 ${effect.max}`);
     expect(JSON.stringify(cs)).toBe(before);
@@ -56,13 +57,14 @@ describe.each([false, true])('角色资源转换（升级=%s）', up => {
   });
   it('灰中索引只按已经发生的消耗抽牌；本牌消耗留待后续兑换', () => {
     let cs = battle(); cs.player.turnFlags.exhausted = 2; cs.player.statuses.echo = 1;
-    cs = use(cs, 'ash_index', up); expect(cs.player.hand).toHaveLength(2); expect(cs.player.turnFlags.exhausted).toBe(3);
-    cs = use(cs, 'ash_index', up); expect(cs.player.hand).toHaveLength(3);
+    // 升级版每次结算（本体与回响）各额外抽 1 张。
+    cs = use(cs, 'ash_index', up); expect(cs.player.hand).toHaveLength(2 + (up ? 2 : 0)); expect(cs.player.turnFlags.exhausted).toBe(3);
+    cs = use(cs, 'ash_index', up); expect(cs.player.hand).toHaveLength(3 + (up ? 3 : 0));
   });
-  it('借火鼓风消耗目标燃烧、保留不足整份部分，不能凭空产能', () => {
+  it('借火鼓风把目标燃烧全部消耗（余数也不留），每 4（3）层换 1 点能量，回响那次已无燃烧可换', () => {
     let cs = battle(); cs.enemies[0].statuses.burn = 11; cs.player.statuses.echo = 1;
-    cs = use(cs, 'borrow_flame', up); expect(cs.player.energy).toBe(5); expect(cs.enemies[0].statuses.burn).toBe(3);
-    cs = use(cs, 'borrow_flame', up); expect(cs.player.energy).toBe(5);
+    cs = use(cs, 'borrow_flame', up); expect(cs.player.energy).toBe(up ? 6 : 5); expect(cs.enemies[0].statuses.burn ?? 0).toBe(0);
+    cs = use(cs, 'borrow_flame', up); expect(cs.player.energy).toBe(up ? 6 : 5);
   });
   it('回脉忆战认实际治疗，过量治疗不计，同一份治疗不能重复兑换', () => {
     let cs = battle(); cs.player.hp = 75;
@@ -98,6 +100,6 @@ describe.each([false, true])('角色资源转换（升级=%s）', up => {
     const before = JSON.stringify(cs);
     const text = describeCard(c, { player: cs.player, target: cs.enemies[0], relics: cs.relics, isFirstAttack: false, crescendoBonus: 0 });
     expect(text).toContain('当前 0'); expect(JSON.stringify(cs)).toBe(before);
-    const next = playCard(cs, c.uid, 'e0').state; expect(next.player.energy).toBe(3); expect(next.player.hand).toHaveLength(0);
+    const next = playCard(cs, c.uid, 'e0').state; expect(next.player.energy).toBe(3 - viewDef(id, up).cost); expect(next.player.hand).toHaveLength(id === 'ash_index' && up ? 1 : 0); // 灰中索引升级后固定多抽 1 张
   });
 });

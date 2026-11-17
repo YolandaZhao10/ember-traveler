@@ -7,7 +7,7 @@ import { recordJourney } from './history';
 import { ensurePowerInstances } from './powers';
 import { ENEMIES } from '../data/enemies';
 import { ensureEncounterPlan } from './encounters';
-import { BLOCK_MAX, clampCharge } from './constants';
+import { BLOCK_MAX, chargeLimit, clampCharge } from './constants';
 import { appliedBurn } from './burnHistory';
 import { CARDS, RETIRED_CARDS } from '../data/cards';
 import type { CardInstance } from './types';
@@ -169,7 +169,7 @@ export function loadRun(): RunState | null {
       if (!snapshot?.combat) continue;
       for (const entity of [snapshot.combat.player, ...snapshot.combat.enemies]) entity.block = Math.min(BLOCK_MAX, Math.max(0, entity.block));
       const p = snapshot.combat.player;
-      for (const card of [...p.hand, ...p.draw, ...p.discard, ...p.exhaust]) if (card.bonus !== undefined) card.bonus = clampCharge(card.bonus);
+      for (const card of [...p.hand, ...p.draw, ...p.discard, ...p.exhaust]) if (card.bonus !== undefined) card.bonus = clampCharge(card.bonus, chargeLimit(CARDS[card.defId]?.charge));
     }
     // 旧版只有第一章；快照也升级，避免 SL 后退回旧结构。
     if (run.version >= 4 && run.version < SAVE_VERSION) {
