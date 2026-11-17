@@ -58,6 +58,7 @@ add('traveler', 'uncommon', [
   P('road_armor', '旅途重甲', 'bulwark', 2, [block(5), status('dexterity', 2)], [block(8), status('dexterity', 2)]),
   S('thorn_stance', '刺盾姿态', 'bulwark', 1, [status('thorns', 1), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], [status('thorns', 2), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], { exhaust: true }),
   A('guard_breaker', '破阵刃', 'combo', 2, [hit(12), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 2, 'target'))], [hit(17), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 3, 'target'))]),
+  A('lantern_flurry', '引灯连斩', 'combo', 0, [ember(-2), hit(3, { times: 2 }), draw(1)], [ember(-2), hit(4, { times: 2 }), draw(1)], { requireEmber: 2 }),
 ]);
 add('traveler', 'rare', [
   A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 2))], { target: 'all_enemies' }),

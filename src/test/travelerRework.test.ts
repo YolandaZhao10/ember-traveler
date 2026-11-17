@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CARDS } from '../data/cards';
 import { describeCard } from '../engine/cards';
-import { createCombat, playCard } from '../engine/combat';
+import { canPlayCard, createCombat, endPlayerTurn, playCard } from '../engine/combat';
 import { makeRng } from '../engine/rng';
 import type { CardInstance, CombatState } from '../engine/types';
 
@@ -166,6 +166,49 @@ describe('旅人壁垒牌：只加输出，不动叠甲', () => {
     expect(CARDS.iron_wall.upgrade?.effects).toEqual([{ kind: 'block', amount: 22 }, { kind: 'status', status: 'metallicize', amount: 5, target: 'self' }]);
     expect(CARDS.brace_line.effects.map(e => e.kind)).toEqual(['conditional', 'block']);
     expect(CARDS.long_road.effects).toEqual([{ kind: 'status', status: 'patientGuard', amount: 8, target: 'self' }]);
+  });
+});
+
+describe('旅人新牌：引灯连斩', () => {
+  it('旅人专属的 0 费罕见连击攻击牌，不消耗、不保留、不能以生命代付', () => {
+    const def = CARDS.lantern_flurry;
+    expect([def.name, def.owner, def.archetype, def.rarity, def.type, def.cost, def.target]).toEqual(['引灯连斩', 'traveler', 'combo', 'uncommon', 'attack', 0, 'enemy']);
+    expect([def.requireEmber, def.exhaust, def.retain, def.hpFallback, def.charge]).toEqual([2, undefined, undefined, undefined, undefined]);
+    expect(def.upgrade?.cost).toBeUndefined();
+  });
+
+  it.each([false, true])('消耗 2 点余烬，造成 3/4 点伤害 × 2，抽 1 张牌，进入弃牌堆（升级=%s）', up => {
+    expect(text('lantern_flurry', up)).toBe(`消耗 2 点余烬，造成 ${up ? 4 : 3} 点伤害 × 2，抽 1 张牌。需要 2 点余烬。`);
+    const cs = battle('lantern_flurry', up, 0); cs.player.ember = 3; cs.player.energy = 0;
+    const after = play(cs, 'lantern_flurry');
+    expect([lost(after), after.player.ember, after.player.energy, after.player.attacksPlayedThisTurn]).toEqual([up ? 8 : 6, 1, 0, 1]);
+    expect(after.player.hand.map(c => c.defId)).toEqual(['defend']);
+    expect(after.player.discard.map(c => c.defId)).toEqual(['lantern_flurry']);
+    expect(after.player.exhaust).toEqual([]);
+  });
+
+  it.each([false, true])('余烬不足 2 点时不能打出，也不会改为失去生命（升级=%s）', up => {
+    for (const ember of [0, 1]) {
+      const cs = battle('lantern_flurry', up, 0); cs.player.ember = ember;
+      expect(canPlayCard(cs, cs.player.hand[0]).ok).toBe(false);
+      expect(playCard(cs, 'lantern_flurry', cs.enemies[0].id).state).toBe(cs);
+    }
+  });
+
+  it('不带保留：回合结束时留在手里的引灯连斩进入弃牌堆', () => {
+    const cs = battle('lantern_flurry', false, 0);
+    const after = endPlayerTurn(cs).state;
+    expect(after.player.hand.map(c => c.defId)).not.toContain('lantern_flurry');
+    expect(after.player.discard.map(c => c.defId)).toContain('lantern_flurry');
+  });
+
+  it('每次都要实付 2 点余烬：4 点余烬只够连打两张', () => {
+    let cs = battle('lantern_flurry', false, 0);
+    cs.player.hand = [card('lantern_flurry', 'a'), card('lantern_flurry', 'b'), card('lantern_flurry', 'c')];
+    cs.player.ember = 4;
+    for (const uid of ['a', 'b']) cs = playCard(cs, uid, cs.enemies[0].id).state;
+    expect([lost(cs), cs.player.ember]).toEqual([12, 0]);
+    expect(canPlayCard(cs, cs.player.hand.find(c => c.uid === 'c')!).ok).toBe(false);
   });
 });
 

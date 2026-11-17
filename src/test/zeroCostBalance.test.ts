@@ -106,7 +106,7 @@ const repeatBudgets: Record<string, { damage?: number[]; block?: number[]; ember
   steady_breath: { block: [2, 4], ember: 1 },
 };
 // 已审核例外：可重复零费牌附带过牌，但每次必须实付登记数量的余烬，余烬不足不能打出。
-const paidRepeatExceptions: Record<string, number> = { ember_sift: 2 };
+const paidRepeatExceptions: Record<string, number> = { ember_sift: 2, lantern_flurry: 2 };
 function resourceEffect(effect: Effect): boolean {
   if (effect.kind === 'conditional') return effect.then.some(resourceEffect);
   return ['draw', 'energy', 'heal', 'returnExhausted', 'exhaustHand'].includes(effect.kind)
