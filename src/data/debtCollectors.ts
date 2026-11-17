@@ -17,7 +17,7 @@ interface CollectorNumbers {
 
 /**
  * 讨债人：生命为该章首领的一半，前八回合平均伤害约为首领的 90%～110%（基础值）。
- * 实战倍率按商店所在楼层的首领倍率计算：章末商店遇到的与首领同档，越早的商店越弱。
+ * 实战倍率以该章章末首领的倍率为底，章内每深入一层再往上加（见 run.ts 的 debtCollectorDifficulty）。
  * 只用攻击、多段、格挡、力量成长和减益；不转阶段、不塞牌、不召唤、不逃跑、不偷金币。
  */
 const NUMBERS: Record<ChapterId, CollectorNumbers> = {

@@ -4,12 +4,14 @@ import { debtCollectorId } from '../src/data/debtCollectors';
 import { BUILD_LOADOUTS } from '../src/test/buildLoadouts';
 import { createCombat, playCard, endPlayerTurn, enemyAct, startPlayerTurn } from '../src/engine/combat';
 import { encounterDifficulty } from '../src/engine/difficulty';
+import { debtCollectorDifficulty } from '../src/engine/run';
+import { STANDARD_DIFFICULTY } from '../src/data/difficulty';
 import { makeRng } from '../src/engine/rng';
 import { planMove } from '../src/test/cardFloorBenchmark';
 import { buildScenario } from './buildScenarios';
 import type { ChapterId, CombatState } from '../src/engine/types';
 
-/** 各章讨债人与同章首领的并排对比：同一批构筑牌组、相同种子。讨债人强度随商店楼层变化，分别按章内第 2 层和章末楼层各测一组。 */
+/** 各章讨债人与同章首领的并排对比：同一批构筑牌组、相同种子。讨债人以章末首领倍率为底、随商店楼层往上加，分别按章内第 2 层和章末楼层各测一组。 */
 const arg = (key: string) => { const i = process.argv.indexOf(key); return i < 0 ? undefined : process.argv[i + 1]; };
 const seeds = Number(arg('--seeds') ?? 40);
 const BOSSES: Record<ChapterId, string[]> = { 1: ['ash_sovereign', 'bell_heart'], 2: ['everburning_core'], 3: ['eclipse_archon'], 4: ['nightless_lord'] };
@@ -34,7 +36,8 @@ for (const chapter of [1, 2, 3, 4] as ChapterId[]) {
       // 第一章用六张普通牌的早期牌组，之后用完整的成型牌组；遗物随章节解锁。
       const stage = { id: enemies[0], floor, tier, enemies };
       const { ids, relics, hp, deck } = buildScenario(build, stage);
-      const scaling = kind === 'collector-early' ? encounterDifficulty(CHAPTERS[chapter].startFloor + 1, 'boss') : difficulty;
+      // 讨债人用游戏内的倍率：章内第 2 层与章末楼层各一组；首领用章末首领倍率。
+      const scaling = kind === 'boss' ? difficulty : debtCollectorDifficulty({ chapter, floor: kind === 'collector-early' ? CHAPTERS[chapter].startFloor + 1 : floor, difficulty: STANDARD_DIFFICULTY });
       const results = Array.from({ length: seeds }, (_, seed) => fight(createCombat(enemies[0], enemies, tier, deck(ids), hp, hp, relics, makeRng(`DEBT-${seed}`, 'c'), 100, build.character, scaling).state));
       const mean = (k: 'hpLoss' | 'hpLossRatio' | 'turns') => results.reduce((s, r) => s + r[k], 0) / seeds;
       rows.push({ chapter, kind, enemy: enemies[0], route: build.route, seeds, wins: results.filter(r => r.won).length, stalled: results.filter(r => r.stalled).length, invalid: results.filter(r => r.invalid).length, hpLoss: mean('hpLoss'), hpLossRatio: mean('hpLossRatio'), turns: mean('turns') });

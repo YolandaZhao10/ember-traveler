@@ -641,7 +641,25 @@ export function debtRepay(input: RunState): RunState {
   return recordCheckpoint(run);
 }
 
-/** 迎战讨债人。强度按商店所在楼层的首领倍率计算，越靠后的商店越强；按普通战斗结算遗物效果。 */
+/**
+ * 讨债人的强度：以本章章末首领的倍率为底，章内每深入一层再按首领的逐层步长往上加。
+ * 所以任何商店遇到的都不弱于章末首领的倍率，越靠后越强。
+ */
+export function debtCollectorDifficulty(run: Pick<RunState, 'chapter' | 'floor' | 'difficulty'>) {
+  const chapter = CHAPTERS[run.chapter];
+  const base = encounterDifficulty(chapter.startFloor + chapter.floors - 1, 'boss', run.difficulty);
+  const start = encounterDifficulty(chapter.startFloor, 'boss', run.difficulty);
+  const here = encounterDifficulty(Math.max(chapter.startFloor, run.floor), 'boss', run.difficulty);
+  return {
+    ...base,
+    floor: here.floor,
+    healthMultiplier: base.healthMultiplier + here.healthMultiplier - start.healthMultiplier,
+    attackMultiplier: base.attackMultiplier + here.attackMultiplier - start.attackMultiplier,
+    blockMultiplier: base.blockMultiplier + here.blockMultiplier - start.blockMultiplier,
+  };
+}
+
+/** 迎战讨债人；按普通战斗结算遗物效果。 */
 export function debtFight(input: RunState): RunState {
   if (input.screen !== 'debt' || input.loan?.stage !== 'choice') return input;
   const run = clone(input);
@@ -649,7 +667,7 @@ export function debtFight(input: RunState): RunState {
   // 独立随机流：不读写 rng.combat，也不记入已遇到的遭遇，其他节点的结果不变。
   const rng = makeRng(run.seed, `debt:${run.loan!.settled}`);
   const res = createCombat(id, [id], 'normal', run.deck, run.hp, run.maxHp, run.relics, rng, run.uidCounter, run.character,
-    encounterDifficulty(run.floor, 'boss', run.difficulty), run.gold);
+    debtCollectorDifficulty(run), run.gold);
   run.loan!.stage = 'fight';
   run.combat = res.state;
   run.gold = res.state.gold;
