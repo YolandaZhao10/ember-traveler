@@ -67,7 +67,7 @@ describe('扩展卡池与遗物配额', () => {
   });
   it.each(characters)('%s 专属牌配额含资源牌、循环牌与血誓重演，初始牌另计', owner => {
     const cards = CARD_LIST.filter(c => c.owner === owner);
-    const expected = { traveler: [20, 22, 15], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
+    const expected = { traveler: [20, 23, 14], picker: [20, 23, 15], oathbound: [23, 24, 15], scholar: [22, 24, 16] };
     expect(['common', 'uncommon', 'rare'].map(rarity => cards.filter(c => c.rarity === rarity).length)).toEqual(expected[owner]);
     expect(cards.filter(c => c.rarity === 'starter').length).toBeGreaterThan(0);
     for (const c of cards) for (const other of characters) expect(cardAvailableTo(c, other)).toBe(owner === other);

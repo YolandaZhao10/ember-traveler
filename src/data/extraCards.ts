@@ -37,31 +37,31 @@ add('traveler', 'common', [
   A('cross_guard', '交锋', 'combo', 1, [hit(7), block(6)], [hit(10), block(8)]),
   A('pommel_jab', '柄击', 'combo', 1, [hit(7), status('weak', 1, 'target')], [hit(10), status('weak', 1, 'target')]),
   A('trail_cut', '踏痕斩', 'combo', 1, [hit(8), when(guarded, ember(2))], [hit(11), when(guarded, ember(2))]),
-  A('frontier_sweep', '开路横斩', 'combo', 1, [hit(7, { aoe: true }), when(attacks(2), status('vulnerable', 1, 'all'))], [hit(10, { aoe: true }), when(attacks(2), status('vulnerable', 2, 'all'))], { target: 'all_enemies' }),
+  A('frontier_sweep', '开路横斩', 'combo', 1, [hit(7, { aoe: true }), when(attacks(1), status('vulnerable', 1, 'all'))], [hit(10, { aoe: true }), when(attacks(1), status('vulnerable', 2, 'all'))], { target: 'all_enemies' }),
   S('steady_grip', '稳握', 'combo', 0, [block(4), when(cards(2), draw(1))], [block(7), when(cards(2), draw(1))], { exhaust: true }),
   S('measured_step', '量步', 'combo', 1, [draw(1), block(8)], [draw(1), block(11)]),
   A('shield_edge', '盾缘', 'bulwark', 1, [hit(6), when(guarded, status('tempThorns', 2))], [hit(9), when(guarded, status('tempThorns', 3))]),
   S('brace_line', '架盾', 'bulwark', 1, [when(guarded, status('metallicize', 1)), block(7)], [when(guarded, status('metallicize', 2)), block(10)]),
   S('ember_patrol', '提灯巡守', 'bulwark', 1, [block(9), when(cards(2), status('energyNext', 1))], [block(12), when(cards(2), status('energyNext', 1))]),
   S('rally_step', '整步', 'bulwark', 0, [block(3), when(attacks(1), ember(1))], [block(5), when(attacks(1), ember(1))]),
-  A('lantern_poke', '灯火突刺', 'combo', 1, [hit(6), ember(1), when(attacks(2), draw(1))], [hit(9), ember(1), when(attacks(2), draw(1))]),
+  A('lantern_poke', '灯火突刺', 'combo', 1, [hit(7), ember(1), when(attacks(1), draw(1))], [hit(10), ember(1), when(attacks(1), draw(1))]),
 ]);
 add('traveler', 'uncommon', [
-  S('pursuit_step', '追风步', 'combo', 0, [draw(1), when(cards(2), strength(2))], [draw(2), when(cards(2), strength(3))], { exhaust: true }),
+  S('pursuit_step', '追风步', 'combo', 0, [draw(1), when(cards(2), strength(3))], [draw(2), when(cards(2), strength(4))], { exhaust: true }),
   A('hooking_cut', '钩刃', 'combo', 1, [hit(4, { times: 2 }), status('vulnerable', 1, 'target')], [hit(6, { times: 2 }), status('vulnerable', 1, 'target')]),
   A('blade_rain', '碎刃雨', 'combo', 2, [hit(6, { times: 2, aoe: true }), status('weak', 1, 'all'), when(cards(3), draw(1))], [hit(8, { times: 2, aoe: true }), status('weak', 2, 'all'), when(cards(3), draw(2))], { target: 'all_enemies' }),
-  S('marching_rhythm', '行军拍', 'combo', 1, [draw(2), when(attacks(2), status('energyNext', 1))], [draw(3), when(attacks(2), status('energyNext', 1))]),
+  S('marching_rhythm', '行军拍', 'combo', 1, [draw(2), block(4), when(attacks(1), status('energyNext', 1))], [draw(3), block(4), when(attacks(1), status('energyNext', 1))]),
   A('swift_return', '回身刺', 'combo', 0, [hit(5), when(attacks(2), block(4))], [hit(7), when(attacks(2), block(6))]),
   S('ember_plate', '余烬锻甲', 'bulwark', 1, [ember(-2), block(12), draw(1)], [ember(-2), block(16), draw(1)], { requireEmber: 2 }),
   S('iron_escort', '铁卫护送', 'bulwark', 2, [block(14), status('weak', 1, 'all'), draw(1)], [block(18), status('weak', 1, 'all'), draw(2)]),
   A('shield_rush', '持盾冲锋', 'bulwark', 2, [block(10), { kind: 'damageByBlock', bonus: 3 }, status('vulnerable', 1, 'target')], [block(14), { kind: 'damageByBlock', bonus: 3 }, status('vulnerable', 2, 'target')]),
   P('road_armor', '旅途重甲', 'bulwark', 2, [block(5), status('dexterity', 2)], [block(8), status('dexterity', 2)]),
   S('thorn_stance', '刺盾姿态', 'bulwark', 1, [status('thorns', 1), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], [status('thorns', 2), { kind: 'doubleStatus', status: 'thorns', target: 'self' }, draw(1)], { exhaust: true }),
-  A('guard_breaker', '破阵刃', 'combo', 2, [hit(12), status('weak', 2, 'target'), when(attacks(2), status('vulnerable', 2, 'target'))], [hit(17), status('weak', 2, 'target'), when(attacks(2), status('vulnerable', 3, 'target'))]),
+  A('guard_breaker', '破阵刃', 'combo', 2, [hit(12), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 2, 'target'))], [hit(17), status('weak', 2, 'target'), when(attacks(1), status('vulnerable', 3, 'target'))]),
 ]);
 add('traveler', 'rare', [
-  A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(2), status('crescendo', 2))], { target: 'all_enemies' }),
-  A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(2), hit(12))], [hit(26), when(attacks(2), hit(16))]),
+  A('blade_tempest', '连刃风暴', 'combo', 2, [hit(4, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 1))], [hit(5, { times: 3, aoe: true }), when(attacks(1), status('crescendo', 2))], { target: 'all_enemies' }),
+  A('last_lantern', '长夜终灯', 'combo', 2, [hit(20), when(attacks(1), hit(10))], [hit(26), when(attacks(1), hit(13))]),
   S('unbroken_stride', '不息步伐', 'combo', 0, [draw(2), when(attacks(3), status('echo', 1))], [draw(3), when(attacks(3), status('echo', 1))], { exhaust: true }),
   P('vanguard_oath', '先锋誓言', 'combo', 2, [status('vanguardCycle', 8)], [status('vanguardCycle', 12)]),
   A('encircling_blades', '环刃', 'combo', 1, [hit(3, { times: 4 }), when(attacks(2), status('energyNext', 1))], [hit(4, { times: 4 }), when(attacks(2), status('energyNext', 2))]),
@@ -70,7 +70,7 @@ add('traveler', 'rare', [
   A('iron_rebuke', '铁壁回敬', 'bulwark', 2, [{ kind: 'damageByBlock', bonus: 6, mult: 2 }, status('weak', 2, 'target')], [{ kind: 'damageByBlock', bonus: 10, mult: 2 }, status('weak', 3, 'target')]),
   S('lantern_shelter', '灯下庇护', 'bulwark', 1, [ember(-3), { kind: 'clearDebuffs' }, block(20)], [ember(-3), { kind: 'clearDebuffs' }, block(28)], { requireEmber: 3, retain: true }),
   P('long_road', '漫长守望', 'bulwark', 2, [status('patientGuard', 8)], [status('patientGuard', 11)]),
-  A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(2), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(2), status('energyNext', 2))], { target: 'all_enemies' }),
+  A('dawn_charge', '破晓冲锋', 'combo', 2, [hit(12, { aoe: true }), ember(3), when(attacks(1), status('energyNext', 2))], [hit(16, { aoe: true }), ember(4), when(attacks(1), status('energyNext', 2))], { target: 'all_enemies' }),
 ]);
 
 // 拾灰者：点火、控场与消耗回收；高收益治疗和资源牌均限制重复使用。

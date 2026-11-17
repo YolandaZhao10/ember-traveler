@@ -93,8 +93,8 @@ def({
   owner: 'traveler',
   cost: 0,
   target: 'enemy',
-  effects: [{ kind: 'damage', amount: 3 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
-  upgrade: { effects: [{ kind: 'damage', amount: 5 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
+  effects: [{ kind: 'damage', amount: 3 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'gainEmber', amount: 1 }] }],
+  upgrade: { effects: [{ kind: 'damage', amount: 5 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'gainEmber', amount: 1 }] }] },
 });
 def({
   id: 'twin_blades',
@@ -170,8 +170,8 @@ def({
   owner: 'traveler',
   cost: 2,
   target: 'enemy',
-  effects: [{ kind: 'damagePerAttack', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 16 }] }],
-  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 2 }, then: [{ kind: 'block', amount: 24 }] }] },
+  effects: [{ kind: 'damagePerAttack', amount: 6 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'block', amount: 12 }] }],
+  upgrade: { effects: [{ kind: 'damagePerAttack', amount: 8 }, { kind: 'conditional', cond: { kind: 'attacksThisTurnAtLeast', value: 1 }, then: [{ kind: 'block', amount: 16 }] }] },
   flavor: '每一刀都为下一刀铺路。',
 });
 def({
@@ -190,7 +190,7 @@ def({
   id: 'war_drum',
   name: '战鼓',
   type: 'power',
-  rarity: 'rare',
+  rarity: 'uncommon',
   archetype: 'combo',
   owner: 'traveler',
   cost: 1,
