@@ -1414,8 +1414,8 @@ EXTRA_CURSES.forEach(def);
 CYCLE_CARDS.forEach(def);
 
 /**
- * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对；
- * 只影响从共享池抽奖励时的权重，不限制其他角色获得。
+ * 共享牌的主接口角色（CardDef.hook）。集中在这里登记，便于对照设计表整体核对。
+ * 接口牌只发给登记的角色：奖励、商店与事件的随机给牌都不会把它给其他角色（见 cardAvailableTo）。
  */
 const SHARED_HOOKS: Record<CharacterId, string[]> = {
   // 投石、守夜、匀息、辟邪灯、卸热、掷出火把、熔炉、篝火避难所
@@ -1444,6 +1444,11 @@ export function cardsOfRarity(r: CardDef['rarity']): CardDef[] {
   return CARD_LIST.filter((c) => c.rarity === r);
 }
 
+/**
+ * 这名角色能否从奖励、商店、事件随机拿到这张牌。专属牌只给本人；通用牌里，底座牌与共鸣牌人人可得，
+ * 接口牌只给登记的角色。只管发牌：旧存档牌组里已有的其他角色接口牌照常可用。
+ */
 export function cardAvailableTo(c: CardDef, character: CharacterId): boolean {
-  return !c.owner || c.owner === character;
+  if (c.owner) return c.owner === character;
+  return !c.hook || c.hook === character;
 }

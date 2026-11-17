@@ -407,13 +407,12 @@ function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState,
 }
 
 /**
- * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现，其他角色的接口牌更少。
+ * 从共享池抽具体牌时的权重：本角色的接口牌与共鸣牌更常出现。其他角色的接口牌不在池里（见 cardAvailableTo）。
  * 专属牌恒为 1；旅人暂不加权，全部为 1。
  */
 export function sharedRewardWeight(card: CardDef, character: CharacterId): number {
   if (card.owner || character === 'traveler') return 1;
-  if (card.kindred || card.hook === character) return 1.5;
-  return card.hook ? 0.75 : 1;
+  return card.kindred || card.hook === character ? 1.5 : 1;
 }
 
 /** 与均匀抽取同样只消耗一次随机数；权重全为 1 时结果与原先的均匀抽取完全相同。 */
