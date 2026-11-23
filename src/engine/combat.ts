@@ -562,7 +562,8 @@ export function createCombat(
   };
   enemyIds.forEach((id, i) => {
     const def = ENEMIES[id];
-    const hpv = scaleEnemyValue(nextInt(cs.rng, def.hp[0], def.hp[1]), difficulty?.healthMultiplier);
+    const baseHp = difficulty?.complexIntents && def.hardHp ? def.hardHp : def.hp;
+    const hpv = scaleEnemyValue(nextInt(cs.rng, baseHp[0], baseHp[1]), difficulty?.healthMultiplier);
     cs.enemies.push({
       id: `e${i}`,
       defId: id,

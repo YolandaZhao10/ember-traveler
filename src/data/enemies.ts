@@ -75,6 +75,7 @@ def({
   name: '蚀骨蛛',
   tier: 'normal',
   hp: [22, 26],
+  hardHp: [30, 30],
   sprite: 'spider',
   description: '牙上淬着让人无力的毒。',
   moves: [
@@ -92,7 +93,7 @@ def({
       ],
     },
     { id: 'web', name: '织网', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
-    { id: 'rend', name: '撕咬', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }] },
+    { id: 'rend', name: '撕咬', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }], hardActions: [{ kind: 'attack', amount: 10 }] },
   ],
   chooseMove: (ctx) => {
     if (ctx.enemy.turn === 0) return 'fang';
@@ -156,6 +157,7 @@ def({
   name: '暗影夜鸦',
   tier: 'normal',
   hp: [16, 20],
+  hardHp: [23, 24],
   sprite: 'crow',
   description: '它们的叫声会让人手脚发软。',
   moves: [

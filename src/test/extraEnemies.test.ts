@@ -90,6 +90,24 @@ describe('前三章新增普通怪的独立行为', () => {
     }
   });
 
+  it('挑战难度专用基础生命：夜鸦 23–24、蚀骨蛛 30，标准难度仍用原区间', () => {
+    const hps = (id: string, floor: number, settings: typeof STANDARD_DIFFICULTY) => {
+      const d = encounterDifficulty(floor, 'normal', settings);
+      const seen = new Set<number>();
+      for (let i = 0; i < 80; i++) seen.add(createCombat('hp', [id], 'normal', [], 100, 100, [], makeRng(`HP-${i}`, 'c'), 0, 'traveler', d).state.enemies[0].maxHp);
+      return [Math.min(...seen), Math.max(...seen)];
+    };
+    const hard = DIFFICULTY_PRESETS[2].settings;
+    expect(hps('shade_crow', 0, hard)).toEqual([34, 36]);
+    expect(hps('shade_crow', 18, hard)).toEqual([47, 49]);
+    expect(hps('bone_spider', 0, hard)).toEqual([45, 45]);
+    expect(hps('bone_spider', 18, hard)).toEqual([61, 61]);
+    expect(hps('shade_crow', 0, STANDARD_DIFFICULTY)).toEqual([18, 23]);
+    expect(hps('bone_spider', 0, STANDARD_DIFFICULTY)).toEqual([25, 30]);
+    // 只提高生命、意图不到 125% 的自定义难度不启用专用生命。
+    expect(hps('bone_spider', 0, { ...STANDARD_DIFFICULTY, enemyHealth: 130 })).toEqual([Math.round(22 * 1.15 * 1.3), Math.round(26 * 1.15 * 1.3)]);
+  });
+
   it('压力釜和锯轮的爆发力量不会无限累积，压力釜自损不会自杀', () => {
     for (const id of ['pressure_boiler', 'slag_saw']) {
       let cs = battle([id]);

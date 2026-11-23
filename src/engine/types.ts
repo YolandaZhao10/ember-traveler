@@ -258,6 +258,8 @@ export interface EnemyDef {
   id: string;
   name: string;
   hp: [number, number];
+  /** 挑战难度（复合招式启用时）改用的基础生命区间；不填则与 hp 相同。 */
+  hardHp?: [number, number];
   tier: 'normal' | 'elite' | 'boss';
   sprite: string;
   /** 每回合最多失去最大生命的比例；战斗创建时向上取整并固定额度。 */
