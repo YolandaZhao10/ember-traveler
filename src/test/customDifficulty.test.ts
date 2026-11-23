@@ -43,11 +43,15 @@ describe('新旅程自定义难度', () => {
     expect(battle.combat!.difficulty).toEqual(encounterDifficulty(0, 'normal', custom));
     const make = (settings: RunDifficulty) => createCombat('test', ['tomb_puppet'], 'normal', [], 100, 100, [], makeRng('CUSTOM', 'c'), 0, 'traveler', encounterDifficulty(0, 'normal', settings)).state;
     const standard = make(STANDARD_DIFFICULTY); let changed = make(custom);
-    expect(changed.enemies[0].maxHp).toBe(Math.round(standard.enemies[0].maxHp * 1.3));
+    // 生命按「基础值 × 整体强度 1.15 × 难度 130%」一次取整。
+    const raw = createCombat('test', ['tomb_puppet'], 'normal', [], 100, 100, [], makeRng('CUSTOM', 'c'), 0).state.enemies[0].maxHp;
+    expect(encounterDifficulty(0, 'normal', custom).healthMultiplier / encounterDifficulty(0, 'normal', STANDARD_DIFFICULTY).healthMultiplier).toBeCloseTo(1.3, 9);
+    expect(changed.enemies[0].maxHp).toBe(Math.round(raw * encounterDifficulty(0, 'normal', custom).healthMultiplier));
+    expect(changed.enemies[0].maxHp).toBeGreaterThan(standard.enemies[0].maxHp);
     expect(changed.enemies[0].moveId).toBe(standard.enemies[0].moveId);
-    const intent = enemyIntent(changed, changed.enemies[0]); expect(intent).toMatchObject({ kind: 'attack', amount: 7 });
+    const intent = enemyIntent(changed, changed.enemies[0]); expect(intent).toMatchObject({ kind: 'attack', amount: 8 });
     changed = enemyAct(endPlayerTurn(changed).state, 'e0').state;
-    expect(changed.player.hp).toBe(93);
+    expect(changed.player.hp).toBe(92);
   });
   it.each<DifficultyLevel>(['low', 'normal', 'high'])('金币%s档影响实际战斗奖励，不改变初始金币', level => {
     let run = R.newRun('CUSTOM-GOLD', 'traveler', { ...STANDARD_DIFFICULTY, gold: level });

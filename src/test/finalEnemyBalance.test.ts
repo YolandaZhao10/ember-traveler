@@ -25,8 +25,8 @@ function round(input: CombatState) {
 }
 
 describe('终章精英与首领攻防节奏', () => {
-  it('标准难度第62/65层的生命上限分别为550和1220，开场不额外叠盾', () => {
-    for (const [id, hp] of [['last_warden', 550], ['nightless_lord', 1220]] as const) {
+  it('标准难度第62/65层的生命上限分别为633和1403，开场不额外叠盾', () => {
+    for (const [id, hp] of [['last_warden', 633], ['nightless_lord', 1403]] as const) {
       const cs = battle(id);
       expect(cs.enemies[0].hp).toBe(hp);
       expect(cs.enemies[0].maxHp).toBe(hp);
@@ -52,15 +52,15 @@ describe('终章精英与首领攻防节奏', () => {
     cs = round(cs).state;
     expect(cs.player.statuses.vulnerable).toBe(2);
     const firstVerdict = round(cs); cs = firstVerdict.state;
-    expect(firstVerdict.damage).toBe(72);
+    expect(firstVerdict.damage).toBe(84);
     cs = round(cs).state;
     const sheathe = round(cs); cs = sheathe.state;
-    expect(sheathe.damage).toBe(13);
+    expect(sheathe.damage).toBe(15);
     expect(cs.enemies[0].statuses.strength).toBe(2);
-    expect(cs.enemies[0].block).toBe(25);
+    expect(cs.enemies[0].block).toBe(28);
     expect(round(cs).damage).toBe(0);
     cs = round(cs).state;
-    expect(round(cs).damage).toBe(75);
+    expect(round(cs).damage).toBe(87);
   });
 
   it.each(DIFFICULTY_PRESETS)('$name难度：首领一阶段三攻一整备，敕令轻伤后再施加虚弱与冷灰', ({ settings }) => {
@@ -87,7 +87,7 @@ describe('终章精英与首领攻防节奏', () => {
     cs.enemies[0].statuses.vulnerable = 2;
     const awaken = round(cs); cs = awaken.state;
     expect(awaken.move).toBe('awaken');
-    expect(awaken.damage).toBe(6);
+    expect(awaken.damage).toBe(7);
     expect(cs.enemies[0].statuses.weak ?? 0).toBe(0);
     expect(cs.enemies[0].statuses.vulnerable ?? 0).toBe(0);
     expect(cs.enemies[0].statuses.strength).toBe(3);

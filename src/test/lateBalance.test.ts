@@ -18,9 +18,9 @@ const battle = (ids: string[] = []) => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('终局公平性与成长边界', () => {
-  it('困难首领仍有1586生命与每回合25%承伤上限，63伤开场只使用一次，壁垒持续强化', () => {
-    let cs = battle(); expect(cs.enemies[0].maxHp).toBe(1586); expect(cs.enemies[0].damageGuard?.limit).toBe(397);
-    expect(enemyIntent(cs,cs.enemies[0])).toMatchObject({amount:63,times:1});
+  it('困难首领仍有1824生命与每回合25%承伤上限，73伤开场只使用一次，壁垒持续强化', () => {
+    let cs = battle(); expect(cs.enemies[0].maxHp).toBe(1824); expect(cs.enemies[0].damageGuard?.limit).toBe(456);
+    expect(enemyIntent(cs,cs.enemies[0])).toMatchObject({amount:73,times:1});
     for(let i=0;i<8;i++) { cs=endPlayerTurn(cs).state; cs=enemyAct(cs,'e0').state; cs=startPlayerTurn(cs).state; }
     expect(cs.enemies[0].moveHistory.filter(m=>m==='opening')).toHaveLength(1);
     expect(cs.enemies[0].statuses.strength).toBe(6);
