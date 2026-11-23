@@ -29,7 +29,7 @@ describe('挑战复合意图', () => {
     expect(enemyMoveActions(standard, m)).toEqual(m.actions);
     expect(enemyMoveActions(cs, m)).toEqual(m.hardActions);
     // 标准也明确预告易伤/脆弱，不能混入只属于困难的格挡、强化或塞牌。
-    expect(enemyIntentExtras(standard, e)).toEqual(m.actions.flatMap(a => a.kind === 'status' && a.target === 'player' && ['frail','vulnerable'].includes(a.status) ? [`施加${a.status === 'frail' ? '脆弱' : '易伤'} ${a.amount}`] : []));
+    expect(enemyIntentExtras(standard, e)).toEqual(m.actions.flatMap(a => a.kind === 'clearDebuffs' && a.keepBurnRatio ? ['清除其他负面，燃烧减半'] : a.kind === 'status' && a.target === 'player' && ['frail','vulnerable'].includes(a.status) ? [`施加${a.status === 'frail' ? '脆弱' : '易伤'} ${a.amount}`] : []));
     expect(enemyIntentExtras(cs, e).length > 0).toBe(m.hardActions!.some(a => a.kind !== 'attack'));
     const atk = m.hardActions!.find(a => a.kind === 'attack');
     const intent = enemyIntent(cs, e)!;

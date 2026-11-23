@@ -453,6 +453,8 @@ export function enemyIntentExtras(cs: CombatState, e: EnemyState): string[] {
     if (a.kind === 'block') return [`格挡 ${calcBlock(scaleEnemyValue(a.amount, cs.difficulty?.blockMultiplier), e.statuses)}`];
     if (a.kind === 'status') return [`${a.target === 'player' ? '施加' : a.target === 'allies' ? '全体' : ''}${STATUSES[a.status].name} ${a.amount}`];
     if (a.kind === 'addCardToDraw' || a.kind === 'addCardToDiscard') return [`${CARDS[a.cardId].name} ×${a.count} → ${a.kind === 'addCardToDraw' ? '抽牌堆' : '弃牌堆'}`];
+    if (a.kind === 'healWeakest') return [`治疗最弱友方 ${a.amount}`];
+    if (a.kind === 'heal') return [`治疗 ${a.amount}`];
     return [];
   });
 }
@@ -561,7 +563,8 @@ export function createCombat(
   };
   enemyIds.forEach((id, i) => {
     const def = ENEMIES[id];
-    const hpv = scaleEnemyValue(nextInt(cs.rng, def.hp[0], def.hp[1]), difficulty?.healthMultiplier);
+    const baseHp = difficulty?.complexIntents && def.hardHp ? def.hardHp : def.hp;
+    const hpv = scaleEnemyValue(nextInt(cs.rng, baseHp[0], baseHp[1]), difficulty?.healthMultiplier);
     cs.enemies.push({
       id: `e${i}`,
       defId: id,

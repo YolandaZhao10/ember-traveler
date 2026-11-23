@@ -18,12 +18,12 @@ const battle = (ids: string[] = []) => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('终局公平性与成长边界', () => {
-  it('困难首领仍有1586生命与每回合25%承伤上限，63伤开场只使用一次，壁垒持续强化', () => {
-    let cs = battle(); expect(cs.enemies[0].maxHp).toBe(1586); expect(cs.enemies[0].damageGuard?.limit).toBe(397);
-    expect(enemyIntent(cs,cs.enemies[0])).toMatchObject({amount:63,times:1});
+  it('困难首领仍有1824生命与每回合25%承伤上限，73伤开场只使用一次，壁垒持续强化', () => {
+    let cs = battle(); expect(cs.enemies[0].maxHp).toBe(1824); expect(cs.enemies[0].damageGuard?.limit).toBe(456);
+    expect(enemyIntent(cs,cs.enemies[0])).toMatchObject({amount:73,times:1});
     for(let i=0;i<8;i++) { cs=endPlayerTurn(cs).state; cs=enemyAct(cs,'e0').state; cs=startPlayerTurn(cs).state; }
     expect(cs.enemies[0].moveHistory.filter(m=>m==='opening')).toHaveLength(1);
-    expect(cs.enemies[0].statuses.strength).toBe(6);
+    expect(cs.enemies[0].statuses.strength).toBe(12);
   });
   it.each([0,1,24,25])('最终首领觉醒保留燃烧的一半并向上取整：%s层；其他减益清除', burn => {
     let cs = battle(); cs.enemies[0].hp=600; cs.enemies[0].statuses={burn,weak:3,vulnerable:3,frail:3}; cs.player.statuses.everburn=1;

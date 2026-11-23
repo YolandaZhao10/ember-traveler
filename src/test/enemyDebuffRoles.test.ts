@@ -19,8 +19,10 @@ describe('单次攻击敌人的削弱整备',()=>{
   for (const hard of [false,true]) it.each(cases)(`%s/%s 预告与结算一致，不再每轮叠力量，困难=${hard}`, (id,move,status,amount)=>{
     let cs=battle(id,hard);cs.enemies[0].moveId=move;
     const intent=enemyIntent(cs,cs.enemies[0]);
-    expect(intent?.kind).toBe(id==='wind_scribe'?'attack_debuff':'defend_debuff');
-    if(id!=='wind_scribe')expect(intentText(intent).text).toBe('防御+削弱');
+    // 熔渣巨像的聚渣在挑战难度附带攻击，意图变为攻击＋削弱。
+    const attacking=id==='wind_scribe'||(hard&&id==='slag_colossus');
+    expect(intent?.kind).toBe(attacking?'attack_debuff':'defend_debuff');
+    if(!attacking)expect(intentText(intent).text).toBe('防御+削弱');
     expect(enemyIntentExtras(cs,cs.enemies[0])).toContain(`施加${status==='frail'?'脆弱':'易伤'} ${amount}`);
     const step=enemyAct(endPlayerTurn(cs).state,'e0');cs=step.state;
     expect(cs.player.statuses[status]).toBe(amount);expect(cs.enemies[0].statuses.strength??0).toBe(0);

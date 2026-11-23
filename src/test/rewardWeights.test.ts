@@ -8,7 +8,7 @@ const characters: CharacterId[] = ['traveler', 'picker', 'oathbound', 'scholar']
 const rewardRarities = ['common', 'uncommon', 'rare'];
 const add = (run: RunState, ...ids: string[]) => { for (const id of ids) run.deck.push({ uid: `extra-${run.deck.length}`, defId: id, upgraded: false }); return run; };
 
-/** 改版前的抽取流程：固定 25% 抽共享池，池内均匀抽取。用来确认随机数消耗次数不变。 */
+/** 改版前的抽取流程：固定按基础概率抽共享池，池内均匀抽取。用来确认随机数消耗次数不变。 */
 function uniformChoices(run: RunState, tier: R.CardRewardTier, n: number): CardDef[] {
   const weights = R.cardRarityWeights(run.floor, tier, run.difficulty.cardRarity);
   const selected: CardDef[] = [];
@@ -17,7 +17,7 @@ function uniformChoices(run: RunState, tier: R.CardRewardTier, n: number): CardD
     let pool = CARD_LIST.filter(card => card.rarity === rarity && !selected.some(c => c.id === card.id)
       && (tier === 'boss' ? card.owner === run.character : cardAvailableTo(card, run.character)));
     if (tier === 'normal' || tier === 'elite') {
-      const shared = chance(run.rng.reward, .25);
+      const shared = chance(run.rng.reward, R.SHARED_REWARD_CHANCE);
       pool = pool.filter(c => shared ? !c.owner : c.owner === run.character);
     }
     if (pool.length) selected.push(pick(run.rng.reward, pool));
@@ -48,19 +48,22 @@ describe('共享牌的主接口标注', () => {
 });
 
 describe('奖励抽共享池的概率', () => {
-  it.each(characters)('%s：初始牌组为 25%；打击、防御、引火、诅咒和专属牌都不计入共享牌数', character => {
+  it.each(characters)('%s：初始牌组为 35%；打击、防御、引火、诅咒和专属牌都不计入共享牌数', character => {
     const run = R.newRun(`SHARE-${character}`, character);
-    expect(R.sharedRewardChance(run.deck)).toBe(0.25);
+    expect(R.sharedRewardChance(run.deck)).toBe(0.35);
     add(run, 'strike', 'defend', 'kindle', 'kindle', 'ashes', 'ashes', 'ashes');
     add(run, ...CARD_LIST.filter(c => c.owner === character && c.rarity === 'common').slice(0, 4).map(c => c.id));
-    expect(R.sharedRewardChance(run.deck)).toBe(0.25);
-    add(run, 'stoke', 'torch');
-    expect(R.sharedRewardChance(run.deck)).toBe(0.25);
-    add(run, 'kindred_spark');
     expect(R.sharedRewardChance(run.deck)).toBe(0.35);
+    add(run, 'stoke', 'torch');
+    expect(R.sharedRewardChance(run.deck)).toBe(0.35);
+    add(run, 'kindred_spark');
+    expect(R.sharedRewardChance(run.deck)).toBe(0.45);
+    // 卡牌事件沿用调整前的 25% / 35%。
+    expect(R.sharedRewardChance(run.deck, 'event')).toBe(0.35);
+    expect(R.sharedRewardChance(R.newRun('CHANCE-EVENT', character).deck, 'event')).toBe(0.25);
   });
 
-  it.each(characters)('%s：牌组有 3 张共享牌后，普通与精英奖励每槽约 35% 来自共享池，首领仍只出专属稀有牌', character => {
+  it.each(characters)('%s：牌组有 3 张共享牌后，普通与精英奖励每槽约 45% 来自共享池，首领仍只出专属稀有牌', character => {
     for (const tier of ['normal', 'elite'] as const) {
       const run = add(R.newRun(`SHARE35-${character}-${tier}`, character), 'stoke', 'torch', 'tinder_bundle');
       let shared = 0, total = 0;
@@ -68,8 +71,8 @@ describe('奖励抽共享池的概率', () => {
         run.floor = i % 65;
         for (const c of R.generateCardChoices(run, tier, 3)) { shared += Number(!CARDS[c.defId].owner); total++; }
       }
-      expect(shared / total).toBeGreaterThan(0.33);
-      expect(shared / total).toBeLessThan(0.37);
+      expect(shared / total).toBeGreaterThan(0.43);
+      expect(shared / total).toBeLessThan(0.47);
       expect(R.generateCardChoices(run, 'boss', 3).every(c => CARDS[c.defId].owner === character && CARDS[c.defId].rarity === 'rare')).toBe(true);
     }
   });

@@ -10,7 +10,7 @@ const battle = (ids = ['looter'], seed = 'ESCAPE') => createCombat('escape-test'
 afterEach(() => vi.unstubAllGlobals());
 
 describe('偷钱怪逃跑', () => {
-  it.each([{ id: 'looter', protectedTurns: 5 }, { id: 'ash_taxman', protectedTurns: 6 }])('$id前$protectedTurns回合不逃跑，之后随机预告且有完整玩家回合可阻止', ({ id, protectedTurns }) => {
+  it.each([{ id: 'looter', protectedTurns: 7, low: 50, high: 100 }, { id: 'ash_taxman', protectedTurns: 6, low: 40, high: 85 }])('$id前$protectedTurns回合不逃跑，之后随机预告且有完整玩家回合可阻止', ({ id, protectedTurns, low, high }) => {
     let attempts = 0;
     for (let seed = 0; seed < 300; seed++) {
       let cs = battle([id], `ESCAPE-BOUNDARY-${seed}`);
@@ -25,7 +25,23 @@ describe('偷钱怪逃跑', () => {
         expect(cs.enemies[0].flags.escaped).toBeUndefined();
       }
     }
-    expect(attempts).toBeGreaterThan(40); expect(attempts).toBeLessThan(85);
+    expect(attempts).toBeGreaterThan(low); expect(attempts).toBeLessThan(high);
+  });
+
+  it('掠夺者前 7 回合固定为突刺、偷窃、连刺、偷窃、突刺、偷窃、连刺，第 8 回合起四种意图都会出现', () => {
+    const later = new Set<string>();
+    for (let seed = 0; seed < 120; seed++) {
+      let cs = battle(['looter'], `LOOTER-ORDER-${seed}`);
+      const moves: string[] = [];
+      for (let turn = 0; turn < 7; turn++) {
+        moves.push(cs.enemies[0].moveId ?? '');
+        cs = endPlayerTurn(cs).state; cs = enemyAct(cs, 'e0').state; cs = startPlayerTurn(cs).state;
+      }
+      expect(moves).toEqual(['lunge', 'steal', 'flurry', 'steal', 'lunge', 'steal', 'flurry']);
+      expect(stolenGold(cs)).toBe(36);
+      later.add(cs.enemies[0].moveId ?? '');
+    }
+    expect([...later].sort()).toEqual(['escape', 'flurry', 'lunge', 'steal']);
   });
 
   it('逃跑只移出自己并带走实际偷款，不触发死亡、饮血、击杀遗物或同伴复仇', () => {

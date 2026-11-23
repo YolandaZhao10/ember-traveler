@@ -57,7 +57,7 @@ describe('随楼层上升的卡牌稀有度', () => {
   });
 });
 
-it('四角色普通/精英奖励每槽通用来源约25%，与楼层、池大小及功能筛选无关',()=>{
+it('四角色普通/精英奖励每槽通用来源约35%，与楼层、池大小及功能筛选无关',()=>{
  for(const character of ['traveler','picker','oathbound','scholar'] as const)for(const tier of ['normal','elite'] as const){
   const run=R.newRun(`SHARED-${character}-${tier}`,character);let shared=0,total=0;
   for(let i=0;i<1500;i++){
@@ -66,7 +66,7 @@ it('四角色普通/精英奖励每槽通用来源约25%，与楼层、池大小
    expect(R.generateCardChoices(JSON.parse(snapshot),tier,3)).toEqual(cards);
    for(const c of cards){const d=CARDS[c.defId];expect(!d.owner||d.owner===character).toBe(true);shared+=Number(!d.owner);total++;}
   }
-  expect(shared/total).toBeGreaterThan(.23);expect(shared/total).toBeLessThan(.27);
+  expect(shared/total).toBeGreaterThan(.33);expect(shared/total).toBeLessThan(.37);
   expect(R.generateCardChoices(run,'boss',3).every(c=>CARDS[c.defId].owner===character&&CARDS[c.defId].rarity==='rare')).toBe(true);
  }
 });

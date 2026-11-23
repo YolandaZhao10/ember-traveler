@@ -118,7 +118,7 @@ describe('平衡边界回归', () => {
     for (let turn = 0; turn < 3; turn++) {
       const intent = enemyIntent(cs, cs.enemies[0]); const hp = cs.player.hp;
       cs = enemyAct(endPlayerTurn(cs).state, 'e0').state;
-      if (intent?.kind === 'attack') { expect(hp - cs.player.hp).toBe(intent.amount * intent.times); attacks++; }
+      if (intent?.kind === 'attack' || intent?.kind === 'attack_debuff') { expect(hp - cs.player.hp).toBe(intent.amount * intent.times); attacks++; }
       cs = startPlayerTurn(cs).state;
     }
     expect(attacks).toBe(2);

@@ -46,8 +46,10 @@ describe('第三章精英攻防节奏', () => {
           hits.push(result.actions.filter(a => a.attacks).length);
           moves.push(result.actions[0].move!);
         }
-        expect(hits.slice(0, 4).reduce((sum, n) => sum + n, 0)).toBe(id === 'moon_duelist' ? 4 : 3);
-        expect(hits.slice(4).reduce((sum, n) => sum + n, 0)).toBe(id === 'moon_duelist' ? 4 : 3);
+        // 挑战难度下巨像的整备回合也附带一次轻击。
+        const perCycle = id === 'moon_duelist' || cs.difficulty?.complexIntents ? 4 : 3;
+        expect(hits.slice(0, 4).reduce((sum, n) => sum + n, 0)).toBe(perCycle);
+        expect(hits.slice(4).reduce((sum, n) => sum + n, 0)).toBe(perCycle);
         expect(moves.slice(4)).toEqual(moves.slice(0, 4));
         expect(cs.enemies[0].block).toBeGreaterThanOrEqual(0);
         expect(cs.outcome).toBe('ongoing');

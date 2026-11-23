@@ -8,6 +8,8 @@ export const CHAPTER_ENEMY_STRENGTH: Record<ChapterId, { health: number; attack:
   4: { health: 2.5, attack: 1.9, block: 2.14 },
 };
 export const FLOOR_STRENGTH_STEP = { health: .02, attack: .012, block: .015 };
+/** 全体怪物的整体强度：生命、伤害、格挡统一乘上这个值，对所有难度、所有怪物（含精英、首领、讨债人）生效。 */
+export const GLOBAL_ENEMY_STRENGTH = 1.15;
 
 export const STANDARD_DIFFICULTY: RunDifficulty = {
   enemyHealth: 100, enemyIntent: 100, bossHealth: 100, bossIntent: 100, gold: 100, relicRarity: 100, cardRarity: 100,

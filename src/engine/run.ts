@@ -19,7 +19,7 @@ import { distinctRewardPool } from './cardChoices';
 import { describeCard } from './cards';
 import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick, type RngState } from './rng';
-import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
+import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EncounterDef, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
 export const SAVE_VERSION = 20;
 
@@ -179,6 +179,19 @@ export function ensureRewardCheckpoint(input: RunState): RunState {
 }
 
 // ---------- 战斗 ----------
+/**
+ * 普通战和精英战同一敌组本局只出现一次：预排的敌组已经打过时，换成当前楼层可用、还没打过的一组；
+ * 可用的都打过了，就换成最久没遇到的那一组。这两类敌组不在地图上预告，入场时改换不影响已显示的信息。
+ * 用独立的种子流挑选，不推进战斗随机流。首领不受影响。
+ */
+function variedEncounter(run: RunState, planned: EncounterDef, pool: EncounterDef[], nodeId: string): EncounterDef {
+  if (!run.seenEncounters.includes(planned.id)) return planned;
+  const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
+  if (fresh.length) return pick(makeRng(run.seed, `${planned.tier}-vary:${run.chapter}:${nodeId}`), fresh);
+  const last = (e: EncounterDef) => run.seenEncounters.lastIndexOf(e.id);
+  return pool.reduce((oldest, e) => (last(e) < last(oldest) ? e : oldest), planned);
+}
+
 function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunState {
   const localFloor = run.floor - CHAPTERS[run.chapter].startFloor;
   const pool = ENCOUNTERS.filter(
@@ -186,7 +199,8 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   );
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
   const node = run.currentNodeId ? run.map.nodes[run.currentNodeId] : undefined;
-  const enc = (node && plannedEncounter(run, node)) ?? pick(run.rng.combat, fresh.length ? fresh : pool);
+  const planned = node && plannedEncounter(run, node);
+  const enc = planned ? (tier === 'boss' ? planned : variedEncounter(run, planned, pool, node!.id)) : pick(run.rng.combat, fresh.length ? fresh : pool);
   if (node) node.encounterId = enc.id;
   run.seenEncounters.push(enc.id);
   const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty), run.gold);
@@ -384,26 +398,31 @@ export function cardRarityWeights(floor: number, tier: CardRewardTier, level: Di
   return weights;
 }
 
-/** 每个奖励槽抽共享池的概率；牌组里已有足够多共享牌时提高。 */
-export const SHARED_REWARD_CHANCE = 0.25;
-export const SHARED_REWARD_CHANCE_INVESTED = 0.35;
+/** 战斗奖励每个牌位抽共享池的概率；牌组里已有足够多共享牌时提高。 */
+export const SHARED_REWARD_CHANCE = 0.35;
+export const SHARED_REWARD_CHANCE_INVESTED = 0.45;
+/** 未指定牌名的卡牌事件沿用调整前的概率。 */
+export const SHARED_EVENT_CHANCE = 0.25;
+export const SHARED_EVENT_CHANCE_INVESTED = 0.35;
 export const SHARED_INVESTED_AT = 3;
 
 /** 只数会出现在奖励里的共享牌：打击、防御、引火等初始牌与诅咒不算。 */
-export function sharedRewardChance(deck: CardInstance[]): number {
+export function sharedRewardChance(deck: CardInstance[], source: 'battle' | 'event' = 'battle'): number {
   const picked = deck.filter(c => {
     const d = CARDS[c.defId];
     return !!d && !d.owner && (d.rarity === 'common' || d.rarity === 'uncommon' || d.rarity === 'rare');
   }).length;
-  return picked >= SHARED_INVESTED_AT ? SHARED_REWARD_CHANCE_INVESTED : SHARED_REWARD_CHANCE;
+  const invested = picked >= SHARED_INVESTED_AT;
+  if (source === 'event') return invested ? SHARED_EVENT_CHANCE_INVESTED : SHARED_EVENT_CHANCE;
+  return invested ? SHARED_REWARD_CHANCE_INVESTED : SHARED_REWARD_CHANCE;
 }
 
 /** 先决定来源，再选具体牌；扩充通用卡池不会稀释角色专属牌的来源权重。固定消耗一次随机数。 */
-function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState, deck: CardInstance[]): CardDef[] {
+function rewardOwnerPool(pool: CardDef[], character: CharacterId, rng: RngState, deck: CardInstance[], source: 'battle' | 'event' = 'battle'): CardDef[] {
   const shared = pool.filter(c => !c.owner), owned = pool.filter(c => c.owner === character);
   if (!shared.length) return owned;
   if (!owned.length) return shared;
-  return chance(rng, sharedRewardChance(deck)) ? shared : owned;
+  return chance(rng, sharedRewardChance(deck, source)) ? shared : owned;
 }
 
 /**
@@ -946,7 +965,7 @@ function applyOutcomes(run: RunState, outcomes: EventOutcome[], texts: string[])
           const weights = cardRarityWeights(run.floor, 'normal', run.difficulty.cardRarity);
           const rarity = o.rarity ?? weightedPick(run.rng.event, (['common', 'uncommon', 'rare'] as const).map(item => ({ item, weight: weights[item] })));
           const pool = CARD_LIST.filter(c => cardAvailableTo(c, run.character) && c.rarity === rarity);
-          defId = pickRewardCard(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event, run.deck), run.character).id;
+          defId = pickRewardCard(run.rng.event, rewardOwnerPool(pool, run.character, run.rng.event, run.deck, 'event'), run.character).id;
         }
         run.deck.push(makeCard(run, defId));
         texts.push(`获得卡牌「${CARDS[defId].name}」。`);

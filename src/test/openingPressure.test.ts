@@ -22,7 +22,7 @@ describe('高压开场与第三章首领', () => {
     }
     expect(cs.enemies[0].moveHistory.filter(m => m === 'opening')).toHaveLength(1);
   });
-  it('第三章Boss标准60层生命提高，帷幕保留非攻击整备，仍每轮保留屏障窗口', () => {
+  it('第三章Boss标准60层生命提高，帷幕保留非攻击整备，屏障给玩家施加2层虚弱', () => {
     let cs = createCombat('boss', ['eclipse_archon'], 'boss', [], 1000, 1000, [], makeRng('BOSS', 'c'), 100, 'traveler', encounterDifficulty(59, 'boss')).state;
     expect(cs.enemies[0].hp).toBe(Math.round(290 * encounterDifficulty(59, 'boss').healthMultiplier));
     const sequence = [];
@@ -36,7 +36,8 @@ describe('高压开场与第三章首领', () => {
     }
     expect(sequence).toEqual(['scythe', 'veil', 'orbits', 'shell']);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
-    expect(cs.enemies[0].statuses.vulnerable).toBe(1);
+    expect(cs.enemies[0].statuses.vulnerable).toBeUndefined();
+    expect(cs.player.statuses.weak).toBe(2);
   });
   it('半血日蚀只触发一次，过渡后的第一击减伤，之后恢复完整强度', () => {
     const card = { uid: 'phase-hit', defId: 'strike', upgraded: false };
@@ -45,7 +46,7 @@ describe('高压开场与第三章首领', () => {
     cs = playCard(cs, card.uid, 'e0').state;
     expect(cs.enemies[0].moveId).toBe('awaken');
     cs = startPlayerTurn(enemyAct(endPlayerTurn(cs).state, 'e0').state).state;
-    expect(cs.enemies[0].statuses).toMatchObject({ strength: 3, weak: 1 });
+    expect(cs.enemies[0].statuses).toMatchObject({ strength: 4, weak: 1 });
     expect(cs.enemies[0].moveId).toBe('eclipse');
     const weakened = enemyIntent(cs, cs.enemies[0]);
     const clean = structuredClone(cs); delete clean.enemies[0].statuses.weak;

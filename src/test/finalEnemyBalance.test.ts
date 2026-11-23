@@ -25,8 +25,8 @@ function round(input: CombatState) {
 }
 
 describe('终章精英与首领攻防节奏', () => {
-  it('标准难度第62/65层的生命上限分别为550和1220，开场不额外叠盾', () => {
-    for (const [id, hp] of [['last_warden', 550], ['nightless_lord', 1220]] as const) {
+  it('标准难度第62/65层的生命上限分别为633和1403，开场不额外叠盾', () => {
+    for (const [id, hp] of [['last_warden', 633], ['nightless_lord', 1403]] as const) {
       const cs = battle(id);
       expect(cs.enemies[0].hp).toBe(hp);
       expect(cs.enemies[0].maxHp).toBe(hp);
@@ -34,16 +34,16 @@ describe('终章精英与首领攻防节奏', () => {
     }
   });
 
-  it.each(DIFFICULTY_PRESETS)('$name难度：精英每四轮三攻一整备，意图吻合实际伤害', ({ settings }) => {
+  it.each(DIFFICULTY_PRESETS)('$name难度：精英八回合一个循环，只有封庭敕令不攻击，意图吻合实际伤害', ({ settings }) => {
     let cs = battle('last_warden', settings);
     const moves: string[] = [], hits: boolean[] = [];
     for (let turn = 0; turn < 8; turn++) {
       const result = round(cs); cs = result.state;
       moves.push(result.move!); hits.push(result.attacks);
     }
-    expect(moves).toEqual(['seal', 'verdict', 'twins', 'sheathe', 'seal', 'verdict', 'twins', 'sheathe']);
-    expect(hits).toEqual(cs.difficulty?.complexIntents ? Array(8).fill(true) : [false, true, true, true, false, true, true, true]);
-    expect(cs.enemies[0].statuses.strength).toBe(4);
+    expect(moves).toEqual(['seal', 'verdict', 'twins', 'sheathe', 'brand', 'sunder', 'verdict', 'sheathe']);
+    expect(hits).toEqual(cs.difficulty?.complexIntents ? Array(8).fill(true) : [false, true, true, true, true, true, true, true]);
+    expect(cs.enemies[0].statuses.strength).toBe(cs.difficulty?.complexIntents ? 20 : 8);
     expect([...cs.player.hand, ...cs.player.draw, ...cs.player.discard].filter(c => c.defId === 'doubt')).toHaveLength(2);
   });
 
@@ -52,15 +52,18 @@ describe('终章精英与首领攻防节奏', () => {
     cs = round(cs).state;
     expect(cs.player.statuses.vulnerable).toBe(2);
     const firstVerdict = round(cs); cs = firstVerdict.state;
-    expect(firstVerdict.damage).toBe(72);
+    expect(firstVerdict.damage).toBe(84);
     cs = round(cs).state;
     const sheathe = round(cs); cs = sheathe.state;
-    expect(sheathe.damage).toBe(13);
-    expect(cs.enemies[0].statuses.strength).toBe(2);
-    expect(cs.enemies[0].block).toBe(25);
-    expect(round(cs).damage).toBe(0);
-    cs = round(cs).state;
-    expect(round(cs).damage).toBe(75);
+    expect(sheathe.damage).toBe(15);
+    expect(cs.enemies[0].statuses.strength).toBe(4);
+    expect(cs.enemies[0].block).toBe(28);
+    // 第二轮改用烙庭印：轻斩并施加 2 层脆弱，随后是裂阶三斩。
+    const brand = round(cs); cs = brand.state;
+    expect(brand.move).toBe('brand'); expect(brand.damage).toBeGreaterThan(0);
+    expect(cs.player.statuses.frail).toBe(2);
+    const sunder = round(cs);
+    expect(sunder.move).toBe('sunder'); expect(sunder.damage).toBeGreaterThan(brand.damage);
   });
 
   it.each(DIFFICULTY_PRESETS)('$name难度：首领一阶段三攻一整备，敕令轻伤后再施加虚弱与冷灰', ({ settings }) => {
@@ -76,29 +79,29 @@ describe('终章精英与首领攻防节奏', () => {
     }
     expect(moves).toEqual(['opening', 'edict', 'pulse', 'wall']);
     expect(hits).toEqual([true, true, true, false]);
-    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 3 : 0);
+    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 6 : 1);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
   });
 
-  it('半血变身仍只触发一次，二阶段壁垒是可规划的安全回合，不继续叠力', () => {
+  it('半血变身仍只触发一次，二阶段八回合一个循环，壁垒是可规划的安全回合', () => {
     let cs = battle('nightless_lord');
     cs.enemies[0].hp = Math.floor(cs.enemies[0].maxHp / 2);
     cs.enemies[0].statuses.weak = 2;
     cs.enemies[0].statuses.vulnerable = 2;
     const awaken = round(cs); cs = awaken.state;
     expect(awaken.move).toBe('awaken');
-    expect(awaken.damage).toBe(6);
+    expect(awaken.damage).toBe(7);
     expect(cs.enemies[0].statuses.weak ?? 0).toBe(0);
     expect(cs.enemies[0].statuses.vulnerable ?? 0).toBe(0);
-    expect(cs.enemies[0].statuses.strength).toBe(3);
+    expect(cs.enemies[0].statuses.strength).toBe(7);
     const moves: string[] = [], hits: boolean[] = [];
     for (let turn = 0; turn < 8; turn++) {
       const result = round(cs); cs = result.state;
       moves.push(result.move!); hits.push(result.attacks);
     }
-    expect(moves).toEqual(['nightfall', 'wall', 'extinguish', 'edict', 'nightfall', 'wall', 'extinguish', 'edict']);
+    expect(moves).toEqual(['nightfall', 'wall', 'extinguish', 'edict', 'dusk', 'wall', 'voidbrand', 'edict']);
     expect(hits).toEqual([true, false, true, true, true, false, true, true]);
-    expect(cs.enemies[0].statuses.strength).toBe(3);
+    expect(cs.enemies[0].statuses.strength).toBe(9);
     expect(cs.enemies[0].moveHistory.filter(id => id === 'awaken')).toHaveLength(1);
   });
 });

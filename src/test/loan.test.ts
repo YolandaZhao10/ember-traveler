@@ -285,16 +285,16 @@ describe('借款与回退、随机数', () => {
     const early = R.debtFight(borrowAndReturn(0));
     expect(early.floor).toBe(1);
     const d = early.combat!.difficulty!;
-    expect(d.healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 0.02 * 1.1, 6);
-    expect(d.attackMultiplier).toBeCloseTo(chapterEnd.attackMultiplier + 0.012 * 1.08, 6);
+    expect(d.healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 0.02 * 1.1 * 1.15, 6);
+    expect(d.attackMultiplier).toBeCloseTo(chapterEnd.attackMultiplier + 0.012 * 1.08 * 1.15, 6);
     expect(d.blockMultiplier).toBeGreaterThan(chapterEnd.blockMultiplier);
     const at = (floor: number, chapter: 1 | 2 | 3 | 4 = 1) => R.debtCollectorDifficulty({ chapter, floor, difficulty: early.difficulty });
     expect(at(0).healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier, 6);
     expect(at(0).attackMultiplier).toBeCloseTo(chapterEnd.attackMultiplier, 6);
     for (let floor = 1; floor < 20; floor++) expect(at(floor).healthMultiplier).toBeGreaterThan(at(floor - 1).healthMultiplier);
-    expect(at(19).healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 19 * 0.02 * 1.1, 6);
+    expect(at(19).healthMultiplier).toBeCloseTo(chapterEnd.healthMultiplier + 19 * 0.02 * 1.1 * 1.15, 6);
     // 终章的商店同样以终章首领倍率为底。
-    expect(at(62, 4).healthMultiplier).toBeCloseTo(encounterDifficulty(64, 'boss').healthMultiplier + 2 * 0.02 * 1.1, 6);
+    expect(at(62, 4).healthMultiplier).toBeCloseTo(encounterDifficulty(64, 'boss').healthMultiplier + 2 * 0.02 * 1.1 * 1.15, 6);
     const lateDoor = borrowAndReturn(0); lateDoor.floor = 17;
     expect(R.debtFight(lateDoor).combat!.enemies[0].maxHp).toBeGreaterThan(early.combat!.enemies[0].maxHp);
   });

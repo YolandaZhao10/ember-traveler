@@ -7,7 +7,7 @@ import * as R from '../engine/run';
 import { loadRun, saveRun } from '../engine/save';
 import type { ChapterId, RunState } from '../engine/types';
 import { CHAPTER_IDS, CHAPTERS, TOTAL_FLOORS } from '../data/chapters';
-import { STANDARD_DIFFICULTY } from '../data/difficulty';
+import { GLOBAL_ENEMY_STRENGTH, STANDARD_DIFFICULTY } from '../data/difficulty';
 
 const copy = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 function storage(run: RunState) {
@@ -54,8 +54,9 @@ describe('逐层难度与20层迁移', () => {
       }
     }
     const entries = CHAPTER_IDS.map(c => encounterDifficulty(CHAPTERS[c].startFloor, 'normal'));
-    expect(entries.map(x => x.healthMultiplier)).toEqual([1, 1.5, 2, 2.5]);
-    expect(entries.map(x => x.attackMultiplier)).toEqual([1, 1.3, 1.6, 1.9]);
+    // 全体怪物整体强度 ×1.15。
+    [1, 1.5, 2, 2.5].forEach((v, i) => expect(entries[i].healthMultiplier).toBeCloseTo(v * GLOBAL_ENEMY_STRENGTH, 9));
+    [1, 1.3, 1.6, 1.9].forEach((v, i) => expect(entries[i].attackMultiplier).toBeCloseTo(v * GLOBAL_ENEMY_STRENGTH, 9));
   });
   it('生命、意图、实际多段伤害与敌人格挡都使用同一强化，虚弱易伤仍生效', () => {
     const d = encounterDifficulty(39, 'elite');
@@ -63,7 +64,7 @@ describe('逐层难度与20层迁移', () => {
     const base = createCombat('scale', ['furnace_drone'], 'elite', [], 1000, 1000, [], makeRng('SCALE', 'c'), 0).state;
     expect(cs.enemies[0].maxHp).toBe(Math.round(base.enemies[0].maxHp * d.healthMultiplier));
     cs = enemyAct(endPlayerTurn(cs).state, 'e0').state;
-    expect(cs.enemies[0].block).toBe(19);
+    expect(cs.enemies[0].block).toBe(22);
     cs.phase = 'player'; cs.enemies[0].moveId = 'pound'; cs.enemies[0].statuses.weak = 1; delete cs.enemies[0].flags.acted;
     cs.player.statuses.vulnerable = 2;
     const intent = enemyIntent(cs, cs.enemies[0])!;
@@ -83,7 +84,7 @@ describe('逐层难度与20层迁移', () => {
     expect(loaded.combat).toEqual(run.combat);
     expect(R.resetCurrentNode(loaded).combat).toEqual(run.combat);
     saveRun(loaded); expect(loadRun()!.combat).toEqual(run.combat);
-    expect(encounterDifficulty(40, 'normal').healthMultiplier).toBe(2);
+    expect(encounterDifficulty(40, 'normal').healthMultiplier).toBeCloseTo(2 * GLOBAL_ENEMY_STRENGTH, 9);
   });
   it.each<ChapterId>([1, 2])('第%s章旧战斗与SL完整保留，旧路线增加8层且始终连接首领', chapter => {
     const old = legacy(chapter); storage(old);
