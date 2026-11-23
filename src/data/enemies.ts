@@ -434,7 +434,7 @@ def({
   moves: [
     { id: 'toll', name: '钟鸣', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
     { id: 'pendulum', name: '摆锤', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
-    { id: 'gears', name: '齿轮壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+    { id: 'gears', name: '齿轮壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 4, target: 'self' }] },
     {
       id: 'overdrive',
       name: '失控',
@@ -444,7 +444,7 @@ def({
         { kind: 'status', status: 'strength', amount: 1, target: 'self' },
         { kind: 'block', amount: 12 },
         { kind: 'addCardToDiscard', cardId: 'ashes', count: 2 },
-      ], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'block', amount: 12 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 2 }],
+      ], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 4, target: 'self' }, { kind: 'block', amount: 12 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 2 }],
     },
     { id: 'shatter', name: '碎钟', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
     { id: 'flurry', name: '钟锤连击', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 4 }] },
