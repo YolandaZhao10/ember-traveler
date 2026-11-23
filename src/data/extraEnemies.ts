@@ -26,10 +26,10 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : last(c) === 'parry' ? 'riposte' : ['slash', 'opening'].includes(last(c)) ? (c.player.block >= 8 ? 'feint' : 'parry') : 'slash',
   },
   {
-    id: 'grave_lamplighter', name: '守灯人', tier: 'normal', hp: [24, 28], sprite: 'grave_lamplighter',
-    description: '以灯火治疗生命比例最低的存活敌人6点（包括自身），随后敲击、扬灰削弱。治疗每三次行动一次，优先集火可以切断救援。',
+    id: 'grave_lamplighter', name: '守灯人', tier: 'normal', hp: [28, 32], sprite: 'grave_lamplighter',
+    description: '以灯火治疗生命比例最低的存活敌人6点（挑战难度10点，包括自身），随后敲击、扬灰削弱。治疗每三次行动一次，优先集火可以切断救援。',
     moves: [
-      { id: 'mend', name: '扶灯救护', intent: 'buff', actions: [{ kind: 'healWeakest', amount: 6 }] },
+      { id: 'mend', name: '扶灯救护', intent: 'buff', actions: [{ kind: 'healWeakest', amount: 6 }], hardActions: [{ kind: 'healWeakest', amount: 10 }] },
       { id: 'knock', name: '灯杆敲击', intent: 'attack', actions: [{ kind: 'attack', amount: 5 }] },
       { id: 'ash', name: '扬灰遮目', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     ], chooseMove: c => cycle(c, ['knock', 'mend', 'ash']),

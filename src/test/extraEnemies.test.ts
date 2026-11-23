@@ -3,6 +3,7 @@ import { ENEMIES, ENCOUNTERS } from '../data/enemies';
 import { EXTRA_ENEMIES, EXTRA_ENCOUNTERS } from '../data/extraEnemies';
 import { createCombat, endPlayerTurn, enemyAct, enemyIntent, playCard, startPlayerTurn } from '../engine/combat';
 import { encounterDifficulty } from '../engine/difficulty';
+import { DIFFICULTY_PRESETS, STANDARD_DIFFICULTY } from '../data/difficulty';
 import { makeRng } from '../engine/rng';
 import { extraEnemyBody } from '../ui/sprites/ExtraEnemySprites';
 import { intentText } from '../ui/components/Common';
@@ -64,6 +65,20 @@ describe('前三章新增普通怪的独立行为', () => {
     const healed = enemyAct(cs, 'e0');
     expect(healed.state.enemies[1].hp).toBe(0); expect(healed.state.enemies[0].hp).toBe(cs.enemies[0].maxHp);
     expect(healed.events).toContainEqual({ type: 'heal', targetId: 'e0', amount: 2 });
+  });
+
+  it('守灯人基础生命 28–32，只出现在多只怪的敌组里，挑战难度治疗 10 点、标准仍为 6 点', () => {
+    expect(ENEMIES.grave_lamplighter.hp).toEqual([28, 32]);
+    const groups = ENCOUNTERS.filter(e => e.enemies.includes('grave_lamplighter'));
+    expect(groups.length).toBeGreaterThan(0);
+    for (const e of groups) expect(e.enemies.length).toBeGreaterThan(1);
+    for (const [settings, amount] of [[STANDARD_DIFFICULTY, 6], [DIFFICULTY_PRESETS[2].settings, 10]] as const) {
+      const cs = createCombat('lamp', ['grave_lamplighter', 'tomb_puppet'], 'normal', [], 100, 100, [], makeRng('LAMP', 'c'), 0, 'traveler', encounterDifficulty(5, 'normal', settings)).state;
+      cs.phase = 'enemy'; cs.enemies[0].moveId = 'mend'; cs.enemies[1].hp = 1;
+      const result = enemyAct(cs, 'e0');
+      expect(result.state.enemies[1].hp).toBe(1 + amount);
+      expect(result.events).toContainEqual({ type: 'heal', targetId: 'e1', amount });
+    }
   });
 
   it('压力釜和锯轮的爆发力量不会无限累积，压力釜自损不会自杀', () => {

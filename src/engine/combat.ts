@@ -453,6 +453,7 @@ export function enemyIntentExtras(cs: CombatState, e: EnemyState): string[] {
     if (a.kind === 'block') return [`格挡 ${calcBlock(scaleEnemyValue(a.amount, cs.difficulty?.blockMultiplier), e.statuses)}`];
     if (a.kind === 'status') return [`${a.target === 'player' ? '施加' : a.target === 'allies' ? '全体' : ''}${STATUSES[a.status].name} ${a.amount}`];
     if (a.kind === 'addCardToDraw' || a.kind === 'addCardToDiscard') return [`${CARDS[a.cardId].name} ×${a.count} → ${a.kind === 'addCardToDraw' ? '抽牌堆' : '弃牌堆'}`];
+    if (a.kind === 'healWeakest') return [`治疗最弱友方 ${a.amount}`];
     return [];
   });
 }
