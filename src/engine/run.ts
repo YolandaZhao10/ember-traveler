@@ -180,14 +180,14 @@ export function ensureRewardCheckpoint(input: RunState): RunState {
 
 // ---------- 战斗 ----------
 /**
- * 精英尽量不重复：预排的精英本局已经打过时，换成本章还没打过的一组；
- * 本章精英都打过了，就换成最久没遇到的那一组。精英敌组不在地图上预告，入场时改换不影响已显示的信息。
- * 用独立的种子流挑选，不推进战斗随机流。
+ * 普通战和精英战同一敌组本局只出现一次：预排的敌组已经打过时，换成当前楼层可用、还没打过的一组；
+ * 可用的都打过了，就换成最久没遇到的那一组。这两类敌组不在地图上预告，入场时改换不影响已显示的信息。
+ * 用独立的种子流挑选，不推进战斗随机流。首领不受影响。
  */
-function variedElite(run: RunState, planned: EncounterDef, pool: EncounterDef[], nodeId: string): EncounterDef {
+function variedEncounter(run: RunState, planned: EncounterDef, pool: EncounterDef[], nodeId: string): EncounterDef {
   if (!run.seenEncounters.includes(planned.id)) return planned;
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
-  if (fresh.length) return pick(makeRng(run.seed, `elite-vary:${run.chapter}:${nodeId}`), fresh);
+  if (fresh.length) return pick(makeRng(run.seed, `${planned.tier}-vary:${run.chapter}:${nodeId}`), fresh);
   const last = (e: EncounterDef) => run.seenEncounters.lastIndexOf(e.id);
   return pool.reduce((oldest, e) => (last(e) < last(oldest) ? e : oldest), planned);
 }
@@ -200,7 +200,7 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
   const node = run.currentNodeId ? run.map.nodes[run.currentNodeId] : undefined;
   const planned = node && plannedEncounter(run, node);
-  const enc = planned ? (tier === 'elite' ? variedElite(run, planned, pool, node!.id) : planned) : pick(run.rng.combat, fresh.length ? fresh : pool);
+  const enc = planned ? (tier === 'boss' ? planned : variedEncounter(run, planned, pool, node!.id)) : pick(run.rng.combat, fresh.length ? fresh : pool);
   if (node) node.encounterId = enc.id;
   run.seenEncounters.push(enc.id);
   const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty), run.gold);

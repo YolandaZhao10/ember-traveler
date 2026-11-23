@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENCOUNTERS } from '../data/enemies';
 import { generateMap } from '../engine/map';
 import * as R from '../engine/run';
+import { makeRng, pick } from '../engine/rng';
 import type { ChapterId, RunState } from '../engine/types';
 
 const copy = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
@@ -64,11 +65,55 @@ describe('精英尽量不重复', () => {
     expect(b).toBeDefined();
   });
 
-  it('普通战斗仍按预排敌组出现', () => {
-    const run = R.newRun('ELITE-NORMAL');
+  it('普通战同一敌组本局只出现一次：预排的打过了就换成当前楼层可用、没打过的一组', () => {
+    const run = R.newRun('NORMAL-VARY');
     const id = run.map.startIds[0];
     const planned = run.map.nodes[id].encounterId!;
     run.seenEncounters = [planned];
-    expect(R.travelTo(run, id).combat!.encounterId).toBe(planned);
+    const entered = R.travelTo(run, id);
+    const actual = ENCOUNTERS.find(e => e.id === entered.combat!.encounterId)!;
+    expect(actual.id).not.toBe(planned);
+    expect(actual.tier).toBe('normal');
+    expect(actual.minFloor ?? 0).toBe(0);
+    expect(R.travelTo(run, id).combat!.encounterId).toBe(actual.id);
+  });
+
+  it('首领不换：打过记录里有它也照常出现', () => {
+    const run = R.newRun('BOSS-KEEP');
+    const boss = Object.values(run.map.nodes).find(n => n.type === 'boss')!;
+    const previous = Object.values(run.map.nodes).find(n => n.next.includes(boss.id))!;
+    run.currentNodeId = previous.id; run.visited = [previous.id];
+    const planned = boss.encounterId!;
+    run.seenEncounters = [planned];
+    expect(R.travelTo(run, boss.id).combat!.encounterId).toBe(planned);
+  });
+
+  it.each([1, 2, 3] as ChapterId[])('第%s章随机走完整条路线，普通战不出现重复敌组，精英在组数用完前不重复', chapter => {
+    for (let seed = 0; seed < 60; seed++) {
+      let run = R.newRun(`PATH-${chapter}-${seed}`);
+      if (chapter !== 1) { run.chapter = chapter; run.map = generateMap(run.rng.map, chapter); }
+      run.hp = run.maxHp = 9999;
+      const rng = makeRng(`PATH-${chapter}-${seed}`, 'walk');
+      const fought: string[] = [];
+      let options = run.map.startIds;
+      while (options.length) {
+        const id = pick(rng, options);
+        const node = run.map.nodes[id];
+        if (node.type === 'combat' || node.type === 'elite') {
+          const entered = R.travelTo(run, id);
+          fought.push(entered.combat!.encounterId);
+          run = { ...entered, combat: null, screen: 'map' } as typeof run;
+        } else {
+          run.currentNodeId = id; run.visited = [...run.visited, id];
+        }
+        options = node.next;
+      }
+      expect(fought.length).toBeGreaterThan(2);
+      const tierOf = (id: string) => ENCOUNTERS.find(e => e.id === id)!.tier;
+      const normals = fought.filter(id => tierOf(id) === 'normal'), eliteFights = fought.filter(id => tierOf(id) === 'elite');
+      expect(new Set(normals).size, normals.join(',')).toBe(normals.length);
+      // 精英组数有限（第二、三章各 3 组），路线上的精英多于组数时才会重复。
+      expect(new Set(eliteFights).size, eliteFights.join(',')).toBe(Math.min(eliteFights.length, elites(chapter).length));
+    }
   });
 });
