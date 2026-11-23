@@ -39,10 +39,10 @@ def({
   tier: 'normal',
   hp: [30, 34],
   sprite: 'puppet',
-  description: '重击后抖落墓灰，将 1 张灰烬塞入弃牌堆；随后支撑躯壳，留下两个不攻击的回合。',
+  description: '重击后抖落墓灰，将 1 张灰烬塞入弃牌堆（挑战难度塞入抽牌堆）；随后支撑躯壳，留下两个不攻击的回合。',
   moves: [
     { id: 'smash', name: '重击', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }], hardActions: [{ kind: 'attack', amount: 9 }, { kind: 'block', amount: 3 }] },
-    { id: 'dust', name: '抖落墓灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
+    { id: 'dust', name: '抖落墓灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 1 }] },
     { id: 'brace', name: '支撑', intent: 'defend', actions: [{ kind: 'block', amount: 6 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['smash', 'dust', 'brace']),
@@ -56,7 +56,7 @@ def({
   sprite: 'ember',
   description: '失去主人的火种，漫无目的地灼烧一切。',
   moves: [
-    { id: 'spark', name: '火花', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }] },
+    { id: 'spark', name: '火花', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }], hardActions: [{ kind: 'attack', amount: 7 }] },
     {
       id: 'scorch',
       name: '灼烫',
@@ -84,6 +84,10 @@ def({
       intent: 'attack_debuff',
       actions: [
         { kind: 'attack', amount: 5 },
+        { kind: 'status', status: 'weak', amount: 1, target: 'player' },
+      ],
+      hardActions: [
+        { kind: 'attack', amount: 7 },
         { kind: 'status', status: 'weak', amount: 1, target: 'player' },
       ],
     },
