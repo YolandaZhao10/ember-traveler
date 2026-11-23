@@ -7,9 +7,9 @@ const cycle = (c: EnemyAiContext, moves: string[]) => moves[c.enemy.turn % moves
 export const EXTRA_ENEMIES: EnemyDef[] = [
   {
     id: 'ash_crossbow', name: '灰巷弩手', tier: 'normal', hp: [30, 34], sprite: 'ash_crossbow',
-    description: '架弩时自身获得2层易伤，随后射出重矢，再用短刀掩护装填。抓住架弩后暴露的回合抢攻。',
+    description: '架弩时给玩家施加1层虚弱，随后射出重矢，再用短刀掩护装填。',
     moves: [
-      { id: 'aim', name: '架弩露隙', intent: 'special', actions: [{ kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
+      { id: 'aim', name: '架弩露隙', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
       { id: 'bolt', name: '穿街重矢', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
       { id: 'reload', name: '装填短刺', intent: 'attack', actions: [{ kind: 'attack', amount: 4 }] },
     ], chooseMove: c => cycle(c, ['aim', 'bolt', 'reload']),
@@ -36,11 +36,11 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [54, 62], sprite: 'pressure_boiler',
-    description: '加压获得8格挡与2力量，喷汽后移除这2力量并自损5生命（不会自杀）；冷却时轻击并暴露2层易伤。爆发后是反攻窗口。',
+    description: '加压获得8格挡与2力量，喷汽后移除这2力量并自损5生命（不会自杀）；冷却时轻击并给玩家施加1层虚弱。',
     moves: [
       { id: 'pressure', name: '封阀加压', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
       { id: 'vent', name: '超压喷汽', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }, { kind: 'status', status: 'strength', amount: -2, target: 'self' }, { kind: 'loseHp', amount: 5 }] },
-      { id: 'cool', name: '开阀冷却', intent: 'attack', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
+      { id: 'cool', name: '开阀冷却', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     ], chooseMove: c => cycle(c, ['pressure', 'vent', 'cool']),
   },
   {
@@ -76,9 +76,9 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [55, 63], sprite: 'phase_lancer',
-    description: '锁定时自身获得2层易伤，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，可趁锁定回合击杀或削弱。',
+    description: '锁定时给玩家施加2层虚弱，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，',
     moves: [
-      { id: 'lock', name: '裂隙锁定', intent: 'special', actions: [{ kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
+      { id: 'lock', name: '裂隙锁定', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }] },
       { id: 'pierce', name: '穿隙刺', intent: 'attack', actions: [{ kind: 'attack', amount: 8, piercing: true }] },
       { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
     ], chooseMove: c => cycle(c, ['lock', 'pierce', 'sweep']),

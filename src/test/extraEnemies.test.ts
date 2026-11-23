@@ -44,10 +44,10 @@ describe('前三章新增普通怪的独立行为', () => {
     }
   });
 
-  it('弩手架弩后确实暴露一整个玩家回合，决斗者反击只持续到回斩前', () => {
+  it('弩手架弩给玩家的虚弱持续一整个玩家回合，决斗者反击只持续到回斩前', () => {
     let crossbow = round(battle(['ash_crossbow']));
-    expect(crossbow.enemies[0].statuses.vulnerable).toBe(1); expect(crossbow.enemies[0].moveId).toBe('bolt');
-    crossbow = round(crossbow); expect(crossbow.enemies[0].statuses.vulnerable).toBeUndefined();
+    expect(crossbow.player.statuses.weak).toBe(1); expect(crossbow.enemies[0].statuses.vulnerable).toBeUndefined(); expect(crossbow.enemies[0].moveId).toBe('bolt');
+    crossbow = round(crossbow); expect(crossbow.player.statuses.weak).toBeUndefined();
     let duelist = round(round(battle(['ash_duelist'])));
     expect(duelist.enemies[0].statuses.thorns).toBe(2); expect(duelist.enemies[0].moveId).toBe('riposte');
     duelist = round(duelist); expect(duelist.enemies[0].statuses.thorns).toBeUndefined();

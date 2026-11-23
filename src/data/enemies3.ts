@@ -92,12 +92,12 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'eclipse_archon', name: '坠星司辰', tier: 'boss', hp: [290, 290], sprite: 'eclipse_archon',
-    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 28 点基础格挡与 3 力量，同时自身获得2层虚弱，让转阶段后的第一次攻击减伤。星尘帷幕施加脆弱并向抽牌堆随机塞入 1 张眩晕和 1 张灼伤；日蚀转阶段时仅向弃牌堆塞入 1 张疑惧一次；之后重斩、帷幕、三连击与屏障循环；屏障回合可以整备，展开屏障时自身获得2层易伤，下一玩家回合可趁隙爆发。',
+    description: '拨动星轨的天穹君王。半血进入日蚀：清除负面状态、获得 28 点基础格挡与 3 力量，同时自身获得2层虚弱，让转阶段后的第一次攻击减伤。星尘帷幕施加脆弱并向抽牌堆随机塞入 1 张眩晕和 1 张灼伤；日蚀转阶段时仅向弃牌堆塞入 1 张疑惧一次；之后重斩、帷幕、三连击与屏障循环；屏障回合不攻击，展开屏障时给玩家施加2层虚弱。',
     moves: [
       { id: 'scythe', name: '弦月镰', intent: 'attack', actions: [{ kind: 'attack', amount: 19 }] },
       { id: 'veil', name: '星尘帷幕', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 2, target: 'player' }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'scorch', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'frail', amount: 2, target: 'player' }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'scorch', count: 1 }] },
       { id: 'orbits', name: '双轨交错', intent: 'attack', actions: [{ kind: 'attack', amount: 10, times: 2 }] },
-      { id: 'shell', name: '天穹屏障', intent: 'defend', actions: [{ kind: 'block', amount: 24 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'self' }] },
+      { id: 'shell', name: '天穹屏障', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 24 }, { kind: 'status', status: 'weak', amount: 2, target: 'player' }] },
       { id: 'awaken', name: '日蚀降临', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 28 }, { kind: 'status', status: 'weak', amount: 2, target: 'self' }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
       { id: 'eclipse', name: '坠星裁决', intent: 'attack', actions: [{ kind: 'attack', amount: 23 }] },
       { id: 'rain', name: '群星陨落', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 3 }] },
