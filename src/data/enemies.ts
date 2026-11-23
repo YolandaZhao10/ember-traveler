@@ -111,7 +111,7 @@ def({
   sprite: 'cultist',
   description: '向灰烬祈祷的狂信者。越拖越危险，速战速决。',
   moves: [
-    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'ritual', amount: 1, target: 'self' }] },
+    { id: 'chant', name: '咒文', intent: 'buff', actions: [{ kind: 'status', status: 'ritual', amount: 2, target: 'self' }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'ritual', amount: 4, target: 'self' }] },
     { id: 'strike', name: '仪式刀', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }] },
   ],
   chooseMove: (ctx) => (ctx.enemy.turn === 0 ? 'chant' : 'strike'),
@@ -126,7 +126,7 @@ def({
   description: '古城的碎石自己站了起来。每次挥击都很沉。',
   moves: [
     { id: 'crush', name: '碾压', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
-    { id: 'fortify', name: '加固', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'fortify', name: '加固', intent: 'defend_buff', actions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     { id: 'slam', name: '震地', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['slam', 'fortify', 'crush']),
@@ -138,7 +138,7 @@ def({
   tier: 'normal',
   hp: [26, 30],
   sprite: 'looter',
-  description: '第二回合偷窃。前5回合不会逃跑，第6回合起每次选择意图有20%概率准备逃跑；在它行动前击败可追回金币，否则带钱离场。',
+  description: '前7回合固定为突刺、偷窃、连刺、偷窃、突刺、偷窃、连刺，不会逃跑；第8回合起突刺、连刺、偷窃、逃跑各25%。在它行动前击败可追回金币，否则带钱离场。',
   moves: [
     { id: 'lunge', name: '突刺', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     { id: 'flurry', name: '连刺', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 3 }] },
@@ -146,9 +146,10 @@ def({
     { id: 'escape', name: '携财逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
   chooseMove: (ctx) => {
-    if (ctx.enemy.turn >= 5 && chance(ctx.rng, 0.2)) return 'escape';
-    if (ctx.enemy.turn === 1) return 'steal';
-    return last(ctx) === 'flurry' ? 'lunge' : chance(ctx.rng, 0.5) ? 'flurry' : 'lunge';
+    // 前 7 回合固定；第 8 回合起四种意图各 25%。
+    const opening = ['lunge', 'steal', 'flurry', 'steal', 'lunge', 'steal', 'flurry'];
+    if (ctx.enemy.turn < opening.length) return opening[ctx.enemy.turn];
+    return pick(ctx.rng, ['lunge', 'flurry', 'steal', 'escape']);
   },
 });
 
