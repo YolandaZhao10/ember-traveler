@@ -46,7 +46,7 @@ describe('高压开场与第三章首领', () => {
     cs = playCard(cs, card.uid, 'e0').state;
     expect(cs.enemies[0].moveId).toBe('awaken');
     cs = startPlayerTurn(enemyAct(endPlayerTurn(cs).state, 'e0').state).state;
-    expect(cs.enemies[0].statuses).toMatchObject({ strength: 3, weak: 1 });
+    expect(cs.enemies[0].statuses).toMatchObject({ strength: 4, weak: 1 });
     expect(cs.enemies[0].moveId).toBe('eclipse');
     const weakened = enemyIntent(cs, cs.enemies[0]);
     const clean = structuredClone(cs); delete clean.enemies[0].statuses.weak;

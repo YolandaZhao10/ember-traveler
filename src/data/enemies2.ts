@@ -97,13 +97,13 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'everburning_core', name: '永燃炉心', tier: 'boss', hp: [231, 231], sprite: 'everburning_core',
-    description: '深城的动力核心。泄压时混入冷灰并点燃你；半血后进入过载，清除负面状态、获得 20 格挡与 1 力量，随后在爆燃后重铸外壳，留出进攻窗口。',
+    description: '深城的动力核心。泄压时混入冷灰并点燃你；半血后进入过载，清除负面状态、获得 20 格挡与 3 力量（挑战难度 8），随后在爆燃后重铸外壳，留出进攻窗口。',
     moves: [
       { id: 'pressure', name: '高压冲击', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }], hardActions: [{ kind: 'attack', amount: 19 }] },
       { id: 'vent', name: '炉心泄压', intent: 'debuff', actions: [{ kind: 'status', status: 'burn', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'pistons', name: '双缸锻击', intent: 'attack', actions: [{ kind: 'attack', amount: 8, times: 2 }], hardActions: [{ kind: 'attack', amount: 10, times: 2 }] },
-      { id: 'shell', name: '重铸外壳', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
-      { id: 'overdrive', name: '炉心过载', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 20 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'shell', name: '重铸外壳', intent: 'defend', actions: [{ kind: 'block', amount: 16 }], hardActions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 4, target: 'self' }] },
+      { id: 'overdrive', name: '炉心过载', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 20 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 20 }, { kind: 'status', status: 'strength', amount: 8, target: 'self' }] },
       { id: 'eruption', name: '熔流喷发', intent: 'attack', actions: [{ kind: 'attack', amount: 19 }], hardActions: [{ kind: 'attack', amount: 23 }] },
       { id: 'cascade', name: '连环爆燃', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 3 }], hardActions: [{ kind: 'attack', amount: 8, times: 3 }] },
     ],

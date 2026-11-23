@@ -254,7 +254,7 @@ def({
   moves: [
     { id: 'regal_slash', name: '王权斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
     { id: 'ash_storm', name: '灰烬风暴', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
-    { id: 'ash_wall', name: '灰烬壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+    { id: 'ash_wall', name: '灰烬壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 4, target: 'self' }] },
     {
       id: 'awaken',
       name: '余烬苏醒',
@@ -263,6 +263,12 @@ def({
         { kind: 'clearDebuffs' },
         { kind: 'block', amount: 18 },
         { kind: 'status', status: 'strength', amount: 1, target: 'self' },
+        { kind: 'status', status: 'weak', amount: 2, target: 'player' },
+        { kind: 'status', status: 'frail', amount: 2, target: 'player' },
+      ], hardActions: [
+        { kind: 'clearDebuffs' },
+        { kind: 'block', amount: 18 },
+        { kind: 'status', status: 'strength', amount: 7, target: 'self' },
         { kind: 'status', status: 'weak', amount: 2, target: 'player' },
         { kind: 'status', status: 'frail', amount: 2, target: 'player' },
       ],
@@ -444,7 +450,7 @@ def({
         { kind: 'status', status: 'strength', amount: 1, target: 'self' },
         { kind: 'block', amount: 12 },
         { kind: 'addCardToDiscard', cardId: 'ashes', count: 2 },
-      ], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 4, target: 'self' }, { kind: 'block', amount: 12 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 2 }],
+      ], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 7, target: 'self' }, { kind: 'block', amount: 12 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 2 }],
     },
     { id: 'shatter', name: '碎钟', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
     { id: 'flurry', name: '钟锤连击', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 4 }] },

@@ -76,7 +76,7 @@ describe('终章精英与首领攻防节奏', () => {
     }
     expect(moves).toEqual(['opening', 'edict', 'pulse', 'wall']);
     expect(hits).toEqual([true, true, true, false]);
-    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 3 : 0);
+    expect(cs.enemies[0].statuses.strength ?? 0).toBe(cs.difficulty?.complexIntents ? 4 : 0);
     expect(cs.enemies[0].block).toBeGreaterThan(0);
   });
 
@@ -90,7 +90,7 @@ describe('终章精英与首领攻防节奏', () => {
     expect(awaken.damage).toBe(7);
     expect(cs.enemies[0].statuses.weak ?? 0).toBe(0);
     expect(cs.enemies[0].statuses.vulnerable ?? 0).toBe(0);
-    expect(cs.enemies[0].statuses.strength).toBe(3);
+    expect(cs.enemies[0].statuses.strength).toBe(5);
     const moves: string[] = [], hits: boolean[] = [];
     for (let turn = 0; turn < 8; turn++) {
       const result = round(cs); cs = result.state;
@@ -98,7 +98,7 @@ describe('终章精英与首领攻防节奏', () => {
     }
     expect(moves).toEqual(['nightfall', 'wall', 'extinguish', 'edict', 'nightfall', 'wall', 'extinguish', 'edict']);
     expect(hits).toEqual([true, false, true, true, true, false, true, true]);
-    expect(cs.enemies[0].statuses.strength).toBe(3);
+    expect(cs.enemies[0].statuses.strength).toBe(5);
     expect(cs.enemies[0].moveHistory.filter(id => id === 'awaken')).toHaveLength(1);
   });
 });

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CHAPTERS } from '../data/chapters';
 import { DIFFICULTY_PRESETS } from '../data/difficulty';
 import { ENCOUNTERS, ENEMIES } from '../data/enemies';
-import { createCombat, enemyMoveActions } from '../engine/combat';
+import { createCombat, endPlayerTurn, enemyAct, enemyMoveActions, startPlayerTurn } from '../engine/combat';
 import { encounterDifficulty } from '../engine/difficulty';
 import { makeRng } from '../engine/rng';
 
@@ -27,5 +27,36 @@ describe('精英都有成长手段', () => {
   it.each(elites)('%s 在标准和挑战难度下都有：加力量，或攻击并施加易伤、虚弱、脆弱', id => {
     expect(ENEMIES[id].moves.some(m => grows(m.actions))).toBe(true);
     expect(ENEMIES[id].moves.some(m => grows(m.hardActions ?? m.actions))).toBe(true);
+  });
+});
+
+describe('挑战难度的首领成长', () => {
+  /** 8 回合后主怪身上的力量；首领在第 4 回合后被压到半血以触发阶段变化。 */
+  const growth = (encId: string) => {
+    const enc = ENCOUNTERS.find(e => e.id === encId)!; const ch = (enc.chapter ?? 1) as 1 | 2 | 3 | 4, c = CHAPTERS[ch];
+    const floor = c.startFloor + (enc.tier === 'boss' ? c.floors - 1 : ch === 4 ? 1 : 4);
+    let total = 0; const N = 12;
+    for (let s = 0; s < N; s++) {
+      let cs = createCombat('g', enc.enemies, enc.tier, [], 999999, 999999, [], makeRng(`GROW-${s}`, 'c'), 0, 'traveler', encounterDifficulty(floor, enc.tier, DIFFICULTY_PRESETS[2].settings)).state;
+      for (let t = 0; t < 8; t++) {
+        if (enc.tier === 'boss' && t === 4) for (const e of cs.enemies) e.hp = Math.min(e.hp, Math.floor(e.maxHp / 2));
+        cs.player.draw = []; cs.player.hand = []; cs.player.discard = [];
+        cs = endPlayerTurn(cs).state;
+        for (const e of cs.enemies) if (e.hp > 0 && !e.flags.escaped) cs = enemyAct(cs, e.id).state;
+        cs.player.statuses = {};
+        cs = startPlayerTurn(cs).state;
+      }
+      total += Math.max(0, ...cs.enemies.filter(e => e.hp > 0 && !e.flags.escaped).map(e => e.statuses.strength ?? 0));
+    }
+    return total / N;
+  };
+  it('每章首领的力量成长高于本章所有精英，且高于上一章的首领', () => {
+    let previous = 0;
+    for (const ch of [1, 2, 3, 4]) {
+      const of = (tier: string) => ENCOUNTERS.filter(e => (e.chapter ?? 1) === ch && e.tier === tier).map(e => growth(e.id));
+      const elites = of('elite'), bosses = of('boss');
+      for (const boss of bosses) { expect(boss).toBeGreaterThan(Math.max(...elites)); expect(boss).toBeGreaterThan(previous); }
+      previous = Math.max(...bosses);
+    }
   });
 });
