@@ -24,7 +24,7 @@ def({
   description: '成群出没的小东西。单只不足为惧，聚在一起会越来越凶。',
   moves: [
     { id: 'bite', name: '啃咬', intent: 'attack', actions: [{ kind: 'attack', amount: 4 }] },
-    { id: 'swarm', name: '群聚', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+    { id: 'swarm', name: '群聚', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 2, target: 'allies' }], hardActions: [{ kind: 'status', status: 'strength', amount: 3, target: 'allies' }] },
   ],
   chooseMove: (ctx) => {
     if (ctx.enemy.turn === 0) return chance(ctx.rng, 0.5) ? 'bite' : 'swarm';

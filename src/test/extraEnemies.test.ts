@@ -81,6 +81,15 @@ describe('前三章新增普通怪的独立行为', () => {
     }
   });
 
+  it('灰烬鼠群聚：标准给全体友方 2 力量，挑战难度 3 力量', () => {
+    for (const [settings, amount] of [[STANDARD_DIFFICULTY, 2], [DIFFICULTY_PRESETS[2].settings, 3]] as const) {
+      const cs = createCombat('rats', ['ash_rat', 'ash_rat', 'ash_rat'], 'normal', [], 100, 100, [], makeRng('RATS', 'c'), 0, 'traveler', encounterDifficulty(0, 'normal', settings)).state;
+      cs.phase = 'enemy'; cs.enemies[0].moveId = 'swarm';
+      const result = enemyAct(cs, 'e0').state;
+      expect(result.enemies.map(e => e.statuses.strength)).toEqual([amount, amount, amount]);
+    }
+  });
+
   it('压力釜和锯轮的爆发力量不会无限累积，压力釜自损不会自杀', () => {
     for (const id of ['pressure_boiler', 'slag_saw']) {
       let cs = battle([id]);
