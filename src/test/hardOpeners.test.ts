@@ -18,3 +18,14 @@ describe('挑战难度的开局招式', () => {
     }
   });
 });
+
+describe('精英都有成长手段', () => {
+  const grows = (xs: { kind: string; status?: string; target?: string; amount?: number }[]) =>
+    xs.some(a => a.kind === 'status' && (a.status === 'strength' || a.status === 'ritual') && a.target !== 'player' && (a.amount ?? 0) > 0)
+    || (xs.some(a => a.kind === 'attack') && xs.some(a => a.kind === 'status' && a.target === 'player' && ['vulnerable', 'weak', 'frail'].includes(a.status ?? '')));
+  const elites = [...new Set(ENCOUNTERS.filter(e => e.tier === 'elite').flatMap(e => e.enemies))].filter(id => ENEMIES[id].tier === 'elite');
+  it.each(elites)('%s 在标准和挑战难度下都有：加力量，或攻击并施加易伤、虚弱、脆弱', id => {
+    expect(ENEMIES[id].moves.some(m => grows(m.actions))).toBe(true);
+    expect(ENEMIES[id].moves.some(m => grows(m.hardActions ?? m.actions))).toBe(true);
+  });
+});

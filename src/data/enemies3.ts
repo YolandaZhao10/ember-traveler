@@ -63,9 +63,9 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [129, 137], sprite: 'moon_duelist',
     description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时先轻击，再格挡并增长 2 力量；轻击弱于重斩，下一轮连击会更强。',
     moves: [
-      { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }], hardActions: [{ kind: 'attack', amount: 8, times: 2 }] },
-      { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
-      { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
+      { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }], hardActions: [{ kind: 'attack', amount: 9, times: 2 }] },
+      { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }], hardActions: [{ kind: 'attack', amount: 27 }] },
       { id: 'step', name: '月步', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     ], chooseMove: c => cycle(c, ['twins', 'mark', 'crescent', 'step']),
   },

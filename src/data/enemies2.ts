@@ -66,10 +66,10 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'forge_knight', name: '锻炉骑士', tier: 'elite', hp: [107, 115], sprite: 'forge_knight',
-    description: '护甲尚未冷却的骑士。开场有 2 层荆棘；格挡、重斩、连斩依次循环。',
+    description: '护甲尚未冷却的骑士。开场有 2 层荆棘；淬甲（格挡并获得 2 力量）、重斩、连斩依次循环，越拖越强。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
-      { id: 'temper', name: '淬甲', intent: 'defend', actions: [{ kind: 'block', amount: 16 }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 16 }] },
+      { id: 'temper', name: '淬甲', intent: 'defend_buff', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
       { id: 'cleave', name: '熔钢斩', intent: 'attack', actions: [{ kind: 'attack', amount: 17 }] },
       { id: 'double', name: '双重锻击', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
     ],
@@ -87,11 +87,11 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   },
   {
     id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [119, 129], sprite: 'slag_colossus',
-    description: '熔渣凝结成的重型躯壳。聚渣施加2回合易伤，给出一个玩家回合应对后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
+    description: '熔渣凝结成的重型躯壳。聚渣施加2回合易伤，给出一个玩家回合应对后重击；熔接时喷溅熔渣造成 6 点基础伤害、施加 1 层虚弱，并回复 6 点生命。',
     moves: [
       { id: 'gather', name: '聚渣', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }], hardActions: [{ kind: 'attack', amount: 19 }] },
-      { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }], hardActions: [{ kind: 'attack', amount: 7 }, { kind: 'heal', amount: 6 }] },
+      { id: 'mend', name: '熔接飞溅', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }], hardActions: [{ kind: 'attack', amount: 7 }, { kind: 'heal', amount: 6 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     ],
     chooseMove: ctx => cycle(ctx, ['gather', 'crush', 'mend']),
   },

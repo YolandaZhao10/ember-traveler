@@ -228,9 +228,9 @@ def({
   tier: 'elite',
   hp: [40, 40],
   sprite: 'sentinel',
-  description: '一对石像守卫，护卫时获得格挡并施加1回合脆弱。其中一个倒下时，另一个会暴怒。',
+  description: '一对石像守卫，石拳附带1层虚弱，护卫时获得格挡并施加1回合脆弱。其中一个倒下时，另一个会暴怒。',
   moves: [
-    { id: 'strike', name: '石拳', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }], hardActions: [{ kind: 'attack', amount: 11 }] },
+    { id: 'strike', name: '石拳', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }], hardActions: [{ kind: 'attack', amount: 11 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     { id: 'guard', name: '护卫', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   chooseMove: (ctx) => {
@@ -400,7 +400,7 @@ def({
   sprite: 'taxman',
   description: '抢走金币并定期净化，账本壁垒施加2回合脆弱。前6回合不会逃跑，第7回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
   moves: [
-    { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }] },
+    { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }], hardActions: [{ kind: 'attack', amount: 17 }] },
     { id: 'ledger', name: '账本壁垒', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
     { id: 'escape', name: '携账逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
