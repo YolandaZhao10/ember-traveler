@@ -6,8 +6,8 @@ export const CHAPTER_FOUR_ENEMIES: EnemyDef[] = [
     description: '最后一道守卫。先举盾施加易伤，并向抽牌堆随机塞入 1 张眩晕和 1 张缠缚，随后重斩与双击；收剑时追加一次轻斩、获得 2 力量并塞入 1 张疑惧。每四轮只有封庭敕令停止攻击。',
     moves: [
       { id: 'seal', name: '封庭敕令', intent: 'special', actions: [{ kind: 'block', amount: 16 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'block', amount: 16 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }] },
-      { id: 'verdict', name: '断路重斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }], hardActions: [{ kind: 'attack', amount: 22 }, { kind: 'block', amount: 5 }] },
-      { id: 'twins', name: '守门双击', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }] },
+      { id: 'verdict', name: '断路重斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }], hardActions: [{ kind: 'attack', amount: 24 }, { kind: 'block', amount: 5 }] },
+      { id: 'twins', name: '守门双击', intent: 'attack', actions: [{ kind: 'attack', amount: 9, times: 2 }], hardActions: [{ kind: 'attack', amount: 10, times: 2 }] },
       { id: 'sheathe', name: '收剑封志', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 10 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }, { kind: 'addCardToDiscard', cardId: 'doubt', count: 1 }] },
     ], chooseMove: c => ['seal', 'verdict', 'twins', 'sheathe'][c.enemy.turn % 4],
   },

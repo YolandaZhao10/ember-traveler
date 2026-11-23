@@ -5,20 +5,20 @@ const cycle = (ctx: EnemyAiContext, order: string[]) => order[ctx.enemy.turn % o
 /** 星骸天穹：破甲、连击与辅助敌人的组合，需要按意图决定集火顺序。 */
 export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
   {
-    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [36, 41], sprite: 'star_moth',
+    id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [36, 41], hardHp: [43, 49], sprite: 'star_moth',
     description: '星砂施加 1 层脆弱，并向弃牌堆塞入 2 张眩晕；眩晕占抽牌位，留在手中会在回合结束时消耗。扑击与合翼之间仍有反攻窗口。',
     moves: [
-      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }] },
-      { id: 'flutter', name: '碎翼扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-      { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
+      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }] },
+      { id: 'flutter', name: '碎翼扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }], hardActions: [{ kind: 'attack', amount: 6, times: 2 }] },
+      { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 8 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'block', amount: 8 }] },
     ], chooseMove: c => cycle(c, ['dust', 'flutter', 'wings', 'flutter']),
   },
   {
-    id: 'glass_wisp', name: '碎镜灵', tier: 'normal', hp: [32, 36], sprite: 'glass_wisp',
+    id: 'glass_wisp', name: '碎镜灵', tier: 'normal', hp: [32, 36], hardHp: [43, 48], sprite: 'glass_wisp',
     description: '镜片以双击切割，随后轻击并重组。死亡时使你获得 1 层虚弱。',
     moves: [
-      { id: 'shards', name: '飞镜', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-      { id: 'assemble', name: '聚镜', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 1 }, { kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+      { id: 'shards', name: '飞镜', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }], hardActions: [{ kind: 'attack', amount: 5, times: 2 }] },
+      { id: 'assemble', name: '聚镜', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 1 }, { kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'block', amount: 9 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
     ], onDeath: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }],
     chooseMove: c => cycle(c, ['shards', 'assemble', 'shards']),
   },
@@ -35,9 +35,9 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'wind_scribe', name: '风页抄写者', tier: 'normal', hp: [46, 53], sprite: 'wind_scribe',
     description: '将 1 张眩晕和 1 张缠缚插入抽牌堆随机位置，扰乱接下来的过牌；之后轻击并施加1回合脆弱，再用纸刃攻击。每四轮塞牌一次。',
     moves: [
-      { id: 'page', name: '迷失书页', intent: 'debuff', actions: [{ kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }] },
-      { id: 'chorus', name: '风中合诵', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
-      { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
+      { id: 'page', name: '迷失书页', intent: 'debuff', actions: [{ kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'addCardToDraw', cardId: 'dazed', count: 1 }, { kind: 'addCardToDraw', cardId: 'tangle', count: 1 }] },
+      { id: 'chorus', name: '风中合诵', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 2 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
+      { id: 'cut', name: '纸刃', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }], hardActions: [{ kind: 'attack', amount: 16 }] },
     ], chooseMove: c => cycle(c, ['page', 'chorus', 'cut', 'cut']),
   },
   {
@@ -54,8 +54,8 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [63, 71], sprite: 'star_pilgrim',
     description: '沉重的星仪兼具武器与护甲。重击后回复 4 生命，并把 1 张破绽塞入弃牌堆，放大后续攻击的威胁。',
     moves: [
-      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
-      { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
+      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
+      { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }], hardActions: [{ kind: 'attack', amount: 19 }] },
       { id: 'repair', name: '拾回星屑', intent: 'special', actions: [{ kind: 'heal', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'exposure', count: 1 }] },
     ], chooseMove: c => cycle(c, ['burden', 'fall', 'repair']),
   },
@@ -63,7 +63,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'moon_duelist', name: '月蚀剑侍', tier: 'elite', hp: [129, 137], sprite: 'moon_duelist',
     description: '双刃后以轻斩留下 2 层易伤，再接落月重斩。月步时先轻击，再格挡并增长 2 力量；轻击弱于重斩，下一轮连击会更强。',
     moves: [
-      { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
+      { id: 'twins', name: '双月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }], hardActions: [{ kind: 'attack', amount: 8, times: 2 }] },
       { id: 'mark', name: '蚀影印', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'crescent', name: '落月斩', intent: 'attack', actions: [{ kind: 'attack', amount: 22 }] },
       { id: 'step', name: '月步', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'block', amount: 16 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },

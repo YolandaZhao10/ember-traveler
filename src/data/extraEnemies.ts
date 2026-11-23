@@ -57,8 +57,8 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'slag_saw', name: '炉轨锯轮', tier: 'normal', hp: [46, 52], sprite: 'slag_saw',
     description: '首回合冲轨三切每段4点基础伤害，仅使用一次；三连试切后磨齿增加2力量，再发动五连锯，随后移除这2力量。卡齿回合只防御并使自身虚弱，荆棘与减伤能克制密集连击。',
     moves: [
-      { id: 'opening', name: '冲轨三切', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }] },
-      { id: 'cut', name: '三齿试切', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 3 }] },
+      { id: 'opening', name: '冲轨三切', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 3 }], hardActions: [{ kind: 'attack', amount: 5, times: 3 }] },
+      { id: 'cut', name: '三齿试切', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 3 }], hardActions: [{ kind: 'attack', amount: 4, times: 3 }] },
       { id: 'sharpen', name: '磨齿提速', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
       { id: 'saw', name: '五齿连锯', intent: 'attack', actions: [{ kind: 'attack', amount: 2, times: 5 }, { kind: 'status', status: 'strength', amount: -2, target: 'self' }] },
       { id: 'jam', name: '卡齿停转', intent: 'defend', actions: [{ kind: 'block', amount: 5 }, { kind: 'status', status: 'weak', amount: 2, target: 'self' }] },
@@ -68,10 +68,10 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [59, 65], sprite: 'sealed_archivist',
     description: '仅开场行动塞入1张会保留的重负（只限本场），随后斩页、封书防护、双刃轮换。弃置或消耗重负可解放手牌空间。',
     moves: [
-      { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
-      { id: 'cut', name: '断章斩', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
+      { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
+      { id: 'cut', name: '断章斩', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }], hardActions: [{ kind: 'attack', amount: 16 }] },
       { id: 'close', name: '合卷禁声', intent: 'defend_buff', actions: [{ kind: 'block', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
-      { id: 'twins', name: '禁页双刃', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
+      { id: 'twins', name: '禁页双刃', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }], hardActions: [{ kind: 'attack', amount: 6, times: 2 }] },
     ], chooseMove: c => c.enemy.turn === 0 ? 'seal' : ['cut', 'close', 'twins'][(c.enemy.turn - 1) % 3],
   },
   {
@@ -79,8 +79,8 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     description: '锁定时给玩家施加2层虚弱，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，',
     moves: [
       { id: 'lock', name: '裂隙锁定', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'weak', amount: 2, target: 'player' }] },
-      { id: 'pierce', name: '穿隙刺', intent: 'attack', actions: [{ kind: 'attack', amount: 8, piercing: true }] },
-      { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
+      { id: 'pierce', name: '穿隙刺', intent: 'attack', actions: [{ kind: 'attack', amount: 8, piercing: true }], hardActions: [{ kind: 'attack', amount: 9, piercing: true }] },
+      { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }], hardActions: [{ kind: 'attack', amount: 12 }] },
     ], chooseMove: c => cycle(c, ['lock', 'pierce', 'sweep']),
   },
   {

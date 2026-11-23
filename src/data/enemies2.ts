@@ -5,11 +5,11 @@ const cycle = (ctx: EnemyAiContext, order: string[]) => order[ctx.enemy.turn % o
 /** 熔炉深城的独立敌人、形象与遭遇。 */
 export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
   {
-    id: 'slag_tick', name: '炉渣虫', tier: 'normal', hp: [22, 26], sprite: 'slag_tick',
+    id: 'slag_tick', name: '炉渣虫', tier: 'normal', hp: [22, 26], hardHp: [30, 35], sprite: 'slag_tick',
     description: '蜷在炉灰里的小虫。先喷出灼火再扑咬，死亡时给你施加 1 层燃烧。',
     moves: [
-      { id: 'spit', name: '喷渣', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'burn', amount: 1, target: 'player' }] },
-      { id: 'bite', name: '炽咬', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
+      { id: 'spit', name: '喷渣', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'burn', amount: 1, target: 'player' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'burn', amount: 1, target: 'player' }] },
+      { id: 'bite', name: '炽咬', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }], hardActions: [{ kind: 'attack', amount: 9 }] },
     ],
     onDeath: [{ kind: 'status', status: 'burn', amount: 1, target: 'player' }],
     chooseMove: ctx => cycle(ctx, ['spit', 'bite']),
@@ -28,8 +28,8 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'chain_guard', name: '锁链卫兵', tier: 'normal', hp: [50, 57], sprite: 'chain_guard',
     description: '空甲由锁链牵引。束缚施加 2 层易伤，下一击尤其危险；收链时可以反攻。',
     moves: [
-      { id: 'bind', name: '束缚', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
-      { id: 'pull', name: '拖拽斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }], hardActions: [{ kind: 'attack', amount: 12 }, { kind: 'block', amount: 4 }] },
+      { id: 'bind', name: '束缚', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'pull', name: '拖拽斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }], hardActions: [{ kind: 'attack', amount: 13 }, { kind: 'block', amount: 4 }] },
       { id: 'coil', name: '收链', intent: 'defend', actions: [{ kind: 'block', amount: 10 }], hardActions: [{ kind: 'attack', amount: 2 }, { kind: 'block', amount: 10 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['bind', 'pull', 'coil']),
@@ -40,7 +40,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     moves: [
       { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
       { id: 'coal', name: '扬起热灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }], hardActions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }] },
-      { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
+      { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }], hardActions: [{ kind: 'attack', amount: 10 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['stoke', 'rake', 'coal', 'rake']),
   },
@@ -90,8 +90,8 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     description: '熔渣凝结成的重型躯壳。聚渣施加2回合易伤，给出一个玩家回合应对后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
     moves: [
       { id: 'gather', name: '聚渣', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
-      { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
-      { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }] },
+      { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }], hardActions: [{ kind: 'attack', amount: 19 }] },
+      { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }], hardActions: [{ kind: 'attack', amount: 7 }, { kind: 'heal', amount: 6 }] },
     ],
     chooseMove: ctx => cycle(ctx, ['gather', 'crush', 'mend']),
   },
@@ -99,13 +99,13 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'everburning_core', name: '永燃炉心', tier: 'boss', hp: [231, 231], sprite: 'everburning_core',
     description: '深城的动力核心。泄压时混入冷灰并点燃你；半血后进入过载，清除负面状态、获得 20 格挡与 1 力量，随后在爆燃后重铸外壳，留出进攻窗口。',
     moves: [
-      { id: 'pressure', name: '高压冲击', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }] },
+      { id: 'pressure', name: '高压冲击', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }], hardActions: [{ kind: 'attack', amount: 19 }] },
       { id: 'vent', name: '炉心泄压', intent: 'debuff', actions: [{ kind: 'status', status: 'burn', amount: 2, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
-      { id: 'pistons', name: '双缸锻击', intent: 'attack', actions: [{ kind: 'attack', amount: 8, times: 2 }] },
+      { id: 'pistons', name: '双缸锻击', intent: 'attack', actions: [{ kind: 'attack', amount: 8, times: 2 }], hardActions: [{ kind: 'attack', amount: 10, times: 2 }] },
       { id: 'shell', name: '重铸外壳', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
       { id: 'overdrive', name: '炉心过载', intent: 'special', actions: [{ kind: 'clearDebuffs' }, { kind: 'block', amount: 20 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
-      { id: 'eruption', name: '熔流喷发', intent: 'attack', actions: [{ kind: 'attack', amount: 19 }] },
-      { id: 'cascade', name: '连环爆燃', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 3 }] },
+      { id: 'eruption', name: '熔流喷发', intent: 'attack', actions: [{ kind: 'attack', amount: 19 }], hardActions: [{ kind: 'attack', amount: 23 }] },
+      { id: 'cascade', name: '连环爆燃', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 3 }], hardActions: [{ kind: 'attack', amount: 8, times: 3 }] },
     ],
     checkPhase: e => e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null,
     chooseMove: ctx => ctx.enemy.phase === 1 ? cycle(ctx, ['pressure', 'vent', 'pistons', 'shell'])
