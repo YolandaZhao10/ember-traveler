@@ -19,7 +19,7 @@ import { distinctRewardPool } from './cardChoices';
 import { describeCard } from './cards';
 import { STATUSES } from '../data/statuses';
 import { chance, makeRng, nextInt, pick, shuffle, weightedPick, type RngState } from './rng';
-import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
+import type { CardDef, CardInstance, CharacterId, CombatEvent, DifficultyLevel, EncounterDef, EventOutcome, Rarity, RelicRarity, RelicJourneyRule, RunDifficulty, RunState, ShopState } from './types';
 
 export const SAVE_VERSION = 20;
 
@@ -179,6 +179,19 @@ export function ensureRewardCheckpoint(input: RunState): RunState {
 }
 
 // ---------- 战斗 ----------
+/**
+ * 精英尽量不重复：预排的精英本局已经打过时，换成本章还没打过的一组；
+ * 本章精英都打过了，就换成最久没遇到的那一组。精英敌组不在地图上预告，入场时改换不影响已显示的信息。
+ * 用独立的种子流挑选，不推进战斗随机流。
+ */
+function variedElite(run: RunState, planned: EncounterDef, pool: EncounterDef[], nodeId: string): EncounterDef {
+  if (!run.seenEncounters.includes(planned.id)) return planned;
+  const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
+  if (fresh.length) return pick(makeRng(run.seed, `elite-vary:${run.chapter}:${nodeId}`), fresh);
+  const last = (e: EncounterDef) => run.seenEncounters.lastIndexOf(e.id);
+  return pool.reduce((oldest, e) => (last(e) < last(oldest) ? e : oldest), planned);
+}
+
 function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunState {
   const localFloor = run.floor - CHAPTERS[run.chapter].startFloor;
   const pool = ENCOUNTERS.filter(
@@ -186,7 +199,8 @@ function startEncounter(run: RunState, tier: 'normal' | 'elite' | 'boss'): RunSt
   );
   const fresh = pool.filter((e) => !run.seenEncounters.includes(e.id));
   const node = run.currentNodeId ? run.map.nodes[run.currentNodeId] : undefined;
-  const enc = (node && plannedEncounter(run, node)) ?? pick(run.rng.combat, fresh.length ? fresh : pool);
+  const planned = node && plannedEncounter(run, node);
+  const enc = planned ? (tier === 'elite' ? variedElite(run, planned, pool, node!.id) : planned) : pick(run.rng.combat, fresh.length ? fresh : pool);
   if (node) node.encounterId = enc.id;
   run.seenEncounters.push(enc.id);
   const res = createCombat(enc.id, enc.enemies, tier, run.deck, run.hp, run.maxHp, run.relics, run.rng.combat, run.uidCounter, run.character, encounterDifficulty(run.floor, tier, run.difficulty), run.gold);
