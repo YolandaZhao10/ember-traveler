@@ -23,7 +23,7 @@ describe('终局公平性与成长边界', () => {
     expect(enemyIntent(cs,cs.enemies[0])).toMatchObject({amount:73,times:1});
     for(let i=0;i<8;i++) { cs=endPlayerTurn(cs).state; cs=enemyAct(cs,'e0').state; cs=startPlayerTurn(cs).state; }
     expect(cs.enemies[0].moveHistory.filter(m=>m==='opening')).toHaveLength(1);
-    expect(cs.enemies[0].statuses.strength).toBe(8);
+    expect(cs.enemies[0].statuses.strength).toBe(12);
   });
   it.each([0,1,24,25])('最终首领觉醒保留燃烧的一半并向上取整：%s层；其他减益清除', burn => {
     let cs = battle(); cs.enemies[0].hp=600; cs.enemies[0].statuses={burn,weak:3,vulnerable:3,frail:3}; cs.player.statuses.everburn=1;

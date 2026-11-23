@@ -50,6 +50,12 @@ describe('挑战难度的首领成长', () => {
     }
     return total / N;
   };
+  it('终章的精英和首领，成长比前三章所有精英和首领的最高值至少高 25%', () => {
+    const of = (ch: number) => ENCOUNTERS.filter(e => (e.chapter ?? 1) === ch && e.tier !== 'normal').map(e => growth(e.id));
+    const before = Math.max(...[1, 2, 3].flatMap(of));
+    for (const g of of(4)) expect(g).toBeGreaterThanOrEqual(before * 1.25);
+  });
+
   it('每章首领的力量成长高于本章所有精英，且高于上一章的首领', () => {
     let previous = 0;
     for (const ch of [1, 2, 3, 4]) {
