@@ -38,7 +38,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'pressure_boiler', name: '游走压力釜', tier: 'normal', hp: [54, 62], sprite: 'pressure_boiler',
     description: '加压获得8格挡与2力量，喷汽后移除这2力量并自损5生命（不会自杀）；冷却时轻击并给玩家施加1层虚弱。',
     moves: [
-      { id: 'pressure', name: '封阀加压', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+      { id: 'pressure', name: '封阀加压', intent: 'defend_buff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 8 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
       { id: 'vent', name: '超压喷汽', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }, { kind: 'status', status: 'strength', amount: -2, target: 'self' }, { kind: 'loseHp', amount: 5 }] },
       { id: 'cool', name: '开阀冷却', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     ], chooseMove: c => cycle(c, ['pressure', 'vent', 'cool']),
@@ -68,7 +68,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'sealed_archivist', name: '禁页看守', tier: 'normal', hp: [59, 65], sprite: 'sealed_archivist',
     description: '仅开场行动塞入1张会保留的重负（只限本场），随后斩页、封书防护、双刃轮换。弃置或消耗重负可解放手牌空间。',
     moves: [
-      { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
+      { id: 'seal', name: '禁页封存', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'burden', count: 1 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'burden', count: 1 }] },
       { id: 'cut', name: '断章斩', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
       { id: 'close', name: '合卷禁声', intent: 'defend_buff', actions: [{ kind: 'block', amount: 9 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
       { id: 'twins', name: '禁页双刃', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
@@ -78,7 +78,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'phase_lancer', name: '隙星枪客', tier: 'normal', hp: [55, 63], sprite: 'phase_lancer',
     description: '锁定时给玩家施加2层虚弱，下一枪造成8点基础穿透伤害、无视格挡，再接普通横扫。穿透仍受力量、虚弱与易伤修正，',
     moves: [
-      { id: 'lock', name: '裂隙锁定', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }] },
+      { id: 'lock', name: '裂隙锁定', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'weak', amount: 2, target: 'player' }] },
       { id: 'pierce', name: '穿隙刺', intent: 'attack', actions: [{ kind: 'attack', amount: 8, piercing: true }] },
       { id: 'sweep', name: '收枪横扫', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
     ], chooseMove: c => cycle(c, ['lock', 'pierce', 'sweep']),
@@ -87,7 +87,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'orbit_gambler', name: '逆轨棋士', tier: 'normal', hp: [63, 71], sprite: 'orbit_gambler',
     description: '落子回合只获得8格挡。之后选招时，若你的格挡至少10就准备15伤害破阵并施加脆弱，否则准备三连击；不会随你本回合出牌改变已显示的意图。',
     moves: [
-      { id: 'place', name: '布下星局', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
+      { id: 'place', name: '布下星局', intent: 'defend', actions: [{ kind: 'block', amount: 8 }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 8 }] },
       { id: 'break', name: '破阵一击', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 15 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
       { id: 'triple', name: '三子追击', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
     ], chooseMove: c => c.enemy.turn % 3 === 0 ? 'place' : c.player.block >= 10 ? 'break' : 'triple',

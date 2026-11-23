@@ -8,7 +8,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'star_moth', name: '星砂蛾', tier: 'normal', hp: [36, 41], sprite: 'star_moth',
     description: '星砂施加 1 层脆弱，并向弃牌堆塞入 2 张眩晕；眩晕占抽牌位，留在手中会在回合结束时消耗。扑击与合翼之间仍有反攻窗口。',
     moves: [
-      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }] },
+      { id: 'dust', name: '星砂落尘', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'dazed', count: 2 }] },
       { id: 'flutter', name: '碎翼扑击', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
       { id: 'wings', name: '合拢月翼', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
     ], chooseMove: c => cycle(c, ['dust', 'flutter', 'wings', 'flutter']),
@@ -26,7 +26,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'astral_sentinel', name: '星轨卫士', tier: 'normal', hp: [65, 73], sprite: 'astral_sentinel',
     description: '星矛在架盾后刺击，再施加易伤。盾墙回合是蓄力的机会。',
     moves: [
-      { id: 'orbit', name: '环轨盾', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
+      { id: 'orbit', name: '环轨盾', intent: 'defend', actions: [{ kind: 'block', amount: 16 }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 16 }] },
       { id: 'spear', name: '贯星', intent: 'attack', actions: [{ kind: 'attack', amount: 15 }], hardActions: [{ kind: 'attack', amount: 15 }, { kind: 'block', amount: 4 }] },
       { id: 'mark', name: '星轨标记', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 6 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
     ], chooseMove: c => cycle(c, ['orbit', 'spear', 'mark', 'spear']),
@@ -54,7 +54,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     id: 'star_pilgrim', name: '失轨朝圣者', tier: 'normal', hp: [63, 71], sprite: 'star_pilgrim',
     description: '沉重的星仪兼具武器与护甲。重击后回复 4 生命，并把 1 张破绽塞入弃牌堆，放大后续攻击的威胁。',
     moves: [
-      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
+      { id: 'burden', name: '负星而行', intent: 'defend_buff', actions: [{ kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 11 }, { kind: 'status', status: 'thorns', amount: 1, target: 'self' }] },
       { id: 'fall', name: '星仪坠落', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
       { id: 'repair', name: '拾回星屑', intent: 'special', actions: [{ kind: 'heal', amount: 4 }, { kind: 'addCardToDiscard', cardId: 'exposure', count: 1 }] },
     ], chooseMove: c => cycle(c, ['burden', 'fall', 'repair']),
@@ -84,7 +84,7 @@ export const CHAPTER_THREE_ENEMIES: EnemyDef[] = [
     description: '开场有 2 荆棘。蓄盾后落锤、三连击；修补时以碎岩攻击，回复 8 生命并增长 1 力量，让下一轮进攻更强。每轮只有蓄盾时停止进攻。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
-      { id: 'rise', name: '拔起星岩', intent: 'defend', actions: [{ kind: 'block', amount: 18 }] },
+      { id: 'rise', name: '拔起星岩', intent: 'defend', actions: [{ kind: 'block', amount: 18 }], hardActions: [{ kind: 'attack', amount: 8 }, { kind: 'block', amount: 18 }] },
       { id: 'crush', name: '崩天锤', intent: 'attack', actions: [{ kind: 'attack', amount: 24 }] },
       { id: 'shower', name: '碎星雨', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
       { id: 'mend', name: '重聚星骸', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 8 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },

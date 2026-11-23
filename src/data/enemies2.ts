@@ -18,7 +18,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'furnace_drone', name: '铸铁傀儡', tier: 'normal', hp: [46, 52], sprite: 'furnace_drone',
     description: '撑起铁壳时排出冷灰，向弃牌堆塞入 1 张冷灰，干扰余烬积累；随后连续挥锤。',
     moves: [
-      { id: 'shell', name: '排灰铁壳', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
+      { id: 'shell', name: '排灰铁壳', intent: 'special', actions: [{ kind: 'block', amount: 10 }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'block', amount: 10 }, { kind: 'addCardToDiscard', cardId: 'cold_ash', count: 1 }] },
       { id: 'hammer', name: '铸锤', intent: 'attack', actions: [{ kind: 'attack', amount: 13 }] },
       { id: 'pound', name: '连锤', intent: 'attack', actions: [{ kind: 'attack', amount: 6, times: 2 }] },
     ],
@@ -38,7 +38,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'cinder_stoker', name: '添火侍从', tier: 'normal', hp: [37, 42], sprite: 'cinder_stoker',
     description: '添火为所有同伴增加 1 力量，挥钳后扬起 1 张灼伤塞入弃牌堆，再挥钳。每四次行动强化一次。',
     moves: [
-      { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+      { id: 'stoke', name: '添火', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
       { id: 'coal', name: '扬起热灰', intent: 'debuff', actions: [{ kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }], hardActions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }, { kind: 'addCardToDiscard', cardId: 'scorch', count: 1 }] },
       { id: 'rake', name: '火钳', intent: 'attack', actions: [{ kind: 'attack', amount: 7 }] },
     ],
@@ -69,7 +69,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     description: '护甲尚未冷却的骑士。开场有 2 层荆棘；格挡、重斩、连斩依次循环。',
     onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 2, target: 'self' }],
     moves: [
-      { id: 'temper', name: '淬甲', intent: 'defend', actions: [{ kind: 'block', amount: 16 }] },
+      { id: 'temper', name: '淬甲', intent: 'defend', actions: [{ kind: 'block', amount: 16 }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'block', amount: 16 }] },
       { id: 'cleave', name: '熔钢斩', intent: 'attack', actions: [{ kind: 'attack', amount: 17 }] },
       { id: 'double', name: '双重锻击', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
     ],
@@ -79,7 +79,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'kiln_overseer', name: '炉窑监工', tier: 'elite', hp: [80, 88], sprite: 'kiln_overseer',
     description: '带着两只炉渣虫巡查的监工。号令强化同伴，炙杖连击之后会短暂休整。',
     moves: [
-      { id: 'order', name: '催炉令', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+      { id: 'order', name: '催炉令', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
       { id: 'rod', name: '炙杖', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 2 }] },
       { id: 'guard', name: '炉灰屏障', intent: 'defend', actions: [{ kind: 'block', amount: 12 }] },
     ],
@@ -89,7 +89,7 @@ export const CHAPTER_TWO_ENEMIES: EnemyDef[] = [
     id: 'slag_colossus', name: '熔渣巨像', tier: 'elite', hp: [119, 129], sprite: 'slag_colossus',
     description: '熔渣凝结成的重型躯壳。聚渣施加2回合易伤，给出一个玩家回合应对后重击；熔接时喷溅熔渣造成 6 点基础伤害，并回复 6 点生命。',
     moves: [
-      { id: 'gather', name: '聚渣', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
+      { id: 'gather', name: '聚渣', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'block', amount: 8 }, { kind: 'status', status: 'vulnerable', amount: 2, target: 'player' }] },
       { id: 'crush', name: '塌炉', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
       { id: 'mend', name: '熔接飞溅', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }, { kind: 'heal', amount: 6 }] },
     ],
