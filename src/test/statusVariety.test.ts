@@ -76,7 +76,9 @@ describe('状态牌各有处理方式', () => {
       if(hard) cs.difficulty={...encounterDifficulty(64,ENEMIES[id].tier),complexIntents:true};
       const input=endPlayerTurn(cs).state;
       const result=enemyAct(input,'e0');
-      expect(result.state.player[pile].map(c=>c.defId).sort()).toEqual([...expected].sort());
+      // 锈甲蜗在挑战难度改为塞进抽牌堆，张数不变。
+      const where = hard && id==='rust_snail' ? 'draw' : pile;
+      expect(result.state.player[where].map(c=>c.defId).sort()).toEqual([...expected].sort());
       expect(enemyAct(input,'e0')).toEqual(result);
       expect(enemyAct(result.state,'e0').state).toBe(result.state);
     }

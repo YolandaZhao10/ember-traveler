@@ -10,7 +10,7 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     description: '架弩时给玩家施加1层虚弱，随后射出重矢，再用短刀掩护装填。',
     moves: [
       { id: 'aim', name: '架弩露隙', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
-      { id: 'bolt', name: '穿街重矢', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
+      { id: 'bolt', name: '穿街重矢', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }], hardActions: [{ kind: 'attack', amount: 17 }] },
       { id: 'reload', name: '装填短刺', intent: 'attack', actions: [{ kind: 'attack', amount: 4 }] },
     ], chooseMove: c => cycle(c, ['aim', 'bolt', 'reload']),
   },
@@ -18,10 +18,10 @@ export const EXTRA_ENEMIES: EnemyDef[] = [
     id: 'ash_duelist', name: '灰衣决斗者', tier: 'normal', hp: [34, 38], sprite: 'ash_duelist',
     description: '首回合拔刃突袭造成12点基础伤害，之后不再使用；斩击后准备反击架势：获得7格挡与2荆棘，下次回斩前移除这2荆棘。若选招时你的格挡至少8，改用佯攻施加脆弱。已显示的意图不会临时改变。',
     moves: [
-      { id: 'opening', name: '拔刃突袭', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
+      { id: 'opening', name: '拔刃突袭', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }], hardActions: [{ kind: 'attack', amount: 14 }] },
       { id: 'slash', name: '试探斩', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
-      { id: 'parry', name: '反击架势', intent: 'defend_buff', actions: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }] },
-      { id: 'riposte', name: '收势回斩', intent: 'attack', actions: [{ kind: 'status', status: 'thorns', amount: -2, target: 'self' }, { kind: 'attack', amount: 9 }] },
+      { id: 'parry', name: '反击架势', intent: 'defend_buff', actions: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 2, target: 'self' }], hardActions: [{ kind: 'block', amount: 7 }, { kind: 'status', status: 'thorns', amount: 3, target: 'self' }] },
+      { id: 'riposte', name: '收势回斩', intent: 'attack', actions: [{ kind: 'status', status: 'thorns', amount: -2, target: 'self' }, { kind: 'attack', amount: 9 }], hardActions: [{ kind: 'status', status: 'thorns', amount: -3, target: 'self' }, { kind: 'attack', amount: 9 }] },
       { id: 'feint', name: '绕盾佯攻', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
     ], chooseMove: c => c.enemy.turn === 0 ? 'opening' : last(c) === 'parry' ? 'riposte' : ['slash', 'opening'].includes(last(c)) ? (c.player.block >= 8 ? 'feint' : 'parry') : 'slash',
   },

@@ -189,7 +189,7 @@ def({
   description: '仍在守卫早已不存在的王座。盾墙后面越来越硬。',
   moves: [
     { id: 'cleave', name: '斩击', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
-    { id: 'wall', name: '盾墙', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+    { id: 'wall', name: '盾墙', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }], hardActions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
     { id: 'charge', name: '冲锋', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['charge', 'wall', 'cleave']),
@@ -210,10 +210,10 @@ def({
       actions: [
         { kind: 'attack', amount: 4 },
         { kind: 'status', status: 'burn', amount: 4, target: 'player' },
-      ],
+      ], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'status', status: 'burn', amount: 5, target: 'player' }],
     },
     { id: 'rain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
-    { id: 'offering', name: '献祭', intent: 'buff', actions: [{ kind: 'loseHp', amount: 5 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
+    { id: 'offering', name: '献祭', intent: 'buff', actions: [{ kind: 'loseHp', amount: 5 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }], hardActions: [{ kind: 'loseHp', amount: 5 }, { kind: 'status', status: 'strength', amount: 3, target: 'self' }] },
   ],
   onCombatStart: () => [{ kind: 'status', status: 'enrage', amount: 1, target: 'self' }],
   chooseMove: (ctx) => {
@@ -230,7 +230,7 @@ def({
   sprite: 'sentinel',
   description: '一对石像守卫，护卫时获得格挡并施加1回合脆弱。其中一个倒下时，另一个会暴怒。',
   moves: [
-    { id: 'strike', name: '石拳', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }] },
+    { id: 'strike', name: '石拳', intent: 'attack', actions: [{ kind: 'attack', amount: 9 }], hardActions: [{ kind: 'attack', amount: 11 }] },
     { id: 'guard', name: '护卫', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 8 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   chooseMove: (ctx) => {
@@ -254,7 +254,7 @@ def({
   moves: [
     { id: 'regal_slash', name: '王权斩', intent: 'attack', actions: [{ kind: 'attack', amount: 12 }] },
     { id: 'ash_storm', name: '灰烬风暴', intent: 'attack', actions: [{ kind: 'attack', amount: 5, times: 3 }] },
-    { id: 'ash_wall', name: '灰烬壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'ash_wall', name: '灰烬壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 12 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     {
       id: 'awaken',
       name: '余烬苏醒',
@@ -277,7 +277,7 @@ def({
         { kind: 'attack', amount: 5 },
         { kind: 'status', status: 'burn', amount: 3, target: 'player' },
         { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 },
-      ],
+      ], hardActions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'burn', amount: 3, target: 'player' }, { kind: 'addCardToDraw', cardId: 'ashes', count: 1 }],
     },
   ],
   checkPhase: (e) => (e.phase === 1 && e.hp <= e.maxHp / 2 ? 2 : null),
@@ -302,10 +302,11 @@ def({
   name: '灰烬蝠',
   tier: 'normal',
   hp: [10, 13],
+  hardHp: [13, 15],
   sprite: 'bat',
   description: '靠吸血维生的小东西，打它们要快。',
   moves: [
-    { id: 'drain', name: '吸血', intent: 'attack', actions: [{ kind: 'attack', amount: 3 }, { kind: 'heal', amount: 3 }] },
+    { id: 'drain', name: '吸血', intent: 'attack', actions: [{ kind: 'attack', amount: 3 }, { kind: 'heal', amount: 3 }], hardActions: [{ kind: 'attack', amount: 4 }, { kind: 'heal', amount: 4 }] },
     { id: 'shriek', name: '尖啸', intent: 'debuff', actions: [{ kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   chooseMove: (ctx) => (last(ctx) === 'shriek' ? 'drain' : chance(ctx.rng, 0.3) ? 'shriek' : 'drain'),
@@ -320,8 +321,8 @@ def({
   description: '缩壳后喷出锈灰，造成轻伤并将 1 张黏液塞入弃牌堆，随后碾压。',
   moves: [
     { id: 'shell', name: '缩壳', intent: 'defend', actions: [{ kind: 'block', amount: 12 }] },
-    { id: 'acid', name: '锈灰喷吐', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'slime', count: 1 }] },
-    { id: 'roll', name: '碾压', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }] },
+    { id: 'acid', name: '锈灰喷吐', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'slime', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDraw', cardId: 'slime', count: 1 }] },
+    { id: 'roll', name: '碾压', intent: 'attack', actions: [{ kind: 'attack', amount: 8 }], hardActions: [{ kind: 'attack', amount: 10 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['shell', 'acid', 'roll']),
 });
@@ -334,9 +335,9 @@ def({
   sprite: 'deacon',
   description: '信徒的头目，会为同伴祈福。半血以下治疗 6 点并获得 4 格挡，两次治疗之间至少行动两次。',
   moves: [
-    { id: 'bless', name: '祈福', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }] },
+    { id: 'bless', name: '祈福', intent: 'buff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'allies' }], hardActions: [{ kind: 'status', status: 'strength', amount: 2, target: 'allies' }] },
     { id: 'firerain', name: '火雨', intent: 'attack', actions: [{ kind: 'attack', amount: 4, times: 2 }] },
-    { id: 'mend', name: '治疗', intent: 'buff', actions: [{ kind: 'heal', amount: 6 }, { kind: 'block', amount: 4 }] },
+    { id: 'mend', name: '治疗', intent: 'buff', actions: [{ kind: 'heal', amount: 6 }, { kind: 'block', amount: 4 }], hardActions: [{ kind: 'heal', amount: 10 }, { kind: 'block', amount: 4 }] },
   ],
   chooseMove: (ctx) => {
     if (ctx.enemy.turn === 0) return 'bless';
@@ -354,7 +355,7 @@ def({
   description: '盔甲里早已没有人。开场有 1 层荆棘，攻击它会被反伤。',
   moves: [
     { id: 'stance', name: '守势', intent: 'defend', actions: [{ kind: 'block', amount: 8 }] },
-    { id: 'cleave', name: '重劈', intent: 'attack', actions: [{ kind: 'attack', amount: 10 }] },
+    { id: 'cleave', name: '重劈', intent: 'attack', actions: [{ kind: 'attack', amount: 10 }], hardActions: [{ kind: 'attack', amount: 12 }] },
   ],
   onCombatStart: () => [{ kind: 'status', status: 'thorns', amount: 1, target: 'self' }],
   chooseMove: (ctx) => cycle(ctx, ['stance', 'cleave']),
@@ -368,7 +369,7 @@ def({
   sprite: 'grub',
   description: '蠕动时获得格挡并施加1回合脆弱，随后喷火。死亡时爆开，点燃你。',
   moves: [
-    { id: 'spit', name: '喷火', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'burn', amount: 2, target: 'player' }] },
+    { id: 'spit', name: '喷火', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'burn', amount: 2, target: 'player' }], hardActions: [{ kind: 'attack', amount: 6 }, { kind: 'status', status: 'burn', amount: 3, target: 'player' }] },
     { id: 'wriggle', name: '蠕动', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 5 }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
   ],
   onDeath: [{ kind: 'status', status: 'burn', amount: 2, target: 'player' }],
@@ -384,8 +385,8 @@ def({
   description: '笛声让人手软，刺耳的高音还会在你的牌堆里留下灰烬。',
   moves: [
     { id: 'tune', name: '笛音', intent: 'debuff', actions: [{ kind: 'status', status: 'weak', amount: 1, target: 'player' }, { kind: 'status', status: 'vulnerable', amount: 1, target: 'player' }] },
-    { id: 'knock', name: '敲击', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }] },
-    { id: 'screech', name: '刺耳', intent: 'special', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }] },
+    { id: 'knock', name: '敲击', intent: 'attack', actions: [{ kind: 'attack', amount: 6 }], hardActions: [{ kind: 'attack', amount: 7 }] },
+    { id: 'screech', name: '刺耳', intent: 'special', actions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDiscard', cardId: 'ashes', count: 1 }], hardActions: [{ kind: 'attack', amount: 3 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 1 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['tune', 'knock', 'screech', 'knock']),
 });
@@ -400,7 +401,7 @@ def({
   description: '抢走金币并定期净化，账本壁垒施加2回合脆弱。前6回合不会逃跑，第7回合起每次选择意图有20%概率准备逃跑；行动前击败可追回金币，逃走则带钱离场且不掉落精英遗物。',
   moves: [
     { id: 'levy', name: '征税', intent: 'special', actions: [{ kind: 'attack', amount: 8 }, { kind: 'stealGold', amount: 20 }] },
-    { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }] },
+    { id: 'verdict', name: '审判', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }], hardActions: [{ kind: 'attack', amount: 17 }] },
     { id: 'ledger', name: '账本壁垒', intent: 'defend_debuff', actions: [{ kind: 'block', amount: 10 }, { kind: 'clearDebuffs' }, { kind: 'status', status: 'frail', amount: 2, target: 'player' }] },
     { id: 'escape', name: '携账逃跑', intent: 'escape', actions: [{ kind: 'escape' }] },
   ],
@@ -415,9 +416,9 @@ def({
   sprite: 'beast',
   description: '胸腔里烧着一团火。咆哮时增长力量并削弱你，随后撕裂、吞噬；每轮咆哮都是反攻窗口。',
   moves: [
-    { id: 'roar', name: '咆哮', intent: 'debuff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
+    { id: 'roar', name: '咆哮', intent: 'debuff', actions: [{ kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }], hardActions: [{ kind: 'status', status: 'strength', amount: 2, target: 'self' }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }] },
     { id: 'rend', name: '撕裂', intent: 'attack', actions: [{ kind: 'attack', amount: 7, times: 2 }] },
-    { id: 'devour', name: '吞噬', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }, { kind: 'heal', amount: 4 }] },
+    { id: 'devour', name: '吞噬', intent: 'attack', actions: [{ kind: 'attack', amount: 14 }, { kind: 'heal', amount: 4 }], hardActions: [{ kind: 'attack', amount: 14 }, { kind: 'heal', amount: 6 }] },
   ],
   chooseMove: (ctx) => cycle(ctx, ['roar', 'rend', 'devour']),
 });
@@ -433,7 +434,7 @@ def({
   moves: [
     { id: 'toll', name: '钟鸣', intent: 'attack_debuff', actions: [{ kind: 'attack', amount: 5 }, { kind: 'status', status: 'weak', amount: 1, target: 'player' }, { kind: 'status', status: 'frail', amount: 1, target: 'player' }] },
     { id: 'pendulum', name: '摆锤', intent: 'attack', actions: [{ kind: 'attack', amount: 11 }] },
-    { id: 'gears', name: '齿轮壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }] },
+    { id: 'gears', name: '齿轮壁垒', intent: 'defend_buff', actions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }], hardActions: [{ kind: 'block', amount: 14 }, { kind: 'status', status: 'strength', amount: 2, target: 'self' }] },
     {
       id: 'overdrive',
       name: '失控',
@@ -443,7 +444,7 @@ def({
         { kind: 'status', status: 'strength', amount: 1, target: 'self' },
         { kind: 'block', amount: 12 },
         { kind: 'addCardToDiscard', cardId: 'ashes', count: 2 },
-      ],
+      ], hardActions: [{ kind: 'clearDebuffs' }, { kind: 'status', status: 'strength', amount: 1, target: 'self' }, { kind: 'block', amount: 12 }, { kind: 'addCardToDraw', cardId: 'ashes', count: 2 }],
     },
     { id: 'shatter', name: '碎钟', intent: 'attack', actions: [{ kind: 'attack', amount: 16 }] },
     { id: 'flurry', name: '钟锤连击', intent: 'attack', actions: [{ kind: 'attack', amount: 3, times: 4 }] },

@@ -34,12 +34,12 @@ describe('偷钱怪逃跑', () => {
       let cs = battle(['looter'], `LOOTER-ORDER-${seed}`);
       const moves: string[] = [];
       for (let turn = 0; turn < 7; turn++) {
-        moves.push(cs.enemies[0].moveId);
+        moves.push(cs.enemies[0].moveId ?? '');
         cs = endPlayerTurn(cs).state; cs = enemyAct(cs, 'e0').state; cs = startPlayerTurn(cs).state;
       }
       expect(moves).toEqual(['lunge', 'steal', 'flurry', 'steal', 'lunge', 'steal', 'flurry']);
       expect(stolenGold(cs)).toBe(36);
-      later.add(cs.enemies[0].moveId);
+      later.add(cs.enemies[0].moveId ?? '');
     }
     expect([...later].sort()).toEqual(['escape', 'flurry', 'lunge', 'steal']);
   });

@@ -454,6 +454,7 @@ export function enemyIntentExtras(cs: CombatState, e: EnemyState): string[] {
     if (a.kind === 'status') return [`${a.target === 'player' ? '施加' : a.target === 'allies' ? '全体' : ''}${STATUSES[a.status].name} ${a.amount}`];
     if (a.kind === 'addCardToDraw' || a.kind === 'addCardToDiscard') return [`${CARDS[a.cardId].name} ×${a.count} → ${a.kind === 'addCardToDraw' ? '抽牌堆' : '弃牌堆'}`];
     if (a.kind === 'healWeakest') return [`治疗最弱友方 ${a.amount}`];
+    if (a.kind === 'heal') return [`治疗 ${a.amount}`];
     return [];
   });
 }
